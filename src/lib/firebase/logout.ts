@@ -1,17 +1,18 @@
 import { cookies } from "next/headers";
 import { auth } from "../../../firebase"; 
 import { signOut } from "firebase/auth";
+import { database } from "../../../firebase";
+import { ref, remove } from "firebase/database";
 
-const handleLogout = async () => {
+const handleLogout = async (sessionId: string) => {
 try {
     // Firebase sign out
-    await signOut(auth); 
-
-    // Clear the authentication cookies
-    const cookieStore = await cookies();
-    cookieStore.delete("token");
-    cookieStore.delete("start");
-
+    console.log("sessionID at handleLogout", sessionId);
+    await signOut(auth);
+    const dbRef = ref(database, `session/${sessionId}`);
+    await remove(dbRef);
+    const dbRef2 = ref(database, `sessionId/${sessionId}`);
+    await remove(dbRef2);
     console.log("✅ User logged out");
     
     return {status: 200, message: "User logged out"};

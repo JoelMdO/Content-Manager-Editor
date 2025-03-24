@@ -6,9 +6,9 @@ import { NextResponse } from "next/server";
 import admin from "firebase-admin";
 
 
-export const authenticateUser = async (token: string): Promise<{ status: number; message: string; userId?: string }> => {
+export const authenticateUser = async (user: string): Promise<{ status: number; message: string; userId?: string }> => {
 
-    const cookiesAuth = await cookies();
+    // const cookiesAuth = await cookies();
     // Check if user is signed in via cookie
     // const isSignedIn = cookiesAuth.get("start")?.value;
     // console.log("Cookies at setAuthListener:", isSignedIn);  // Log cookie value
@@ -22,21 +22,22 @@ export const authenticateUser = async (token: string): Promise<{ status: number;
     // Check if Token still valid
     // console.log("user signed in", isSignedIn, "token", localStorage.getItem("token"));
     // const token = cookiesAuth.get("token")?.value;
-    console.log("token at auth listener", token)
-    if (!token) {
-        console.error("🚨 Token is missing.");
-        return { status: 401, message: "User not authenticated. Token is missing." };
-    } else {
-        const decodedToken = await admin.auth().verifyIdToken(token);
-        const userId = decodedToken.uid;
-    if (userId){
-        console.log("userID = yes");
-        return {status: 200, message: userId};
-    } else {
-    // Refresh token
-    console.log("Refreshing token");
+    // console.log("token at auth listener", token)
+    // if (!token) {
+    //     console.error("🚨 Token is missing.");
+    //     return { status: 401, message: "User not authenticated. Token is missing." };
+    // } else {
+    //     const decodedToken = await admin.auth().verifyIdToken(token);
+    //     const userId = decodedToken.uid;
+    // if (userId){
+    //     console.log("userID = yes");
+    //     return {status: 200, message: userId};
+    // } else {
+    // // Refresh token
+    // console.log("Refreshing token");
     return new Promise((resolve, reject) => {
         onAuthStateChanged(auth, async (user) => {
+            console.log("User at setAuthListener", user);
         if (user) {
             try {
                 // Get fresh token
@@ -44,7 +45,7 @@ export const authenticateUser = async (token: string): Promise<{ status: number;
                 const decodedToken = await admin.auth().verifyIdToken(newToken);
                 const userId = decodedToken.uid;
                 if (userId){
-                    resolve({status: 200, message: userId});
+                    resolve({status: 200, message: newToken});
                 }
             } catch (error) {
                 console.error("Failed to refresh token:", error);
@@ -52,4 +53,4 @@ export const authenticateUser = async (token: string): Promise<{ status: number;
             }
         }
     });
-})};}};
+})};

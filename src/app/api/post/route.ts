@@ -10,26 +10,26 @@ import { cookies } from "next/headers";
 export async function POST(req: Request): Promise<Response> {
     //
     console.log('At api post');
-    let docId: string = "";
+    // let docId: string = "";
     // Array to store image URLs
     const imageUrls: { url: string }[] = [];
     const formData = await req.formData();
     console.log('formData at api post', formData);
-    let userKey: string = "";
-    let token: string = "";
-    const serviceAccount = {
-        "type": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_type,
-        "project_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_project_id,
-        "private_key_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_private_key_id,
-        "private_key": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_private_key?.replace(/\\n/g, "\n"),
-        "client_email": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_email,
-        "client_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_id,
-        "auth_uri": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_auth_uri,
-        "token_uri": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_token_uri,
-        "auth_provider_x509_cert_url": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_auth_provider_x509_cert_url,
-        "client_x509_cert_url": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_x509_cert_url,
-        "universe_domain": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_universe_domain
-    }
+    // let userKey: string = "";
+    // let token: string = "";
+    // const serviceAccount = {
+    //     "type": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_type,
+    //     "project_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_project_id,
+    //     "private_key_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_private_key_id,
+    //     "private_key": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_private_key?.replace(/\\n/g, "\n"),
+    //     "client_email": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_email,
+    //     "client_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_id,
+    //     "auth_uri": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_auth_uri,
+    //     "token_uri": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_token_uri,
+    //     "auth_provider_x509_cert_url": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_auth_provider_x509_cert_url,
+    //     "client_x509_cert_url": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_x509_cert_url,
+    //     "universe_domain": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_universe_domain
+    // }
     //
     console.log("project_id", process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_project_id);
     interface Article{

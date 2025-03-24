@@ -19,8 +19,9 @@ const Login: React.FC = () => {
             return;
         }
         successAlert("auth", response.message);
+        const sessionId = response.sessionId;
+        sessionStorage.setItem("sessionId", sessionId);
         window.location.href = "/dashboard";
-        // router.replace("/dashboard"); // Redirect to dashboard
     };
 
     return (

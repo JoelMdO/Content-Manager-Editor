@@ -86,7 +86,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                                 console.log("url", url);                                
                                 if (response.status === 200) {
                                 successAlert("saved");
-                                } else if (response.message === "User not authenticated"){
+                                } else if (response.message === "User not authenticated" || response.status === 401) {
                                     errorAlert("saved", "nonauth", response.message);
                                     //Redirect the user to login page
                                     console.log('redirecting to login page');

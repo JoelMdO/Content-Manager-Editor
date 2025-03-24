@@ -1,7 +1,6 @@
 'server-only';
-import {cookies} from "next/headers";
 import { NextResponse } from "next/server";
-import forwardResponseWithCookie from "./forward_cookie";
+import sessionCheck from "./authentication/session_check";
 
 const apiRoutes = async (postData: any): Promise<any> => {
     const {data, type} = postData;  
@@ -12,51 +11,38 @@ const apiRoutes = async (postData: any): Promise<any> => {
     let body: string | FormData = new FormData();
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
-    // const cookie = await cookies();
-    // console.log("cookies at api routes", cookie.getAll());
     //
     try{
     switch(type){
+        //## SANITIZE LINK
         case "clean-link":
             endPoint = "sanitize";
             body = JSON.stringify(data);
             headers["Content-Type"] = "application/json";
         break;
+        //## SANITIZE IMAGE
         case "clean-image":
             endPoint = "sanitize";
             body.append('file', data);
         break;
+        //## POST
         case "post":
             endPoint = type;
-            // Get token from cookies
-            const cookieStore = await cookies();
-            let token = cookieStore.get("token")?.value;
-            const start = cookieStore.get("start")?.value;
-            console.log('token at apiRoutes', token, 'start at apiRoutes', start);
-            if (!token) {
-                console.log("Token missing, reauthenticating...");
-                const authResponse = await fetch(`${url}/api/auth`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ reauth: true }), // Pass a flag to reauthenticate
-                    credentials: "include", // Include cookies in the request
-                });
-                console.log("authResponse at apiRoutes", authResponse)
-                const authJson = await authResponse.json();
-                console.log("authJson after reauthenticate at apiRoutes", authJson)
-                if (authJson.status !== 200) {
+            ///-----------------------------------------------
+            /// Verify sessionId if its valid through the sessionCheck function
+            ///-----------------------------------------------
+            const sessionId = data.get("session");
+            console.log("session at apiRoutes", sessionId);
+            const response = await sessionCheck(sessionId);
+                console.log("authJson after reauthenticate at apiRoutes", response)
+                if (response.status !== 200) {
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                 }
-                const userId = authJson.message;
-                body.append('userId', userId!);
-                console.log("Reauthenticated, new userId:", userId);
-            }
-                // return NextResponse.json({
-            //     status: 401,
-            //     message: "Authentication required"
-            // }, { status: 401 });
+                body.append('userId', response.user!);
+                console.log("Reauthenticated, new userId:", response.user!);
+            ///-----------------------------------------------
+            /// Check if data is already FormData
+            ///-----------------------------------------------
                 if (data instanceof FormData) {
                     console.log('data is formdata');
                     body = data;
@@ -65,22 +51,24 @@ const apiRoutes = async (postData: any): Promise<any> => {
                     console.log('data is not formdata');
                     body = new FormData();
                     for (const key in data) {
-                        if (data.hasOwnProperty(key)) {
+                        if (data.hasOwnProperty(key && key != "session")) {
                             body.append(key, data[key]);
                         }
                     }
                 }
             credentials = "include";
         break;
+        //## AUTH
         case "auth":
             endPoint = "auth";
             body = JSON.stringify(data);
             headers["Content-Type"] = "application/json";
             credentials = "include";
         break;
+        //## LOGOUT
         case "logout":
             endPoint = "logout";
-            body = "";
+            body = JSON.stringify(data);
             headers["Content-Type"] = "application/json";
             credentials = "include";
         break;      
@@ -88,7 +76,9 @@ const apiRoutes = async (postData: any): Promise<any> => {
             console.log('type not found');
             return {status: 205, message: "type not found"};
     }
-    // Call the API
+    ///-----------------------------------------------
+    /// Call the API
+    ///-----------------------------------------------
         console.log(`called ${endPoint}`);
         console.log('headers', headers);
         const response = await fetch(`${url}/api/${endPoint}`, {
@@ -97,16 +87,20 @@ const apiRoutes = async (postData: any): Promise<any> => {
             headers: headers,
             credentials: credentials
         });
+        console.log("response at apiRoutes before json", response);
         // Wait for the JSON response
         const jsonResponse = await response.json();
-        console.log(`response at api routes from ${type}`, {status: jsonResponse.status, message: jsonResponse.message});
-        ///-----------------------------------------------------------------------------
-        ///When the user has been authenticated, to forward the cookies. 
-        ///-----------------------------------------------------------------------------
-        if (jsonResponse.message === "User authenticated"){
-            return forwardResponseWithCookie(jsonResponse);
+        ///-----------------------------------------------
+        /// From api/auth return the sessionId.
+        ///-----------------------------------------------
+        console.log("jsonResponse at apiRoutes", jsonResponse);
+        if(jsonResponse.message === "User authenticated"){
+            const sessionId = jsonResponse.session;
+            console.log("Authenticated sessionId:", sessionId);
+            return NextResponse.json({ status: jsonResponse.status, message: "User authenticated", sessionId: sessionId });
         } else {
-            return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
+        console.log(`response at api routes from ${type}`, {status: jsonResponse.status, message: jsonResponse.message});
+        return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
         }
     } catch (error) {    
     console.error(error);
