@@ -20,6 +20,7 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         const token = await user.getIdToken();
         if(!token){
                 console.log("No Token:");
+                return {status: 400, message: "Authentication failed"};
         }console.log("Token:", token);
         //--------------------------------------------------------------------------------
         // Generate a session
@@ -27,12 +28,16 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         const session = await generateSession(token);
         console.log("Session:", session);
         if(session.status === 400){
-        response = NextResponse.json({status: 400, message: session.message});
-        return response;
+        return NextResponse.json({status: 400, message: session.message});
         }
+        // Send a 200 response immediately
+        const response = NextResponse.json({ status: 200, message: "User authenticated", sessionId: session.sessionId});
+        console.log("response at firebase auth", response);
+        console.log("User signed in successfully");
         //--------------------------------------------------------------------------------
         // Store the session
         //--------------------------------------------------------------------------------
+        (async () => {
         console.log("session.user", session.user);
         const dbRef = ref(database, `session/${session.user}`);  
         await update(dbRef, {session, "sessionID": session.sessionId});
@@ -42,6 +47,8 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         const dbRef2 = ref(database, `sessionId/${session.sessionId}`);  
         await update(dbRef2, {"sessionPlate": session.sessionPlate});
         //--------------------------------------------------------------------------------
+        console.log("Background tasks completed successfully.");
+        })();
         // set a response to send the cookies:
         // response = NextResponse.json({status: 200, message: "User authenticated"});
         // Store token in httpOnly cookie (secure)
@@ -64,9 +71,7 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         //         maxAge: 60 * 60,  // 1 hour
         //         priority: "high"
         // });
-        console.log("response at firebase auth", response);
-        console.log("User signed in successfully");
-        return {status: 200, message: "User authenticated", sessionId: session.sessionId};
+        return response;  
         } catch(e){
         console.log("response at firebase auth", e);
         return{status: 400, message: e};

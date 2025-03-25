@@ -9,14 +9,15 @@ const getSessionId = async (sessionId: string) => {
     if (snapshot.exists()) {
         const sessionData = snapshot.val();
         console.log("Session data:", sessionData);
-        return snapshot.exists(); // Return the session data
+        console.log("Session Plate at session data:", sessionData.sessionPlate);
+        return {status: snapshot.exists(), message: sessionData.sessionPlate}; // Return the session data
     } else {
         console.log("No session data found for this user.");
-        return false;
+        return {status: snapshot.exists(), message: "No session data found for this user."};
     }
     } catch (error) {
     console.error("Error getting session data:", error);
-    return false;
+    return {status: false, message: error};
     }
 }
 

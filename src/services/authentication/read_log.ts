@@ -1,9 +1,12 @@
 const readLog = (session: String) =>{
+    //
+    console.log("Session at Readlog:", session)
+    //
     const crypto = require('crypto');
     const buffer = Buffer.from(session, 'base64');
     const saltLength = Number(process.env.NEXT_PUBLIC_saltLength);
     const ivLength = Number(process.env.NEXT_PUBLIC_ivLength);
-     const tagLength = Number(process.env.NEXT_PUBLIC_tagLength);
+    const tagLength = Number(process.env.NEXT_PUBLIC_tagLength);
     console.log("saltLength", saltLength, "ivLength", ivLength, "tagLength", tagLength);
     //
     if (buffer.length < saltLength + ivLength) {
@@ -40,6 +43,7 @@ const readLog = (session: String) =>{
     decipher.setAuthTag(tag); 
     let decrypted = decipher.update(encryptedData, 'binary', 'utf8');
     decrypted += decipher.final('utf8'); // Complete the decryption
+    console.log("Decrypted at ReadLog:", decrypted);
     return decrypted;
 }
 

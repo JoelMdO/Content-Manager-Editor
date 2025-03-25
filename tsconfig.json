@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/slices/count_slice.js", "src/app/store.ts", "src/slices/image_slice.ts", "test/button.test.jsx", "src/services/handle_image.js", "firebase.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/slices/count_slice.js", "src/app/store.ts", "src/slices/image_slice.ts", "test/button.test.jsx", "src/services/handle_image.js", "firebase.js", "test/decript_test.js"],
   "exclude": ["node_modules"]
 }

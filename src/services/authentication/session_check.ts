@@ -11,6 +11,7 @@ async function sessionCheck(sessionId: string) : Promise<{status: number; messag
     //==================================================
     // Check the session ID if same on the database
     //==================================================
+    console.log("sessionId", sessionId);
     if(sessionId){
     const hashedSessionIdDB = await getSessionId(sessionId);
     console.log("hashedSessionIdDB", hashedSessionIdDB);
@@ -19,13 +20,11 @@ async function sessionCheck(sessionId: string) : Promise<{status: number; messag
     // if sessionId matches, obtain the sessionPlate
     // with userId.
     //==================================================
-    const sessionPlate = await getSessionBySessionId(sessionId, "plate");
-    console.log("sessionPlate", sessionPlate);
-    console.log("sessionPlate.sessionId", sessionPlate.sessionId);
-    const userId = readLog(sessionPlate.sessionId);
+    console.log("sessionPlate", hashedSessionIdDB.message);
+    const userId = readLog(hashedSessionIdDB.message);
     console.log('Decrypted Data userId:', userId);
     //==================================================
-    // if sessionId matches, obtain the session and 
+    // if sessionId matches, obtain the session and
     // decrypt the token
     //==================================================
     const session = await getSessionBySessionId(userId);
