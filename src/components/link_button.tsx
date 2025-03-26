@@ -37,9 +37,9 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
                     dialogRef.current?.showModal()}>
             <Image src="/link.png" className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt="uploaded-image"/>Paste Link
             </button>
-            <dialog ref={dialogRef} className="modal bg-blue w-[30%] h-[20%] rounded shadow-lg ">
+            <dialog ref={dialogRef} className="modal bg-blue md:w-[30%] w-[60%] h-[20%] rounded shadow-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <form method="dialog" className="modal-box flex flex-col justify-center items-center">
-                <h3 className="pt-2 pb-2 font-bold text-white text-lg text-center    ">Add Link</h3>
+                <h3 className="pt-2 pb-2 font-bold text-white text-lg text-center">Add Link</h3>
                 <input ref={linkInputRef}
                     type="text"
                     className="input input-bordered border-green w-[90%] h-[40px]"
