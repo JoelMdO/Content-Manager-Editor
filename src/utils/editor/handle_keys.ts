@@ -1,4 +1,4 @@
-import deleteImageFromIndexDB from "./delete_img_from_indexdb";
+import deleteImageFromIndexDB from "../images_edit/delete_img_from_indexdb";
 
 
 export const handleKeyBoardActions = (

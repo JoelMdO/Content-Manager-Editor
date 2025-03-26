@@ -1,14 +1,20 @@
-import { credential } from "firebase-admin";
-import createFormData from "./create_formData";
-import forwardResponseWithCookie from "./forward_cookie";
+import createFormData from "../../utils/images_edit/create_formData";
 
 const callHub = async (type: string, data?: any) : Promise<any> => {
+    ///=============================================================
+    /// Function to orchestrate the api endpoints as hub.
+    ///=============================================================
     console.log('data at call hub', data);
     console.log('type at call hub', type);
     let body: FormData | string = new FormData(); 
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
     //
+    ///-----------------------------------------------
+    /// Build the body of the request as each one it has
+    /// different structure. 
+    //  Once done it will redirect to the hub.
+    ///-----------------------------------------------
     switch(type){
         ///## SANITIZE IMAGE
         case "clean-image": 

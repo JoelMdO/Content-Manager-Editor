@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 import { useSelector } from "react-redux";
 import Image from "next/image";
-import callHub from "@/services/call_hub";
-import successAlert from "./alerts/sucess";
-import errorAlert from "./alerts/error";
+import successAlert from "../alerts/sucess";
+import errorAlert from "../alerts/error";
 import { useRouter } from "next/navigation";
+import saveButtonClicked from "@/utils/buttons/save_button_clicked";
+import emailMe from "@/utils/buttons/email_me";
 
 interface ButtonProps {
     type: string;
@@ -13,39 +14,20 @@ interface ButtonProps {
 //
 const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
     //
-    // Ensure safe access to editorRefs
-    // variables.
+    // Variables.
     let text: string, color: string, hover_color: string, icon: string;
     let position: string;
-    let articleContent: any[] = [];
     const url = process.env.NEXT_PUBLIC_url_api;
     const router = useRouter();
     // States
     const [isClicked, setIsClicked] = useState(false);
     const [loading, setLoading] = useState(false);
-    // retrieve Image from Redux
+    // Retrieve text styles from Redux for saving on saveButtonClicked
     const italic = useSelector((state: any) => state.data_state?.fontStyle);
     const bold = useSelector((state: any) => state.data_state?.fontWeight);
     console.log('italic', italic);
     console.log('bold', bold);
-
-    //
     console.log(`Button ${type}`);
-    //
-    const saveButtonClicked = async () => {
-        console.log('saveButtonClicked', saveButtonClicked);
-        console.log('italic on click', italic);
-        console.log('bold on click', bold);
-        articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-        articleContent.push(
-            {type: "italic", content: italic},
-            {type: "bold", content: bold});
-        const response = await callHub("post", articleContent);
-        console.log('response at saveButtonClicked after callHub', response);
-        console.log('response status', response.status);
-            return response;
-        //}
-    };
     //
     //
     switch (type) {
@@ -55,7 +37,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
         hover_color= "bg-green-light";
         icon='/inbox.png';
         position='';
-        break;  
+        break;
         default:
         text = "Clear";
         hover_color= "bg-green";
@@ -79,9 +61,9 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                             setIsClicked(false);
                             setLoading(true);
                         if(type === "post"){
-                            saveButtonClicked()
-                            .then((response) => {
-                                
+                            ///For Posting the article
+                            saveButtonClicked(italic, bold)
+                            .then((response) => {    
                                 console.log('Response status:', response.status);
                                 console.log('Response message:', response.message);
                                 console.log("url", url);                                
@@ -102,8 +84,11 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                             }).catch((error) => {
                                 errorAlert("saved", "error", error);
                             })
+                        }if (type === "logo"){
+                            ///To connect with me on Logo click
+                            emailMe();
                         } else {
-                            //TODO clear function
+                            ///No action as clear function is on dashboard/page.tsx
                         }
                         }, 1000);}}   >
                         <Image src={icon} style={{display:isClicked? "none" :"block"}} className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt={`${text}-icon`}/>{isClicked? "Posting" : `${text}`}

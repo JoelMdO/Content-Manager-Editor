@@ -1,6 +1,6 @@
 import { link } from "fs";
-import callHub from "./call_hub";
-import { AppDispatch } from "./store";
+import callHub from "../api/call_hub";
+import { AppDispatch } from "../store";
 import linkWrapperHtml from "@/utils/wrapper_html";
 
 

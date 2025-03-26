@@ -1,9 +1,6 @@
-import { cookies } from "next/headers";
-import apiRoutes  from "../../../services/api_routes";
+import apiRoutes  from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
-import forwardResponseWithCookie from "@/services/forward_cookie";
 // import { supabase } from "../../../lib/supabase_client";
-// import { url } from "inspector";
 export async function POST(req: Request): Promise<any> {
     //
     let postData: string | File | {} = "";

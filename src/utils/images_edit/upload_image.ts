@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
-import { AppDispatch } from "./store";
-import callHub from "./call_hub";
+import { AppDispatch } from "../store";
+import callHub from "../api/call_hub";
 import saveImageTemporally from "./save_img_temp";
 //
 interface TrackedImage {

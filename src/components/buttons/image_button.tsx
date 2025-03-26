@@ -1,10 +1,10 @@
 import React, {ChangeEvent, useEffect, useRef, useState} from "react";
-import uploadImage from "../services/upload_image";
-import { AppDispatch } from "../services/store";
+import uploadImage from "../../utils/images_edit/upload_image";
+import { AppDispatch } from "../../services/store";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
-import successAlert from "./alerts/sucess";
-import errorAlert from "./alerts/error";
+import successAlert from "../alerts/sucess";
+import errorAlert from "../alerts/error";
 
 interface ButtonProps {
     editorRefs?: React.RefObject<(HTMLDivElement | null)[]>;

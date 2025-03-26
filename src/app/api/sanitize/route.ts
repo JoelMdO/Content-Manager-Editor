@@ -1,4 +1,4 @@
-import { sanitizeData, sanitizeFile } from "@/services/sanitize";
+import { sanitizeData, sanitizeFile } from "@/utils/editor/sanitize";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request): Promise<Response> {

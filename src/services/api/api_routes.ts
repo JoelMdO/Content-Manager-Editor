@@ -1,11 +1,13 @@
 'server-only';
 import { NextResponse } from "next/server";
-import sessionCheck from "./authentication/session_check";
+import sessionCheck from "../authentication/session_check";
 
 const apiRoutes = async (postData: any): Promise<any> => {
+    ///=============================================================
+    /// Function to redirect the api endpoints, includes the fecthing
+    ///=============================================================
     const {data, type} = postData;  
     console.log('data at apiRoutes', data, 'type at apiRoutes', type);
-
     const url = process.env.NEXT_PUBLIC_url_api; //TODO change env file with url on deployment.
     let endPoint: string = "";
     let body: string | FormData = new FormData();
@@ -13,6 +15,9 @@ const apiRoutes = async (postData: any): Promise<any> => {
     let credentials: RequestCredentials = "omit";
     //
     try{
+    ///-----------------------------------------------
+    /// Api endpoints, per type.
+    ///-----------------------------------------------
     switch(type){
         //## SANITIZE LINK
         case "clean-link":
@@ -79,7 +84,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
             return {status: 205, message: "type not found"};
     }
     ///-----------------------------------------------
-    /// Call the API
+    /// Call the corresponding API endpoint
     ///-----------------------------------------------
         console.log(`called ${endPoint}`);
         console.log('headers', headers);

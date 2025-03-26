@@ -1,18 +1,20 @@
 'use client'
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { handleKeyBoardActions } from "../../services/handle_keys";
+import { handleKeyBoardActions } from "../../services/editor/handle_keys";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../services/store";
 import { createArticleID } from "@/utils/create_id";
 import dynamic from "next/dynamic";
-import { debounce } from "lodash";
-import LogOutButton from "@/components/logout_buttons";
-import deleteImageFromIndexDB from "@/services/delete_img_from_indexdb";
+import { handleClear } from "@/utils/dashboard/handler_clear";
+import { handleSave } from "@/utils/dashboard/handle_save"; 
+import LogOutButton from "@/components/buttons/logout_buttons";
+import { debouncedUpdateStore } from "@/utils/dashboard/debounceUpdateStore";
+import { handleContentChange } from "@/utils/dashboard/handle_content_change";
 
-const ImageButton = dynamic(() => import("../../components/image_button"), { ssr: false });
-const LinkButton = dynamic(() => import("../../components/link_button"), { ssr: false });
-const FontStyleUI = dynamic(() => import("../../components/font_style_ui"), { ssr: false });
-const CustomButton = dynamic(() => import("../../components/custom_buttons"), { ssr: false });
+const ImageButton = dynamic(() => import("../../components/buttons/image_button"), { ssr: false });
+const LinkButton = dynamic(() => import("../../components/buttons/link_button"), { ssr: false });
+const FontStyleUI = dynamic(() => import("../../components/buttons/font_style_buttons"), { ssr: false });
+const CustomButton = dynamic(() => import("../../components/buttons/custom_buttons"), { ssr: false });
 
 const ArticlePage: React.FC = () => {
   //
@@ -26,8 +28,11 @@ const ArticlePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   console.log('page'); 
   const pageRef = useRef(null);
+  //
+  ///======================================================
   // Check if an article is already created on page load
   // Store articleID in a ref to persist across renders
+  ///======================================================
   const articleIDRef = useRef<string>("");
   const previousArticleID = useSelector((state: any) => state.data_state?.id);
   // Create article ID only once when component mounts
@@ -52,97 +57,100 @@ const ArticlePage: React.FC = () => {
     sessionStorage.removeItem("tempTitle");
     sessionStorage.removeItem("tempBody");
   }, [dispatch, previousArticleID]);
+
+  ///========================================================
   // Update the store with the Title and Body of the article
   // Debounced store update function
-  const debouncedUpdateStore = useCallback(
-    debounce((newTitle: string, newBody: string) => {
-      if (!articleIDRef.current) return;
-      console.log('debounce Called');
-      let title = newTitle.split(" ").slice(0, 2).join("-");
-      let id = `${title}-${articleIDRef.current}`;
-      // Remove previous body content before adding the new one
-      let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-      if (newTitle !== "") {
-        console.log('newTitle at debounce', newTitle);
-        console.log('id at debounce', id);
-        // Ensure only the latest title and id
-        articleContent = articleContent.filter((item: { type: string}) => item.type !== "title" && item.type !== "id"); 
-        // Add text to articleContent
-        articleContent.push({
-            type: "title",
-            content: title,
-        });
-        articleContent.push({
-          type: "id",
-          content: id,
-      });
-      }
-
-
-      if (newBody !== "") {
-        console.log('newBody at debounce', newBody);
-        // Ensure only the latest body
-        articleContent = articleContent.filter((item: { type: string }) => item.type !== "body");
-        // Add text to articleContent
-        articleContent.push({
-          type: "body",
-          content: newBody,
-        });
-      sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
-      const storedContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-      console.log("Updated articleContent:", storedContent);
-      }
-    }, 500), // Wait 500ms after last change before updating store
-    []
-  );
+  ///========================================================
+  // const debouncedUpdateStore = useCallback( 
+  //   debounce((newTitle: string, newBody: string) => {
+  //     if (!articleIDRef.current) return;
+  //     console.log('debounce Called');
+  //     let title = newTitle.split(" ").slice(0, 2).join("-");
+  //     let id = `${title}-${articleIDRef.current}`;
+  //     //----------------------------------------------------
+  //     // Remove previous Title and Body content before adding the new one
+  //     //----------------------------------------------------
+  //     let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
+  //     if (newTitle !== "") {
+  //       console.log('newTitle at debounce', newTitle);
+  //       console.log('id at debounce', id);
+  //       // Ensure only the latest title and id
+  //       articleContent = articleContent.filter((item: { type: string}) => item.type !== "title" && item.type !== "id"); 
+  //       // Add text to articleContent
+  //       articleContent.push({
+  //           type: "title",
+  //           content: title,
+  //       });
+  //       articleContent.push({
+  //         type: "id",
+  //         content: id,
+  //     });
+  //     }
+  //     if (newBody !== "") {
+  //       console.log('newBody at debounce', newBody);
+  //       // Ensure only the latest body
+  //       articleContent = articleContent.filter((item: { type: string }) => item.type !== "body");
+  //       // Add text to articleContent
+  //       articleContent.push({
+  //         type: "body",
+  //         content: newBody,
+  //       });
+  //     sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
+  //     const storedContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
+  //     console.log("Updated articleContent:", storedContent);
+  //     }
+  //   }, 500), // Wait 500ms after last change before updating store
+  //   []
+  // );
 
   // Handle content changes
-  const handleContentChange = (index: number, content: string) => {
-    console.log('handleContentChange Called');
-    //
-    if (index === 0) { // Title
-      setIsTitle(false);
-      setTheTitle(content);
-      sessionStorage.setItem("tempTitle", content);
-      // Get the last title content
-      debouncedUpdateStore(content, theBody);
-    } else { // Article
-      setIsArticle(false);
-      setTheBody(content);
-      sessionStorage.setItem("tempBody", content);
-      // Get the last body content
-      debouncedUpdateStore(theTitle, content); 
-      }
-  };
+  // const handleContentChange = (index: number, content: string) => {
+  //   console.log('handleContentChange Called');
+  //   //
+  //   if (index === 0) { // Title
+  //     setIsTitle(false);
+  //     setTheTitle(content);
+  //     sessionStorage.setItem("tempTitle", content);
+  //     // Get the last title content
+  //     debouncedUpdateStore(content, theBody);
+  //   } else { // Article
+  //     setIsArticle(false);
+  //     setTheBody(content);  
+  //     sessionStorage.setItem("tempBody", content);
+  //     // Get the last body content
+  //     debouncedUpdateStore(theTitle, content); 
+  //     }
+  // };
+  // //
+  // // Call debounce flush() on button click
+  // const handleSave = () => {
+  //   console.log('Button clicked, flushing debounce');
+  //   debouncedUpdateStore.flush(); // Immediately executes pending updates
+  // };
   //
-  // Call debounce flush() on button click
-  const handleSave = () => {
-    console.log('Button clicked, flushing debounce');
-    debouncedUpdateStore.flush(); // Immediately executes pending updates
-  };
-  //
-  const handleClear = () => {
-    // Clear title and body state
-    setTheTitle(""); 
-    setTheBody("");
-    // Remove the sesstion Storage after the page is mounted and if exist the article is created
-    sessionStorage.removeItem("tempTitle");
-    sessionStorage.removeItem("tempBody");
-    // Clear the content inside the contentEditable divs
-    editorRefs.current.forEach((ref) => {
-    if (ref) {
-      ref.innerText = "";
-    }
-    //Delete image from indexdb
-    deleteImageFromIndexDB(undefined, "clear-all").then((response: any) => {
-      if (response.status === 200) {
-      console.log(response.message);
-      }else{
-        console.log("no image", response.message)
-      }
-    });
-  });
-  }
+  // const handleClear = () => {
+  //   // Clear title and body state
+  //   setTheTitle(""); 
+  //   setTheBody("");
+  //   // Remove the sesstion Storage after the page is mounted and if exist the article is created
+  //   sessionStorage.removeItem("tempTitle");
+  //   sessionStorage.removeItem("tempBody");
+  //   // Clear the content inside the contentEditable divs
+  //   editorRefs.current.forEach((ref) => {
+  //   if (ref) {
+  //     ref.innerText = "";
+  //   }
+  //   //Delete image from indexdb
+  //   deleteImageFromIndexDB(undefined, "clear-all").then((response: any) => {
+  //     if (response.status === 200) {
+  //     console.log(response.message);
+  //     }else{
+  //       console.log("no image", response.message)
+  //     }
+  //   });
+  // });
+  // }
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
@@ -158,8 +166,8 @@ const ArticlePage: React.FC = () => {
         <ImageButton editorRefs={editorRefs} index={1}/>
         <LinkButton editorRefs={editorRefs} index={1} />
         <FontStyleUI/>
-        <CustomButton type='post' onClick={handleSave}/>
-        <CustomButton type='clear' onClick={handleClear}/>
+        <CustomButton type='post' onClick={() => handleSave(debouncedUpdateStore)}/>
+        <CustomButton type='clear' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/>
         <LogOutButton />
       </aside>
       {/* Menu Mobile*/}
@@ -168,9 +176,9 @@ const ArticlePage: React.FC = () => {
           <div className="flex flex-row space-x-2">
         <ImageButton editorRefs={editorRefs} index={1}/>
         <LinkButton editorRefs={editorRefs} index={1} /></div>
-        <CustomButton type='clear' onClick={handleClear}/></div>
+        <CustomButton type='clear' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/></div>
         <FontStyleUI/>
-        <CustomButton type='post' onClick={handleSave}/>
+        <CustomButton type='post' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/>
         <LogOutButton />
       </nav>
       {/* Main Content */}
@@ -191,7 +199,7 @@ const ArticlePage: React.FC = () => {
                   onFocus={() => index === 0 ? setPlaceHolderTitle(false) : setPlaceHolderArticle(false)}
                   onInput={(e) => {
                     const content = (e.target as HTMLDivElement).innerText;
-                    handleContentChange(index, content);
+                    handleContentChange(index, content, setIsTitle, setTheTitle, setIsArticle, setTheBody, debouncedUpdateStore);
                   }}
                 >
                   {(index === 0 ? isPlaceHolderTitle : isPlaceHolderArticle ) && 

@@ -1,5 +1,5 @@
 import {handleFontChange} from "../services/font_style"; 
-import { AppDispatch } from "../services/store";
+import { AppDispatch } from "../../services/store";
 import { useDispatch} from "react-redux";
 const FontStyleUI: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();

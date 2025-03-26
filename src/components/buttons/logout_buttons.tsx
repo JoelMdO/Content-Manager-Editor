@@ -1,8 +1,8 @@
 import React, {useState} from "react";
 import Image from "next/image";
-import callHub from "@/services/call_hub";
+import callHub from "../../services/api/call_hub";
 import { useRouter } from "next/navigation";
-import errorAlert from "./alerts/error";
+import errorAlert from "../alerts/error";
 
 //
 const LogOutButton: React.FC<any> = () => {
