@@ -8,11 +8,11 @@ const handleLogout = async (sessionId: string) => {
 try {
     // Firebase sign out
     console.log("sessionID at handleLogout", sessionId);
-    await signOut(auth);
     const dbRef = ref(database, `session/${sessionId}`);
     await remove(dbRef);
     const dbRef2 = ref(database, `sessionId/${sessionId}`);
     await remove(dbRef2);
+    await signOut(auth);
     console.log("✅ User logged out");
     
     return {status: 200, message: "User logged out"};

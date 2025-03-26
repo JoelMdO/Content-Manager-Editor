@@ -27,6 +27,7 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         //--------------------------------------------------------------------------------
         const session = await generateSession(token);
         console.log("Session:", session);
+        console.log("session user outside of genateSession", session.user);
         if(session.status === 400){
         return NextResponse.json({status: 400, message: session.message});
         }
@@ -38,16 +39,18 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         // Store the session
         //--------------------------------------------------------------------------------
         (async () => {
+        console.log("Background task started");
         console.log("session.user", session.user);
         const dbRef = ref(database, `session/${session.user}`);  
-        await update(dbRef, {session, "sessionID": session.sessionId});
+        update(dbRef, {session});
         //--------------------------------------------------------------------------------
         // Store the sessionId
         //--------------------------------------------------------------------------------
         const dbRef2 = ref(database, `sessionId/${session.sessionId}`);  
-        await update(dbRef2, {"sessionPlate": session.sessionPlate});
+        update(dbRef2, {"sessionPlate": session.sessionPlate});
         //--------------------------------------------------------------------------------
         console.log("Background tasks completed successfully.");
+        console.log("userID after first saving", session.user);
         })();
         // set a response to send the cookies:
         // response = NextResponse.json({status: 200, message: "User authenticated"});

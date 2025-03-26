@@ -6,8 +6,8 @@ import { AppDispatch } from "../../services/store";
 import { createArticleID } from "@/utils/create_id";
 import dynamic from "next/dynamic";
 import { debounce } from "lodash";
-import callHub from "@/services/call_hub";
 import LogOutButton from "@/components/logout_buttons";
+import deleteImageFromIndexDB from "@/services/delete_img_from_indexdb";
 
 const ImageButton = dynamic(() => import("../../components/image_button"), { ssr: false });
 const LinkButton = dynamic(() => import("../../components/link_button"), { ssr: false });
@@ -120,6 +120,29 @@ const ArticlePage: React.FC = () => {
     console.log('Button clicked, flushing debounce');
     debouncedUpdateStore.flush(); // Immediately executes pending updates
   };
+  //
+  const handleClear = () => {
+    // Clear title and body state
+    setTheTitle(""); 
+    setTheBody("");
+    // Remove the sesstion Storage after the page is mounted and if exist the article is created
+    sessionStorage.removeItem("tempTitle");
+    sessionStorage.removeItem("tempBody");
+    // Clear the content inside the contentEditable divs
+    editorRefs.current.forEach((ref) => {
+    if (ref) {
+      ref.innerText = "";
+    }
+    //Delete image from indexdb
+    deleteImageFromIndexDB(undefined, "clear-all").then((response: any) => {
+      if (response.status === 200) {
+      console.log(response.message);
+      }else{
+        console.log("no image", response.message)
+      }
+    });
+  });
+  }
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
@@ -136,12 +159,16 @@ const ArticlePage: React.FC = () => {
         <LinkButton editorRefs={editorRefs} index={1} />
         <FontStyleUI/>
         <CustomButton type='post' onClick={handleSave}/>
+        <CustomButton type='clear' onClick={handleClear}/>
         <LogOutButton />
       </aside>
       {/* Menu Mobile*/}
       <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row">
+        <div className="flex items-center flex-col">
+          <div className="flex flex-row space-x-2">
         <ImageButton editorRefs={editorRefs} index={1}/>
-        <LinkButton editorRefs={editorRefs} index={1} />
+        <LinkButton editorRefs={editorRefs} index={1} /></div>
+        <CustomButton type='clear' onClick={handleClear}/></div>
         <FontStyleUI/>
         <CustomButton type='post' onClick={handleSave}/>
         <LogOutButton />

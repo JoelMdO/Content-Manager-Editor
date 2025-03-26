@@ -32,8 +32,6 @@ const createLog= (token: any) =>  {
     encrypted_data,
     ]).toString('base64');
     //
-    const fullCiphertext = Buffer.concat([salt, iv, tag, encrypted_data]);
-    console.log("Final Encrypted Data Length:", fullCiphertext.length);
     console.log("iv", iv.length, "tag", tag.length, "encrypted_data", encrypted_data.length);
     console.log("log", log);
     //

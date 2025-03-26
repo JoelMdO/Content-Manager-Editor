@@ -1,4 +1,3 @@
-import { cp } from "fs";
 
 const getImageTemporally = async (fileName: string) => {
     return new Promise((resolve: any, reject: any) => {

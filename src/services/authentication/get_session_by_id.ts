@@ -10,7 +10,7 @@ async function getSessionBySessionId(sessionId: string, type?: string) {
   //   ""
   // } else {
     sessionIdRef = ref(database, `session/${sessionId}`);
-    console.log("Session found for no Plate:", sessionIdRef);
+    console.log("SessionIDRef found at getSessionBySessionId:", sessionIdRef);
   //}
 
   console.log(`Attempting to retrieve session for sessionId: ${sessionId} with type: ${type}`);
@@ -18,21 +18,36 @@ async function getSessionBySessionId(sessionId: string, type?: string) {
   try {
   
 
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (!user) {
-      console.error("User is not authenticated.");
-      return null;
-    }
-
-    const uid = user.uid;
-    console.log("Authenticated user UID:", uid);
+    // const auth = getAuth();
+    // const user = auth.currentUser;
+    // console.log("auth", auth);
+    // console.log("user", user);
+    // if (!user) {
+    //   console.error("User is not authenticated.");
+    // }
+    // // const uid = user.uid;
+    // // console.log("Authenticated user UID:", uid);
+    // if (user) {
+    //   const idTokenResult = await user.getIdTokenResult();
+    //   const expirationTime = new Date(idTokenResult.expirationTime);
+    //   console.log("Token expiration time:", expirationTime);
+    //   console.log("Authenticated user UID:", user.uid);
+    
+    //   if (expirationTime < new Date()) {
+    //     console.error("Authentication token has expired.");
+    //   }
+    // if (sessionId !== user.uid) {
+    //   console.error("Session ID does not match the authenticated user's UID.");
+    // }}
+    //
     const sessionIdSnapshot = await get(sessionIdRef);
 
     if (sessionIdSnapshot.exists()) {
       console.log("session found sessionPlate", sessionIdSnapshot.val());
-        return sessionIdSnapshot.val(); // Return the session data
+      const session = sessionIdSnapshot.val();
+      const log = session.session.session.log;
+      console.log("log", log);
+        return log; // Return the session data
       } else {
         console.log("No session data found for this userId.");
         return null;

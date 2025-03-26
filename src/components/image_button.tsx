@@ -47,7 +47,7 @@ const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
     return ( 
         <>
             <button
-                className={`h-[40px] w-[9em] ${saveButtonClicked ? "bg-cream" : "bg-blue"} hover:bg-green ${saveButtonClicked ? "text-black" : "text-white"} text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`}
+                className={`h-[40px] w-[9em] shadow-md shadow-black ${saveButtonClicked ? "bg-cream" : "bg-blue"} hover:bg-green ${saveButtonClicked ? "text-black" : "text-white"} text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`}
                 onClick={() => {
                     handleButtonClick();
                     }}>

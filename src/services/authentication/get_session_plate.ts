@@ -1,6 +1,6 @@
 import { database } from "../../../firebase";
 import { ref, get } from "firebase/database";
-const getSessionId = async (sessionId: string) => {
+const getSessionPlate = async (sessionId: string) => {
 
     const sessionRef = ref(database, `sessionId/${sessionId}`);
 
@@ -21,4 +21,4 @@ const getSessionId = async (sessionId: string) => {
     }
 }
 
-export default getSessionId;
+export default getSessionPlate;

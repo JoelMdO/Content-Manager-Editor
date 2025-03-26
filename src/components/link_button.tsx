@@ -32,7 +32,7 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
     return ( 
         <>
             <button
-                className={`h-[40px] w-[9em] bg-blue hover:bg-green text-white text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`} 
+                className={`h-[40px] w-[9em] shadow-md shadow-black bg-blue hover:bg-green text-white text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`} 
                 onClick={() => 
                     dialogRef.current?.showModal()}>
             <Image src="/link.png" className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt="uploaded-image"/>Paste Link

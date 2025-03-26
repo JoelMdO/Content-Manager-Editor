@@ -57,10 +57,10 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
         position='';
         break;  
         default:
-        text = "";
-        hover_color= "";
-        color = "";
-        icon='';
+        text = "Clear";
+        hover_color= "bg-green";
+        color = "bg-blue";
+        icon='/clear.png';
         position='';
         break;
         
@@ -78,26 +78,33 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                         setTimeout(() => {
                             setIsClicked(false);
                             setLoading(true);
+                        if(type === "post"){
                             saveButtonClicked()
                             .then((response) => {
-                                setLoading(false);
+                                
                                 console.log('Response status:', response.status);
                                 console.log('Response message:', response.message);
                                 console.log("url", url);                                
                                 if (response.status === 200) {
+                                setLoading(false);
                                 successAlert("saved");
                                 } else if (response.message === "User not authenticated" || response.status === 401) {
+                                    setLoading(false);
                                     errorAlert("saved", "nonauth", response.message);
                                     //Redirect the user to login page
                                     console.log('redirecting to login page');
                                         router.push(`${url}/`);
                                 } else {
+                                    setLoading(false);    
                                     console.log('at else');
                                 errorAlert("saved", "non200", response.message);
                                 }
                             }).catch((error) => {
                                 errorAlert("saved", "error", error);
                             })
+                        } else {
+                            //TODO clear function
+                        }
                         }, 1000);}}   >
                         <Image src={icon} style={{display:isClicked? "none" :"block"}} className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt={`${text}-icon`}/>{isClicked? "Posting" : `${text}`}
             </button>

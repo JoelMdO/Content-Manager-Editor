@@ -20,6 +20,7 @@ const Login: React.FC = () => {
         }
         successAlert("auth", response.message);
         const sessionId = response.sessionId;
+        console.log("sessionId at log page", sessionId);
         sessionStorage.setItem("sessionId", sessionId);
         window.location.href = "/dashboard";
     };

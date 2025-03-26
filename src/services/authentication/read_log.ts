@@ -1,4 +1,4 @@
-const readLog = (session: String) =>{
+const readLog = (session: string) =>{
     //
     console.log("Session at Readlog:", session)
     //
@@ -12,8 +12,6 @@ const readLog = (session: String) =>{
     if (buffer.length < saltLength + ivLength) {
         throw new Error(`Invalid buffer: Not enough data. Expected at least ${saltLength + ivLength} bytes but got ${buffer.length}`);
     }
-    console.log("Buffer (hex):", buffer.toString("hex"));
-    console.log("Buffer Length:", buffer.length);
     const minLength = saltLength + ivLength + tagLength;
     if (buffer.length < minLength) {
     throw new Error(`Invalid buffer: Expected at least ${minLength} bytes but got ${buffer.length}`);
@@ -24,7 +22,7 @@ const readLog = (session: String) =>{
     const iv = buffer.subarray(saltLength, saltLength + ivLength);
     const tag = buffer.subarray(saltLength + ivLength, saltLength + ivLength + tagLength);
     const encryptedData = buffer.subarray(saltLength + ivLength + tagLength);
-    console.log("salt", salt, "iv", iv, "tag", tag, "encryptedData", encryptedData);
+    console.log("salt", salt.length, "iv",iv.length);
     // Derive the key
     const masterKey = Buffer.from(process.env.NEXT_PUBLIC_secure_key!, 'base64'); // Your master key
     const key = crypto.pbkdf2Sync(
@@ -43,6 +41,7 @@ const readLog = (session: String) =>{
     decipher.setAuthTag(tag); 
     let decrypted = decipher.update(encryptedData, 'binary', 'utf8');
     decrypted += decipher.final('utf8'); // Complete the decryption
+    decrypted = decrypted.trim().replace(/\x00/g, '').replace(/[^\x20-\x7E]/g, '');
     console.log("Decrypted at ReadLog:", decrypted);
     return decrypted;
 }

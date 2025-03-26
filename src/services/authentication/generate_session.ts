@@ -41,12 +41,12 @@ async function generateSession(token: string) : Promise<any>{
     // Create a log for the session
     //==================================================
     const log = createLog(token);
+    console.log("listo el log", log);
     //==================================================    
     // Generate the session
     //==================================================
     const sessionId = uuidv4();
-    const sessions: Record<string, { log: any; createdAt: number; validUntil: number }> = {};
-    sessions[sessionId] = {
+    const body_session: Object = {
     log,
     createdAt: Date.now(),
     validUntil: Date.now() + (60 * 60 * 1000) // 1 hour
@@ -67,7 +67,8 @@ async function generateSession(token: string) : Promise<any>{
     // Store the session
     //==================================================
     console.log(`Session created: ${sessionId} for user log: ${log}`);
-    return {session: sessions, sessionId: hashedSessionId, user: user, sessionPlate: sessionPlate};
+    console.log("session.user before sending out form generateSession", user);
+    return {session: body_session, sessionId: hashedSessionId, user: user, sessionPlate: sessionPlate};
 }
 
 export default generateSession;

@@ -38,14 +38,15 @@ const apiRoutes = async (postData: any): Promise<any> => {
                 if (response.status !== 200) {
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                 }
-                body.append('userId', response.user!);
                 console.log("Reauthenticated, new userId:", response.user!);
             ///-----------------------------------------------
             /// Check if data is already FormData
             ///-----------------------------------------------
                 if (data instanceof FormData) {
                     console.log('data is formdata');
-                    body = data;
+                    data.append('userId', response.user!);
+                    data.delete('session');
+                    body=data;
                 } else {
                     // Convert data to FormData if it's not already
                     console.log('data is not formdata');
@@ -54,6 +55,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
                         if (data.hasOwnProperty(key && key != "session")) {
                             body.append(key, data[key]);
                         }
+                        body.append('userId', response.user!);
                     }
                 }
             credentials = "include";
@@ -81,6 +83,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
     ///-----------------------------------------------
         console.log(`called ${endPoint}`);
         console.log('headers', headers);
+        console.log('endpoint', `${url}/api/${endPoint}`);
         const response = await fetch(`${url}/api/${endPoint}`, {
             method: 'POST',
             body: body,
