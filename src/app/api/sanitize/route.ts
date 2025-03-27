@@ -2,20 +2,22 @@ import { sanitizeData, sanitizeFile } from "@/utils/editor/sanitize";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request): Promise<Response> {
+    ///----------------------------------------------------------------
+    ///Endpoint to sanitize the content before heading to the editor
+    ///----------------------------------------------------------------
     //
-    console.log('request at POST sanitize');
     let postData: string | File;
     let response: { status: number, message: string } = { status: 0, message: "" };
     const contentType = req.headers.get('Content-Type') || '';
 
+    ///Based on the contentType received its able to determine if there is a
+    ///file or not.
     try {
         if(contentType.includes("application/json")){
             postData = await req.json();
-            console.log('postData at sanitize', postData);
             response = await sanitizeData(postData);
             
         } else {
-            console.log('checking image at POST sanitize');
             const formData = await req.formData();
             const file = formData.get("file");
 
@@ -24,16 +26,11 @@ export async function POST(req: Request): Promise<Response> {
             }
             
             postData = file;
-            console.log("Received file:", postData.name, postData.type);
             response =  await sanitizeFile(postData);
         }
-        // const response = await sanitizeData(postData);
-        console.log('response at sanitize', response.message, response.status);
-        console.log('Raw response from sanitizeData:', response);
         if(response.status === 200) return NextResponse.json({status: 200, message: response.message});
         else return NextResponse.json({status: 205, message: response.message, });
     } catch (error) {
-    console.error(error);
     return NextResponse.json({status: 205, message: "error on url"});
     }
 }

@@ -5,7 +5,9 @@ import emailMe from "@/utils/buttons/email_me";
 //
 const LogoButton: React.FC<any> = () => {
     //
-    // Function to handle button click and add a new textarea/
+    ///========================================================
+    // Logo button to allow the user to contact me
+    ///========================================================
     //
     return ( 
         <>
@@ -13,7 +15,6 @@ const LogoButton: React.FC<any> = () => {
             <button
                 className={"h-[40px] text-black text-[0.60rem] md:text-base font-light rounded flex items-center justify-center md:gap-2 gap-1 mt-4"}
                 onClick={() => {
-                    console.log('button Logo clicked');
                         setTimeout(() => {
                             emailMe();
                         }, 500);}}   >

@@ -1,7 +1,10 @@
 import getImageTemporally from "./get_img_temp";
 
 const createFormData = async (type: string, data: any) => {
-    console.log('data at createFormData', data);
+    ///========================================================
+    // Function to create the form data to be sent to the hub
+    // the form data will be mainly to transfer images to the api.
+    ///========================================================
     const formData = new FormData();
     const title = JSON.stringify(data.find((item: any) => item.type === "title"));
     const id = JSON.stringify(data.find((item: any)=> item.type === "id"));
@@ -14,27 +17,20 @@ const createFormData = async (type: string, data: any) => {
     formData.append('type', type);
     formData.append('italic', italic);
     formData.append('bold', bold);
+    //
+    // Filter if any image on the data
     const imagePromises = data.filter((item: any) => item.type === "image") // Filter images only
     .map(async (item: any) => { 
-        console.log('📸 Processing image:', item.fileName);
         try {
-        console.log('images gettingt them', item);
-        console.log('images name', item.fileName);
         const response = await getImageTemporally(item.fileName);
             if ((response as { file: File }).file instanceof File) {
                 formData.append(`image`, (response as { file: File }).file);
-                console.log("From getImageTemporally: Image added to formData:", (response as { file: File }).file.name);
             } else {
-                console.warn("⚠️ From getImageTemporally: Retrieved data is not a File:", response);
             }
         } catch (error) {
-            console.log("Error retrieving image:", error);
         }
     });
     await Promise.all(imagePromises);
-    console.log('title at createFormData', title);
-    console.log('id at createFormData', id);
-    console.log("All images added to FormData.");
     return formData;
 }
 

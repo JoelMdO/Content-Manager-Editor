@@ -1,16 +1,15 @@
-
 'server-only';
 import sanitizeHtml from 'sanitize-html';
 
 export async function sanitizeData(data: any) : Promise<{ status: number, message: string }> {
-    console.log('starting sanitize');
+    ///========================================================
+    // Function to sanitize the links
+    ///========================================================
     let sanitizedData: { status: number, message: string } = { status: 0, message: "" };
     let value: string = "";
 
         if (typeof data === 'string') {
-            console.log('data is string');
             value = sanitizeHtml(data);
-            console.log('value', value);
             // Check if the string is a URL
             if (isValidUrl(value)) {
                 sanitizedData = sanitizeUrl(value);
@@ -18,7 +17,6 @@ export async function sanitizeData(data: any) : Promise<{ status: number, messag
                 sanitizedData = {status: 205, message: "url not allowed"};
         }} else {
            //is not a string return error. 
-        console.log('data is not file or string');
             sanitizedData = {status: 205, message: "url not allowed"};
         }
     return sanitizedData;
@@ -44,7 +42,9 @@ function sanitizeUrl(url: string): { status: number; message: string } {
 
 // Sanitize file uploads
 export async function sanitizeFile(file: File): Promise<{ status: number; message: string }> {
-    console.log('at sanitize file');
+    ///========================================================
+    // Function to sanitize the images.
+    ///========================================================
     const allowedTypes = ["image/png", "image/jpeg", "image/gif"];
     const maxSize = 500 * 1024; // 5kB limit
     try{
@@ -73,11 +73,9 @@ export async function sanitizeFile(file: File): Promise<{ status: number; messag
 
         // Basic check: Make sure the file starts with valid image headers
         if (!isValidImage(uint8Array)) {
-            console.error("File content is not a valid image");
             return { status: 400, message: "Invalid image content" };
         }
     } catch (error) {
-        console.error("Error reading file:", error);
         return { status: 500, message: "Error processing file" };
     }
 

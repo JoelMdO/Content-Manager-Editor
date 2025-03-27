@@ -2,6 +2,9 @@ import {handleFontChange} from "../../utils/editor/handle_font_change";
 import { AppDispatch } from "../../services/store";
 import { useDispatch} from "react-redux";
 const FontStyleUI: React.FC = () => {
+    ///========================================================
+    // To give to the font style as Bold or Italic
+    ///========================================================
     const dispatch = useDispatch<AppDispatch>();
 
     return (

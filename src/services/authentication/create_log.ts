@@ -1,5 +1,8 @@
 
 const createLog= (token: any) =>  {
+    ///========================================================
+    // Create the log object for session
+    ///========================================================
     const crypto = require('crypto');
     const salt = crypto.randomBytes(Number(process.env.NEXT_PUBLIC_saltLength!));
     const iv = crypto.randomBytes(Number(process.env.NEXT_PUBLIC_ivLength!));
@@ -31,9 +34,6 @@ const createLog= (token: any) =>  {
     tag,
     encrypted_data,
     ]).toString('base64');
-    //
-    console.log("iv", iv.length, "tag", tag.length, "encrypted_data", encrypted_data.length);
-    console.log("log", log);
     //
     return log;
 };

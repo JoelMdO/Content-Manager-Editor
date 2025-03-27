@@ -1,7 +1,9 @@
 const deleteImageFromIndexDB = async (fileName?: string, type?: string) => 
     new Promise((resolve, reject) => {
+    ///========================================================
+    // Function to delete an image from the IndexedDB
+    ///========================================================
     // Open the IndexedDB with the name "imageStore" and version 1
-    console.log("type at deleteImageFrom", type);
     const request = window.indexedDB.open("imageStore", 1);
     //
     request.onupgradeneeded = (event) => {
@@ -18,12 +20,9 @@ const deleteImageFromIndexDB = async (fileName?: string, type?: string) =>
         /// Delete all images from indexDb
         /// ---------------------------------------------------------
         if(type === "clear-all"){
-            console.log("clearing all");   
             const getAllKeysRequest = store.getAllKeys();
-            console.log("keys at getall", getAllKeysRequest);
             getAllKeysRequest.onsuccess = () => {
                 const keys = getAllKeysRequest.result;
-                console.log("keys after getall", keys);
                 if (keys.length === 0) {
                     resolve({ status: 200, message: "No images found in IndexedDB" });
                     return;
@@ -32,8 +31,8 @@ const deleteImageFromIndexDB = async (fileName?: string, type?: string) =>
                 // Delete each image
                 keys.forEach((key) => {
                     const deleteRequest = store.delete(key);
-                    deleteRequest.onsuccess = () => console.log(`Deleted image: ${key}`);
-                    deleteRequest.onerror = () => console.error(`Failed to delete image: ${key}`);
+                    deleteRequest.onsuccess = () => ("");
+                    deleteRequest.onerror = () => ""
                 });
 
                 resolve({ status: 200, message: `Deleted ${keys.length} images from IndexedDB` });
@@ -48,7 +47,7 @@ const deleteImageFromIndexDB = async (fileName?: string, type?: string) =>
         /// ---------------------------------------------------------
         const deleteRequest = store.delete(fileName!);
 
-        deleteRequest.onsuccess = () => console.log(`Image deleted from IndexedDB: ${fileName}`);
+        deleteRequest.onsuccess = () => "";
         resolve({ status: 200, message: `Image deleted from IndexedDB: ${fileName}` });
         
         deleteRequest.onerror = () => reject({status: 205, message: `Error deleting image from the IndexedDB`});

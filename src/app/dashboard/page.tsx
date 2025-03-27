@@ -26,7 +26,6 @@ const ArticlePage: React.FC = () => {
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const editorRefs = useRef<(HTMLDivElement| null)[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  console.log('page'); 
   const pageRef = useRef(null);
   //
   ///======================================================
@@ -39,7 +38,6 @@ const ArticlePage: React.FC = () => {
   useEffect(() => {
     if (!articleIDRef.current) {
       articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
-      console.log('articleID', articleIDRef.current);
     }
     // Check if the article has already been created
     const savedTitle = sessionStorage.getItem("tempTitle");
@@ -58,13 +56,20 @@ const ArticlePage: React.FC = () => {
     sessionStorage.removeItem("tempBody");
   }, [dispatch, previousArticleID]);
 
-  // Cleanup debounce on unmount
+  ///---------------------------------------------------
+  //  Cleanup debounce on unmount
+  ///---------------------------------------------------
   useEffect(() => {
     return () => {
       debouncedUpdateStore.cancel();
     };
   }, [debouncedUpdateStore]);
   //
+  ///======================================================
+  /// UI Editor with a menu with options to insert images,
+  // links, and bold or italic font style, with an <aside>
+  // for tablet and desktop and a <nav> for mobile
+  ///======================================================
   return (
     <>
     <div ref={pageRef} className="flex flex-col md:flex-row h-screen bg-black">
@@ -94,8 +99,6 @@ const ArticlePage: React.FC = () => {
         <div key={index} style={{ userSelect: "text", cursor: "text" }}
                 ref={(el) => {
                   if (el && !editorRefs.current[index]) {
-                    // Assign only if not already set
-                    // as due to API call on LinkButton needs to be hold
                     editorRefs.current[index] = el; 
                 }
                 }}

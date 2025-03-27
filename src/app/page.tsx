@@ -4,15 +4,16 @@ import { useRouter } from "next/navigation";
 import callHub from "../services/api/call_hub";
 import successAlert from "@/components/alerts/sucess";
 import errorAlert from "@/components/alerts/error";
-import CustomButton from "@/components/buttons/custom_buttons";
 import LogoButton from "@/components/buttons/logo_button";
-// import emailMe from "@/path/to/emailMe"; // Uncomment and complete this if needed
 
-const Login: React.FC = () => { 
+const Login: React.FC = () => {
+    ///===================================================
+    // User Login UI
+    ///=================================================== 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const router = useRouter();
 
+    //handleLogin with Firebase authentication
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         const response = await callHub("auth", {email, password});
@@ -23,11 +24,15 @@ const Login: React.FC = () => {
         }
         successAlert("auth", response.message);
         const sessionId = response.sessionId;
-        console.log("sessionId at log page", sessionId);
+        
         sessionStorage.setItem("sessionId", sessionId);
         window.location.href = "/dashboard";
     };
-
+    //
+    ///--------------------------------------------------------
+    /// UI with a login form and a contact button for the 
+    /// user to reach the software engineer.
+    ///--------------------------------------------------------
     return (
         <>
         <div className ="relative w-full min-h-screen flex flex-col justify-center px-4 sm:px-8 md:px-16">

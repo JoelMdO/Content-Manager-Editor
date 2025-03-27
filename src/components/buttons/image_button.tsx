@@ -12,6 +12,9 @@ interface ButtonProps {
 }
 
 const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
+    ///========================================================
+    // To load images and store them in IndexedDB for later save on db.
+    ///========================================================
     //
     // Ensure safe access to editorRefs
     const editorRef = editorRefs?.current ? editorRefs.current[index] : null;
@@ -44,6 +47,9 @@ const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
         }
     };
     //
+    ///--------------------------------------------------------
+    // UI for the image button
+    ///--------------------------------------------------------
     return ( 
         <>
             <button

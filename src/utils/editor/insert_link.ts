@@ -5,24 +5,20 @@ import linkWrapperHtml from "@/utils/wrapper_html";
 
 
 const insertLink = async (dispatch: AppDispatch, link_url: string, editorRef: HTMLDivElement | null): Promise<any> => {
+    ///========================================================
+    // Function to insert a link at the cursor position
+    ///========================================================
     //
     try{
-    console.log('at insetLink');
-    console.log('link_url at insertLink', link_url);
-    console.log('link at insertLink', link_url);
     // Store reference before API call
     if(link_url === undefined || !editorRef) return {status: 205, message: "Link not inserted"};;
     // Check if there's an active selection or range
     const selection = window.getSelection();
     let range = selection?.getRangeAt(0);
-
     const editorRefBefore = editorRef;
-    console.log('editorRefBefore', editorRefBefore);
     const response = await callHub("clean-link", link_url);
-    console.log('response at insertLink', response);
-    // const jsonResponse = await response.json();
+    // 
     if (response.status === 200) {
-        console.log('not 205');
         //Create a component for the link
         const link = linkWrapperHtml("link", link_url);
         // Click to open link
@@ -33,21 +29,15 @@ const insertLink = async (dispatch: AppDispatch, link_url: string, editorRef: HT
         //
         // Insert the link at cursor position
         const editor = editorRefBefore;
-        console.log('editorRefAfter', editor);
-        console.log('range at link', range);
         if (!selection || selection.rangeCount === 0) {
-            console.log("No selection, appending to editor");
             editor?.appendChild(link);
             return {status: 200, message: "Link inserted successfully"};
         }
         
         if (range) {
-            console.log("With range");
             range.deleteContents(); 
         // Ensure the range is expanded (if collapsed)
         if (range.collapsed) {
-            console.log('range collapsed');
-            console.log('link', link);
             const spaceNode = document.createTextNode(" ");
             editor?.appendChild(spaceNode);
                 var sel = window.getSelection();
@@ -91,7 +81,6 @@ const insertLink = async (dispatch: AppDispatch, link_url: string, editorRef: HT
             range.collapse(false);  // Move the cursor to the end of the inserted link
             return { status: 200, message: "Link inserted successfully" };
         } else {
-            console.log("No range");
             // If no selection, append at the end of the editor
             editor?.appendChild(link);
             return {status: 200, message: "Link inserted successfully"};

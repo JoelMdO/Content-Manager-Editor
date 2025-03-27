@@ -13,6 +13,9 @@ interface LinkButtonProps {
 }
 
 const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
+    ///========================================================
+    // To load links and store them in IndexedDB for later save on db.
+    ///========================================================
     //
     // Ensure safe access to editorRefs
     const editorRef = editorRefs?.current ? editorRefs.current[index] : null;
@@ -23,12 +26,14 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
     const getLinkValue = () => {
         if (linkInputRef.current) {
             link_url = linkInputRef.current.value;
-            console.log("Pasted Link:", linkInputRef.current.value);
         }
     };
     // redux
     const dispatch = useDispatch<AppDispatch>();
     //
+    ///--------------------------------------------------------
+    // UI with a button to add a link
+    ///--------------------------------------------------------
     return ( 
         <>
             <button

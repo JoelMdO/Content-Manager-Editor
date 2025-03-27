@@ -10,7 +10,10 @@ interface LoadingToastProps {
 }
 //
 const LoadingToast: React.FC<LoadingToastProps> = ({ onShow }) => {
-    console.log('toast called', onShow);
+   ///========================================================
+   // To show a loading toast
+   ///========================================================
+   //TODO to check if its needed to be implemented.
     const toast = useRef<Toast>(null);
     const [progress, setProgress] = useState(0);
     const interval = useRef<number | null>(null);
@@ -53,7 +56,6 @@ const LoadingToast: React.FC<LoadingToastProps> = ({ onShow }) => {
     };
     //
     useEffect(() => {
-    console.log('onShow', onShow);
     if(onShow) {
         show();
     }}, [onShow]);

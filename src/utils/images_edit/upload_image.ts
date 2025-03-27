@@ -11,21 +11,20 @@ interface TrackedImage {
 //
 
 const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivElement|null, dispatch: AppDispatch): Promise<any> => {
+    ///========================================================
+    // Function to upload an image
+    ///========================================================
     //
     try{
-    console.log('upload image');
-
     //Array sintax
         const file = e.target.files?.[0];
         const fileName = file?.name;
     //
     // Store reference before API call
         const editorRefBefore = editorRef;
-        console.log('editorRefBefore', editorRefBefore);
     if (!file || !editorRef) return;
     // Check if the file is a valid image and if its save it on the server 
     const response = await callHub( "clean-image", file);
-    console.log('response image', response);
     if (response.status === 200) {
      // Set up a FileReader to read the image file source
         const reader = new FileReader();    
@@ -40,14 +39,11 @@ const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivE
             const date = new Date();
             const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear().toString().slice(-2)}`;
             const imageId = `${formattedDate}-${fileName}`;
-            console.log('imageId', imageId);
             img.setAttribute('id', imageId); // Set image Id to allow selection
             // Add a reference to the image in the editor
             const imgRef = document.createElement('p');
             imgRef.textContent = imageId;
             imgRef.style.justifySelf = "center";
-            // imgRef.style.marginTop = "auto";
-            // imgRef.style.marginBottom="10px";
             imgRef.className = "text-xs text-gray-500";
             // Store `imgRef` on `img` so it can be accessed later
             img.dataset.refId = imageId; 
@@ -59,11 +55,9 @@ const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivE
             const responseSaveImage = await saveImageTemporally(file) as { status: number };
             if (responseSaveImage.status === 205) 
             return responseSaveImage;
-            console.log('responseSaveImage', responseSaveImage);
             // Get current article content from sessionStorage
             let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-            console.log('articleContent at Upload Image', articleContent);  
-            // // Add image data (file and blobUrl) to articleContent
+            // Add image data (file and blobUrl) to articleContent
             articleContent.push({
                 type: "image",
                 imageId: imageId,
@@ -71,7 +65,6 @@ const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivE
                 blobUrl: objectUrl, // Temporary preview URL
             });
             sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
-            console.log('articleContent at UUpload Image', articleContent);  
             //Clic handler to make the image selectable
             img.onclick = (e) => {
             const selection = window.getSelection();
@@ -114,10 +107,8 @@ const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivE
                 bubbles: true,
                 cancelable: true,
             });
-            editorRef.dispatchEvent(inputEvent);
-            console.log('Image Parent:', img.parentNode);
-            console.log('Image Next Sibling:', img.nextSibling);
-            console.log('Text Below Image:', imgRef.textContent);        //
+            editorRef.dispatchEvent(inputEvent);      
+            //
         } else {
             // If no selection, append at the end of the editor
         editor?.appendChild(img);

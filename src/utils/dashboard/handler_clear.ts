@@ -5,7 +5,9 @@ export const handleClear = (
   setTheBody: (value: string) => void,
   editorRefs: React.RefObject<(HTMLDivElement | null)[]>
 ) => {
-  console.log("Clearing content");
+  ///======================================================
+  // Clear content from dashboard
+  ///======================================================
 
   // Clear title and body state
   setTheTitle("");
@@ -24,10 +26,5 @@ export const handleClear = (
 
   // Delete images from IndexedDB
   deleteImageFromIndexDB(undefined, "clear-all").then((response: any) => {
-    if (response.status === 200) {
-      console.log(response.message);
-    } else {
-      console.log("No image", response.message);
-    }
   });
 };

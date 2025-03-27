@@ -9,7 +9,10 @@ setTheBody: (value: string) => void,
 debouncedUpdateStore: (title: string, body: string) => void
 ) => {
 
-    console.log("handleContentChange Called");
+///========================================================
+// Function to handler the content change on the editor, when 
+// the user types or modifies the content. 
+///========================================================
 
 if (index === 0) {
     // Title

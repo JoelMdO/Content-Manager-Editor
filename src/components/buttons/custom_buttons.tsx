@@ -6,6 +6,8 @@ import errorAlert from "../alerts/error";
 import { useRouter } from "next/navigation";
 import saveButtonClicked from "@/utils/buttons/save_button_clicked";
 import emailMe from "@/utils/buttons/email_me";
+import { subtle } from "crypto";
+import { log } from "console";
 
 interface ButtonProps {
     type: string;
@@ -13,6 +15,10 @@ interface ButtonProps {
 }
 //
 const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
+    ///========================================================
+    // Custom Buttons used on dashboard page at this stage is only
+    // for Post (Save the article)
+    ///========================================================
     //
     // Variables.
     let text: string, color: string, hover_color: string, icon: string;
@@ -25,9 +31,6 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
     // Retrieve text styles from Redux for saving on saveButtonClicked
     const italic = useSelector((state: any) => state.data_state?.fontStyle);
     const bold = useSelector((state: any) => state.data_state?.fontWeight);
-    console.log('italic', italic);
-    console.log('bold', bold);
-    console.log(`Button ${type}`);
     //
     //
     switch (type) {
@@ -55,7 +58,6 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
             <button
                 className={`h-[40px] w-[9em] shadow-md shadow-black ${position} ${isClicked? "text-black":"text-white"} text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4 ${isClicked? "bg-cream" : `${color}`} hover:${hover_color}`}
                 onClick={() => {
-                    console.log('button post clicked');
                     if (onClick) onClick(); setIsClicked(true);
                         setTimeout(() => {
                             setIsClicked(false);
@@ -63,10 +65,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                         if(type === "post"){
                             ///For Posting the article
                             saveButtonClicked(italic, bold)
-                            .then((response) => {    
-                                console.log('Response status:', response.status);
-                                console.log('Response message:', response.message);
-                                console.log("url", url);                                
+                            .then((response) => {     
                                 if (response.status === 200) {
                                 setLoading(false);
                                 successAlert("saved");
@@ -74,12 +73,10 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                                     setLoading(false);
                                     errorAlert("saved", "nonauth", response.message);
                                     //Redirect the user to login page
-                                    console.log('redirecting to login page');
                                         router.push(`${url}/`);
                                 } else {
                                     setLoading(false);    
-                                    console.log('at else');
-                                errorAlert("saved", "non200", response.message);
+                                 errorAlert("saved", "non200", response.message);
                                 }
                             }).catch((error) => {
                                 errorAlert("saved", "error", error);

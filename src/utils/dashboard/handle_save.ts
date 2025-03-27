@@ -1,4 +1,6 @@
 export const handleSave = (debouncedUpdateStore: any) => {
-    console.log("Button clicked, flushing debounce");
+  ///========================================================
+  // After the data has been sent to the database, flush the debounced store
+  ///========================================================
     debouncedUpdateStore.flush(); // Immediately executes pending updates
 };

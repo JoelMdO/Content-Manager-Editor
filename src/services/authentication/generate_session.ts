@@ -31,17 +31,13 @@ async function generateSession(token: string) : Promise<any>{
     //==================================================
     const decodedToken = await admin.auth().verifyIdToken(token);
     const user = decodedToken.uid;
-    console.log("decodedToken", decodedToken);
-    console.log("user", user);
     if(!user){
-        console.error("🚨 User not found.");
-        return {status: 400, message: "User not found."};
+          return {status: 400, message: "User not found."};
     }
     //==================================================
     // Create a log for the session
     //==================================================
     const log = createLog(token);
-    console.log("listo el log", log);
     //==================================================    
     // Generate the session
     //==================================================
@@ -55,19 +51,16 @@ async function generateSession(token: string) : Promise<any>{
     // Hash session ID
     //==================================================
     const crypto = require('crypto');
-    const hash = crypto.createHash('sha256');
+    const hash = crypto.createHash(process.env.NEXT_PUBLIC_HASH_ALGORITHM!);
     hash.update(sessionId);
-    const hashedSessionId = hash.digest('hex');
+    const hashedSessionId = hash.digest(process.env.NEXT_PUBLIC_HASH_DIGEST!);
     //==================================================
     // Encrypt Payload
     //==================================================
     const sessionPlate = createLog(user);
-    console.log("sessionPlate at generateSession", sessionPlate);
     //==================================================
     // Store the session
     //==================================================
-    console.log(`Session created: ${sessionId} for user log: ${log}`);
-    console.log("session.user before sending out form generateSession", user);
     return {session: body_session, sessionId: hashedSessionId, user: user, sessionPlate: sessionPlate};
 }
 
