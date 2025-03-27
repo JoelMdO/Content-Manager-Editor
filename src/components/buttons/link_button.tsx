@@ -1,10 +1,10 @@
 import React, {useRef} from "react";
-import { AppDispatch } from "../services/store";
+import { AppDispatch } from "../../services/store";
 import { useDispatch} from "react-redux";
 import Image from "next/image";
-import insertLink from "@/services/editor/insert_link";
-import successAlert from "./alerts/sucess";
-import errorAlert from "./alerts/error";
+import insertLink from "@/utils/editor/insert_link";
+import successAlert from "../alerts/sucess";
+import errorAlert from "../alerts/error";
 import { get } from "lodash";
 
 interface LinkButtonProps {

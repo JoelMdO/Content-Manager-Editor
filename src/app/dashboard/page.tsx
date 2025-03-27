@@ -1,6 +1,6 @@
 'use client'
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { handleKeyBoardActions } from "../../services/editor/handle_keys";
+import { handleKeyBoardActions } from "../../utils/editor/handle_keys";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../services/store";
 import { createArticleID } from "@/utils/create_id";
@@ -58,99 +58,6 @@ const ArticlePage: React.FC = () => {
     sessionStorage.removeItem("tempBody");
   }, [dispatch, previousArticleID]);
 
-  ///========================================================
-  // Update the store with the Title and Body of the article
-  // Debounced store update function
-  ///========================================================
-  // const debouncedUpdateStore = useCallback( 
-  //   debounce((newTitle: string, newBody: string) => {
-  //     if (!articleIDRef.current) return;
-  //     console.log('debounce Called');
-  //     let title = newTitle.split(" ").slice(0, 2).join("-");
-  //     let id = `${title}-${articleIDRef.current}`;
-  //     //----------------------------------------------------
-  //     // Remove previous Title and Body content before adding the new one
-  //     //----------------------------------------------------
-  //     let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-  //     if (newTitle !== "") {
-  //       console.log('newTitle at debounce', newTitle);
-  //       console.log('id at debounce', id);
-  //       // Ensure only the latest title and id
-  //       articleContent = articleContent.filter((item: { type: string}) => item.type !== "title" && item.type !== "id"); 
-  //       // Add text to articleContent
-  //       articleContent.push({
-  //           type: "title",
-  //           content: title,
-  //       });
-  //       articleContent.push({
-  //         type: "id",
-  //         content: id,
-  //     });
-  //     }
-  //     if (newBody !== "") {
-  //       console.log('newBody at debounce', newBody);
-  //       // Ensure only the latest body
-  //       articleContent = articleContent.filter((item: { type: string }) => item.type !== "body");
-  //       // Add text to articleContent
-  //       articleContent.push({
-  //         type: "body",
-  //         content: newBody,
-  //       });
-  //     sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
-  //     const storedContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-  //     console.log("Updated articleContent:", storedContent);
-  //     }
-  //   }, 500), // Wait 500ms after last change before updating store
-  //   []
-  // );
-
-  // Handle content changes
-  // const handleContentChange = (index: number, content: string) => {
-  //   console.log('handleContentChange Called');
-  //   //
-  //   if (index === 0) { // Title
-  //     setIsTitle(false);
-  //     setTheTitle(content);
-  //     sessionStorage.setItem("tempTitle", content);
-  //     // Get the last title content
-  //     debouncedUpdateStore(content, theBody);
-  //   } else { // Article
-  //     setIsArticle(false);
-  //     setTheBody(content);  
-  //     sessionStorage.setItem("tempBody", content);
-  //     // Get the last body content
-  //     debouncedUpdateStore(theTitle, content); 
-  //     }
-  // };
-  // //
-  // // Call debounce flush() on button click
-  // const handleSave = () => {
-  //   console.log('Button clicked, flushing debounce');
-  //   debouncedUpdateStore.flush(); // Immediately executes pending updates
-  // };
-  //
-  // const handleClear = () => {
-  //   // Clear title and body state
-  //   setTheTitle(""); 
-  //   setTheBody("");
-  //   // Remove the sesstion Storage after the page is mounted and if exist the article is created
-  //   sessionStorage.removeItem("tempTitle");
-  //   sessionStorage.removeItem("tempBody");
-  //   // Clear the content inside the contentEditable divs
-  //   editorRefs.current.forEach((ref) => {
-  //   if (ref) {
-  //     ref.innerText = "";
-  //   }
-  //   //Delete image from indexdb
-  //   deleteImageFromIndexDB(undefined, "clear-all").then((response: any) => {
-  //     if (response.status === 200) {
-  //     console.log(response.message);
-  //     }else{
-  //       console.log("no image", response.message)
-  //     }
-  //   });
-  // });
-  // }
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
@@ -162,7 +69,7 @@ const ArticlePage: React.FC = () => {
     <>
     <div ref={pageRef} className="flex flex-col md:flex-row h-screen bg-black">
       {/* Left Menu on Tablet / Desktop*/}
-      <aside className="hidden w-1/4 h-100vh bg-gray-800 text-white md:flex items-center flex-col">
+      <aside className="hidden w-[25%] h-full bg-gray-800 text-white md:flex items-center flex-col">
         <ImageButton editorRefs={editorRefs} index={1}/>
         <LinkButton editorRefs={editorRefs} index={1} />
         <FontStyleUI/>
@@ -171,7 +78,7 @@ const ArticlePage: React.FC = () => {
         <LogOutButton />
       </aside>
       {/* Menu Mobile*/}
-      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row">
+      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row fixed">
         <div className="flex items-center flex-col">
           <div className="flex flex-row space-x-2">
         <ImageButton editorRefs={editorRefs} index={1}/>
@@ -182,7 +89,7 @@ const ArticlePage: React.FC = () => {
         <LogOutButton />
       </nav>
       {/* Main Content */}
-      <main className="flex-1 p-4">
+      <main className="flex-1 p-4 pt-[20vh] md:pt-2 md:w-[75%] overflow-y-auto min-h-screen">
       {["Title", "Article"].map((placeholder, index) => (
         <div key={index} style={{ userSelect: "text", cursor: "text" }}
                 ref={(el) => {
@@ -192,7 +99,7 @@ const ArticlePage: React.FC = () => {
                     editorRefs.current[index] = el; 
                 }
                 }}
-                className={`${placeholder === "Title" ? "h-[10%]": "h-[85%]"} ${placeholder === "Title" ? "font-bold": "font-normal"} p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
+                className={`${placeholder === "Title" ? "h-[10%]": "h-[100vh]"} ${placeholder === "Title" ? "font-bold": "font-normal"} p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
                 contentEditable={true}
                 onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs)}
                 suppressContentEditableWarning={true}

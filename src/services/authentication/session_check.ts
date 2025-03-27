@@ -4,7 +4,7 @@ import getSessionBySessionId from "./get_session_by_id";
 import readLog from "./read_log";
 import getSessionPlate from "./get_session_plate";
 
-async function sessionCheck(sessionId: string) : Promise<{status: number; message: string; user?: string}> {
+async function sessionCheck(sessionId: string, type?: string) : Promise<{status: number; message: string; user?: string}> {
     //==================================================
     // Check the session ID if same on the database
     //==================================================
@@ -66,14 +66,6 @@ async function sessionCheck(sessionId: string) : Promise<{status: number; messag
             return {status: 400, message: "User not longer authenticated. Please sign again."};
         }
     }
-    // //==================================================
-    // // Token and Session refresh
-    // //==================================================
-    // if (user){
-    // const freshToken = await admin.auth().createCustomToken(user);
-    // const newSession = await generateSession(freshToken);
-    // return {status: newSession.status, message: "User authenticated", session: newSession.session, user: user};
-    // }
     return {status: 200, message: "User authenticated", user: user};
 }else{
     return {status: 401, message: "Session not found"};

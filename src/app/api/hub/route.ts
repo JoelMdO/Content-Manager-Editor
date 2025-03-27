@@ -48,6 +48,20 @@ export async function POST(req: Request): Promise<any> {
                 postData = formData;
                 type = "post";
             break;
+            ///### LOGOUT
+            case "logout":
+                console.log("Posting at hub POST");
+                //Retrieve the authorization session token from the headers
+                const sessionIdForLougout = req.headers.get("Authorization")?.split(" ")[1];
+                console.log("session at hub/POST", sessionIdForLougout);
+                if (sessionIdForLougout) {
+                    postData = sessionIdForLougout;
+                } else {
+                    console.warn("Session is undefined, skipping formData append.");
+                    return NextResponse.json({ status: 401, message: "User without a valid session" });
+                }
+                type = typeOfAction;
+            break;
             ///### SANITIZE (clean-image).
             default:
             console.log('data is file image');

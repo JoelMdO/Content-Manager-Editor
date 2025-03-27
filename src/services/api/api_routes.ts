@@ -75,7 +75,15 @@ const apiRoutes = async (postData: any): Promise<any> => {
         //## LOGOUT
         case "logout":
             endPoint = "logout";
-            body = JSON.stringify(data);
+            ///-----------------------------------------------
+            /// Verify sessionId if its valid through the sessionCheck function
+            ///-----------------------------------------------
+            const sessionIdForLogout = data.get("session");
+            console.log("session at apiRoutes", sessionIdForLogout);
+            const responseSessionCheck = await sessionCheck(sessionIdForLogout);
+            console.log("userId:", responseSessionCheck.user!);
+            const auth = {user: responseSessionCheck.user!, sessionId: sessionIdForLogout};
+            body = JSON.stringify(auth);
             headers["Content-Type"] = "application/json";
             credentials = "include";
         break;      

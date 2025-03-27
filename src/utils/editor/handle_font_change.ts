@@ -1,5 +1,5 @@
 import { addFontStyle, addFontWeight, deleteFontStyle, deleteFontWeight } from "@/slices/data_slice";
-import { AppDispatch } from "./store";
+import { AppDispatch } from "../../services/store";
 
   export const handleFontChange = (value: string, dispatch: AppDispatch) => {
     const selection = window.getSelection();

@@ -3,7 +3,7 @@ import deleteImageFromIndexDB from "../images_edit/delete_img_from_indexdb";
 export const handleClear = (
   setTheTitle: (value: string) => void,
   setTheBody: (value: string) => void,
-  editorRefs: React.MutableRefObject<(HTMLDivElement | null)[]>
+  editorRefs: React.RefObject<(HTMLDivElement | null)[]>
 ) => {
   console.log("Clearing content");
 

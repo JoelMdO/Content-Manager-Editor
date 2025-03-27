@@ -18,7 +18,10 @@ const LogOutButton: React.FC<any> = () => {
     const sessionId = sessionStorage.getItem('sessionId');
     console.log("sessionId at handleLogout", sessionId);
     const response =  await callHub('logout', sessionId);
+    /// Remove sessionStorage.
     sessionStorage.removeItem('sessionId');
+    sessionStorage.removeItem("tempTitle");
+    sessionStorage.removeItem("tempBody");
     if (response.status == 200){
         console.log("should redirect")
         router.push(`${url}/`);
