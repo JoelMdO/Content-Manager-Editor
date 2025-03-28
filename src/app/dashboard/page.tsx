@@ -10,6 +10,7 @@ import { handleSave } from "@/utils/dashboard/handle_save";
 import LogOutButton from "@/components/buttons/logout_buttons";
 import { debouncedUpdateStore } from "@/utils/dashboard/debounceUpdateStore";
 import { handleContentChange } from "@/utils/dashboard/handle_content_change";
+import setContentWithCursorPreservation from "@/utils/dashboard/set_content_with_cursor";
 
 const ImageButton = dynamic(() => import("../../components/buttons/image_button"), { ssr: false });
 const LinkButton = dynamic(() => import("../../components/buttons/link_button"), { ssr: false });
@@ -32,29 +33,40 @@ const ArticlePage: React.FC = () => {
   // Check if an article is already created on page load
   // Store articleID in a ref to persist across renders
   ///======================================================
-  const articleIDRef = useRef<string>("");
-  const previousArticleID = useSelector((state: any) => state.data_state?.id);
-  // Create article ID only once when component mounts
-  useEffect(() => {
-    if (!articleIDRef.current) {
-      articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
-    }
-    // Check if the article has already been created
-    const savedTitle = sessionStorage.getItem("tempTitle");
-    const savedBody = sessionStorage.getItem("tempBody");
+  // const articleIDRef = useRef<string>("");
+  // console.log('articleIDRef', articleIDRef);
   
-    if (savedTitle) {
-      setTheTitle(savedTitle);
-      setIsTitle(false);
-    }
-    if (savedBody) {
-      setTheBody(savedBody);
-      setIsArticle(false);
-    }
-    // Remove the sesstion Storage after the page is mounted and if exist the article is created
-    sessionStorage.removeItem("tempTitle");
-    sessionStorage.removeItem("tempBody");
-  }, [dispatch, previousArticleID]);
+  // const previousArticleID = useSelector((state: any) => state.data_state?.id);
+  // console.log("previousArticleID", previousArticleID);
+  // Create article ID only once when component mounts
+  let savedBody: string = "";
+  let savedTitle: string = "";
+
+  useEffect(() => {
+    // if (!articleIDRef.current) {
+    //   articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
+    //   console.log("articleIdRef.current", articleIDRef.current);
+    // }
+      // Check if the article has already been created
+      // const article = sessionStorage.getItem("articleContent");
+      const article = sessionStorage.getItem("articleContent");
+      if (article !== null || article !== undefined){
+        try{
+        const jsonArticle = JSON.parse(article!);
+        console.log('article', jsonArticle); 
+        console.log("Article already created");
+        savedTitle = jsonArticle[0]?.content;
+        savedBody = jsonArticle[2]?.content;
+        console.log('savedTitle', savedTitle);
+        console.log('savedBody', savedBody);
+      // Remove the sesstion Storage after the page is mounted and if exist the article is created
+      sessionStorage.removeItem("tempTitle");
+      sessionStorage.removeItem("tempBody");
+      //TODO add a sessionarticle remove.
+      }catch (error){
+        console.log(error);
+      }}
+  }, []);
 
   ///---------------------------------------------------
   //  Cleanup debounce on unmount
@@ -64,6 +76,21 @@ const ArticlePage: React.FC = () => {
       debouncedUpdateStore.cancel();
     };
   }, [debouncedUpdateStore]);
+  //
+ ///========================================================
+ // Update the DOM if a previous article session is saved.
+ ///========================================================
+  useEffect(() => {
+    if (savedTitle) {
+      setTheTitle(savedTitle);
+      setIsTitle(!savedTitle);
+      setPlaceHolderTitle(false);
+    if (savedBody) {
+      setTheBody(savedBody);
+      setIsArticle(!savedBody);
+      setPlaceHolderArticle(false);
+    }
+  }}, [savedTitle, savedBody]);
   //
   ///======================================================
   /// UI Editor with a menu with options to insert images,
@@ -95,6 +122,7 @@ const ArticlePage: React.FC = () => {
       </nav>
       {/* Main Content */}
       <main className="flex-1 p-4 pt-[20vh] md:pt-2 md:w-[75%] overflow-y-auto min-h-screen">
+      <div className="border border-gray-600 border-1px">
       {["Title", "Article"].map((placeholder, index) => (
         <div key={index} style={{ userSelect: "text", cursor: "text" }}
                 ref={(el) => {
@@ -109,17 +137,23 @@ const ArticlePage: React.FC = () => {
                   onFocus={() => index === 0 ? setPlaceHolderTitle(false) : setPlaceHolderArticle(false)}
                   onInput={(e) => {
                     const content = (e.target as HTMLDivElement).innerText;
-                    handleContentChange(index, content, setIsTitle, setTheTitle, setIsArticle, setTheBody, debouncedUpdateStore);
+                    handleContentChange(index, content, setIsTitle, setIsArticle, debouncedUpdateStore);
                   }}
-                >
-                  {(index === 0 ? isPlaceHolderTitle : isPlaceHolderArticle ) && 
-                  (index === 0 ? isTitle : isArticle ) && (
-                    <span className="text-gray-400">
-                      {index === 0 ? `${placeholder} here...` : `Write your ${placeholder} here...`}
-                    </span>
-                  )}
+                  >
+                    {index === 0
+            ? theTitle || (
+                isPlaceHolderTitle && (
+                  <span className="text-gray-400">{`${placeholder} here...`}</span>
+                )
+              )
+            : theBody || (
+                isPlaceHolderArticle && (
+                  <span className="text-gray-400">{`Write your ${placeholder} here...`}</span>
+                )
+              )}
+                </div>
+              ))}  
         </div>
-    ))}
       </main>
     </div>
     </>

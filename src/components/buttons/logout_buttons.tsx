@@ -18,8 +18,8 @@ const LogOutButton: React.FC<any> = () => {
     const router = useRouter();
     //
     const handleLogout = async () => {
-    const sessionId = sessionStorage.getItem('sessionId');
-    const response =  await callHub('logout', sessionId);
+    // const sessionId = sessionStorage.getItem('sessionId');
+    const response =  await callHub('logout');
     /// Remove sessionStorage.
     sessionStorage.removeItem('sessionId');
     sessionStorage.removeItem("tempTitle");

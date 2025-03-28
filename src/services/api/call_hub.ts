@@ -23,14 +23,18 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         case "post":
             const formData = await createFormData(type, data);
             const sessionId = sessionStorage.getItem('sessionId');
+            console.log('sessionId', sessionId);
+            
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             body = formData;
             credentials = "include";
             break;
         //## LOGOUT
-        case "logout":
-            body = JSON.stringify({data: data, type: type});
+        case "logout":  
+            body = JSON.stringify({data: "", type: type});
             const sessionIdForLougout = sessionStorage.getItem('sessionId');
+            console.log('sessionIdForLougout', sessionIdForLougout);
+            
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionIdForLougout}` };
             break;

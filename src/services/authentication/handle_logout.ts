@@ -11,6 +11,8 @@ const handleLogout = async (data: { user: string; sessionId: string }) => {
     //
     const user = data.user!;
     const sessionId = data.sessionId!;
+    console.log('user', user);
+    console.log('sessionId', sessionId);    
     //
     if (user){
     const dbRef = ref(database, `session/${user}`);
@@ -21,7 +23,7 @@ const handleLogout = async (data: { user: string; sessionId: string }) => {
     try{
     const dbRef2 = ref(database, `sessionId/${sessionId}`);
     await remove(dbRef2);
-    } catch(error){
+    } catch(error){ 
     }
     // Above can be not mandatory to be accomplished due to session
     // authentication, but signout will be.

@@ -1,5 +1,5 @@
 import { database } from "../../../../firebase";
-import { ref, update } from "firebase/database";
+import { ref, push, set } from "firebase/database";
 import { NextResponse } from "next/server";
 // import { supabase } from "../../../lib/supabase_client";
 import cloudinary from "@/lib/cloudinary/cloudinary";
@@ -122,15 +122,15 @@ export async function POST(req: Request): Promise<Response> {
         article.italic = italicContent;
         
         // SAVE in db.
+        const id = push(dbRef);
         const title = article.title;
         const body = article.article;
         const images = article.images;
-        const bold = article.bold;
+        const bold = article.bold;  
         const italic = article.italic;
         //
-        await update(dbRef, {
-            title, body, images, bold, italic
-            });
+        await set(dbRef, {
+            id,title, body, images, bold, italic});
         return NextResponse.json({status:200, message: "Data saved successfully"});
     } catch (error) {
         return NextResponse.json({ status: 500, message: "Error processing request." });
