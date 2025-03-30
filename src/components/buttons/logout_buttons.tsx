@@ -21,7 +21,6 @@ const LogOutButton: React.FC<any> = () => {
     // const sessionId = sessionStorage.getItem('sessionId');
     const response =  await callHub('logout');
     /// Remove sessionStorage.
-    sessionStorage.removeItem('sessionId');
     sessionStorage.removeItem("tempTitle");
     sessionStorage.removeItem("tempBody");
     if (response.status == 200){
