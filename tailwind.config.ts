@@ -11,6 +11,8 @@ export default {
     extend: {
       screens: {
         md: '768px',
+        sm: '480px',
+        xs: '360px',
       },
       colors: {
           'light-background': colors.light.background,

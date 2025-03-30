@@ -1,18 +1,21 @@
 'use client'
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { handleKeyBoardActions } from "../../services/handle_keys";
+import { handleKeyBoardActions } from "../../utils/editor/handle_keys";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../services/store";
 import { createArticleID } from "@/utils/create_id";
 import dynamic from "next/dynamic";
-import { debounce } from "lodash";
-import callHub from "@/services/call_hub";
-import LogOutButton from "@/components/logout_buttons";
+import { handleClear } from "@/utils/dashboard/handler_clear";
+import { handleSave } from "@/utils/dashboard/handle_save"; 
+import LogOutButton from "@/components/buttons/logout_buttons";
+import { debouncedUpdateStore } from "@/utils/dashboard/debounceUpdateStore";
+import { handleContentChange } from "@/utils/dashboard/handle_content_change";
+import setContentWithCursorPreservation from "@/utils/dashboard/set_content_with_cursor";
 
-const ImageButton = dynamic(() => import("../../components/image_button"), { ssr: false });
-const LinkButton = dynamic(() => import("../../components/link_button"), { ssr: false });
-const FontStyleUI = dynamic(() => import("../../components/font_style_ui"), { ssr: false });
-const CustomButton = dynamic(() => import("../../components/custom_buttons"), { ssr: false });
+const ImageButton = dynamic(() => import("../../components/buttons/image_button"), { ssr: false });
+const LinkButton = dynamic(() => import("../../components/buttons/link_button"), { ssr: false });
+const FontStyleUI = dynamic(() => import("../../components/buttons/font_style_buttons"), { ssr: false });
+const CustomButton = dynamic(() => import("../../components/buttons/custom_buttons"), { ssr: false });
 
 const ArticlePage: React.FC = () => {
   //
@@ -24,157 +27,136 @@ const ArticlePage: React.FC = () => {
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const editorRefs = useRef<(HTMLDivElement| null)[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  console.log('page'); 
   const pageRef = useRef(null);
+  //
+  ///======================================================
   // Check if an article is already created on page load
   // Store articleID in a ref to persist across renders
-  const articleIDRef = useRef<string>("");
-  const previousArticleID = useSelector((state: any) => state.data_state?.id);
-  // Create article ID only once when component mounts
-  useEffect(() => {
-    if (!articleIDRef.current) {
-      articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
-      console.log('articleID', articleIDRef.current);
-    }
-    // Check if the article has already been created
-    const savedTitle = sessionStorage.getItem("tempTitle");
-    const savedBody = sessionStorage.getItem("tempBody");
+  ///======================================================
+  // const articleIDRef = useRef<string>("");
+  // console.log('articleIDRef', articleIDRef);
   
-    if (savedTitle) {
-      setTheTitle(savedTitle);
-      setIsTitle(false);
-    }
-    if (savedBody) {
-      setTheBody(savedBody);
-      setIsArticle(false);
-    }
-    // Remove the sesstion Storage after the page is mounted and if exist the article is created
-    sessionStorage.removeItem("tempTitle");
-    sessionStorage.removeItem("tempBody");
-  }, [dispatch, previousArticleID]);
-  // Update the store with the Title and Body of the article
-  // Debounced store update function
-  const debouncedUpdateStore = useCallback(
-    debounce((newTitle: string, newBody: string) => {
-      if (!articleIDRef.current) return;
-      console.log('debounce Called');
-      let title = newTitle.split(" ").slice(0, 2).join("-");
-      let id = `${title}-${articleIDRef.current}`;
-      // Remove previous body content before adding the new one
-      let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-      if (newTitle !== "") {
-        console.log('newTitle at debounce', newTitle);
-        console.log('id at debounce', id);
-        // Ensure only the latest title and id
-        articleContent = articleContent.filter((item: { type: string}) => item.type !== "title" && item.type !== "id"); 
-        // Add text to articleContent
-        articleContent.push({
-            type: "title",
-            content: title,
-        });
-        articleContent.push({
-          type: "id",
-          content: id,
-      });
-      }
+  // const previousArticleID = useSelector((state: any) => state.data_state?.id);
+  // console.log("previousArticleID", previousArticleID);
+  // Create article ID only once when component mounts
+  let savedBody: string = "";
+  let savedTitle: string = "";
 
+  useEffect(() => {
+    console.log("useEffect 1is running...");
+    // if (!articleIDRef.current) {
+    //   articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
+    //   console.log("articleIdRef.current", articleIDRef.current);
+    // }
+      // Check if the article has already been created
+      // const article = sessionStorage.getItem("articleContent");
+      const article = sessionStorage.getItem("articleContent");
+      if (article !== null || article !== undefined){
+        try{
+        const jsonArticle = JSON.parse(article!);
+        console.log('article', jsonArticle); 
+        console.log("Article already created");
+        savedTitle = jsonArticle[0]?.content;
+        savedBody = jsonArticle[2]?.content;
+        console.log('savedTitle', savedTitle);
+        console.log('savedBody', savedBody);
+      // Remove the sesstion Storage after the page is mounted and if exist the article is created
+      sessionStorage.removeItem("tempTitle");
+      sessionStorage.removeItem("tempBody");
+      //TODO add a sessionarticle remove.
+      }catch (error){
+        console.log(error);
+      }}
+  }, []);
 
-      if (newBody !== "") {
-        console.log('newBody at debounce', newBody);
-        // Ensure only the latest body
-        articleContent = articleContent.filter((item: { type: string }) => item.type !== "body");
-        // Add text to articleContent
-        articleContent.push({
-          type: "body",
-          content: newBody,
-        });
-      sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
-      const storedContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
-      console.log("Updated articleContent:", storedContent);
-      }
-    }, 500), // Wait 500ms after last change before updating store
-    []
-  );
-
-  // Handle content changes
-  const handleContentChange = (index: number, content: string) => {
-    console.log('handleContentChange Called');
-    //
-    if (index === 0) { // Title
-      setIsTitle(false);
-      setTheTitle(content);
-      sessionStorage.setItem("tempTitle", content);
-      // Get the last title content
-      debouncedUpdateStore(content, theBody);
-    } else { // Article
-      setIsArticle(false);
-      setTheBody(content);
-      sessionStorage.setItem("tempBody", content);
-      // Get the last body content
-      debouncedUpdateStore(theTitle, content); 
-      }
-  };
-  //
-  // Call debounce flush() on button click
-  const handleSave = () => {
-    console.log('Button clicked, flushing debounce');
-    debouncedUpdateStore.flush(); // Immediately executes pending updates
-  };
-  // Cleanup debounce on unmount
+  ///---------------------------------------------------
+  //  Cleanup debounce on unmount
+  ///---------------------------------------------------
   useEffect(() => {
     return () => {
       debouncedUpdateStore.cancel();
     };
   }, [debouncedUpdateStore]);
   //
+ ///========================================================
+ // Update the DOM if a previous article session is saved.
+ ///========================================================
+  useEffect(() => {
+    console.log("useEffect2is running...");
+    if (savedTitle) {
+      setTheTitle(savedTitle);
+      setIsTitle(!savedTitle);
+      setPlaceHolderTitle(false);
+    if (savedBody) {
+      setTheBody(savedBody);
+      setIsArticle(!savedBody);
+      setPlaceHolderArticle(false);
+    }
+  }}, [savedTitle, savedBody]);
+  //
+  ///======================================================
+  /// UI Editor with a menu with options to insert images,
+  // links, and bold or italic font style, with an <aside>
+  // for tablet and desktop and a <nav> for mobile
+  ///======================================================
   return (
     <>
     <div ref={pageRef} className="flex flex-col md:flex-row h-screen bg-black">
       {/* Left Menu on Tablet / Desktop*/}
-      <aside className="hidden w-1/4 h-100vh bg-gray-800 text-white md:flex items-center flex-col">
+      <aside className="hidden w-[25%] h-full bg-gray-800 text-white md:flex items-center flex-col">
         <ImageButton editorRefs={editorRefs} index={1}/>
         <LinkButton editorRefs={editorRefs} index={1} />
         <FontStyleUI/>
-        <CustomButton type='post' onClick={handleSave}/>
+        <CustomButton type='post' onClick={() => handleSave(debouncedUpdateStore)}/>
+        <CustomButton type='clear' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/>
         <LogOutButton />
       </aside>
       {/* Menu Mobile*/}
-      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row">
+      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row fixed">
+        <div className="flex items-center flex-col">
+          <div className="flex flex-row space-x-2">
         <ImageButton editorRefs={editorRefs} index={1}/>
-        <LinkButton editorRefs={editorRefs} index={1} />
+        <LinkButton editorRefs={editorRefs} index={1} /></div>
+        <CustomButton type='clear' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/></div>
         <FontStyleUI/>
-        <CustomButton type='post' onClick={handleSave}/>
+        <CustomButton type='post' onClick={()=> handleSave(debouncedUpdateStore)}/>
         <LogOutButton />
       </nav>
       {/* Main Content */}
-      <main className="flex-1 p-4">
+      <main className="flex-1 p-4 pt-[20vh] md:pt-2 md:w-[75%] overflow-y-auto min-h-screen">
+      <div className="border border-gray-600 border-1px">
       {["Title", "Article"].map((placeholder, index) => (
         <div key={index} style={{ userSelect: "text", cursor: "text" }}
                 ref={(el) => {
                   if (el && !editorRefs.current[index]) {
-                    // Assign only if not already set
-                    // as due to API call on LinkButton needs to be hold
                     editorRefs.current[index] = el; 
                 }
                 }}
-                className={`${placeholder === "Title" ? "h-[10%]": "h-[85%]"} ${placeholder === "Title" ? "font-bold": "font-normal"} p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
+                className={`${placeholder === "Title" ? "h-[10%]": "h-[100vh]"} ${placeholder === "Title" ? "font-bold": "font-normal"} p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
                 contentEditable={true}
                 onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs)}
                 suppressContentEditableWarning={true}
                   onFocus={() => index === 0 ? setPlaceHolderTitle(false) : setPlaceHolderArticle(false)}
                   onInput={(e) => {
-                    const content = (e.target as HTMLDivElement).innerText;
-                    handleContentChange(index, content);
+                    // const content = (e.target as HTMLDivElement).innerText;
+                    const content = (e.target as HTMLDivElement).innerHTML;
+                    handleContentChange(index, content, setIsTitle, setIsArticle, debouncedUpdateStore);
                   }}
-                >
-                  {(index === 0 ? isPlaceHolderTitle : isPlaceHolderArticle ) && 
-                  (index === 0 ? isTitle : isArticle ) && (
-                    <span className="text-gray-400">
-                      {index === 0 ? `${placeholder} here...` : `Write your ${placeholder} here...`}
-                    </span>
-                  )}
+                  >
+                    {index === 0
+            ? theTitle || (
+                isPlaceHolderTitle && (
+                  <span className="text-gray-400">{`${placeholder} here...`}</span>
+                )
+              )
+            : theBody || (
+                isPlaceHolderArticle && (
+                  <span className="text-gray-400">{`Write your ${placeholder} here...`}</span>
+                )
+              )}
+                </div>
+              ))}  
         </div>
-    ))}
       </main>
     </div>
     </>

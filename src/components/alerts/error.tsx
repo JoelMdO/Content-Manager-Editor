@@ -1,9 +1,14 @@
 import Swal from 'sweetalert2';
 
 const errorAlert = (type: string, status: string = "", message: string = "") => {
+    ///=============================================================
+    // Error Alerts with use of sweetalert
+    ///=============================================================
     //
     let text: string;
     let button_text: string = "Retry";
+    //
+    //Type of Alerts messages
     switch (status) {
         case "non200":
         text = `Upload ${type} failed ${message}.`;
@@ -19,7 +24,9 @@ const errorAlert = (type: string, status: string = "", message: string = "") => 
         text=`Error uploading the ${type}: ${message}`;
         break;
     }
-    //
+    ///------------------------------
+    // Sweetalert
+    ///------------------------------
     const Toast = Swal.mixin({
         toast: true,
         position: "center",

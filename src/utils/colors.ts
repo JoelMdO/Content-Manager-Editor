@@ -1,4 +1,3 @@
-import { Grenze } from "next/font/google";
 
 const Colors = {
     light: {

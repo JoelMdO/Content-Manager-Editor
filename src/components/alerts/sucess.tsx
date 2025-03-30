@@ -1,10 +1,14 @@
 import Swal from 'sweetalert2';
 
 const successAlert = (type: string, data: string = "") => {
+     ///=============================================================
+    // Sucess Alerts with use of sweetalert
+    ///=============================================================
+    //
     //
     let text: string;
-    console.log('data', data);
     //
+    // Alert types and messages
     switch (type) {
         case "link":
         text = "Link inserted";
@@ -19,8 +23,9 @@ const successAlert = (type: string, data: string = "") => {
         text = "Image uploaded";
         break;
     }
-    //
-
+    ///------------------------------
+    // Sweetalert
+    ///------------------------------
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",

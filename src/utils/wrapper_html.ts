@@ -1,6 +1,9 @@
 
 
 const linkWrapperHtml = (type: string, url:string): HTMLElement => {
+    ///========================================================
+    // Wrapper to be as container of a link or image
+    ///========================================================
     //
     let htmlType: string;
     switch (type) {

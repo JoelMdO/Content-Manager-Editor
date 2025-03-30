@@ -1,9 +1,11 @@
 import { AppDispatch } from "@/services/store"
 export const createArticleID = (dispatch: AppDispatch, isArticleCreated: string) => {
+    ///========================================================
+    // Function to create an article ID
+    ///========================================================
     //
     if (!isArticleCreated || isArticleCreated === '') {
     // Create an article ID .
-    console.log('Create an article ID on page load.');
     const date = new Date();
     const day = date.getDate(); // Day of the month (1-31)
     const month = date.getMonth() + 1; // Month (0-11, so adding 1)

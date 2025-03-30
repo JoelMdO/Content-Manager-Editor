@@ -1,9 +1,8 @@
-import { cookies } from "next/headers";
-import apiRoutes  from "../../../services/api_routes";
+import sanitize from "sanitize-html";
+import apiRoutes  from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
-import forwardResponseWithCookie from "@/services/forward_cookie";
-// import { supabase } from "../../../lib/supabase_client";
-// import { url } from "inspector";
+import { sanitizeData } from "@/utils/editor/sanitize";
+
 export async function POST(req: Request): Promise<any> {
     //
     let postData: string | File | {} = "";
@@ -12,59 +11,89 @@ export async function POST(req: Request): Promise<any> {
     //
     //
     try {
-            //### For non files only text as
+        ///-----------------------------------------------
+        /// Check the content type to see if the request 
+        /// comes without files only text
+        ///-----------------------------------------------    
             if (contentType.includes("application/json")){
-                console.log('data is content type json');
                 const getPostData = await req.json();
                 postData = getPostData.data;
                 type = getPostData.type;
-                console.log('postData json at hub', postData);
             }else {
-            //### For including files.
-            console.log('file is going to be checked at post hub');
+         ///-----------------------------------------------       
+         /// For request including files.
+         ///-----------------------------------------------   
             const formData = await req.formData();
+         ///-----------------------------------------------
+         /// Check the type of route the api will take from
+         /// typeofAction (Post, Logout, Clean-File) for
+         /// authentication the type of content is as json
+         ///----------------------------------------------- 
             const typeOfAction = formData.get("type");
-            console.log('typeOfAction at api/hub', typeOfAction);
-
-            //### POST the file.
-            if (typeOfAction === "post"){
-                console.log("Posting at hub POST");
+            switch(typeOfAction){
+            ///#### POST (Save) 
+            case "post":
+                //Retrieve the authorization session token from the headers
+                const session = req.headers.get("Authorization")?.split(" ")[1];
+                console.log('session at api/hub post', session);
+                
+                if (session) {
+                    formData.append("session", session);
+                } else {
+                    console.warn("Session is undefined, skipping formData append.");
+                    return NextResponse.json({ status: 401, message: "User without a valid session" });
+                }
+                /// Sanitize the data
+                const responseAfterSanitize = sanitizeData(formData, "post"); 
+                if ((await responseAfterSanitize).status === 200) {       
                 postData = formData;
                 type = "post";
-            //### LOGOUT
-            } else if (typeOfAction === "logout"){
-                console.log("to log out");
-                postData = "";
-                type = "logout";
-            ///### CLEAN the file.
-            } else {
-            console.log('data is file image');
+                } else {
+                return NextResponse.json({ status: 401, message: "Not valid data" });
+                }
+            break;
+            ///### LOGOUT
+            case "logout":
+                //Retrieve the authorization session token from the headers
+                const sessionIdForLougout = req.headers.get("Authorization")?.split(" ")[1];
+                if (sessionIdForLougout) {
+                    postData = sessionIdForLougout;
+                } else {
+                    return NextResponse.json({ status: 401, message: "User without a valid session" });
+                }
+                type = typeOfAction;
+            break;
+            ///### SANITIZE (clean-image).
+            default:
             const file = formData.get("file");
             if (!(file instanceof File)) {
                 return NextResponse.json({ status: 400, message: "No file uploaded" });
             }
             postData = file;
+            type = "clean-image";
+            break;
             }}
-            //
-            // Get token from cookies
-            const cookieStore = await cookies();
-            const token = cookieStore.get("token")?.value;  
-            const start = cookieStore.get("start")?.value;
-            console.log('token at apiHub', token, 'start at apiHub', start);
-        ///Send the file to the route Sanitize
+        ///-----------------------------------------------
+        /// Redirect the request to the apiRoutes endpoints
+        ///-----------------------------------------------
         const response = await apiRoutes({data: postData, type: type});
         const jsonResponse = await response.json();
-        console.log(`response at hub from ${type}`, {status: jsonResponse.status, message: jsonResponse.message});
-        ///-----------------------------------------------------------------------------
-        ///When the user has been authenticated, to forward the cookies. 
-        ///-----------------------------------------------------------------------------
-        if (jsonResponse.message === "User authenticated"){
-            return forwardResponseWithCookie(jsonResponse);
+        ///-----------------------------------------------
+        /// Response from api/auth return the sessionId.
+        ///-----------------------------------------------
+        if(jsonResponse.message === "User authenticated"){
+            const sessionId = jsonResponse.sessionId;
+            return NextResponse.json({ status: jsonResponse.status, message: "User authenticated", sessionId: sessionId });
+        ///-----------------------------------------------
+        /// From api/post return the body.
+        ///-----------------------------------------------
+        }else if (jsonResponse.message === "Data saved successfully"){
+            const body = jsonResponse.body;
+            return NextResponse.json({ status: jsonResponse.status, message: "Data saved successfully", body: body });
         } else {
-        return NextResponse.json({status: response.status, message: response.message});
+        return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
         }
     } catch (error) {
-        console.error("Error in API route:", error);
         return NextResponse.json({status: 500, message: "Internal Server Error" + error });
     }
 }
