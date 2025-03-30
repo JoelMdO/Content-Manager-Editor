@@ -18,16 +18,18 @@ const authMiddleware = async (req: any): Promise<{status: number}> =>{
     // Validate sessionId in Firebase Realtime Database
     const dbRef = ref(database, `sessionId/${sessionId}`);
     const snapshot = await get(dbRef);
-    try{
+    
     if (!snapshot.exists()) {
+        console.log('snapshot does not exits');
+        
       // If sessionId is invalid, redirect to login
-      return {status: 401};
-    }}catch{
       return {status: 401};
     }
   
     // If sessionId is valid, allow access to the requested route
-    return {status: 2000};
+    console.log('all good');
+    
+    return {status: 200};
   }
 
 export default authMiddleware;
