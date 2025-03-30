@@ -60,7 +60,6 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                 onClick={() => {
                     if (onClick) onClick(); setIsClicked(true);
                         setTimeout(() => {
-                            setIsClicked(false);
                             setLoading(true);
                         if(type === "post"){
                             ///For Posting the article
@@ -68,14 +67,22 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                             .then((response) => {     
                                 if (response.status === 200) {
                                 setLoading(false);
+                                setIsClicked(false);
                                 successAlert("saved");
+                                //From posting the new body article to be updated on the session storage. 
+                                if(response.body){
+                                    let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
+                                    articleContent.push({ type: "body", content: response.body});
+                                }
                                 } else if (response.message === "User not authenticated" || response.status === 401) {
                                     setLoading(false);
+                                    setIsClicked(false);
                                     errorAlert("saved", "nonauth", response.message);
                                     //Redirect the user to login page
                                         router.push(`${url}/`);
                                 } else {
-                                    setLoading(false);    
+                                    setLoading(false);
+                                    setIsClicked(false);    
                                  errorAlert("saved", "non200", response.message);
                                 }
                             }).catch((error) => {

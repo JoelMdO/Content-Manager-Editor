@@ -7,6 +7,8 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
     let body: FormData | string = new FormData(); 
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
+    console.log('callHub called');
+    
     //
     ///-----------------------------------------------
     /// Build the body of the request as each one it has
@@ -24,7 +26,7 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
             const formData = await createFormData(type, data);
             const sessionId = sessionStorage.getItem('sessionId');
             console.log('sessionId', sessionId);
-            
+            console.log('case Post');
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             body = formData;
             credentials = "include";
@@ -58,6 +60,12 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         if(jsonResponse.message === "User authenticated"){
             const sessionId = jsonResponse.sessionId;
             return { status: jsonResponse.status, message: "User authenticated", sessionId: sessionId };
+        ///-----------------------------------------------
+        /// From api/post returzzn the body.
+        ///-----------------------------------------------
+        }else if (jsonResponse.message === "Data saved successfully"){
+            const body = jsonResponse.body;
+            return { status: jsonResponse.status, message: "Data saved successfully", body: body };
         } else {
         return {status: jsonResponse.status, message: jsonResponse.message};
         }

@@ -43,6 +43,7 @@ const ArticlePage: React.FC = () => {
   let savedTitle: string = "";
 
   useEffect(() => {
+    console.log("useEffect 1is running...");
     // if (!articleIDRef.current) {
     //   articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
     //   console.log("articleIdRef.current", articleIDRef.current);
@@ -81,6 +82,7 @@ const ArticlePage: React.FC = () => {
  // Update the DOM if a previous article session is saved.
  ///========================================================
   useEffect(() => {
+    console.log("useEffect2is running...");
     if (savedTitle) {
       setTheTitle(savedTitle);
       setIsTitle(!savedTitle);
@@ -117,7 +119,7 @@ const ArticlePage: React.FC = () => {
         <LinkButton editorRefs={editorRefs} index={1} /></div>
         <CustomButton type='clear' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/></div>
         <FontStyleUI/>
-        <CustomButton type='post' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/>
+        <CustomButton type='post' onClick={()=> handleSave(debouncedUpdateStore)}/>
         <LogOutButton />
       </nav>
       {/* Main Content */}
@@ -136,7 +138,8 @@ const ArticlePage: React.FC = () => {
                 suppressContentEditableWarning={true}
                   onFocus={() => index === 0 ? setPlaceHolderTitle(false) : setPlaceHolderArticle(false)}
                   onInput={(e) => {
-                    const content = (e.target as HTMLDivElement).innerText;
+                    // const content = (e.target as HTMLDivElement).innerText;
+                    const content = (e.target as HTMLDivElement).innerHTML;
                     handleContentChange(index, content, setIsTitle, setIsArticle, debouncedUpdateStore);
                   }}
                   >

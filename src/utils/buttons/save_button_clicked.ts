@@ -9,6 +9,9 @@ const saveButtonClicked = async (italic: string, bold: string) => {
     articleContent.push(
         {type: "italic", content: italic},
         {type: "bold", content: bold});
+        console.log('saveButtonCalled');
+        console.log('articleContent at savedButton', articleContent);
+        
     const response = await callHub("post", articleContent);
         return response;
     //}

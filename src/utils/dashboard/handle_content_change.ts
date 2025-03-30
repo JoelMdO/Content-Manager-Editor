@@ -1,3 +1,4 @@
+import removeBase64FromImgTags from "./remove_img_base64";
 
 export const handleContentChange = (
 index: number,
@@ -11,6 +12,7 @@ debouncedUpdateStore: (title: string, body: string) => void
 // Function to handler the content change on the editor, when 
 // the user types or modifies the content. 
 ///========================================================
+console.log('handleContentChange content', content);
 
 if (index === 0) {
     // Title
@@ -20,7 +22,9 @@ if (index === 0) {
 } else {
     // Article
     setIsArticle(false);
-    sessionStorage.setItem("tempBody", content);
-    debouncedUpdateStore(sessionStorage.getItem("tempTitle") || "", content);
+    const htmlCleaned = removeBase64FromImgTags(content);
+    console.log('htmlCleaned', htmlCleaned);
+    sessionStorage.setItem("tempBody", htmlCleaned);
+    debouncedUpdateStore(sessionStorage.getItem("tempTitle") || "", htmlCleaned);
 }
 };

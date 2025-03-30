@@ -1,12 +1,16 @@
 'server-only';
+import { forEach } from 'lodash';
 import sanitizeHtml from 'sanitize-html';
 
-export async function sanitizeData(data: any) : Promise<{ status: number, message: string }> {
+export async function sanitizeData(data: any, type: string) : Promise<{ status: number, message: string }> {
     ///========================================================
     // Function to sanitize the links
     ///========================================================
+    console.log('sanitizeData called');
+    
     let sanitizedData: { status: number, message: string } = { status: 0, message: "" };
     let value: string = "";
+    if (type ==="link"){
 
         if (typeof data === 'string') {
             value = sanitizeHtml(data);
@@ -19,7 +23,36 @@ export async function sanitizeData(data: any) : Promise<{ status: number, messag
            //is not a string return error. 
             sanitizedData = {status: 205, message: "url not allowed"};
         }
-    return sanitizedData;
+        return sanitizedData;
+    } else {
+        if (data instanceof FormData) {
+        const titleBeforeSanitize = data.get('title');
+        const idBeforeSanitize = data.get('id');
+        const articleBeforeSanitize = data.get('article');
+        const italicBeforeSanitize = data.get('italic');
+        const boldBeforeSanitize = data.get('bold');
+        const imageBeforeSanitize = data.get(`image`); 
+        const title = JSON.stringify(titleBeforeSanitize);
+        const id = JSON.stringify(idBeforeSanitize);
+        const article = JSON.stringify(articleBeforeSanitize);
+        const italic = JSON.stringify(italicBeforeSanitize);
+        const bold = JSON.stringify(boldBeforeSanitize);
+        const image = JSON.stringify(imageBeforeSanitize);
+
+        const dataGroup = [title, id, image, article, italic, bold];
+        try{
+        forEach(dataGroup, (value) => {
+            console.log(typeof(value));
+            if (typeof value === 'string') {
+        sanitizedData = sanitizeUrl(value);
+            }
+        });
+        } catch (error) {
+            console.log(error);
+            sanitizedData.message = `data not allowed, ${error}`;
+        }}
+        return sanitizedData;
+    }
 }
 
 // Helper to validate URL

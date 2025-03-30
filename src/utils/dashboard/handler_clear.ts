@@ -12,7 +12,8 @@ export const handleClear = (
   // Clear title and body state
   setTheTitle("");
   setTheBody("");
-
+  console.log('called handleClear');
+  
   // Remove session storage items
   sessionStorage.removeItem("tempTitle");
   sessionStorage.removeItem("tempBody");

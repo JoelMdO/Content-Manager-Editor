@@ -1,8 +1,13 @@
 import { database } from "../../../../firebase";
-import { ref, push, set } from "firebase/database";
+import { ref, push, set, update, get} from "firebase/database";
 import { NextResponse } from "next/server";
 // import { supabase } from "../../../lib/supabase_client";
 import cloudinary from "@/lib/cloudinary/cloudinary";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import sessionCheck from "@/services/authentication/session_check";
+import { forEach } from "lodash";
+import { log } from "console";
+import replaceSrcWithImagePlaceholders from "@/utils/images_edit/replace_src_on_img";
 
 export async function POST(req: Request): Promise<Response> {
     ///---------------------------------------------------
@@ -10,6 +15,7 @@ export async function POST(req: Request): Promise<Response> {
     ///---------------------------------------------------
     ///
     /// Variables.
+    console.log('at post after api routes');
     const imageUrls: { url: string }[] = [];
     const formData = await req.formData();
     interface Article{
@@ -91,8 +97,6 @@ export async function POST(req: Request): Promise<Response> {
         ///================================================================
         /// SAVE　THE FULL ARTICLE to database:
         ///================================================================
-        const userId = formData.get("userId");
-        const dbRef = ref(database, `articles/${userId}`);
         // Parse individual fields
         const titleData = formData.get("title") as string;
         const titleObj = JSON.parse(titleData);
@@ -103,8 +107,15 @@ export async function POST(req: Request): Promise<Response> {
         const idContent = idObj.content; 
 
         const articleData = formData.get("article") as string;
+        console.log('articleData at api/post POST', articleData);
+        const formArticle = formData.get("article");
+        console.log('articleData at api/post POST', formArticle);
+        
+        
         const bodyObj = JSON.parse(articleData);
+        console.log('bodyObj at api/post POST', bodyObj);
         const bodyContent = bodyObj.content;
+        console.log('bodyContent at api/post POST', bodyContent);
 
         const italicData = formData.get("italic") as string;
         const italicObj = JSON.parse(italicData);
@@ -122,17 +133,68 @@ export async function POST(req: Request): Promise<Response> {
         article.italic = italicContent;
         
         // SAVE in db.
-        const id = push(dbRef);
+        const id = article.id;
         const title = article.title;
-        const body = article.article;
-        const images = article.images;
-        const bold = article.bold;  
-        const italic = article.italic;
+        let body = article.article;
+        let images = article.images;
+        let bold = article.bold;  
+        let italic = article.italic;
         //
-        await set(dbRef, {
-            id,title, body, images, bold, italic});
-        return NextResponse.json({status:200, message: "Data saved successfully"});
+        const userId = formData.get("session")as string;
+        console.log('userId', userId);
+        try{
+        const dbRef = ref(database, `articles/${id}`);
+        console.log("id", id);
+        console.log("title", title);
+        console.log("body", body);
+        console.log("images", images);
+        console.log("bold", bold);
+        console.log("italic", italic);
+        const arrayData = [images, bold, italic];
+        forEach(arrayData, (value) => {
+            console.log("value length", value.length);
+            console.log('value', value);
+            if(Array.isArray(value) && value.length === 0){
+                console.log("value length <0", value.length);
+                console.log('value <0', value);
+                if (value === images) {
+                        images = [{ url: "nil" }];
+                        console.log("images", images);
+                        console.log('arrayData', arrayData);
+                } else if (value === bold) {
+                        bold = ["nil"];
+                        console.log("bold", bold);
+                        console.log('arrayData', arrayData);  
+                } else {
+                    italic=["nil"];
+                    console.log("italic", italic);
+                    console.log('arrayData', arrayData);
+                }}
+            });
+        // Replace src of the each image with the corresponded url:
+        body = replaceSrcWithImagePlaceholders(body, images);
+        console.log('body after replace', body);
+        
+        const articleData = {
+            id,
+            title,
+            body,
+            images,
+            bold,
+            italic
+        };
+        // const articleDataJson = JSON.stringify(articleData);
+        console.log('articleData', articleData);
+        
+        await update(dbRef, {
+            articleData});
+            return NextResponse.json({status:200, message: "Data saved successfully", body: body});
+        }catch (error) {
+            console.log('error', error);
+            return NextResponse.json({ status: 500, message: `Error processing request. ${error}` });
+        }
     } catch (error) {
-        return NextResponse.json({ status: 500, message: "Error processing request." });
+        console.log('error', error);
+        return NextResponse.json({ status: 500, message: `Error processing request. ${error}`});
     }
         }

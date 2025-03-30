@@ -35,8 +35,13 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             /// Verify sessionId if its valid through the sessionCheck function
             ///-----------------------------------------------
+            console.log('at post api routes');
+            
             const sessionId = data.get("session");
+            console.log("sessionId at api routes", sessionId);
             const response = await sessionCheck(sessionId);
+            console.log('response', response);
+            
                 if (response.status !== 200) {
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                 }
@@ -44,8 +49,8 @@ const apiRoutes = async (postData: any): Promise<any> => {
             /// Check if data is already FormData
             ///-----------------------------------------------
                 if (data instanceof FormData) {
-                    data.append('userId', response.user!);
-                    data.delete('session');
+                    data.append('userId', response.user!); 
+                    data.delete('session'); 
                     body=data;
                 } else {
                     // Convert data to FormData if it's not already
@@ -74,9 +79,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             const sessionIdForLogout = data;
             console.log('data', data);
-            
             console.log('sessionIdForLogout', sessionIdForLogout);
-            
             const responseSessionCheck = await sessionCheck(sessionIdForLogout);
             const auth = {user: responseSessionCheck.user!, sessionId: sessionIdForLogout};
             body = JSON.stringify(auth);
@@ -103,6 +106,12 @@ const apiRoutes = async (postData: any): Promise<any> => {
         if(jsonResponse.message === "User authenticated"){
             const sessionId = jsonResponse.session;
             return NextResponse.json({ status: jsonResponse.status, message: "User authenticated", sessionId: sessionId });
+        ///-----------------------------------------------
+        /// From api/post return the body.
+        ///-----------------------------------------------
+        }else if (jsonResponse.message === "Data saved successfully"){
+            const body = jsonResponse.body;
+            return NextResponse.json({ status: jsonResponse.status, message: "Data saved successfully", body: body });
         } else {
         return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
         }
