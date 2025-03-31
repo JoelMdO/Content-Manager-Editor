@@ -4,11 +4,11 @@ import { handleKeyBoardActions } from "../../utils/editor/handle_keys";
 import { useDispatch} from "react-redux";
 import { AppDispatch } from "../../services/store";
 import dynamic from "next/dynamic";
-import { handleClear } from "@/utils/dashboard/handler_clear";
-import { handleSave } from "@/utils/dashboard/handle_save"; 
-import LogOutButton from "@/components/buttons/logout_buttons";
-import { debouncedUpdateStore } from "@/utils/dashboard/debounceUpdateStore";
-import { handleContentChange } from "@/utils/dashboard/handle_content_change";
+import { handleClear } from "../../utils/dashboard/handler_clear";
+import { handleSave } from "../../utils/dashboard/handle_save"; 
+import LogOutButton from "../../components/buttons/logout_buttons";
+import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
+import { handleContentChange } from "../../utils/dashboard/handle_content_change";
 
 const ImageButton = dynamic(() => import("../../components/buttons/image_button"), { ssr: false });
 const LinkButton = dynamic(() => import("../../components/buttons/link_button"), { ssr: false });
