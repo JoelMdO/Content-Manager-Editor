@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import rateLimit from './services/api/rate_limit';
 
+//
 export async function middleware(req: NextRequest) {
 
 ///----------------------------------------------------------------
@@ -71,9 +72,8 @@ if (isSubRequest) {
       `.replace(/\s{2,}/g, ' ').trim()
     );
     return response;
-}
+};
 
 export const config = {
   matcher: ['/api/post', '/api/save', '/dashboard', '/playbook', '/read-playbook'],
 };
-
