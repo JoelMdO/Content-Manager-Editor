@@ -25,12 +25,9 @@ const Login: React.FC = () => {
         successAlert("auth", response.message);
         const sessionId = response.sessionId;
         
-        if (sessionId) {
-            sessionStorage.setItem("sessionId", sessionId);
-        } else {
-            console.error("Session ID is undefined");
-        }
-        router.push("/home");
+        sessionStorage.setItem("sessionId", sessionId);
+        Cookies.set('sessionId', sessionId, { expires: 1 });
+        window.location.href = "/dashboard";
     };
     //
     ///--------------------------------------------------------

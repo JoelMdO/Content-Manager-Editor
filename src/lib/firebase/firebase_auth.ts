@@ -46,7 +46,7 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         return response;  
         } catch(e){
         //
-        return NextResponse.json({status: 400, message: e});
+        return{status: 400, message: e};
         }
         
 }
