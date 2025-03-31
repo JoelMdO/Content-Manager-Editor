@@ -4,8 +4,8 @@ import Image from "next/image";
 import successAlert from "../alerts/sucess";
 import errorAlert from "../alerts/error";
 import { useRouter } from "next/navigation";
-import saveButtonClicked from "@/utils/buttons/save_button_clicked";
-import emailMe from "@/utils/buttons/email_me";
+import saveButtonClicked from "../../utils/buttons/save_button_clicked";
+import emailMe from "../../utils/buttons/email_me";
 
 interface ButtonProps {
     type: string;
