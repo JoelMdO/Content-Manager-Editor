@@ -6,7 +6,7 @@ const saveImageTemporally = async (file: File) =>
     // Open the IndexedDB with the name "imageStore" and version 1
     const request = window.indexedDB.open("imageStore", 1);
     if (!window.indexedDB) {
-        console.error("IndexedDB is not supported by your browser.");
+        reject({status: 205, message: `Store index not supported`});
     }
     //
     request.onupgradeneeded = (event) => {

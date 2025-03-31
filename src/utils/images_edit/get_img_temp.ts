@@ -39,7 +39,6 @@ const getImageTemporally = async (fileName: string) => {
         return {status: 205, message:"Error retrieving image", file: null};
     };
     }} catch (error) {
-    console.error(error);
     return {status: 500, message: error };
 }})};
 

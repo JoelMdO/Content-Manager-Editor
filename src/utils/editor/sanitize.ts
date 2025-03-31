@@ -6,8 +6,7 @@ export async function sanitizeData(data: any, type: string) : Promise<{ status: 
     ///========================================================
     // Function to sanitize the links
     ///========================================================
-    console.log('sanitizeData called');
-    
+
     let sanitizedData: { status: number, message: string } = { status: 0, message: "" };
     let value: string = "";
     if (type ==="link"){
@@ -42,13 +41,11 @@ export async function sanitizeData(data: any, type: string) : Promise<{ status: 
         const dataGroup = [title, id, image, article, italic, bold];
         try{
         forEach(dataGroup, (value) => {
-            console.log(typeof(value));
             if (typeof value === 'string') {
         sanitizedData = sanitizeUrl(value);
             }
         });
         } catch (error) {
-            console.log(error);
             sanitizedData.message = `data not allowed, ${error}`;
         }}
         return sanitizedData;
@@ -82,11 +79,9 @@ export async function sanitizeFile(file: File): Promise<{ status: number; messag
     const maxSize = 500 * 1024; // 5kB limit
     try{
     if (!allowedTypes.includes(file.type)) {
-        console.error("Invalid file type");
-        return {status: 205, message: "Invalid file type"};
+         return {status: 205, message: "Invalid file type"};
     }
     if (file.size > maxSize) {
-        console.error("File too large");
         return {status: 205, message: "File too large"};
     }
      // Sanitize the filename (avoid script injection via filename)
@@ -96,7 +91,6 @@ export async function sanitizeFile(file: File): Promise<{ status: number; messag
     });
 
     if (sanitizedFileName !== file.name) {
-        console.error("File name contains suspicious characters");
         return { status: 400, message: "Invalid file name" };
     }
 

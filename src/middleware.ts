@@ -10,12 +10,10 @@ const isSubRequest = header.get('x-middleware-subrequest');
 const database_url = process.env.NEXT_PUBLIC_databaseURL;
 const { pathname } = req.nextUrl;
 //
-console.log('middleware called for path', pathname);
 ///----------------------------------------------------------------
 // Check in case of subrequest
 ///----------------------------------------------------------------
 if (isSubRequest) {
-  console.log('subrequest called');
   const origin = header.origin || header.referer;
   const url = process.env.NEXT_PUBLIC_api_url;
 
@@ -27,7 +25,6 @@ if (isSubRequest) {
  //Protect the /dashboard route 
 ///----------------------------------------------------------------
   if (pathname.startsWith('/dashboard')) {
-    console.log('calling authMiddleware');
       const authMiddleResponse = await authMiddleware(req);
       if(authMiddleResponse.status === 200){
         response = rateLimit(req);

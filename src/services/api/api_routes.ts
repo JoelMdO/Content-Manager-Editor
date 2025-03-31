@@ -35,12 +35,8 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             /// Verify sessionId if its valid through the sessionCheck function
             ///-----------------------------------------------
-            console.log('at post api routes');
-            
             const sessionId = data.get("session");
-            console.log("sessionId at api routes", sessionId);
             const response = await sessionCheck(sessionId);
-            console.log('response', response);
             
                 if (response.status !== 200) {
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
@@ -78,8 +74,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
             /// Verify sessionId if its valid through the sessionCheck function
             ///-----------------------------------------------
             const sessionIdForLogout = data;
-            console.log('data', data);
-            console.log('sessionIdForLogout', sessionIdForLogout);
             const responseSessionCheck = await sessionCheck(sessionIdForLogout);
             const auth = {user: responseSessionCheck.user!, sessionId: sessionIdForLogout};
             body = JSON.stringify(auth);
@@ -116,7 +110,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
         return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
         }
     } catch (error) {    
-    console.error(error);
     return {status: 500, message: "error" + error, };
     }
 } 

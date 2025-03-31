@@ -1,16 +1,14 @@
 'use client'
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { handleKeyBoardActions } from "../../utils/editor/handle_keys";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 import { AppDispatch } from "../../services/store";
-import { createArticleID } from "@/utils/create_id";
 import dynamic from "next/dynamic";
 import { handleClear } from "@/utils/dashboard/handler_clear";
 import { handleSave } from "@/utils/dashboard/handle_save"; 
 import LogOutButton from "@/components/buttons/logout_buttons";
 import { debouncedUpdateStore } from "@/utils/dashboard/debounceUpdateStore";
 import { handleContentChange } from "@/utils/dashboard/handle_content_change";
-import setContentWithCursorPreservation from "@/utils/dashboard/set_content_with_cursor";
 
 const ImageButton = dynamic(() => import("../../components/buttons/image_button"), { ssr: false });
 const LinkButton = dynamic(() => import("../../components/buttons/link_button"), { ssr: false });
@@ -33,39 +31,23 @@ const ArticlePage: React.FC = () => {
   // Check if an article is already created on page load
   // Store articleID in a ref to persist across renders
   ///======================================================
-  // const articleIDRef = useRef<string>("");
-  // console.log('articleIDRef', articleIDRef);
-  
-  // const previousArticleID = useSelector((state: any) => state.data_state?.id);
-  // console.log("previousArticleID", previousArticleID);
   // Create article ID only once when component mounts
   let savedBody: string = "";
   let savedTitle: string = "";
 
   useEffect(() => {
-    console.log("useEffect 1is running...");
-    // if (!articleIDRef.current) {
-    //   articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
-    //   console.log("articleIdRef.current", articleIDRef.current);
-    // }
       // Check if the article has already been created
-      // const article = sessionStorage.getItem("articleContent");
       const article = sessionStorage.getItem("articleContent");
       if (article !== null || article !== undefined){
         try{
         const jsonArticle = JSON.parse(article!);
-        console.log('article', jsonArticle); 
-        console.log("Article already created");
         savedTitle = jsonArticle[0]?.content;
         savedBody = jsonArticle[2]?.content;
-        console.log('savedTitle', savedTitle);
-        console.log('savedBody', savedBody);
       // Remove the sesstion Storage after the page is mounted and if exist the article is created
       sessionStorage.removeItem("tempTitle");
       sessionStorage.removeItem("tempBody");
-      //TODO add a sessionarticle remove.
+      sessionStorage.removeItem("articleContent");
       }catch (error){
-        console.log(error);
       }}
   }, []);
 
@@ -82,7 +64,6 @@ const ArticlePage: React.FC = () => {
  // Update the DOM if a previous article session is saved.
  ///========================================================
   useEffect(() => {
-    console.log("useEffect2is running...");
     if (savedTitle) {
       setTheTitle(savedTitle);
       setIsTitle(!savedTitle);

@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { auth } from "../../../firebase"; 
 import { signOut } from "firebase/auth";
 import { database } from "../../../firebase";
@@ -11,8 +10,6 @@ const handleLogout = async (data: { user: string; sessionId: string }) => {
     //
     const user = data.user!;
     const sessionId = data.sessionId!;
-    console.log('user', user);
-    console.log('sessionId', sessionId);    
     //
     if (user){
     const dbRef = ref(database, `session/${user}`);

@@ -5,7 +5,6 @@ import Image from "next/image";
 import insertLink from "@/utils/editor/insert_link";
 import successAlert from "../alerts/sucess";
 import errorAlert from "../alerts/error";
-import { get } from "lodash";
 
 interface LinkButtonProps {
     editorRefs?: React.RefObject<(HTMLDivElement | null)[]>;

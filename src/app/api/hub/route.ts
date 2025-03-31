@@ -1,4 +1,3 @@
-import sanitize from "sanitize-html";
 import apiRoutes  from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
 import { sanitizeData } from "@/utils/editor/sanitize";
@@ -35,12 +34,10 @@ export async function POST(req: Request): Promise<any> {
             case "post":
                 //Retrieve the authorization session token from the headers
                 const session = req.headers.get("Authorization")?.split(" ")[1];
-                console.log('session at api/hub post', session);
                 
                 if (session) {
                     formData.append("session", session);
                 } else {
-                    console.warn("Session is undefined, skipping formData append.");
                     return NextResponse.json({ status: 401, message: "User without a valid session" });
                 }
                 /// Sanitize the data

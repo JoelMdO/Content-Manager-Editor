@@ -1,17 +1,13 @@
 import "server-only";
-import admin, { auth } from "firebase-admin";
+import admin from "firebase-admin";
 import getSessionBySessionId from "./get_session_by_id";
 import readLog from "./read_log";
 import getSessionPlate from "./get_session_plate";
-import { getAuth } from "firebase-admin/auth";
-import { database } from "../../../firebase";
-import { ref, push, set, update, get} from "firebase/database";
 
 async function sessionCheck(sessionId: string, id?: string, title?: string, body?: string, images?: object, bold?: string[], italic?: string[]) : Promise<{status: number; message: string; user?: string}> {
     //==================================================
     // Check the session ID if same on the database
     //==================================================
-    console.log('doing sessionCheck');
     
     if(sessionId){
     const SessionPlateId = await getSessionPlate(sessionId);
@@ -58,12 +54,9 @@ async function sessionCheck(sessionId: string, id?: string, title?: string, body
     
     try{
     const decodedToken = await admin.auth().verifyIdToken(token);
-    console.log('decodedToken', decodedToken);
-    
     user = decodedToken.uid;
         
     if(!user){
-        console.error("🚨 User not found.");
         return {status: 400, message: "User not longer authenticated. Please sign again."};
     }
 
@@ -72,13 +65,10 @@ async function sessionCheck(sessionId: string, id?: string, title?: string, body
     } catch (error) {
         // Detect specific Firebase Auth errors
         const errorMessage: string = String(error);
-        console.log('user not authenticated', error);
-        // if(decodedToken.error === "Firebase ID token has expired. 
         // Get a fresh ID token from your client app and try again (auth/id-token-expired).
         if (errorMessage.includes("Firebase ID token has expired.")) {
             // Get a customToken
             const customToken = await admin.auth().createCustomToken(userId);
-            console.log('Generated Custom Token:', customToken);
             // Sign in with the custom token
             const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${process.env.NEXT_PUBLIC_FIREBASE_apiKey}`, {
             method: "POST",
@@ -89,7 +79,6 @@ async function sessionCheck(sessionId: string, id?: string, title?: string, body
             }),
             });
             const data = await response.json();
-            console.log('token new data', data);
             
             if (!response.ok) {
             return {status: 400, message: `Failed to refresh token, ${data}`};
@@ -97,7 +86,6 @@ async function sessionCheck(sessionId: string, id?: string, title?: string, body
             const decodedToken = await admin.auth().verifyIdToken(data.refresh_token);
             user = decodedToken.uid;
             if(!user){
-                console.error("🚨 User not found.");
                 return {status: 400, message: "User not longer authenticated. Please sign again."};
             }
             return {status: 200, message: "User authenticated", user: user};
