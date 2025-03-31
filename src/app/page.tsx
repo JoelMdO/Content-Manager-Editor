@@ -1,6 +1,5 @@
 'use client'
 import { useState } from "react";
-import Cookies from "js-cookie";
 import callHub from "../services/api/call_hub";
 import successAlert from "@/components/alerts/sucess";
 import errorAlert from "@/components/alerts/error";
@@ -26,7 +25,6 @@ const Login: React.FC = () => {
         const sessionId = response.sessionId;
         
         sessionStorage.setItem("sessionId", sessionId);
-        Cookies.set('sessionId', sessionId, { expires: 1 });
         window.location.href = "/dashboard";
     };
     //
