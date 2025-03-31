@@ -1,6 +1,6 @@
 import apiRoutes  from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
-import { sanitizeData } from "@/utils/editor/sanitize";
+import { sanitizeData } from "../../../utils/editor/sanitize";
 
 export async function POST(req: Request): Promise<any> {
     //

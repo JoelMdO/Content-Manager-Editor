@@ -1,6 +1,6 @@
 import callHub from "../../services/api/call_hub";
 import { AppDispatch } from "../../services/store";
-import linkWrapperHtml from "@/utils/wrapper_html";
+import linkWrapperHtml from "../../utils/wrapper_html";
 
 
 const insertLink = async (dispatch: AppDispatch, link_url: string, editorRef: HTMLDivElement | null): Promise<any> => {

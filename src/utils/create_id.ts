@@ -1,4 +1,4 @@
-import { AppDispatch } from "@/services/store"
+import { AppDispatch } from "../services/store"
 export const createArticleID = (dispatch: AppDispatch, isArticleCreated: string) => {
     ///========================================================
     // Function to create an article ID
