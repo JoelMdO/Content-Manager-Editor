@@ -25,10 +25,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
     // Retrieve text styles from Redux for saving on saveButtonClicked
     const italic = useSelector((state: any) => state.data_state?.fontStyle);
     const bold = useSelector((state: any) => state.data_state?.fontWeight);
-    console.log('italic', italic);
-    console.log('bold', bold);
-    console.log(`Button ${type}`);
-    //
+     //
     //
     switch (type) {
         case "post":

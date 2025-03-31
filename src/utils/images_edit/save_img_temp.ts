@@ -3,7 +3,7 @@ const saveImageTemporally = async (file: File) =>
     // Open the IndexedDB with the name "imageStore" and version 1
     const request = window.indexedDB.open("imageStore", 1);
     if (!window.indexedDB) {
-        console.error("IndexedDB is not supported by your browser.");
+   
     }
     //
     request.onupgradeneeded = (event) => {
@@ -39,7 +39,7 @@ const saveImageTemporally = async (file: File) =>
             }
         transaction.oncomplete = () => {
             if(added) {
-                console.log(`Transaction completed: Image saved to the IndexedDB`);
+
                 resolve({status: 200, message: `Image saved to the IndexedDB ${file.name}`});
             } else {
                 reject({status: 205, message: `Error saving image to the IndexedDB`});

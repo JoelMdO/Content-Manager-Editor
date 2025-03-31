@@ -32,8 +32,6 @@ const createLog= (token: any) =>  {
     encrypted_data,
     ]).toString('base64');
     //
-    console.log("iv", iv.length, "tag", tag.length, "encrypted_data", encrypted_data.length);
-    console.log("log", log);
     //
     return log;
 };

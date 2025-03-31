@@ -6,7 +6,6 @@ export const debouncedUpdateStore = debounce(
   // Debounced store update function
   ///========================================================
 (newTitle: string, newBody: string) => {
-    console.log("debounce Called");
 
     let title = newTitle.split(" ").slice(0, 2).join("-");
     let id = `${title}-${sessionStorage.getItem("articleID")}`;
@@ -16,8 +15,6 @@ export const debouncedUpdateStore = debounce(
     let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
 
     if (newTitle !== "") {
-      console.log('newTitle at debounce', newTitle);
-      console.log('id at debounce', id);
       // Ensure only the latest title and id
       articleContent = articleContent.filter(
           (item: { type: string }) => item.type !== "title" && item.type !== "id"
@@ -37,7 +34,6 @@ export const debouncedUpdateStore = debounce(
     }
 
     sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
-    console.log("Updated articleContent:", articleContent);
 },
   500 // Wait 500ms after last change before updating store
 );

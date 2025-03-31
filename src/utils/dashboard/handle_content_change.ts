@@ -9,8 +9,6 @@ setTheBody: (value: string) => void,
 debouncedUpdateStore: (title: string, body: string) => void
 ) => {
 
-    console.log("handleContentChange Called");
-
 if (index === 0) {
     // Title
     setIsTitle(false);

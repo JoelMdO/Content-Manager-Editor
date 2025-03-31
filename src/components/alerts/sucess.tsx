@@ -3,7 +3,6 @@ import Swal from 'sweetalert2';
 const successAlert = (type: string, data: string = "") => {
     //
     let text: string;
-    console.log('data', data);
     //
     switch (type) {
         case "link":

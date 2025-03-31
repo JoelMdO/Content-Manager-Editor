@@ -1,7 +1,6 @@
 const deleteImageFromIndexDB = async (fileName?: string, type?: string) => 
     new Promise((resolve, reject) => {
     // Open the IndexedDB with the name "imageStore" and version 1
-    console.log("type at deleteImageFrom", type);
     const request = window.indexedDB.open("imageStore", 1);
     //
     request.onupgradeneeded = (event) => {
@@ -18,12 +17,12 @@ const deleteImageFromIndexDB = async (fileName?: string, type?: string) =>
         /// Delete all images from indexDb
         /// ---------------------------------------------------------
         if(type === "clear-all"){
-            console.log("clearing all");   
+
             const getAllKeysRequest = store.getAllKeys();
-            console.log("keys at getall", getAllKeysRequest);
+
             getAllKeysRequest.onsuccess = () => {
                 const keys = getAllKeysRequest.result;
-                console.log("keys after getall", keys);
+
                 if (keys.length === 0) {
                     resolve({ status: 200, message: "No images found in IndexedDB" });
                     return;

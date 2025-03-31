@@ -11,13 +11,10 @@ const logout = async () => {
     const cookieStore = await cookies();
     cookieStore.delete("token");
     cookieStore.delete("start");
-
-    console.log("✅ User logged out");
-
       // Redirect to login page
     router.push("/");
     } catch (error) {
-    console.error("❌ Logout failed:", error);
+
     }
 };
 

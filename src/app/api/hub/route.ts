@@ -14,16 +14,13 @@ export async function POST(req: Request): Promise<any> {
         /// comes without files only text
         ///-----------------------------------------------    
             if (contentType.includes("application/json")){
-                console.log('request does not include files');
                 const getPostData = await req.json();
                 postData = getPostData.data;
                 type = getPostData.type;
-                console.log('postData json at hub', postData);
             }else {
          ///-----------------------------------------------       
          /// For request including files.
          ///-----------------------------------------------   
-            console.log('request including files.');
             const formData = await req.formData();
          ///-----------------------------------------------
          /// Check the type of route the api will take from
@@ -31,18 +28,18 @@ export async function POST(req: Request): Promise<any> {
          /// authentication the type of content is as json
          ///----------------------------------------------- 
             const typeOfAction = formData.get("type");
-            console.log('typeOfAction at api/hub', typeOfAction);
+            
             switch(typeOfAction){
             ///#### POST (Save) 
             case "post":
-                console.log("Posting at hub POST");
+            
                 //Retrieve the authorization session token from the headers
                 const session = req.headers.get("Authorization")?.split(" ")[1];
-                console.log("session at hub/POST", session);
+ 
                 if (session) {
                     formData.append("session", session);
                 } else {
-                    console.warn("Session is undefined, skipping formData append.");
+ 
                     return NextResponse.json({ status: 401, message: "User without a valid session" });
                 }
                 postData = formData;
@@ -50,21 +47,21 @@ export async function POST(req: Request): Promise<any> {
             break;
             ///### LOGOUT
             case "logout":
-                console.log("Posting at hub POST");
+ 
                 //Retrieve the authorization session token from the headers
                 const sessionIdForLougout = req.headers.get("Authorization")?.split(" ")[1];
-                console.log("session at hub/POST", sessionIdForLougout);
+ 
                 if (sessionIdForLougout) {
                     postData = sessionIdForLougout;
                 } else {
-                    console.warn("Session is undefined, skipping formData append.");
+ 
                     return NextResponse.json({ status: 401, message: "User without a valid session" });
                 }
                 type = typeOfAction;
             break;
             ///### SANITIZE (clean-image).
             default:
-            console.log('data is file image');
+ 
             const file = formData.get("file");
             if (!(file instanceof File)) {
                 return NextResponse.json({ status: 400, message: "No file uploaded" });
@@ -83,14 +80,14 @@ export async function POST(req: Request): Promise<any> {
         ///-----------------------------------------------
         if(jsonResponse.message === "User authenticated"){
             const sessionId = jsonResponse.sessionId;
-            console.log("Authenticated sessionId:", sessionId);
+ 
             return NextResponse.json({ status: jsonResponse.status, message: "User authenticated", sessionId: sessionId });
         } else {
-        console.log(`response at hub from ${type}`, {status: jsonResponse.status, message: jsonResponse.message});
+ 
         return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
         }
     } catch (error) {
-        console.error("Error in API route:", error);
+ 
         return NextResponse.json({status: 500, message: "Internal Server Error" + error });
     }
 }

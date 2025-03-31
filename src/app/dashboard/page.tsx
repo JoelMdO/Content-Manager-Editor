@@ -26,7 +26,6 @@ const ArticlePage: React.FC = () => {
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const editorRefs = useRef<(HTMLDivElement| null)[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  console.log('page'); 
   const pageRef = useRef(null);
   //
   ///======================================================
@@ -39,8 +38,7 @@ const ArticlePage: React.FC = () => {
   useEffect(() => {
     if (!articleIDRef.current) {
       articleIDRef.current = createArticleID(dispatch, previousArticleID)!;
-      console.log('articleID', articleIDRef.current);
-    }
+      }
     // Check if the article has already been created
     const savedTitle = sessionStorage.getItem("tempTitle");
     const savedBody = sessionStorage.getItem("tempBody");
