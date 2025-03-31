@@ -44,8 +44,7 @@ if (isSubRequest) {
 
   if (!origin || origin != url) {
     return NextResponse.json({ status: 403, error: 'Unauthorized request' });
-  }
-}
+}}
 ///----------------------------------------------------------------
 ///------ Check for any rate limits on other paths ----------------
 ///----------------------------------------------------------------
