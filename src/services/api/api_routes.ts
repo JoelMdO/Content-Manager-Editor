@@ -7,7 +7,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
     /// Function to redirect the api endpoints, includes the fecthing
     ///=============================================================
     const {data, type} = postData;  
-    const url = process.env.NEXT_PUBLIC_url_api;
+    const url = process.env.NEXT_PUBLIC_url_api; //TODO change env file with url on deployment.
     let endPoint: string = "";
     let body: string | FormData = new FormData();
     let headers: HeadersInit = {};
@@ -37,7 +37,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             const sessionId = data.get("session");
             const response = await sessionCheck(sessionId);
-            
+                console.log("authJson after reauthenticate at apiRoutes", response)
                 if (response.status !== 200) {
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                 }

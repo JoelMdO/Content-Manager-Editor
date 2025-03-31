@@ -25,8 +25,6 @@ export const handleKeyBoardActions = (
     ///--------------------------------------------------------
             const selection = window.getSelection();
             if (selection &&  selection!.rangeCount > 0) {
-            // const range = selection!.getRangeAt(0);
-            // const selectedNode = range.commonAncestorContainer;
             if (selection?.rangeCount) {
                 const range = selection.getRangeAt(0);
                 let selectedNode = range.startContainer as HTMLElement;
