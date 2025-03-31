@@ -3,7 +3,7 @@ import { ref, update} from "firebase/database";
 import { ref, update} from "firebase/database";
 import { NextResponse } from "next/server";
 // import { supabase } from "../../../lib/supabase_client";
-import cloudinary from "@/lib/cloudinary/cloudinary";
+import cloudinary from "../../../lib/cloudinary/cloudinary";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
 import { forEach } from "lodash";
 import replaceSrcWithImagePlaceholders from "../../../utils/images_edit/replace_src_on_img";
