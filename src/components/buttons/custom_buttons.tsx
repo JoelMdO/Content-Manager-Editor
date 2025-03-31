@@ -6,8 +6,6 @@ import errorAlert from "../alerts/error";
 import { useRouter } from "next/navigation";
 import saveButtonClicked from "@/utils/buttons/save_button_clicked";
 import emailMe from "@/utils/buttons/email_me";
-import { subtle } from "crypto";
-import { log } from "console";
 
 interface ButtonProps {
     type: string;

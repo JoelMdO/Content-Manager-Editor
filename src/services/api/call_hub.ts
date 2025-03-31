@@ -8,8 +8,6 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
     let body: FormData | string = new FormData(); 
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
-    console.log('callHub called');
-    
     //
     ///-----------------------------------------------
     /// Build the body of the request as each one it has
@@ -26,8 +24,6 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         case "post":
             const formData = await createFormData(type, data);
             const sessionId = sessionStorage.getItem('sessionId');
-            console.log('sessionId', sessionId);
-            console.log('case Post');
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             body = formData;
             credentials = "include";
@@ -38,8 +34,6 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
             const sessionIdForLougout = sessionStorage.getItem('sessionId');
             sessionStorage.removeItem('sessionId');
             Cookies.remove('sessionId');
-            console.log('sessionIdForLougout', sessionIdForLougout);
-            
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionIdForLougout}` };
             break;
@@ -73,7 +67,7 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         return {status: jsonResponse.status, message: jsonResponse.message};
         }
     } catch (error) {
-    return {status: 500, message: error };
+  return {status: 500, message: error };
     }
 }
 export default callHub;

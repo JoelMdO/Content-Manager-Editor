@@ -1,10 +1,9 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { cookies, headers } from "next/headers";
 import { auth } from "../../../firebase";   
 import { NextResponse } from "next/server";
 import generateSession from "@/services/authentication/generate_session";
 import { database } from "../../../firebase";
-import { ref, set, update } from "firebase/database";
+import { ref, update } from "firebase/database";
 
 const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         

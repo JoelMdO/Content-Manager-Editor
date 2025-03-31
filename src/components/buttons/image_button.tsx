@@ -1,7 +1,7 @@
-import React, {ChangeEvent, useEffect, useRef, useState} from "react";
+import React, {ChangeEvent, useRef, useState} from "react";
 import uploadImage from "../../utils/images_edit/upload_image";
 import { AppDispatch } from "../../services/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Image from "next/image";
 import successAlert from "../alerts/sucess";
 import errorAlert from "../alerts/error";
@@ -59,12 +59,14 @@ const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
                     }}>
             <Image src="/upload-outline.png" className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt="uploaded-image"/>Add Image
             </button>
+            <label>
+                "Upload"
             <input
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 accept="image/*"
-                className="hidden" />
+                className="hidden" /></label>
         </>
     );
     
