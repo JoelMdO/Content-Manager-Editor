@@ -49,7 +49,6 @@ export async function POST(req: Request): Promise<Response> {
         }
 
         if(imageFiles.length > 0){
-            ///TODO Check if authorized to upload images
             //Filter valid file objects
                 pre_images = imageFiles.filter((value): value is File => value instanceof File);
 
@@ -101,7 +100,6 @@ export async function POST(req: Request): Promise<Response> {
         const idData = formData.get("id") as string;
         const idObj = JSON.parse(idData);
         const idContent = idObj.content; 
-
         const articleData = formData.get("article") as string;
         const bodyObj = JSON.parse(articleData);
         const bodyContent = bodyObj.content;
