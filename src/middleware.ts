@@ -7,7 +7,7 @@ export async function middleware(req: any) {
 const header = req.headers;
 let response: any;
 const isSubRequest = header.get('x-middleware-subrequest');
-const database_url = process.env.NEXT_PUBLIC_databaseURL;
+const database_url = String(process.env.NEXT_PUBLIC_databaseURL);
 const { pathname } = req.nextUrl;
 //
 ///----------------------------------------------------------------
@@ -42,8 +42,8 @@ if (isSubRequest) {
 ///----------------------------------------------------------------
     response.headers = {
       ...response.headers,
-    'Content-Security-Policy':
-    `default-src 'self';
+    'Content-Security-Policy': `
+    default-src 'self';
     script-src 'self';
     style-src 'self';
     img-src 'self';
@@ -55,7 +55,7 @@ if (isSubRequest) {
     frame-ancestors 'self';
     upgrade-insecure-requests;
     block-all-mixed-content;
-    .replace(/\s{2,}/g, ' ').trim();`,
+    `.replace(/\s{2,}/g, ' ').trim(),
     }
     return response;
 }
