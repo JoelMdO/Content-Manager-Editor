@@ -11,6 +11,10 @@ const handleLogout = async (data: { user: string; sessionId: string }) => {
     const user = data.user!;
     const sessionId = data.sessionId!;
     //
+    console.log('ihandler Logout user', user);
+    console.log('handler logout sessoinid', sessionId);
+    
+    
     if (user){
     const dbRef = ref(database, `session/${user}`);
     try{

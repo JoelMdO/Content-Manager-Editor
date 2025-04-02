@@ -17,6 +17,10 @@ const apiRoutes = async (postData: any): Promise<any> => {
     ///-----------------------------------------------
     /// Api endpoints, per type.
     ///-----------------------------------------------
+    console.log('type at apiRoutes', type);
+    console.log('data at apiRouotes', data);
+    
+    
     switch(type){
         //## SANITIZE LINK
         case "clean-link":
@@ -94,6 +98,8 @@ const apiRoutes = async (postData: any): Promise<any> => {
         });
         // Wait for the JSON response
         const jsonResponse = await response.json();
+        console.log('jsonResponse at apiRpiutes', jsonResponse);
+        
         ///-----------------------------------------------
         /// From api/auth return the sessionId.
         ///-----------------------------------------------

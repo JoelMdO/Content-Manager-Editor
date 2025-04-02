@@ -13,10 +13,8 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         try{
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const { user } = userCredential;
-        console.log('user', user);
         
         const token = await user.getIdToken();
-        console.log('token', token);
         
         if(!token){
                 return NextResponse.json({status: 400, message: "Authentication failed"});
@@ -24,8 +22,7 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         //--------------------------------------------------------------------------------
         // Generate a session
         //--------------------------------------------------------------------------------
-        const session = await generateSession(token);
-        console.log('`sessino', session);
+        const session = await generateSession(token); 
         
         if(session.status === 400){
         return NextResponse.json({status: 400, message: session.message});

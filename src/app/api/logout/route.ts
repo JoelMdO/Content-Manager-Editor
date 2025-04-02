@@ -11,5 +11,5 @@ export async function POST(req: Request): Promise<Response> {
     (async () => {
     handleLogout(data);
     })();
-    return response
+    return response;
 }
