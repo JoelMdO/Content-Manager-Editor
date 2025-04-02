@@ -1,4 +1,4 @@
-import callHub from "@/services/api/call_hub";
+import callHub from "../../services/api/call_hub";
 
 const saveButtonClicked = async (italic: string, bold: string) => {
     let articleContent: any[] = [];

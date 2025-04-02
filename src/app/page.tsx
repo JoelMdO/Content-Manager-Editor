@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import callHub from "../services/api/call_hub";
-import successAlert from "@/components/alerts/sucess";
-import errorAlert from "@/components/alerts/error";
-import LogoButton from "@/components/buttons/logo_button";
+import successAlert from "../components/alerts/sucess";
+import errorAlert from "../components/alerts/error";
+import LogoButton from "../components/buttons/logo_button";
 
 const Login: React.FC = () => { 
     const [email, setEmail] = useState("");

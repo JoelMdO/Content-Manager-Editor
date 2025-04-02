@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import emailMe from "@/utils/buttons/email_me";
+import emailMe from "../../utils/buttons/email_me";
 
 //
 const LogoButton: React.FC<any> = () => {

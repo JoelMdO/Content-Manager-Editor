@@ -1,4 +1,4 @@
-import handleLogout from "@/services/authentication/handle_logout";
+import handleLogout from "../../../services/authentication/handle_logout";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request): Promise<Response> {

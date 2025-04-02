@@ -1,4 +1,4 @@
-import { addFontStyle, addFontWeight, deleteFontStyle, deleteFontWeight } from "@/slices/data_slice";
+import { addFontStyle, addFontWeight, deleteFontStyle, deleteFontWeight } from "../../slices/data_slice";
 import { AppDispatch } from "../../services/store";
 
   export const handleFontChange = (value: string, dispatch: AppDispatch) => {
