@@ -13,14 +13,20 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         try{
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const { user } = userCredential;
+        console.log('user', user);
+        
         const token = await user.getIdToken();
+        console.log('token', token);
+        
         if(!token){
-                return {status: 400, message: "Authentication failed"};
+                return NextResponse.json({status: 400, message: "Authentication failed"});
         }
         //--------------------------------------------------------------------------------
         // Generate a session
         //--------------------------------------------------------------------------------
         const session = await generateSession(token);
+        console.log('`sessino', session);
+        
         if(session.status === 400){
         return NextResponse.json({status: 400, message: session.message});
         }
@@ -43,8 +49,9 @@ const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         return response;  
         } catch(e){
         //
-        return{status: 400, message: e};
+        return NextResponse.json({status: 400, message: e});
         }
+        
 }
 
 export default firebaseAuth;
