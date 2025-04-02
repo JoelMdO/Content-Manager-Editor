@@ -7,6 +7,8 @@ export async function POST(req: Request): Promise<any> {
     let type: string = "clean-image";
     const contentType = req.headers.get('Content-Type') || '';
     //
+    console.log('api/hub at POST');
+    
     //
     try {
         ///-----------------------------------------------
@@ -14,9 +16,33 @@ export async function POST(req: Request): Promise<any> {
         /// comes without files only text
         ///-----------------------------------------------    
             if (contentType.includes("application/json")){
+                console.log('called contentType application/');
+                
                 const getPostData = await req.json();
                 postData = getPostData.data;
                 type = getPostData.type;
+                switch(type){
+                    ///### LOGOUT
+                    case "logout":
+                        console.log('called logout at api/hub POST');
+                        
+                        //Retrieve the authorization session token from the headers
+                        const sessionIdForLougout = req.headers.get("Authorization")?.split(" ")[1];
+                        console.log('sessionIdForLogout', sessionIdForLougout);
+                        
+                        if (sessionIdForLougout) {
+                            postData = sessionIdForLougout;
+                        } else {
+         
+                            return NextResponse.json({ status: 401, message: "User without a valid session" });
+                        }
+                        type = type;
+                    break;
+                    default:
+                        postData = postData;
+                        type = type;
+                    break;
+                }
             }else {
          ///-----------------------------------------------       
          /// For request including files.
@@ -28,6 +54,7 @@ export async function POST(req: Request): Promise<any> {
          /// authentication the type of content is as json
          ///----------------------------------------------- 
             const typeOfAction = formData.get("type");
+            console.log('typeofAction at api/hub POST', typeOfAction);
             
             switch(typeOfAction){
             ///#### POST (Save) 
@@ -44,20 +71,6 @@ export async function POST(req: Request): Promise<any> {
                 }
                 postData = formData;
                 type = "post";
-            break;
-            ///### LOGOUT
-            case "logout":
- 
-                //Retrieve the authorization session token from the headers
-                const sessionIdForLougout = req.headers.get("Authorization")?.split(" ")[1];
- 
-                if (sessionIdForLougout) {
-                    postData = sessionIdForLougout;
-                } else {
- 
-                    return NextResponse.json({ status: 401, message: "User without a valid session" });
-                }
-                type = typeOfAction;
             break;
             ///### SANITIZE (clean-image).
             default:

@@ -17,6 +17,10 @@ const apiRoutes = async (postData: any): Promise<any> => {
     ///-----------------------------------------------
     /// Api endpoints, per type.
     ///-----------------------------------------------
+    console.log('type at apiRoutes', type);
+    console.log('data at apiRouotes', data);
+    
+    
     switch(type){
         //## SANITIZE LINK
         case "clean-link":
@@ -72,9 +76,11 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             /// Verify sessionId if its valid through the sessionCheck function
             ///-----------------------------------------------
-            const sessionIdForLogout = data.get("session");
-            const responseSessionCheck = await sessionCheck(sessionIdForLogout);
-            const auth = {user: responseSessionCheck.user!, sessionId: sessionIdForLogout};
+            console.log('called logout at apiRoutes');
+            console.log('sessionIdForLogout at apiRoutes', data);
+            
+            const responseSessionCheck = await sessionCheck(data);
+            const auth = {user: responseSessionCheck.user!, sessionId: data};
             body = JSON.stringify(auth);
             headers["Content-Type"] = "application/json";
             credentials = "include";
@@ -93,6 +99,8 @@ const apiRoutes = async (postData: any): Promise<any> => {
         });
         // Wait for the JSON response
         const jsonResponse = await response.json();
+        console.log('jsonResponse at apiRpiutes', jsonResponse);
+        
         ///-----------------------------------------------
         /// From api/auth return the sessionId.
         ///-----------------------------------------------

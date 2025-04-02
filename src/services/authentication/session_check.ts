@@ -8,6 +8,8 @@ async function sessionCheck(sessionId: string, type?: string) : Promise<{status:
     //==================================================
     // Check the session ID if same on the database
     //==================================================
+    console.log('at sessionCheck');
+    
     if(sessionId){
     const SessionPlateId = await getSessionPlate(sessionId);
     if(SessionPlateId){
@@ -30,6 +32,8 @@ async function sessionCheck(sessionId: string, type?: string) : Promise<{status:
     try{
     const decodedToken = await admin.auth().verifyIdToken(token);
     user = decodedToken.uid;
+    console.log('user at sessionCheck', user);
+    
     if(!user){
         return {status: 400, message: "User not longer authenticated. Please sign again."};
     }

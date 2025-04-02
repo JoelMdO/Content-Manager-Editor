@@ -15,7 +15,11 @@ const LogOutButton: React.FC<any> = () => {
     const router = useRouter();
     //
     const handleLogout = async () => {
+        console.log('called handleLogout at botton');
+        
     const sessionId = sessionStorage.getItem('sessionId');
+    console.log('sessionID at logout button', sessionId);
+    
     const response =  await callHub('logout', sessionId);
     /// Remove sessionStorage.
     sessionStorage.removeItem('sessionId');
