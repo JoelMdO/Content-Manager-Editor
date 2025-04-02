@@ -9,6 +9,8 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
     //
+    console.log('called callHub');
+    
     ///-----------------------------------------------
     /// Build the body of the request as each one it has
     /// different structure. 
@@ -51,6 +53,8 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         credentials: credentials
     });
         const jsonResponse = await response.json();
+        console.log('jsonResponse at callHub', jsonResponse);
+        
         ///-----------------------------------------------
         /// From api/auth return the sessionId.
         ///-----------------------------------------------
