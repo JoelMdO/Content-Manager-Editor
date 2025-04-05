@@ -4,6 +4,7 @@ import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "@/components/buttons/logo_button";
 import { useRouter } from "next/navigation";
 import InopButton from "@/components/buttons/inop_button";
+import RouteButton from "@/components/buttons/routes_button";
 
 const Home: React.FC = () => {
     //
@@ -31,15 +32,15 @@ const Home: React.FC = () => {
             <h1 className="text-white pt-6 pl-2 text-xl font-roboto">Playbook</h1>
             <p className="text-gray-500 text-xs pl-2">Your quick access to software engineer code solutions.</p>
             <div className="flex flex-row self-center pt-2">
-            <button className="bg-gray-500 text-white py-3 px-4 rounded mt-2" type= "button" onClick={()=> router.push(`${url}/playbook`)}>Create New</button>
-            <button className="bg-gray-500 ml-4 text-white py-2 px-4 rounded mt-2" type= "button" onClick={()=> router.push(`${url}/read-playbook`)}>Read Playbook</button>
+            <RouteButton type="playbook" />
+            <RouteButton type="read-playbook" />
          </div>
          </div>
          <div className="flex flex-col w-[50%] h-[30%] bg-transparent border-slate-500 border mt-8 align-middle">
             <h1 className="text-white pt-6 pl-2 text-xl font-roboto">CMS</h1>
             <p className="text-gray-500 text-xs pl-2">Write an article or continue working on one.</p>
             <div className="flex flex-row self-center pt-2">
-            <button className="bg-gray-500 text-white py-3 px-4 rounded mt-2" type= "button" onClick={()=> router.push(`${url}/dashboard`)}>New Article</button>
+            <RouteButton type="dashboard" />
             <InopButton type="load_article" />
          </div>
          </div>
