@@ -1,6 +1,6 @@
 import callHub from "../../services/api/call_hub";
 import { AppDispatch } from "../../services/store";
-import linkWrapperHtml from "@/utils/wrapper_html";
+import linkWrapperHtml from "./wrapper_html";
 
 
 const insertLink = async (dispatch: AppDispatch, link_url: string, editorRef: HTMLDivElement | null): Promise<any> => {
@@ -37,13 +37,13 @@ const insertLink = async (dispatch: AppDispatch, link_url: string, editorRef: HT
             range.deleteContents(); 
         // Ensure the range is expanded (if collapsed)
         if (range.collapsed) {
-            const spaceNode = document.createTextNode(" ");
+            const spaceNode = document.createTextNode('\u00A0');
             editor?.appendChild(spaceNode);
                 var sel = window.getSelection();
                 var newRange = document.createRange();
                 newRange.setStart(spaceNode, spaceNode!.nodeValue!.length);
                 newRange.insertNode(link);
-                //Move cursor afger the link
+                //Move cursor after the link
                 // Insert a space node AFTER the link to move the cursor there
                 newRange.setStartAfter(link);
                 newRange.insertNode(spaceNode);
