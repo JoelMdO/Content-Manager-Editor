@@ -20,7 +20,7 @@ if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsW
   const referrerUrl = referrer ? new URL(referrer) : null;
   const referrerPAth = referrerUrl?.pathname || "";
   console.log(`access to ${path} from referrer ${referrerPAth}`);
-  if (referrerPAth === '/'){
+  if (referrerPAth === '/home'){
     rateLimitResponse = await rateLimit(req);
     if (rateLimitResponse.status === 200) {
       return response;
