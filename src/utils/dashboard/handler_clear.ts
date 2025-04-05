@@ -16,6 +16,7 @@ export const handleClear = (
   // Remove session storage items
   sessionStorage.removeItem("tempTitle");
   sessionStorage.removeItem("tempBody");
+  sessionStorage.removeItem("articleContent");
 
   // Clear contentEditable divs
   editorRefs.current.forEach((ref) => {
