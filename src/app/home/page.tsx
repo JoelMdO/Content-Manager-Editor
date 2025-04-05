@@ -3,6 +3,7 @@ import React from "react"
 import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "@/components/buttons/logo_button";
 import { useRouter } from "next/navigation";
+import InopButton from "@/components/buttons/inop_button";
 
 const Home: React.FC = () => {
     //
@@ -39,8 +40,7 @@ const Home: React.FC = () => {
             <p className="text-gray-500 text-xs pl-2">Write an article or continue working on one.</p>
             <div className="flex flex-row self-center pt-2">
             <button className="bg-gray-500 text-white py-3 px-4 rounded mt-2" type= "button" onClick={()=> router.push(`${url}/dashboard`)}>New Article</button>
-            <button className="bg-gray-800 ml-4 text-white py-3 px-4 rounded mt-2 pointer-events-none" type="button">
-            <span className="ml-8 absolute text-xs font-bold text-black bg-yellow px-6 py-1 rotate-45 pointer-events-none">INOP</span>Load Article</button>
+            <InopButton type="load_article" />
          </div>
          </div>
          </div>
