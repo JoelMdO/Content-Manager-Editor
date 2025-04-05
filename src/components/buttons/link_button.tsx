@@ -57,7 +57,7 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
                     type = "submit"
                     onClick={(e) =>{
                         e.preventDefault();
-                        insertLink("cms", link_url,  editorRef)
+                        insertLink(dispatch, link_url, editorRef)
                         .then((response) => {
                             if (response.status === 200) {
                             successAlert("link");
