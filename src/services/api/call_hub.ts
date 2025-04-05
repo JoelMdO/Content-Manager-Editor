@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import createFormData from "../../utils/images_edit/create_formData";
 
 const callHub = async (type: string, data?: any) : Promise<any> => {
@@ -35,7 +34,6 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
             body = JSON.stringify({data: "", type: type});
             const sessionIdForLougout = sessionStorage.getItem('sessionId');
             sessionStorage.removeItem('sessionId');
-            Cookies.remove('sessionId');
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionIdForLougout}` };
             break;
