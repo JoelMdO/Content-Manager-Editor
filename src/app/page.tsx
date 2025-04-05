@@ -25,7 +25,7 @@ const Login: React.FC = () => {
         const sessionId = response.sessionId;
         
         sessionStorage.setItem("sessionId", sessionId);
-        window.location.href = "/dashboard";
+        window.location.href = "/home";
     };
     //
     ///--------------------------------------------------------
@@ -36,7 +36,7 @@ const Login: React.FC = () => {
         <>
         <div className ="relative w-full min-h-screen flex flex-col justify-center px-4 sm:px-8 md:px-16">
         <div className="absolute top-4 right-4">
-        <LogoButton/></div>
+        <LogoButton type="login" /></div>
         <div className="flex flex-col items-center justify-center min-h-[80vh]">
             <img src="/yourCMS.png" alt="CMS Title" className="w-52 h-52 md:w-[18rem] md:h-[15rem] mb-4" />
             <h1 className="text-2xl font-bold pb-4">Welcome!</h1>

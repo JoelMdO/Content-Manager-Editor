@@ -36,6 +36,7 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
     return ( 
         <>
             <button
+                type = "button"
                 className={`h-[40px] w-[9em] shadow-md shadow-black bg-blue hover:bg-green text-white text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`} 
                 onClick={() => 
                     dialogRef.current?.showModal()}>
@@ -52,7 +53,10 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
                 <div className="pt-4 modal-action flex flex-row items-center justify-evenly w-full">
                     {/* if there is a button in form, it will close the modal */}
                     <button className="btn border-green text-white border-b-2"
-                    onClick={() => insertLink(dispatch, link_url, editorRef)
+                    type = "submit"
+                    onClick={(e) =>{
+                        e.preventDefault();
+                        insertLink(dispatch, link_url, editorRef)
                         .then((response) => {
                             if (response.status === 200) {
                             successAlert("link");
@@ -65,9 +69,10 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
                             errorAlert("link", "error",error);
                             linkInputRef.current!.value = "";
                         })
-                    } 
+                    }} 
                     >Submit</button>
                     <button className="btn border-blue-light text-white border-b-2"
+                    type= "button"
                     onClick={() => dialogRef.current?.close()}
                     >Close</button>
                 </div>
