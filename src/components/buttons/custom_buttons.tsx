@@ -58,7 +58,9 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick}) => {
                 onClick={() => {
                     if (onClick) onClick(); setIsClicked(true);
                         setTimeout(() => {
+                            if(type === "post"){
                             setLoading(true);
+                            }
                         if(type === "post"){
                             ///For Posting the article
                             saveButtonClicked(italic, bold)
