@@ -63,7 +63,7 @@ const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
             <label>
             <input
                 type="file"
-                ref={fileInputRef}
+                ref={fileInputRef}  
                 onChange={handleFileChange}
                 accept="image/*"
                 className="hidden" /></label>
