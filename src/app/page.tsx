@@ -26,8 +26,7 @@ const Login: React.FC = () => {
         const sessionId = response.sessionId;
         
         sessionStorage.setItem("sessionId", sessionId);
-        Cookies.set('sessionId', sessionId, { expires: 1 });
-        window.location.href = "/dashboard";
+        window.location.href = "/home";
     };
     //
     ///--------------------------------------------------------

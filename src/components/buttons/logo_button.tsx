@@ -16,34 +16,17 @@ const LogoButton: React.FC<any> = ({type}) => {
     let image: string = "/byJoel.png";
     let widthM = 90;
     let heightM = 90;
-    let widthDefault = 90;
-    let heightDefault = 90;
     let widthS = 80;
     let heightS = 30;
-    let mtM = "md:mt-0";
-    let mtS = "mt-0";
-    let mbS = "mb-0";
-    let textColor = "text-white";
-    //
+    let pt = "pt-0";
     switch(type){
         case "home":
          image = "/JLogo.webp";
          widthM = 90;
          heightM = 120;
-         widthS  = widthDefault = 65;
-         heightS = heightDefault = 95;
-         mtM = "md:mt-4";
-         mtS = "mt-0";
-         mbS = "mb-2";
-        break;
-        case "playbook":
-         image = "/JLogo.webp";
-         widthM = 90;
-         heightM = 120;
-         widthS  = widthDefault = 50;
-         heightS = heightDefault = 80;
-         mtM = mtM;
-         mtS = mtS;
+         widthS = 90;
+         heightS = 120;
+         pt = "pt-4";
         break;
         default:
          image = image;
@@ -51,26 +34,24 @@ const LogoButton: React.FC<any> = ({type}) => {
          heightM = heightM;
          widthS = widthS;
          heightS = heightS;
-         mtM = mtM;
-         mtS = mtS;
-         textColor = "text-black";
+         pt = pt;
         break;
     }
     //
     return ( 
         <>
-            <div className="relative group">
+            <div className={`relative group ${pt}`}>
             <button
                 type= "button"
-                className={" text-black text-[0.60rem] md:text-base font-light rounded flex items-center justify-center md:gap-2 gap-1"}
+                className={"h-[40px] text-black text-[0.60rem] md:text-base font-light rounded flex items-center justify-center md:gap-2 gap-1 mt-4"}
                 onClick={() => {
                         setTimeout(() => {
                             emailMe();
                         }, 500);}}   >
-                        <Image src={"/byJoel.png"} style={{display:"block"}} className="md:w-[160px] md:h-[70px] w-[80px] h-[40px] cursor-pointer" width={90} height={90} alt={"logoJoel"}/>
+                        <Image src={image} style={{display:"block"}} className={`md:w-[${widthM}] md:h-[${heightM}] w-[${widthS}] h-[${heightS}] cursor-pointer`} width={90} height={90} alt={"logoJoel"}/>
                         <p className="text-xs">2025</p>
             </button>
-            <div className="w-[120px] absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-2 pl-2 rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">Let's connect!</div>
+            <div className="w-[120px] absolute mb-2 origin-bottom bg-gray-800 text-white py-2 pl-2 rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">Let's connect!</div>
             </div>
         </>
     );
