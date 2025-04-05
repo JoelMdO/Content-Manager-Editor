@@ -107,7 +107,8 @@ const ArticlePage: React.FC = () => {
       <main className="flex-1 p-4 pt-[20vh] md:pt-2 md:w-[75%] overflow-y-auto min-h-screen">
       <div className="border border-gray-600 border-1px">
       {["Title", "Article"].map((placeholder, index) => (
-        <div key={index} style={{ userSelect: "text", cursor: "text" }}
+        // <div key={index} style={{ userSelect: "text", cursor: "text" }}
+        <div key={index}
                 ref={(el) => {
                   if (el && !editorRefs.current[index]) {
                     editorRefs.current[index] = el; 
