@@ -34,6 +34,7 @@ const LogOutButton: React.FC<any> = () => {
     //
     return ( 
         <>  <button
+            type= "button"
             className = "md:mt-auto md:mb-14"
             onClick={() => {handleLogout(); setIsClicked(true);}}>
             {/* Mobile Icon */}
