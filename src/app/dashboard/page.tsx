@@ -17,8 +17,6 @@ const CustomButton = dynamic(() => import("../../components/buttons/custom_butto
 
 const ArticlePage: React.FC = () => {
   //
-  const [isTitle, setIsTitle] = useState(true);
-  const [isArticle, setIsArticle] = useState(true);
   const [theTitle, setTheTitle] = useState<string>("");
   const [theBody, setTheBody] = useState<string>("");
   const [isPlaceHolderTitle, setPlaceHolderTitle] = useState<boolean>(true);
@@ -66,11 +64,9 @@ const ArticlePage: React.FC = () => {
   useEffect(() => {
     if (savedTitle) {
       setTheTitle(savedTitle);
-      setIsTitle(!savedTitle);
       setPlaceHolderTitle(false);
     if (savedBody) {
       setTheBody(savedBody);
-      setIsArticle(!savedBody);
       setPlaceHolderArticle(false);
     }
   }}, [savedTitle, savedBody]);
@@ -122,7 +118,7 @@ const ArticlePage: React.FC = () => {
                   onInput={(e) => {
                     // const content = (e.target as HTMLDivElement).innerText;
                     const content = (e.target as HTMLDivElement).innerHTML;
-                    handleContentChange(index, content, setIsTitle, setIsArticle, debouncedUpdateStore);
+                    handleContentChange(index, content, debouncedUpdateStore);
                   }}
                   >
                     {index === 0
