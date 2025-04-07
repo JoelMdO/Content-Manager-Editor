@@ -10,9 +10,11 @@ const path = req.nextUrl.pathname;
 let rateLimitResponse: NextResponse;
 let response: NextResponse = NextResponse.next();
 const database_url = process.env.NEXT_PUBLIC_databaseURL;
+const database_2_url = process.env.NEXT_PUBLIC_Mongo_uri;
 console.log('pathname', path);
 
 if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
+  // if(path.startsWith('/dashboard') || path.startsWith('/read-playbook')) {
   //Get the previous path
   console.log('doing /path', path);
   
@@ -60,7 +62,7 @@ if (isSubRequest) {
       style-src 'self';
       img-src 'self';
       font-src 'self';
-      connect-src 'self' ${database_url};
+      connect-src 'self' ${database_url} ${database_2_url};
       object-src 'none';
       base-uri 'self';
       form-action 'self';            
@@ -73,6 +75,6 @@ if (isSubRequest) {
 }
 
 export const config = {
-  matcher: ['/api/post', '/dashboard', '/playbook', '/read-playbook'],
+  matcher: ['/api/post', 'api/save', '/dashboard', '/playbook', '/read-playbook'],
 };
 

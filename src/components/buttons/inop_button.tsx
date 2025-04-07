@@ -11,6 +11,9 @@ const InopButton: React.FC<ButtonProps> = ({ type }) => {
         case "load_article":
             label = "Read Article";
             break;
+        case "edit_entry":
+            label = "Edit Entry";
+            break;
         default:
             label = "Default Label";
             break;

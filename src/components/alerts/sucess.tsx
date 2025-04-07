@@ -1,6 +1,7 @@
+import { NextRouter } from 'next/router';
 import Swal from 'sweetalert2';
 
-const successAlert = (type: string, data: string = "") => {
+const successAlert = (type: string, data?: string, resetForm?: () => void, router?: NextRouter) => {
      ///=============================================================
     // Sucess Alerts with use of sweetalert
     ///=============================================================
@@ -17,7 +18,7 @@ const successAlert = (type: string, data: string = "") => {
         text = "Article sent";
         break;
         case "auth":
-        text = `Welcome!! \n${data}`;
+        text = `Welcome!! \n${data!}`;
         break;
         default:
         text = "Image uploaded";
@@ -26,6 +27,28 @@ const successAlert = (type: string, data: string = "") => {
     ///------------------------------
     // Sweetalert
     ///------------------------------
+    if (type === "playbook") {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "center",
+            showCancelButton: true,
+            showConfirmButton: true,
+        });
+        Toast.fire({
+            icon: "success",
+            title: "Would you like to add a new entry?",
+            confirmButtonText: "Yes",
+            confirmButtonColor: "green",
+            cancelButtonText: "No",
+            cancelButtonColor: "red"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                resetForm!();
+            }else if (result.dismiss === Swal.DismissReason.cancel) {
+               router!.push("/home");
+            }
+        });
+    } else {
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
@@ -41,6 +64,7 @@ const successAlert = (type: string, data: string = "") => {
         icon: "success",
         title: `${text}  successfully`
     });
+    }
 }
 
 export default successAlert

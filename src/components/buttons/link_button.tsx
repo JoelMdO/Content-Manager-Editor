@@ -2,7 +2,7 @@ import React, {useRef} from "react";
 import { AppDispatch } from "../../services/store";
 import { useDispatch} from "react-redux";
 import Image from "next/image";
-import insertLink from "@/utils/editor/insert_link";
+import insertLink from "../../utils/dashboard/insert_link";
 import successAlert from "../alerts/sucess";
 import errorAlert from "../alerts/error";
 
@@ -56,7 +56,7 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
                     type = "submit"
                     onClick={(e) =>{
                         e.preventDefault();
-                        insertLink(dispatch, link_url, editorRef)
+                        insertLink("cms", link_url,  editorRef)
                         .then((response) => {
                             if (response.status === 200) {
                             successAlert("link");

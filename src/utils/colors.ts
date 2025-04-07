@@ -12,6 +12,7 @@ const Colors = {
     blue: '#27445D',
     yellow: '#FFD95F',
     blue_light: "#3B6790",
+    gray_forms: '#B0B9AE',
     red: '#FF0000',
     cream: '#FBFFE4',
 };

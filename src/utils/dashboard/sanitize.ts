@@ -23,6 +23,21 @@ export async function sanitizeData(data: any, type: string) : Promise<{ status: 
             sanitizedData = {status: 205, message: "url not allowed"};
         }
         return sanitizedData;
+    } else if (type === "text") {
+        // Sanitize the text input
+        if (typeof data === 'string') {
+        const sanitizedText = sanitizeUrl(data);
+        if (sanitizedText.status === 200) {
+            sanitizedData = { status: 200, message: "Valid text input" };
+        } else {
+            sanitizedData = { status: 400, message: "Invalid text input" };
+        }
+        return sanitizedData;
+        } else {
+            //is not a string return error. 
+            sanitizedData = {status: 205, message: "text not allowed"};
+        }
+        return sanitizedData;
     } else {
         if (data instanceof FormData) {
         const titleBeforeSanitize = data.get('title');
