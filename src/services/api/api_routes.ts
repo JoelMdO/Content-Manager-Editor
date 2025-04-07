@@ -12,6 +12,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
     let body: string | FormData = new FormData();
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
+    let sessionId: string = "";
     //
     try{
     ///-----------------------------------------------
@@ -19,6 +20,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
     ///-----------------------------------------------
     console.log('type at apiRoutes', type);
     console.log('data at apiRouotes', data);
+    
     
     
     switch(type){
@@ -39,7 +41,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             /// Verify sessionId if its valid through the sessionCheck function
             ///-----------------------------------------------
-            const sessionId = data.get("session");
+            sessionId = data.get("session");
             const response = await sessionCheck(sessionId);
                 console.log("authJson after reauthenticate at apiRoutes", response)
                 if (response.status !== 200) {
@@ -77,19 +79,41 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             /// Verify sessionId if its valid through the sessionCheck function
             ///-----------------------------------------------
-            const sessionIdForLogout = data;
-            const responseSessionCheck = await sessionCheck(sessionIdForLogout);
-            const auth = {user: responseSessionCheck.user!, sessionId: sessionIdForLogout};
+            sessionId = data;
+            const responseSessionCheck = await sessionCheck(sessionId);
+            const auth = {user: responseSessionCheck.user!, sessionId: sessionId};
             body = JSON.stringify(auth);
             headers["Content-Type"] = "application/json";
             credentials = "include";
-        break;      
+        break;
+        case "playbook-save":
+            endPoint = "save";
+            console.log('calling save');
+            ///-----------------------------------------------
+            /// Verify sessionId if its valid through the sessionCheck function
+            ///-----------------------------------------------
+            sessionId = data.sessionId;
+            console.log('sessionID at apiRoutes playbook', sessionId);
+            const responsePlay = await sessionCheck(sessionId);
+                console.log("authJson after reauthenticate at apiRoutes", responsePlay)
+                if (responsePlay.status !== 200) {
+                    console.log('response not 200 playbook');
+                    return NextResponse.json({ status: 401, message: "Reauthentication failed" });
+                }
+            console.log('doing the rest of playbook after 200 ok');
+            
+            body = JSON.stringify(data.data);
+            headers["Content-Type"] = "application/json";
+            credentials = "include";
+            break;      
         default:
             return {status: 205, message: "type not found"};
     }
     ///-----------------------------------------------
     /// Call the corresponding API endpoint
     ///-----------------------------------------------
+        console.log('calling endpoint', endPoint);
+        
         const response = await fetch(`${url}/api/${endPoint}`, {
             method: 'POST',
             body: body,

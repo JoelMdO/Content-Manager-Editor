@@ -1,6 +1,6 @@
 'use client'
 import React, { useRef, useState, useEffect } from "react";
-import { handleKeyBoardActions } from "../../utils/editor/handle_keys";
+import { handleKeyBoardActions } from "../../utils/dashboard/handle_keyboard_actions";
 import { useDispatch} from "react-redux";
 import { AppDispatch } from "../../services/store";
 import dynamic from "next/dynamic";

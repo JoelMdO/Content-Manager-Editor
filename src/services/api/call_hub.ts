@@ -7,6 +7,7 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
     let body: FormData | string = new FormData(); 
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
+    let sessionId: string | null = "";
     //
     console.log('called callHub');
     
@@ -24,7 +25,7 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         //## POST
         case "post":
             const formData = await createFormData(type, data);
-            const sessionId = sessionStorage.getItem('sessionId');
+            sessionId = sessionStorage.getItem('sessionId');
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             body = formData;
             credentials = "include";
@@ -32,11 +33,19 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         //## LOGOUT
         case "logout":  
             body = JSON.stringify({data: "", type: type});
-            const sessionIdForLougout = sessionStorage.getItem('sessionId');
+            sessionId = sessionStorage.getItem('sessionId');
             sessionStorage.removeItem('sessionId');
             headers["Content-Type"] = "application/json";
-            headers = { ...headers, Authorization: `Bearer ${sessionIdForLougout}` };
+            headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             break;
+        //## PLAYBOOK SAVE
+        case "playbook-save":
+            console.log('called playbook-save from callHub');
+            body = JSON.stringify({data: data, type: type});
+            sessionId = sessionStorage.getItem('sessionId');
+            headers["Content-Type"] = "application/json";
+            headers = { ...headers, Authorization: `Bearer ${sessionId}` };
+            credentials = "include";
         default:
             body = JSON.stringify({data: data, type: type});
             headers["Content-Type"] = "application/json";
