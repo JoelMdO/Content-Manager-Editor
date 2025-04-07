@@ -82,6 +82,9 @@ const apiRoutes = async (postData: any): Promise<any> => {
             sessionId = data;
             const responseSessionCheck = await sessionCheck(sessionId);
             const auth = {user: responseSessionCheck.user!, sessionId: sessionId};
+            sessionId = data;
+            const responseSessionCheck = await sessionCheck(sessionId);
+            const auth = {user: responseSessionCheck.user!, sessionId: sessionId};
             body = JSON.stringify(auth);
             headers["Content-Type"] = "application/json";
             credentials = "include";
@@ -105,35 +108,15 @@ const apiRoutes = async (postData: any): Promise<any> => {
             body = JSON.stringify(data.data);
             headers["Content-Type"] = "application/json";
             credentials = "include";
-            break;
-            case "playbook-search":
-            case "playbook-search-bar":
-            case "playbook-search-category":    
-                endPoint = "search";
-                console.log('calling search');
-                ///-----------------------------------------------
-                /// Verify sessionId if its valid through the sessionCheck function
-                ///-----------------------------------------------
-                sessionId = data.sessionId;
-                console.log('sessionID at apiRoutes playbook search', sessionId);
-                const responsePlaySearch = await sessionCheck(sessionId);
-                    console.log("authJson after reauthenticate at apiRoutes", responsePlaySearch)
-                    if (responsePlaySearch.status !== 200) {
-                        console.log('response not 200 playbook');
-                        return NextResponse.json({ status: 401, message: "Reauthentication failed" });
-                    }
-                console.log('doing the rest of playbook after 200 ok');
-                
-                body = JSON.stringify(postData);
-                headers["Content-Type"] = "application/json";
-                credentials = "include";
-                break;
+            break;      
         default:
             return {status: 205, message: "type not found"};
     }
     ///-----------------------------------------------
     /// Call the corresponding API endpoint
     ///-----------------------------------------------
+        console.log('calling endpoint', endPoint);
+        
         console.log('calling endpoint', endPoint);
         
         const response = await fetch(`${url}/api/${endPoint}`, {

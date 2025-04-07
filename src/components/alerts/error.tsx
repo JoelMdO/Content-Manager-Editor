@@ -49,21 +49,7 @@ const errorAlert = (type: string, status: string = "", message: string = "", rou
         title: text,
         showConfirmButton: true,
         confirmButtonText: button_text,
-        confirmButtonColor: confirmButtonColor}).then((result) => {
-        console.log('result', result);
-        console.log('type', type);
-            
-        if (result.isConfirmed && status === "playbook"){
-            console.log('doing result is confirmed.');
-         router!.push('/');
-        }
-        if (result.dismiss === Swal.DismissReason.timer && status === "playbook") {
-            // Redirect after timer
-            router.push('/'); 
-          }
-        console.log('doing not result confirmed');
-        
-    });
+        confirmButtonColor: 'red'});
 }
 
 export default errorAlert

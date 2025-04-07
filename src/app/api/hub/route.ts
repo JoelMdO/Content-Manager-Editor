@@ -23,12 +23,6 @@ export async function POST(req: Request): Promise<any> {
                 const getPostData = await req.json();
                 postData = getPostData.data;
                 type = getPostData.type;
-                const typeSanitizeResponse = sanitizeData(type, "text");
-                if((await typeSanitizeResponse).status != 200){
-                    return NextResponse.json({ status: 403, message: "Unauthorized" });
-                }
-                console.log('type', type);
-                
                 switch(type){
                     ///### LOGOUT
                     case "logout":
