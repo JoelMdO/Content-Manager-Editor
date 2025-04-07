@@ -23,6 +23,10 @@ export async function POST(req: Request): Promise<any> {
                 const getPostData = await req.json();
                 postData = getPostData.data;
                 type = getPostData.type;
+                const typeSanitizeResponse = sanitizeData(type, "text");
+                if((await typeSanitizeResponse).status != 200){
+                    return NextResponse.json({ status: 403, message: "Unauthorized" });
+                }
                 console.log('type', type);
                 
                 switch(type){
@@ -73,6 +77,10 @@ export async function POST(req: Request): Promise<any> {
          /// authentication the type of content is as json
          ///----------------------------------------------- 
             const typeOfAction = formData.get("type");
+            const typeSanitizeResponse = sanitizeData(typeOfAction, "text");
+                if((await typeSanitizeResponse).status != 200){
+                    return NextResponse.json({ status: 403, message: "Unauthorized" });
+                }
             switch(typeOfAction){
             ///#### POST (Save) 
             case "post":
