@@ -1,4 +1,5 @@
 import {NextRouter} from 'next/router';
+import {NextRouter} from 'next/router';
 import Swal from 'sweetalert2';
 
 const errorAlert = (type: string, status: string = "", message: string = "", router?: any) => {
@@ -22,6 +23,10 @@ const errorAlert = (type: string, status: string = "", message: string = "", rou
         case "logout":
         text = `Attempt to logout failed ${message}.`;
         break;
+        case "playbook":
+        text = `${message}, please log in again`;
+        button_text = "Go to Login";
+        confirmButtonColor = "green";
         case "playbook":
         text = `${message}, please log in again`;
         button_text = "Go to Login";
