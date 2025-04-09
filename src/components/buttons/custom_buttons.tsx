@@ -16,19 +16,19 @@ interface ButtonProps {
     id?: string;
     setViewDetails?: React.Dispatch<React.SetStateAction<boolean>>;
     setEntries?: React.Dispatch<React.SetStateAction<any[]>>;
-    setUpdateNote?: React.Dispatch<React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>>;
-    setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
+    setUpdateNote?: React.Dispatch<React.SetStateAction<boolean>>;
+    onEdit?: (id: string) => void; 
 }
 //
-const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating}) => {
+const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, onEdit}) => {
     ///========================================================
     // Custom Buttons used on dashboard page at this stage is only
     // for Post (Save the article)
     ///========================================================
     //
     // Variables.
-    let text: string, color: string, hover_color: string, icon: string, width: string = "w-[9em]", textColor: string = "text-white", otherFeatures: string = "font-bold mt-4";
-    let textSmallSize: string = "text-[0.60rem]", shadow: string = "shadow-md shadow-black", height: string = "h-[40px]";
+    let text: string, color: string, hover_color: string, icon: string, width: string = "w-[9em]", textColor: string = "text-white", otherFeatures: string = "";
+    let textSmallSize: string = "text-[0.60rem]", shadow: string = "shadow-md shadow-black";
     let position: string;
     const url = process.env.NEXT_PUBLIC_url_api;
     const router = useRouter();
@@ -37,7 +37,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
     const [loading, setLoading] = useState(false);
     const [noteViewMode, setNoteViewMode] = useState<"view" | "edit">("view");
     // const [isNew, setNew] = useState(false);
-    let isNew: boolean = false, isLink: boolean = false;
+    let isNew: boolean = false;
     // Retrieve text styles from Redux for saving on saveButtonClicked
     const italic = useSelector((state: any) => state.data_state?.fontStyle);
     const bold = useSelector((state: any) => state.data_state?.fontWeight);
@@ -52,6 +52,11 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             hover_color= "bg-green-light";
             icon='/inbox.png';
             position='';
+            text = "Post";
+            color = "bg-green";
+            hover_color= "bg-green-light";
+            icon='/inbox.png';
+            position='';
         break;
         case "new":
             isNew = true;
@@ -60,7 +65,6 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             hover_color= "bg-green";
             icon='';
             position='';
-            otherFeatures = "font-bold";
         break;
         case "view-note":
             isNew = true;
@@ -69,53 +73,18 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             hover_color = "bg-gray-200";
             width = "w-full";
             textColor = "text-black";
-            otherFeatures = "py-2 rounded transition mt-4 font-bold";
+            otherFeatures = "py-2 rounded transition";
             icon='';
             position='';
             textSmallSize = "text-[0.80rem]";
             shadow= "shadow-sm shadow-gray-800";
         break;
-        case "updatePlaybook":
-            text= "Cancel";
-            isNew = true;
-            color = "bg-gray-300";
-            hover_color = "bg-blue-light"; 
-            otherFeatures ="px-6 py-3 border border-gray-300 rounded-md";
-            textColor = "text-gray-700";
-            icon = "";
-            position = "";
-            shadow="";
-            height = "";
-            width = "";
-        break;
-        case "new-playbook":
-            text= "Cancel";
-            isNew = true;
-            color = "bg-gray-300";
-            hover_color = "bg-blue-light"; 
-            otherFeatures ="px-6 py-3 border border-gray-300 rounded-md text-bold text-base";
-            textColor = "text-gray-700";
-            icon = "";
-            position = "";
-            shadow="";
-            height = "";
-            width = "";
-        break;
-        case "with-item-playbook":
-            text= "Cancel";
-            isNew = true;
-            isLink = true;
-            color = "bg-gray-300";
-            hover_color = "bg-blue-light"; 
-            otherFeatures ="px-6 py-3 border border-gray-300 rounded-md";
-            textColor = "text-gray-700";
-            icon = "";
-            position = "";
-            shadow="";
-            height = "";
-            width = "";
-        break;
         default:
+            text = "Clear";
+            hover_color= "bg-green";
+            color = "bg-blue";
+            icon='/clear.png';
+            position='';
             text = "Clear";
             hover_color= "bg-green";
             color = "bg-blue";
@@ -132,12 +101,15 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             {isLink?   <Link href="/playbook"/> :
             <button
                 type = "button"                
-                className={`${height} ${width} ${textColor} ${otherFeatures} ${shadow} ${position} ${isClicked? "text-black":{textColor}} ${textSmallSize} md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1  ${isClicked? "bg-cream" : `${color}`} hover:${hover_color}`}
+                className={`h-[40px] ${width} ${textColor} ${otherFeatures} ${shadow} ${position} ${isClicked? "text-black":{textColor}} ${textSmallSize} md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4 ${isClicked? "bg-cream" : `${color}`} hover:${hover_color}`}
                 onClick={() => {
+                    if (onClick) onClick(); 
                     if (onClick) onClick(); 
                         setTimeout(() => {
                         if(type === "post"){
                             ///For Posting the article
+                            setLoading(true);
+                            setIsClicked(true);
                             setLoading(true);
                             setIsClicked(true);
                             saveButtonClicked(italic, bold)
@@ -166,6 +138,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                                 errorAlert("saved", "error", error);
                             })
                         } else if (type === "logo"){
+                        } else if (type === "logo"){
                             ///To connect with me on Logo click
                             emailMe();
                         } else if (type === "view-note"){
@@ -181,21 +154,16 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                               });
                             }else {
                                 //Send the update to allow update the playbook note.
-                                console.log('doing update button');
-                                setUpdateNote!({isUpdateNote: true, noteId: id!});
+                                setUpdateNote!(true);
+                                if (onEdit && id) onEdit(id); // notify parent with ID
                             }
-                        } else if (type === "updatePlaybook"){
-                            console.log('"updatePlaybook"');
-                            setUpdateNote!({isUpdateNote: false, noteId: ""});
-                        } else if (type === "new-playbook") {
-                            setIsCreating!(false);
                         } else {
                             ///No action as clear function is on dashboard/page.tsx
                         }
                         }, 1000);}}   >
-                        {isNew? null : 
+                        {isNew? null :
                         <Image src={icon} style={{display:isClicked? "none" :"block"}} className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt={`${text}-icon`}/>}{isClicked? "Posting" : `${text}`}
-            </button>}
+            </button>
         </>
     );
 }
