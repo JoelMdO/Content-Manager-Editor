@@ -61,6 +61,26 @@ export async function POST(req: Request): Promise<any> {
                         }
                         type = type;
                     break;
+                    case "playbook-search":
+                        console.log('called playbook_search at api/hub POST');
+                        // Sanitize data.
+                        const dataSanitizeResponse = sanitizeData(postData, "text");
+                        if((await dataSanitizeResponse).status != 200){
+                            return NextResponse.json({ status: 403, message: "Unauthorized" });
+                        }
+                        //Retrieve the authorization session token from the headers
+                        sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
+                        console.log('sessionI for playbook', sessionId);
+                        
+                        if (sessionId) {
+                            postData = {sessionId: sessionId, data: postData};
+                        } else {
+         
+                            return NextResponse.json({ status: 401, message: "User without a valid session" });
+                        }
+                        type = type;
+                        postData = postData;
+                    break;
                     default:
                         postData = postData;
                         type = type;
