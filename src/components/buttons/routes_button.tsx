@@ -17,7 +17,7 @@ const RouteButton: React.FC<RouteButtonProps> = ({type}) => {
         label = "Create New";
         break;
         case "read-playbook":
-        path = "/read-playbook";
+        path = "/readPlaybook";
         label = "Read Playbook";
         break;
         default:
