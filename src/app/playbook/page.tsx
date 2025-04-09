@@ -30,3 +30,5 @@ const Playbook: React.FC = () => {
     </div>
   );
 }
+
+export default Playbook;
