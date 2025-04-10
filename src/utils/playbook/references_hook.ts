@@ -36,7 +36,7 @@ export const useReferences = () => {
             if (item.type.startsWith('image/')) {
                 errorAlert("Url", "non200", 'Files, Images are NOT allowed to be pasted.');
                 const updatedReferences = [...references];
-                    updatedReferences[index] = { ...updatedReferences[index], link: "Reference not valid" };
+                    updatedReferences[index] = { ...updatedReferences[index], link: "Reference not valid", title: updatedReferences[index].title || "",  };
                     setReferences(updatedReferences);
             } else {
                 item.getAsString(async (data) => {
@@ -44,12 +44,12 @@ export const useReferences = () => {
                 if (response.status === 200) {
                         const link = response.message;
                         const updatedReferences = [...references];
-                        updatedReferences[index] = { ...updatedReferences[index], link: link };
+                        updatedReferences[index] = { ...updatedReferences[index], link: link, title: updatedReferences[index].title || "",   };
                         setReferences(updatedReferences);
                     } else {
                         errorAlert("Url", "non200", "Link not valid");
                         const updatedReferences = [...references];
-                        updatedReferences[index] = { ...updatedReferences[index], link: "Link not valid" };
+                        updatedReferences[index] = { ...updatedReferences[index], link: "Link not valid", title: updatedReferences[index].title || "", };
                         setReferences(updatedReferences);
                     }
                 })
