@@ -28,10 +28,13 @@ export default function ReadPlaybookPage() {
     codeSnippets?: [{ code: string; language: string }];
     references?: [{title: string, link: string}];
   }
-  
+  interface UpdateNoteState {
+      isUpdateNote: boolean;
+      noteId: string | null;
+  }
   const [entries, setEntries] = useState<Entry[]>([]); // for title, id, category and tags.
   const [isViewDetails, setViewDetails] = useState<boolean>(false); 
-  const [isUpdateNote, setUpdateNote] = useState<boolean>(false);
+  const [isUpdateNote, setUpdateNote] = useState<UpdateNoteState>({ isUpdateNote: false, noteId: "" });
   const [metaToUpdate, setMetaToUpdate] = useState<PlaybookFormProps["meta"] | null>(null);
   // let metaToUpdate: {id: string,
   //   title: string,
@@ -161,10 +164,14 @@ export default function ReadPlaybookPage() {
   };
 
   // const handleEdit = (isOnEdit: string, setMetaToUpdate: React.Dispatch<React.SetStateAction<boolean>>, setUpdateNote: React.Dispatch<React.SetStateAction<boolean>>) => {
-    if(isUpdateNote){
-    const entry = entries.find(e => e.id === isOnEdit);
+  let isMetaToUpdate;  
+  if(isUpdateNote.isUpdateNote){
+      console.log('doing entry for setMeta after isUpdateNote is true');
+      
+    const entry = entries.find(e => e.id === isUpdateNote.noteId);
     if (entry) {
-      setMetaToUpdate({
+      // setMetaToUpdate({
+    isMetaToUpdate = {
         id: entry.id,
         title: entry.title,
         category: entry.category,
@@ -174,7 +181,7 @@ export default function ReadPlaybookPage() {
         codeSnippets: entry.codeSnippets || [{ code: "", language: "" }],
         references: entry.references || [{title: "", link: ""}],
         notes: entry.notes || '',
-      });
+      };
     }
     console.log('entry on isUpdateNote', entry);
   };
@@ -442,7 +449,7 @@ export default function ReadPlaybookPage() {
           //     </button>
           //   </div>
           // </div>
-        ) : isUpdateNote? <PlaybookForm type="updatePlaybook" meta={metaToUpdate!}/> : (
+        ) : isUpdateNote.isUpdateNote? <PlaybookForm type="updatePlaybook" meta={isMetaToUpdate} setUpdateNote={setUpdateNote}/> : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
             {filteredEntries.map(entry => (
               <div key={entry.id} className="bg-white rounded-lg shadow-md overflow-hidden shadow-black">
@@ -495,7 +502,7 @@ export default function ReadPlaybookPage() {
                   )}
                   
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <CustomButton type="view-note" id={`${entry.id}`} setEntries={setEntries} setViewDetails={setViewDetails} setUpdateNote={setUpdateNote} onEdit={onEdit}/>
+                    <CustomButton type="view-note" id={`${entry.id}`} setEntries={setEntries} setViewDetails={setViewDetails} setUpdateNote={setUpdateNote}/>
                     {/* <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded transition" type='button' key={entry.id} onClick={(e) =>}>
                       View Details
                     </button> */}
