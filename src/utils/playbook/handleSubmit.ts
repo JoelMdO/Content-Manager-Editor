@@ -19,7 +19,19 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>,
     e.preventDefault();
     setIsSaving(true);
     //
-    const lastupdate = new Date();
+    const lastUpdate = new Date();
+    const dateFormatted = lastUpdate.toLocaleString('es-ES', {
+      timeZone: 'Europe/Moscow', // UTC+3
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZoneName: 'short'
+    });
+
     const data = {
       title,
       category,
@@ -28,7 +40,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>,
       notes,
       codeSnippets,
       references,
-      lastUpdated: lastupdate
+      lastUpdated: dateFormatted
     };
     //
     const response = await callHub("playbook-save", data);
