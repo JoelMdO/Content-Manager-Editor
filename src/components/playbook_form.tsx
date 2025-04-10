@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import categories from '../utils/categories';
 import handleSubmit from '../utils/playbook/handleSubmit';
 import { useRouter } from 'next/navigation';
+import CustomButton from './buttons/custom_buttons';
 //
 export interface PlaybookFormProps  {
     type?: string;
@@ -20,9 +21,10 @@ export interface PlaybookFormProps  {
       references?: [{title: string, link: string}];
       notes?: string;
       };
+     setUpdateNote?: React.Dispatch<React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>>;
 }
 //
-export default function PlaybookForm({ type, meta }: PlaybookFormProps) {
+export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookFormProps) {
     //
     const color_bg_inputs = "bg-gray-forms";
     const router = useRouter();
@@ -110,7 +112,9 @@ export default function PlaybookForm({ type, meta }: PlaybookFormProps) {
          mockData.codeSnippets.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
          mockData.references.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
          mockData.references.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
-          }} else {
+          }} else if (meta) {
+            console.log('meta at playbook form', meta);
+            
          setTitle(meta!.title);
          setCategory(meta!.category);
          setTags(meta!.tags!);
@@ -328,15 +332,15 @@ export default function PlaybookForm({ type, meta }: PlaybookFormProps) {
             
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-3 border-t pt-6">
-              <Link href="/playbook">
+              {/* <Link href="/playbook">
                 <button 
                   type="button" 
                   className="px-6 py-3 bg-gray-300 border border-gray-300 text-gray-700 rounded-md hover:bg-blue-light"
                 >
                   Cancel
                 </button>
-              </Link>
-              
+              </Link> */}
+              <CustomButton type={type!} setUpdateNote={setUpdateNote}/>
               <button 
                 type="submit" 
                 className="px-6 py-3 bg-blue text-white rounded-md hover:bg-blue-700 flex items-center"
