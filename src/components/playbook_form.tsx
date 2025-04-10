@@ -50,6 +50,8 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
       const [isCategories, setCategories] = useState<string[]>(categories);
       const [tags, setTags] = useState<string[]>([]);
       const [steps, setSteps] = useState<string[]>([]);
+      const [tagInput, setTagInput] = useState('');
+      const [stepInput, setStepInput] = useState('');
       const [notes, setNotes] = useState<string>('');
       const [isSaving, setIsSaving] = useState(false);
       const [saveSuccess, setSaveSuccess] = useState(false);
@@ -172,12 +174,14 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
                     id="tags"
                     className={`w-full p-3 border border-gray-300 ${color_bg_inputs} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-black`}
                     placeholder="E.g., Auth, JWT, Security"
-                    value={tags}
+                    value={tagInput}
                     onChange={(e) => {
                       const value = e.target.value;
+                      setTagInput(value);
                       const tagsArray = value.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
-                      setTags(tagsArray)}}
-                    required
+                      setTags(tagsArray)
+                      e.preventDefault();
+                    }}
                   />
                   <p className="text-xs text-gray-500 mt-1">Add relevant keywords to make this entry easier to find later</p>
                 </div>
@@ -202,9 +206,10 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
                     id="steps"
                     className={`w-full p-3 border border-gray-300 ${color_bg_inputs} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-64 placeholder:text-black`}
                     placeholder="1. Install required packages&#10;2. Set up environment variables&#10;3. Create middleware&#10;4. Example usage"
-                    value={steps}
+                    value={stepInput}
                     onChange={(e) => {
                       const value = e.target.value;
+                      setStepInput(value);
                       const tagsArray = value.split("/n").map(tag => tag.trim()).filter(tag => tag !== '');
                       setSteps(tagsArray)}}
                     required
