@@ -14,7 +14,7 @@ const database_2_url = process.env.NEXT_PUBLIC_Mongo_uri;
 console.log('pathname', path);
 
 // if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
-  if(path.startsWith('/dashboard')) {
+  if(path.startsWith('/dashboard')) { //TODO for test..
   //Get the previous path
   console.log('doing /path', path);
   
