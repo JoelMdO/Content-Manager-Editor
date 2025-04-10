@@ -37,7 +37,7 @@ export const useCodeSnippets = () => {
           const reader = new FileReader();
           reader.onload = () => {
             const updatedSnippets = [...codeSnippets];
-            updatedSnippets[index] = { ...updatedSnippets[index], image: reader.result as string };
+            updatedSnippets[index] = { ...updatedSnippets[index], code: updatedSnippets[index].code || "", image: reader.result as string };
             setCodeSnippets(updatedSnippets);
           };
           reader.readAsDataURL(file); // Convert image to base64
@@ -48,7 +48,7 @@ export const useCodeSnippets = () => {
           const response = await sanitizeData(data, "text"); 
           if (response.status === 200) {
             const updatedSnippets = [...codeSnippets];
-            updatedSnippets[index] = { ...updatedSnippets[index], code: response.message };
+            updatedSnippets[index] = { ...updatedSnippets[index], code: response.message, image: updatedSnippets[index].image || "",  };
             setCodeSnippets(updatedSnippets);
           } else {
             errorAlert("Snippet Paste", "non200", "Link not valid");
