@@ -125,7 +125,7 @@ const Playbook: React.FC = () => {
       
       {/* Main Form */}
       <main className="pt-28 container mx-auto px-4">
-        <PlaybookForm />
+        <PlaybookForm type="new-playbook"/>
         {/* <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <form onSubmit={(e) => handleSubmit( e, setIsSaving, setSaveSuccess, title, category, tags, steps, notes, codeSnippets, references, resetForm, router)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"> */}
