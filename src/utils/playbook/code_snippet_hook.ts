@@ -28,6 +28,7 @@ export const useCodeSnippets = () => {
   }, []);
 
   const updateCodeSnippetPaste = async (index: number, event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    event.preventDefault(); // Prevent default paste behavior
     const items = event.clipboardData.items;
     for (const item of items) {
       if (item.type.startsWith('image/')) {
@@ -41,20 +42,19 @@ export const useCodeSnippets = () => {
           };
           reader.readAsDataURL(file); // Convert image to base64
         }
-        event.preventDefault(); // Prevent default paste behavior
         return;
       } else {
-        const data = item.getAsString.name;
-        console.log('data', data);
-        const response = await sanitizeData(data, "text"); 
-        if (response.status === 200) {
+        item.getAsString(async (data) => {
+          const response = await sanitizeData(data, "text"); 
+          if (response.status === 200) {
             const updatedSnippets = [...codeSnippets];
             updatedSnippets[index] = { ...updatedSnippets[index], code: response.message };
             setCodeSnippets(updatedSnippets);
-        } else {
-            errorAlert("Snippet Paste","non200", "Link not valid");
+          } else {
+            errorAlert("Snippet Paste", "non200", "Link not valid");
             console.error(response.message);
-        }
+          }
+        });
       }
     }
   };
