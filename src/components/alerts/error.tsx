@@ -57,6 +57,10 @@ const errorAlert = (type: string, status: string = "", message: string = "", rou
             console.log('doing result is confirmed.');
          router!.push('/');
         }
+        if (result.dismiss === Swal.DismissReason.timer && status === "playbook") {
+            // Redirect after timer
+            router.push('/'); 
+          }
         console.log('doing not result confirmed');
         
     });
