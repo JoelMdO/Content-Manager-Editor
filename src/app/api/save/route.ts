@@ -1,22 +1,23 @@
-import { MongoClient } from "mongodb";
 import { NextResponse } from "next/server";
+import { dbFireStore } from "../../../../firebase";
+import { collection, addDoc } from 'firebase/firestore';
 
 export async function POST(req: Request): Promise<Response> {
     
     console.log('at save POST');
     
     const uri = process.env.NEXT_PUBLIC_Mongo_uri;
-    const client = new MongoClient(uri!);
-    await client.connect();
-    const db = client.db(process.env.NEXT_PUBLIC_Mongo_db);
-    const collection = db.collection(process.env.NEXT_PUBLIC_Mongo_collection!);
+    // const client = new MongoClient(uri!);
+    // await client.connect();
+    // const db = client.db(process.env.NEXT_PUBLIC_Mongo_db);
+    // const collection = db.collection(process.env.NEXT_PUBLIC_Mongo_collection!);
     const data = await req.json();
     console.log('data', data);
     
-    const {title, category, tags, steps, notes, codeSnippets, references, lastUpdate} = data;
+    const {title, category, tags, steps, notes, codeSnippets, references, lastUpdated} = data;
     console.log('title', title);
-    
-    const response = await collection.insertOne({
+     
+     const dbRef = await addDoc(collection(dbFireStore, 'playbook'), {     
       title,
       category,
       tags,
@@ -24,13 +25,13 @@ export async function POST(req: Request): Promise<Response> {
       notes,
       codeSnippets,
       references,
-      lastUpdate
-    });
-     console.log('response Mong', response);
+      lastUpdated});
+
+     console.log('response Mong', dbRef.id);
      
-    if(response.acknowledged) {
+    if(dbRef.id) {
         return NextResponse.json({status: 200, message: "Playbook Data Saved Successfully"});
     } else {
-        return NextResponse.json({status: 500, message: response});
+        return NextResponse.json({status: 500, message: "Error on saving"});
     }
 }

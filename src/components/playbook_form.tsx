@@ -210,7 +210,7 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
                     onChange={(e) => {
                       const value = e.target.value;
                       setStepInput(value);
-                      const tagsArray = value.split("/n").map(tag => tag.trim()).filter(tag => tag !== '');
+                      const tagsArray = value.split("\n").map(tag => tag.trim()).filter(tag => tag !== '');
                       setSteps(tagsArray)}}
                     required
                   />

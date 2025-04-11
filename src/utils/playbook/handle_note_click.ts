@@ -12,7 +12,7 @@ export default async function handleNoteClick (id: string) {
       title: snap.data().title,
       category: snap.data().category,
       tags: snap.data().tags,
-      lastUpdated: snap.data().lastUpdated.toDate().toLocaleString(),
+      lastUpdated: snap.data().lastUpdated,
       steps: snap.data().steps,
       codeSnippets: snap.data().codeSnippets,
       references: snap.data().references,
