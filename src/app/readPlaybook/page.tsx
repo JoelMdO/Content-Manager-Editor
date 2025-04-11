@@ -117,7 +117,7 @@ export default function ReadPlaybookPage() {
               title: doc.data().title,
               category: doc.data().category,
               tags: doc.data().tags,
-              lastUpdated: doc.data().lastUpdated.toDate().toLocaleString()
+              lastUpdated: doc.data().lastUpdated
           }));
           console.log('meta',meta);
           
