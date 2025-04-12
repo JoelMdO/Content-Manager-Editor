@@ -22,8 +22,14 @@ export const useCodeSnippets = () => {
   }, []);
 
   const updateCodeSnippet = useCallback((index: number, field: string, value: string) => {
+    // 
+    const existingSnippet = codeSnippets[index] ?? { language: "", code: "", image: "" };
     const updatedSnippets = [...codeSnippets];
-    updatedSnippets[index] = { ...updatedSnippets[index], [field]: value };
+    //
+    updatedSnippets[index] = {
+      ...existingSnippet,
+      [field]: value
+    };
     setCodeSnippets(updatedSnippets)
   }, []);
 
