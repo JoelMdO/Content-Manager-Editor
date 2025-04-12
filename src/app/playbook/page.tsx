@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import dynamic from "next/dynamic";
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect} from 'react';
 //
 const LogOutButton = dynamic(() => import('../../components/buttons/logout_buttons'), { ssr: false });
 const LogoButton = dynamic(() => import('../../components/buttons/logo_button'), { ssr: false });
@@ -10,14 +10,16 @@ const  PlaybookForm = dynamic(() => import('../../components/playbook/playbook_f
 //
 const Playbook: React.FC = () => {
   //
-  const searchParams = useSearchParams();
-  const modalParam = searchParams.get('modal');
-  let type: string;
-  if(modalParam === 'true'){
-    type = "with-item-playbook";
-  }else {
-    type = "new-playbook";
-  };
+  // const [type, setType] = useState<'new-playbook' | 'with-item-playbook'>('new-playbook');
+
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const data = sessionStorage.getItem('playbook-item');
+  //     if (data) {
+  //       setType('with-item-playbook');
+  //     }
+  //   }
+  // }, []);
   // const color_bg_inputs = "bg-gray-forms";
   // const router = useRouter();
 //   const {
@@ -124,7 +126,7 @@ const Playbook: React.FC = () => {
       
       {/* Main Form */}
       <main className="pt-28 container mx-auto px-4">
-        <PlaybookForm type={type}/>
+        <PlaybookForm/>
         {/* <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <form onSubmit={(e) => handleSubmit( e, setIsSaving, setSaveSuccess, title, category, tags, steps, notes, codeSnippets, references, resetForm, router)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"> */}
