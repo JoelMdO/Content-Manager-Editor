@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb";
 import searchDataValues from "../../../utils/playbook/search_data_values";
 import { NextResponse } from "next/server";
 
-export async function POST (req: Request){
+export async function POST(req: Request): Promise<Response> {
 
     console.log('at search POST');
     
