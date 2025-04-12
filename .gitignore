@@ -45,3 +45,5 @@ next-env.d.ts
 .qodo
 src/components/loading_toastouse
 .vscode
+cypress
+cypress.config.ts
