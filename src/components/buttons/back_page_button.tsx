@@ -4,7 +4,7 @@ import Link from 'next/link';
 const BackPageButton: React.FC = () => {
  return (
     <>
-    <div className="flex items-center">
+    <div className="flex items-center ml-2">
         <Link href="/home" className="mr-4">
         <div className="flex items-center text-white hover:text-blue-100">
         <ArrowLeft size={18} className="mr-1" />
