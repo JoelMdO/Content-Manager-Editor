@@ -68,7 +68,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
     };
     //
      useEffect(() => {
-          if(type === "with-item-playbook"){
           const data = sessionStorage.getItem("playbook-item");
           if(data){
             const jsonData = JSON.parse(data);
@@ -113,7 +112,7 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
          mockData.codeSnippets.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
          mockData.references.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
          mockData.references.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
-          }} else if (meta) {
+          } else if (meta) {
             console.log('meta at playbook form', meta);
             
          setTitle(meta!.title);
