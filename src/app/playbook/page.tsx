@@ -1,12 +1,12 @@
 'use client';
 import React from 'react';
 import dynamic from "next/dynamic";
-import PlaybookForm from '../../components/playbook/playbook_form';
 import { useSearchParams } from 'next/navigation';
 //
 const LogOutButton = dynamic(() => import('../../components/buttons/logout_buttons'), { ssr: false });
 const LogoButton = dynamic(() => import('../../components/buttons/logo_button'), { ssr: false });
 const BackPageButton = dynamic(() => import('../../components/buttons/back_page_button'), { ssr: false });
+const  PlaybookForm = dynamic(() => import('../../components/playbook/playbook_form'), { ssr: false });
 //
 const Playbook: React.FC = () => {
   //
