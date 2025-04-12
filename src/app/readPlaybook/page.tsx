@@ -5,18 +5,17 @@ import BackPageButton from '../../components/buttons/back_page_button';
 import LogOutButton from '../../components/buttons/logout_buttons';
 import LogoButton from '../../components/buttons/logo_button';
 import categories from '../../utils/categories';
-import PlaybookForm, { PlaybookFormProps } from '../../components/playbook/playbook_form';
 import CustomButton from '../../components/buttons/custom_buttons';
 import callHub from '@/services/api/call_hub';
 import { dbFireStore } from '../../../firebase';
+import dynamic from 'next/dynamic';
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { debounce } from 'lodash';
-import debouncedSearch from '@/utils/playbook/debounce_search';
-import { log } from 'node:console';
-import { useCodeSnippets } from '@/utils/playbook/code_snippet_hook';
+import { PlaybookFormProps } from '../../components/playbook/playbook_form';
+//
+const  PlaybookForm = dynamic(() => import('../../components/playbook/playbook_form'), { ssr: false });
+//
 
-export default function ReadPlaybookPage() {
-
+const ReadPlaybookPage: React.FC = ()=>{
   interface Entry {
     id: string;
     title: string;
@@ -110,6 +109,7 @@ export default function ReadPlaybookPage() {
       ///--------------------------------------------------------
       // Fetch Titles, category and tags when the page loads.
       ///--------------------------------------------------------
+      //TODO change to endpoint
       const fetchData = async () => {
           const snap = await getDocs(collection(dbFireStore, "playbook"));
           const meta = snap.docs.map((doc) => ({
@@ -152,6 +152,7 @@ export default function ReadPlaybookPage() {
   });
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //TODO separate to another file.
     const val = e.target.value;
     console.log("searching", val);
     setSearchTerm(val);
@@ -523,3 +524,5 @@ export default function ReadPlaybookPage() {
     </div>
   );
 }
+
+export default ReadPlaybookPage;
