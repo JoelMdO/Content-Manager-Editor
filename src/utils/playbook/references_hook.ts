@@ -23,8 +23,13 @@ export const useReferences = () => {
 
     // Update a reference field
     const updateReference = useCallback((index: number, field: string, value: string) => {
+        //
+        const existingReferences= references[index] ?? { link: "", title: "" };
         const updatedReferences = [...references];
-        updatedReferences[index] = { ...updatedReferences[index], [field]: value };
+        updatedReferences[index] ={
+            ...existingReferences,
+            [field]: value,
+        }
         setReferences(updatedReferences);
     }
     , []);
