@@ -98,6 +98,19 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             height = "";
             width = "";
         break;
+        case "with-item-playbook":
+            text= "Cancel";
+            isNew = true;
+            color = "bg-gray-300";
+            hover_color = "bg-blue-light"; 
+            otherFeatures ="px-6 py-3 border border-gray-300 rounded-md";
+            textColor = "text-gray-700";
+            icon = "";
+            position = "";
+            shadow="";
+            height = "";
+            width = "";
+        break;
         default:
             text = "Clear";
             hover_color= "bg-green";

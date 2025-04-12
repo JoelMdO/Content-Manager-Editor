@@ -5,7 +5,7 @@ import BackPageButton from '../../components/buttons/back_page_button';
 import LogOutButton from '../../components/buttons/logout_buttons';
 import LogoButton from '../../components/buttons/logo_button';
 import categories from '../../utils/categories';
-import PlaybookForm, { PlaybookFormProps } from '../../components/playbook_form';
+import PlaybookForm, { PlaybookFormProps } from '../../components/playbook/playbook_form';
 import CustomButton from '../../components/buttons/custom_buttons';
 import callHub from '@/services/api/call_hub';
 import { dbFireStore } from '../../../firebase';

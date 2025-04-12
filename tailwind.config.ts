@@ -25,7 +25,8 @@ export default {
           'blue-light': colors.blue_light,
           'red': colors.red, 
           'cream': colors.cream,
-          'gray-forms': colors.gray_forms
+          'gray-forms': colors.gray_forms,
+          'yellow-button': colors.yellow_button
       },
     },
   },

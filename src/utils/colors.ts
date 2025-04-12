@@ -11,6 +11,7 @@ const Colors = {
     green: '#497D74',
     blue: '#27445D',
     yellow: '#FFD95F',
+    yellow_button: '#FAE2BA',
     blue_light: "#3B6790",
     gray_forms: '#B0B9AE',
     red: '#FF0000',
