@@ -13,8 +13,7 @@ const database_url = process.env.NEXT_PUBLIC_databaseURL;
 const database_2_url = process.env.NEXT_PUBLIC_Mongo_uri;
 console.log('pathname', path);
 
-// if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
-  if(path.startsWith('/dashboard')) { //TODO for test..
+if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
   //Get the previous path
   console.log('doing /path', path);
   
@@ -54,23 +53,23 @@ if (isSubRequest) {
 ///----------------------------------------------------------------
 ///------ Add headers ----------------
 ///----------------------------------------------------------------
-    // response.headers.set(
-    //   'Content-Security-Policy',
-    //   `
-    //   default-src 'self';
-    //   script-src 'self';
-    //   style-src 'self';
-    //   img-src 'self';
-    //   font-src 'self';
-    //   connect-src 'self' ${database_url} ${database_2_url};
-    //   object-src 'none';
-    //   base-uri 'self';
-    //   form-action 'self';            
-    //   frame-ancestors 'self';
-    //   upgrade-insecure-requests;
-    //   block-all-mixed-content;
-    //   `.replace(/\s{2,}/g, ' ').trim()
-    // );
+    response.headers.set(
+      'Content-Security-Policy',
+      `
+      default-src 'self';
+      script-src 'self';
+      style-src 'self';
+      img-src 'self';
+      font-src 'self';
+      connect-src 'self' ${database_url} ${database_2_url};
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';            
+      frame-ancestors 'self';
+      upgrade-insecure-requests;
+      block-all-mixed-content;
+      `.replace(/\s{2,}/g, ' ').trim()
+    );
     return response;
 }
 

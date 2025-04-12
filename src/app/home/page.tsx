@@ -44,7 +44,7 @@ const Home: React.FC = () => {
             <p className="text-gray-500 text-xs pl-2">Your quick access to software engineer code solutions.</p>
             {thereIsPlaybook && <RouteButton type="with-item-playbook" />}
             <div className="flex flex-row self-center pt-2 gap-x-4 ">
-            <RouteButton type="playbook" />
+            <RouteButton type="playbook" data-cy="route-button-playbook" />
             <RouteButton type="read-playbook" />
          </div>
          </div>
