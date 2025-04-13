@@ -17,9 +17,10 @@ interface ButtonProps {
     setViewDetails?: React.Dispatch<React.SetStateAction<boolean>>;
     setEntries?: React.Dispatch<React.SetStateAction<any[]>>;
     setUpdateNote?: React.Dispatch<React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>>;
+    setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 //
-const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote}) => {
+const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating}) => {
     ///========================================================
     // Custom Buttons used on dashboard page at this stage is only
     // for Post (Save the article)
@@ -40,6 +41,8 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
     // Retrieve text styles from Redux for saving on saveButtonClicked
     const italic = useSelector((state: any) => state.data_state?.fontStyle);
     const bold = useSelector((state: any) => state.data_state?.fontWeight);
+    console.log('type at custom button', type);
+    
     //
     //
     switch (type) {
@@ -57,6 +60,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             hover_color= "bg-green";
             icon='';
             position='';
+            otherFeatures = "font-bold";
         break;
         case "view-note":
             isNew = true;
@@ -86,11 +90,10 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
         break;
         case "new-playbook":
             text= "Cancel";
-            isLink = true;
             isNew = true;
             color = "bg-gray-300";
             hover_color = "bg-blue-light"; 
-            otherFeatures ="px-6 py-3 border border-gray-300 rounded-md";
+            otherFeatures ="px-6 py-3 border border-gray-300 rounded-md text-bold text-base";
             textColor = "text-gray-700";
             icon = "";
             position = "";
@@ -101,6 +104,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
         case "with-item-playbook":
             text= "Cancel";
             isNew = true;
+            isLink = true;
             color = "bg-gray-300";
             hover_color = "bg-blue-light"; 
             otherFeatures ="px-6 py-3 border border-gray-300 rounded-md";
@@ -183,6 +187,8 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                         } else if (type === "updatePlaybook"){
                             console.log('"updatePlaybook"');
                             setUpdateNote!({isUpdateNote: false, noteId: ""});
+                        } else if (type === "new-playbook") {
+                            setIsCreating!(false);
                         } else {
                             ///No action as clear function is on dashboard/page.tsx
                         }

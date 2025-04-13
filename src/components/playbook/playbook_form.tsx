@@ -8,6 +8,7 @@ import categories from '../../utils/categories';
 import handleSubmit from '../../utils/playbook/handleSubmit';
 import { useRouter } from 'next/navigation';
 import CustomButton from '../buttons/custom_buttons';
+import { useSearchParams } from 'next/navigation';
 //
 export interface PlaybookFormProps  {
     type?: string;
@@ -22,12 +23,17 @@ export interface PlaybookFormProps  {
       notes?: string;
       };
      setUpdateNote?: React.Dispatch<React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>>;
+     'data-cy'?: string
+     setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 //
-export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookFormProps) {
+export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dataCity, setIsCreating}: PlaybookFormProps) {
     //
     const color_bg_inputs = "bg-gray-forms";
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const modal = searchParams.get('modal');
+    console.log("Modal param:", modal);
     //
     const {
         codeSnippets,
@@ -68,51 +74,44 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
     };
     //
      useEffect(() => {
-          const data = sessionStorage.getItem("playbook-item");
-          if(data){
-            const jsonData = JSON.parse(data);
-            const mockData = {
-              title: jsonData.title,
-              category: jsonData.category,
-              tags: jsonData.tags,
-              steps: jsonData.steps,
-              codeSnippets: jsonData.codeSnippets,
-              references: jsonData.references,
-              notes: jsonData.notes,
-            };
-            console.log('mockData', mockData);
+          ///--------------------------------------------------------
+          // When user left a data without saving and it persist on sessionData
+          // user can keep filling the card, user will be redirected to this
+          // form and by obtaining the modal = true, the data will be loaded.
+          ///--------------------------------------------------------
+          if(modal){
+            const data = sessionStorage.getItem("playbook-item");
+            if(data){
+              const jsonData = JSON.parse(data);
+              const mockData = {
+                title: jsonData.title,
+                category: jsonData.category,
+                tags: jsonData.tags,
+                steps: jsonData.steps,
+                codeSnippets: jsonData.codeSnippets,
+                references: jsonData.references,
+                notes: jsonData.notes,
+              };
+              console.log('mockData', mockData);
             
-          // const mockData = {
-          //   id: '12345',
-          //   title: "JWT Authentication Implementation",
-          //   category: "Authentication",
-          //   tags: "JWT,Auth,Security",
-          //   steps: "Install required packages: npm install jsonwebtoken\nSet up environment variables for JWT_SECRET\nCreate auth middleware to verify tokens",
-          //   codeSnippets: [
-          //     {
-          //       language: "typescript",
-          //       code: "import jwt from 'jsonwebtoken';\n\nexport const generateToken = (userId: string) => {\n  return jwt.sign({ id: userId }, process.env.JWT_SECRET!, { expiresIn: '7d' });\n};"
-          //     }
-          //   ],
-          //   references: [
-          //     { title: "JWT Documentation", link: "https://jwt.io/introduction" },
-          //     { title: "Auth Best Practices", link: "https://example.com/auth-best-practices" }
-          //   ],
-          //   notes: "Remember to refresh tokens before expiry. Consider using httpOnly cookies for better security.",
-          //   lastUpdated: "2025-04-01"
-          // };
-          
-         // Set individual state values
-         setTitle(mockData.title);
-         setCategory(mockData.category);
-         setTags(mockData.tags);
-         setSteps(mockData.steps);
-         setNotes(mockData.notes);
-         mockData.codeSnippets.forEach((snippet: { language: string; }, index: number) => updateCodeSnippet(index, 'language', snippet.language));
-         mockData.codeSnippets.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
-         mockData.references.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
-         mockData.references.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
-          } else if (meta) {
+              // Set individual state values
+              setTitle(mockData.title);
+              setCategory(mockData.category);
+              setTags(mockData.tags);
+              setSteps(mockData.steps);
+              setNotes(mockData.notes);
+              mockData.codeSnippets.forEach((snippet: { language: string; }, index: number) => updateCodeSnippet(index, 'language', snippet.language));
+              mockData.codeSnippets.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
+              mockData.references.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
+              mockData.references.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
+            } else {
+              // TODO data is not available, create a redirect to start new due to error on loading data form sessionStorage.
+            }
+        } else if (meta) {
+          ///--------------------------------------------------------
+          // Used when the user wants to update an already saved card with data
+          // meta data will be send as props.
+          ///--------------------------------------------------------
             console.log('meta at playbook form', meta);
             
          setTitle(meta!.title);
@@ -124,15 +123,18 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
          meta!.codeSnippets!.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
          meta!.references!.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
          meta!.references!.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
-          }
+        } else {
+          console.log('doing', type);
+         setIsEditing(false);
+        }
     
      }, []);
     //
 
     return (
         <>
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <form onSubmit={(e) => handleSubmit( e, setIsSaving, setSaveSuccess, title, category, tags, steps, notes, codeSnippets, references, resetForm, router)}>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6" >
+          <form data-cy={dataCity} onSubmit={(e) => handleSubmit( e, setIsSaving, setSaveSuccess, title, category, tags, steps, notes, codeSnippets, references, resetForm, router)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Left Column - Basic Info */}
               <div className="space-y-6">
@@ -343,7 +345,7 @@ export default function PlaybookForm({ type, meta, setUpdateNote }: PlaybookForm
                   Cancel
                 </button>
               </Link> */}
-              <CustomButton type={type!} setUpdateNote={setUpdateNote}/>
+              <CustomButton type={type!} setUpdateNote={setUpdateNote} setIsCreating={setIsCreating}/>
               <button 
                 type="submit" 
                 className="px-6 py-3 bg-blue text-white rounded-md hover:bg-blue-700 flex items-center"

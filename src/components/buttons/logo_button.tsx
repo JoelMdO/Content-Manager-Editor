@@ -66,7 +66,7 @@ const LogoButton: React.FC<LogoButtonProps> = ({type}) => {
             <div className={`relative group ${mtS} ${mtM} ${mbS}`}>
             <button
                 type= "button"
-                className={"h-[40px] text-black text-[0.60rem] md:text-base font-light rounded flex items-center justify-center md:gap-2 gap-1 mt-4"}
+                className={" text-black text-[0.60rem] md:text-base font-light rounded flex items-center justify-center md:gap-2 gap-1"}
                 onClick={() => {
                         setTimeout(() => {
                             emailMe();

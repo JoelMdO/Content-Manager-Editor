@@ -1,6 +1,7 @@
+import errorAlert from "@/components/alerts/error";
 import createFormData from "../../utils/images_edit/create_formData";
 
-const callHub = async (type: string, data?: any) : Promise<any> => {
+const callHub = async (type: string, data?: any) : Promise<{status: number, message: any, sessionId?: string, body?: any}> => {
     ///=============================================================
     /// Function to orchestrate the api endpoints as hub.
     ///=============================================================
@@ -46,14 +47,26 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             credentials = "include";
+            break;
         //## PLAYBOOK SEARCH
+         // When a value is typed on the search bar
+        case "playbook-search-bar":
+         // When the readPlaybook page is mounted.   
         case "playbook-search":
+         // When user searchs by category
+        case "playbook-search-category":
             console.log('called playbook-search from callHub');
-            body = JSON.stringify({data: data, type: type});
             sessionId = sessionStorage.getItem('sessionId');
+            //
+            if(type === "playbook-search-bar"){
+            body = JSON.stringify({data: data, type: type});
+            } else {
+            body = JSON.stringify({data: "", type: type});    
+            }
+            //
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
-            credentials = "include";
+            credentials = "include";    
         default:
             body = JSON.stringify({data: data, type: type});
             headers["Content-Type"] = "application/json";
@@ -74,6 +87,8 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         /// From api/auth return the sessionId.
         ///-----------------------------------------------
         if(jsonResponse.message === "User authenticated"){
+            console.log('doing ok auth');
+            
             const sessionId = jsonResponse.sessionId;
             return { status: jsonResponse.status, message: "User authenticated", sessionId: sessionId };
         ///-----------------------------------------------
@@ -82,6 +97,17 @@ const callHub = async (type: string, data?: any) : Promise<any> => {
         }else if (jsonResponse.message === "Data saved successfully"){
             const body = jsonResponse.body;
             return { status: jsonResponse.status, message: "Data saved successfully", body: body };
+        ///-----------------------------------------------
+        /// From api/search return the meta.
+        ///-----------------------------------------------
+        }else if (jsonResponse.message === "Data found successfully"){
+        const body = jsonResponse.body;
+        return { status: jsonResponse.status, message: "Data found successfully", body: body };
+        ///--------------------------------------------------------
+        // When the user is not longer authenticated
+        ///--------------------------------------------------------
+        } else if (jsonResponse.message === "User not authenticated" || jsonResponse.message === "'Failed to refresh token" || jsonResponse.message === "Reauthentication failed") {   
+         return {status: 401, message: jsonResponse.message};
         } else {
         return {status: jsonResponse.status, message: jsonResponse.message};
         }
