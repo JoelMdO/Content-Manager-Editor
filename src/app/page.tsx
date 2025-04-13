@@ -25,8 +25,12 @@ const Login: React.FC = () => {
         successAlert("auth", response.message);
         const sessionId = response.sessionId;
         
-        sessionStorage.setItem("sessionId", sessionId);
-        window.location.href = "/home";
+        if (sessionId) {
+            sessionStorage.setItem("sessionId", sessionId);
+        } else {
+            console.error("Session ID is undefined");
+        }
+        router.push("/home");
     };
     //
     ///--------------------------------------------------------

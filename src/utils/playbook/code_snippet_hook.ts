@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import insertLink from "../dashboard/insert_link";
 import { sanitizeData } from "../dashboard/sanitize";
 import errorAlert from "@/components/alerts/error";
+import { debounce } from "lodash";
 
 export type CodeSnippet = {
   language: string;
@@ -22,9 +23,25 @@ export const useCodeSnippets = () => {
   }, []);
 
   const updateCodeSnippet = useCallback((index: number, field: string, value: string) => {
+<<<<<<< HEAD
     const updatedSnippets = [...codeSnippets];
     updatedSnippets[index] = { ...updatedSnippets[index], [field]: value };
     setCodeSnippets(updatedSnippets)
+=======
+    // 
+    const existingSnippet = codeSnippets[index] ?? { language: "", code: "", image: "" };
+    console.log('snippet existingSnippt', existingSnippet);
+      const updatedSnippets = [...codeSnippets];
+      console.log('updateSnip-bef', updatedSnippets);
+      
+      //
+      updatedSnippets[index] = {
+        ...existingSnippet,
+        [field]: value
+      };
+      console.log('updatedSnip-aft', updatedSnippets);
+      setCodeSnippets(updatedSnippets)
+>>>>>>> a190d86 (<feat>[readPlaybook]: Added loading data, search data and update data on readPlaybook)
   }, []);
 
   const updateCodeSnippetPaste = async (index: number, event: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -49,7 +66,11 @@ export const useCodeSnippets = () => {
         const response = await sanitizeData(data, "text"); 
         if (response.status === 200) {
             const updatedSnippets = [...codeSnippets];
+<<<<<<< HEAD
             updatedSnippets[index] = { ...updatedSnippets[index], code: response.message };
+=======
+            updatedSnippets[index] = { ...updatedSnippets[index], code: data, image: updatedSnippets[index].image || "",  };
+>>>>>>> a190d86 (<feat>[readPlaybook]: Added loading data, search data and update data on readPlaybook)
             setCodeSnippets(updatedSnippets);
         } else {
             errorAlert("Snippet Paste","non200", "Link not valid");

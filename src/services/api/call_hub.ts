@@ -68,9 +68,7 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             //
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
-            credentials = "include";
-            break;
-      
+            credentials = "include";    
         default:
             body = JSON.stringify({data: data, type: type});
             headers["Content-Type"] = "application/json";
