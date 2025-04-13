@@ -18,9 +18,10 @@ interface ButtonProps {
     setEntries?: React.Dispatch<React.SetStateAction<any[]>>;
     setUpdateNote?: React.Dispatch<React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>>;
     setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
+    'data-cy'?: string;
 }
 //
-const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating}) => {
+const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating, 'data-cy': dataCy}) => {
     ///========================================================
     // Custom Buttons used on dashboard page at this stage is only
     // for Post (Save the article)
@@ -133,6 +134,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             <button
                 type = "button"                
                 className={`${height} ${width} ${textColor} ${otherFeatures} ${shadow} ${position} ${isClicked? "text-black":{textColor}} ${textSmallSize} md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1  ${isClicked? "bg-cream" : `${color}`} hover:${hover_color}`}
+                data-cy={dataCy}
                 onClick={() => {
                     if (onClick) onClick(); 
                         setTimeout(() => {
