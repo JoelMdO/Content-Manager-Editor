@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import insertLink from "../dashboard/insert_link";
 import { sanitizeData } from "../dashboard/sanitize";
 import errorAlert from "@/components/alerts/error";
+import { debounce } from "lodash";
 
 export type CodeSnippet = {
   language: string;
@@ -24,13 +25,17 @@ export const useCodeSnippets = () => {
   const updateCodeSnippet = useCallback((index: number, field: string, value: string) => {
     // 
     const existingSnippet = codeSnippets[index] ?? { language: "", code: "", image: "" };
-    const updatedSnippets = [...codeSnippets];
-    //
-    updatedSnippets[index] = {
-      ...existingSnippet,
-      [field]: value
-    };
-    setCodeSnippets(updatedSnippets)
+    console.log('snippet existingSnippt', existingSnippet);
+      const updatedSnippets = [...codeSnippets];
+      console.log('updateSnip-bef', updatedSnippets);
+      
+      //
+      updatedSnippets[index] = {
+        ...existingSnippet,
+        [field]: value
+      };
+      console.log('updatedSnip-aft', updatedSnippets);
+      setCodeSnippets(updatedSnippets)
   }, []);
 
   const updateCodeSnippetPaste = async (index: number, event: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -54,7 +59,7 @@ export const useCodeSnippets = () => {
           const response = await sanitizeData(data, "text"); 
           if (response.status === 200) {
             const updatedSnippets = [...codeSnippets];
-            updatedSnippets[index] = { ...updatedSnippets[index], code: response.message, image: updatedSnippets[index].image || "",  };
+            updatedSnippets[index] = { ...updatedSnippets[index], code: data, image: updatedSnippets[index].image || "",  };
             setCodeSnippets(updatedSnippets);
           } else {
             errorAlert("Snippet Paste", "non200", "Link not valid");

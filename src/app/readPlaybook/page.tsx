@@ -11,6 +11,10 @@ import { dbFireStore } from '../../../firebase';
 import dynamic from 'next/dynamic';
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { PlaybookFormProps } from '../../components/playbook/playbook_form';
+import errorAlert from '@/components/alerts/error';
+import debouncedSearch from '@/utils/playbook/debounce_search';
+import { debounce } from 'lodash';
+import { useRouter } from 'next/navigation';
 //
 const  PlaybookForm = dynamic(() => import('../../components/playbook/playbook_form'), { ssr: false });
 //
@@ -34,144 +38,77 @@ const ReadPlaybookPage: React.FC = ()=>{
   const [entries, setEntries] = useState<Entry[]>([]); // for title, id, category and tags.
   const [isViewDetails, setViewDetails] = useState<boolean>(false); 
   const [isUpdateNote, setUpdateNote] = useState<UpdateNoteState>({ isUpdateNote: false, noteId: "" });
-  const [metaToUpdate, setMetaToUpdate] = useState<PlaybookFormProps["meta"] | null>(null);
-  // let metaToUpdate: {id: string,
-  //   title: string,
-  //   category: string,
-  //   tags: string[],
-  //   lastUpdated: string,
-  //   notes: string,
-  //   steps: string[],
-  //   codeSnippets: [{ code: string, language: string }],
-  //   references: [{title: string, link: string}]};
-  // {
-    //   id: 1,
-    //   title: "JWT Authentication Implementation",
-    //   category: "Authentication",
-    //   tags: ["JWT", "Auth", "Security"],
-    //   lastUpdated: "2025-04-01",
-    //   steps: [
-    //     "Install required packages: npm install jsonwebtoken",
-    //     "Set up environment variables for JWT_SECRET",
-    //     "Create auth middleware to verify tokens"
-    //   ],
-    //   codeSnippets: [
-    //     {
-    //       language: "typescript",
-    //       code: "import jwt from 'jsonwebtoken';\n\nexport const generateToken = (userId: string) => {\n  return jwt.sign({ id: userId }, process.env.JWT_SECRET!, { expiresIn: '7d' });\n};"
-    //     }
-    //   ],
-    //   references: [
-    //     { title: "JWT Documentation", url: "https://jwt.io/introduction" },
-    //     { title: "Auth Best Practices", url: "https://example.com/auth-best-practices" }
-    //   ],
-    //   notes: "Remember to refresh tokens before expiry. Consider using httpOnly cookies for better security."
-    // },
-    // {
-    //   id: 2,
-    //   title: "React Query Cache Bug Fix",
-    //   category: "Bugs",
-    //   tags: ["React", "Cache", "Data Fetching"],
-    //   lastUpdated: "2025-03-28",
-    //   steps: [
-    //     "Identify stale cache causing UI inconsistencies",
-    //     "Implement proper invalidation on mutations",
-    //     "Add cache time configuration"
-    //   ],
-    //   codeSnippets: [
-    //     {
-    //       language: "typescript",
-    //       code: "const queryClient = useQueryClient();\n\nconst mutation = useMutation({\n  mutationFn: updateTodo,\n  onSuccess: () => {\n    queryClient.invalidateQueries({ queryKey: ['todos'] });\n  },\n});"
-    //     }
-    //   ],
-    //   references: [
-    //     { title: "React Query Docs", url: "https://tanstack.com/query/latest" }
-    //   ],
-    //   notes: "When dealing with real-time data, consider lower cache times or manual invalidation strategies."
-    // }
-  // ]);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  // const [newEntry, setNewEntry] = useState({
-  //   title: "",
-  //   category: "",
-  //   tags: "",
-  //   steps: "",
-  //   codeSnippets: [{ language: "typescript", code: "" }],
-  //   references: [{ title: "", url: "" }],
-  //   notes: ""
-  // });
   const [isCreating, setIsCreating] = useState(false);
-  const [isOnEdit, onEdit] = useState<String>("");
+  const [isZeroSearchData, setZeroSearchData] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
       ///--------------------------------------------------------
       // Fetch Titles, category and tags when the page loads.
       ///--------------------------------------------------------
-      //TODO change to endpoint
+      console.log('doing use effect');
+      
       const fetchData = async () => {
-          const snap = await getDocs(collection(dbFireStore, "playbook"));
-          const meta = snap.docs.map((doc) => ({
-              id: doc.id,
-              title: doc.data().title,
-              category: doc.data().category,
-              tags: doc.data().tags,
-              lastUpdated: doc.data().lastUpdated
-          }));
-          console.log('meta',meta);
-          
+      setIsLoading(true);
+      const response = await callHub("playbook-search");
+      console.log('response', response);
+      setIsLoading(false);
+      if(response.status === 200){
+      const meta = response.body;
+      console.log('meta', meta);
           setEntries(meta);
-      };
-  
+      } else if (response.status === 401){
+        errorAlert("", "playbook", response.message, router);
+      }};
+
       fetchData();
   }, []);
 
-  useEffect(()=>{
+  /// To filter the entries, which received the first load of data from db once the page is loaded
+  /// and also when the user user searchs by search bar, it converts the searchTerm (user value to search)
+  /// and in lowercase matches the title or tags and shows the cards.
+     const filteredEntries = entries.filter(entry => {
+        const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                              entry.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesCategory = selectedCategory === "All" || entry.category === selectedCategory;
+        console.log(entry.title, { matchesSearch, matchesCategory });
+        return matchesSearch && matchesCategory;
+      });
+  //
 
-  },[isViewDetails])
-
-  // const categories = ["All", "Authentication", "Bugs", "API", "Performance", "Security", "DevOps"];
-
-  // const filteredEntries = entries.filter(entry => {
-  //   const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-  //                         entry.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
-  //                         entry.notes.toLowerCase().includes(searchTerm.toLowerCase());
-    
-  //   const matchesCategory = selectedCategory === "All" || entry.category === selectedCategory;
-    
-  //   return matchesSearch && matchesCategory;
-  // });
-  
-  const filteredEntries = entries.filter(entry => {
-    const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          entry.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === "All" || entry.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleInputChange(selectValue: string) {
     //TODO separate to another file.
-    const val = e.target.value;
-    console.log("searching", val);
-    setSearchTerm(val);
-    const response = await callHub("playbook-search", val);
+    console.log("searching", selectValue);
+    setSearchTerm(selectValue);
+    debouncedSearch(selectValue, setEntries, setZeroSearchData, entries);
+  }
+  //
+  async function handleSelectChange(selectedValue: string) {
+    //TODO separate to another file.
+    console.log("searching", selectedValue);
+    const response = await callHub("playbook-search-category", selectedValue);
     if (response.status === 200) {
-      setEntries(response.message);
+      console.log('response.bd at debounce', response.body);
+      
+      setEntries(response.body);
+      setZeroSearchData(false);
     } else {
-      console.error("Error fetching entries:", response.message);
+      if (entries.length <= 0) {
+        setZeroSearchData(true);
+      }
+      console.log("Error fetching entries:", response.message);
     }
-  };
-
-  // const handleEdit = (isOnEdit: string, setMetaToUpdate: React.Dispatch<React.SetStateAction<boolean>>, setUpdateNote: React.Dispatch<React.SetStateAction<boolean>>) => {
+  }
+  //
   let isMetaToUpdate;  
   if(isUpdateNote.isUpdateNote){
       console.log('doing entry for setMeta after isUpdateNote is true');
       
     const entry = entries.find(e => e.id === isUpdateNote.noteId);
     if (entry) {
-      // setMetaToUpdate({
     isMetaToUpdate = {
         id: entry.id,
         title: entry.title,
@@ -186,62 +123,15 @@ const ReadPlaybookPage: React.FC = ()=>{
     }
     console.log('entry on isUpdateNote', entry);
   };
-
-  // const handleCreateEntry = () => {
-  //   const tagsArray = newEntry.tags.split(',').map(tag => tag.trim());
-  //   const stepsArray = newEntry.steps.split('\n').filter(step => step.trim() !== '');
-    
-  //   const newEntryFormatted = {
-  //     id: entries.length + 1,
-  //     title: newEntry.title,
-  //     category: newEntry.category,
-  //     tags: tagsArray,
-  //     lastUpdated: new Date().toISOString().split('T')[0],
-  //     steps: stepsArray,
-  //     codeSnippets: newEntry.codeSnippets,
-  //     references: newEntry.references.filter(ref => ref.title && ref.url),
-  //     notes: newEntry.notes
-  //   };
-    
-  //   setEntries([...entries, newEntryFormatted]);
-  //   setIsCreating(false);
-  //   setNewEntry({
-  //     title: "",
-  //     category: "",
-  //     tags: "",
-  //     steps: "",
-  //     codeSnippets: [{ language: "typescript", code: "" }],
-  //     references: [{ title: "", url: "" }],
-  //     notes: ""
-  //   });
-  // };
-
-  // const handleAddCodeSnippet = () => {
-  //   setNewEntry({
-  //     ...newEntry,
-  //     codeSnippets: [...newEntry.codeSnippets, { language: "typescript", code: "" }]
-  //   });
-  // };
-
-  // const handleAddReference = () => {
-  //   setNewEntry({
-  //     ...newEntry,
-  //     references: [...newEntry.references, { title: "", url: "" }]
-  //   });
-  // };
-
-  // const updateCodeSnippet = (index: number, field: string, value: string) => {
-  //   const updatedSnippets = [...newEntry.codeSnippets];
-  //   updatedSnippets[index] = { ...updatedSnippets[index], [field]: value };
-  //   setNewEntry({ ...newEntry, codeSnippets: updatedSnippets });
-  // };
-
-  // const updateReference = (index: number, field: string, value: string) => {
-  //   const updatedReferences = [...newEntry.references];
-  //   updatedReferences[index] = { ...updatedReferences[index], [field]: value };
-  //   setNewEntry({ ...newEntry, references: updatedReferences });
-  // };
-
+  //
+  console.log({
+    isCreating,
+    isUpdateNote: isUpdateNote.isUpdateNote,
+    isZeroSearchData,
+    isLoading,
+    filteredEntriesLength: filteredEntries.length,
+  });
+  //
   return (
     <div className="flex flex-col min-h-screen bg-blue">
       {/* Header */}
@@ -251,14 +141,7 @@ const ReadPlaybookPage: React.FC = ()=>{
           <BackPageButton />
           <h1 className="text-2xl font-bold">Developer Playbook</h1>  
           </div>
-          <div className='flex gap-2 align-items-center mr-2'>
-          {/* <button
-          type = "button" 
-          onClick={() => setIsCreating(!isCreating)}
-          className="bg-blue-light text-blue-600 w-8 h-2 rounded hover:bg-blue-50 transition"
-        >
-          {isCreating ? "Cancel" : "Create New Entry"}
-        </button> */}
+          <div className='flex gap-2 align-middle  mr-1'>
           <CustomButton type="new" onClick={() => {setIsCreating(!isCreating)}} isCreating={isCreating}/>
           <LogOutButton type="playbook"/>
           <LogoButton type="playbook" />
@@ -281,12 +164,13 @@ const ReadPlaybookPage: React.FC = ()=>{
                   value={searchTerm}
                   onChange={(e) => {
                     console.log('searching', e.target.value);
-                   handleChange(e);
+                    handleInputChange(e.target.value);
+
                   }}
                   onPaste={async (e) => {
                     const pastedText = e.clipboardData.getData("text");
                     console.log("Pasted:", pastedText);
-                    const response = await callHub(pastedText);
+                    const response = await callHub("playbook-search-bar", pastedText);
                     if (response.status === 200) {
                       setEntries(response.message);
                     } else {
@@ -302,7 +186,10 @@ const ReadPlaybookPage: React.FC = ()=>{
                   id="category-select"
                   className="w-full md:w-48 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    handleSelectChange(e.target.value);
+                  }}
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>{category}</option>
@@ -315,144 +202,16 @@ const ReadPlaybookPage: React.FC = ()=>{
         
         {/* Create New Entry Form */}
         {isCreating ? (
-          <PlaybookForm type ="readPlaybook"/>
-          // <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          //   <h2 className="text-xl font-semibold mb-4">Create New Playbook Entry</h2>
-            
-          //   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          //     <div>
-          //       <label className="block mb-1 font-medium">Title</label>
-          //       <input
-          //         type="text"
-          //         className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          //         value={newEntry.title}
-          //         onChange={(e) => setNewEntry({...newEntry, title: e.target.value})}
-          //         placeholder="E.g., NextAuth JWT Implementation"
-          //       />
-          //     </div>
-              
-          //     <div>
-          //       <label htmlFor="set-new-entry" className="block mb-1 font-medium">Category</label>
-          //       <select
-          //         id="set-new-entry"
-          //         className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          //         value={newEntry.category}
-          //         onChange={(e) => setNewEntry({...newEntry, category: e.target.value})}
-          //       >
-          //         <option value="">Select a category</option>
-          //         {categories.filter(c => c !== "All").map(category => (
-          //           <option key={category} value={category}>{category}</option>
-          //         ))}
-          //       </select>
-          //     </div>
-          //   </div>
-            
-          //   <div className="mb-4">
-          //     <label className="block mb-1 font-medium">Tags (comma separated)</label>
-          //     <input
-          //       type="text"
-          //       className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          //       value={newEntry.tags}
-          //       onChange={(e) => setNewEntry({...newEntry, tags: e.target.value})}
-          //       placeholder="E.g., authentication, JWT, security"
-          //     />
-          //   </div>
-            
-          //   <div className="mb-4">
-          //     <label className="block mb-1 font-medium">Steps (one per line)</label>
-          //     <textarea
-          //       className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-          //       value={newEntry.steps}
-          //       onChange={(e) => setNewEntry({...newEntry, steps: e.target.value})}
-          //       placeholder="1. Install required packages&#10;2. Set up environment variables&#10;3. Create middleware"
-          //     />
-          //   </div>
-            
-          //   <div className="mb-4">
-          //     <label className="block mb-1 font-medium">Code Snippets</label>
-          //     {newEntry.codeSnippets.map((snippet, index) => (
-          //       <div key={index} className="mb-4 p-3 border rounded bg-gray-50">
-          //         <div className="mb-2">
-          //           <label className="block mb-1 text-sm">Language</label>
-          //           <input
-          //             type="text"
-          //             className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          //             value={snippet.language}
-          //             onChange={(e) => updateCodeSnippet(index, 'language', e.target.value)}
-          //             placeholder="typescript, javascript, python, etc."
-          //           />
-          //         </div>
-          //         <div>
-          //           <label className="block mb-1 text-sm">Code</label>
-          //           <textarea
-          //             className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 font-mono text-sm"
-          //             value={snippet.code}
-          //             onChange={(e) => updateCodeSnippet(index, 'code', e.target.value)}
-          //             placeholder="// Insert your code here"
-          //           />
-          //         </div>
-          //       </div>
-          //     ))}
-          //     <button
-          //       type="button"
-          //       className="inline-flex items-center px-3 py-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50"
-          //       onClick={handleAddCodeSnippet}
-          //     >
-          //       + Add Another Code Snippet
-          //     </button>
-          //   </div>
-            
-          //   <div className="mb-4">
-          //     <label className="block mb-1 font-medium">References</label>
-          //     {newEntry.references.map((reference, index) => (
-          //       <div key={index} className="mb-2 flex gap-2">
-          //         <input
-          //           type="text"
-          //           className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          //           value={reference.title}
-          //           onChange={(e) => updateReference(index, 'title', e.target.value)}
-          //           placeholder="Reference title"
-          //         />
-          //         <input
-          //           type="text"
-          //           className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          //           value={reference.url}
-          //           onChange={(e) => updateReference(index, 'url', e.target.value)}
-          //           placeholder="URL"
-          //         />
-          //       </div>
-          //     ))}
-          //     <button
-          //       type="button"
-          //       className="inline-flex items-center px-3 py-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50"
-          //       onClick={handleAddReference}
-          //     >
-          //       + Add Another Reference
-          //     </button>
-          //   </div>
-            
-          //   <div className="mb-6">
-          //     <label className="block mb-1 font-medium">Notes & Additional Context</label>
-          //     <textarea
-          //       className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-          //       value={newEntry.notes}
-          //       onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
-          //       placeholder="Add any additional notes, gotchas, or context that would be helpful to remember"
-          //     />
-          //   </div>
-            
-          //   <div className="flex justify-end">
-          //     <button
-          //       className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-          //       onClick={handleCreateEntry}
-          //     >
-          //       Save Entry
-          //     </button>
-          //   </div>
-          // </div>
-        ) : isUpdateNote.isUpdateNote? <PlaybookForm type="updatePlaybook" meta={isMetaToUpdate} setUpdateNote={setUpdateNote}/> : (
+          <PlaybookForm type ="new-playbook" setIsCreating={setIsCreating}/>
+        ) : isUpdateNote.isUpdateNote? <PlaybookForm type="updatePlaybook" meta={isMetaToUpdate} setUpdateNote={setUpdateNote}/> 
+        : isZeroSearchData ? <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">No data found</span> 
+        : isLoading ? (
+          <div className="flex justify-center items-center min-h-[60vh]">
+            <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-            {filteredEntries.map(entry => (
+            {filteredEntries.map((entry: Entry) => (
               <div key={entry.id} className="bg-white rounded-lg shadow-md overflow-hidden shadow-black">
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-2">
@@ -504,9 +263,6 @@ const ReadPlaybookPage: React.FC = ()=>{
                   
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <CustomButton type="view-note" id={`${entry.id}`} setEntries={setEntries} setViewDetails={setViewDetails} setUpdateNote={setUpdateNote}/>
-                    {/* <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded transition" type='button' key={entry.id} onClick={(e) =>}>
-                      View Details
-                    </button> */}
                   </div>
                 </div>
               </div>

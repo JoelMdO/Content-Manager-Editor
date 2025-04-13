@@ -1,2 +1,2 @@
-const categories = ["Authentication", "Bugs", "API", "State Management", "Functions", "Libraries", "Code", "Performance", "Security", "DevOps", "Database", "Testing", "UI/UX", "Deployment"];
+const categories = ["Select a category", "Authentication", "Bugs", "API", "State Management", "Functions", "Libraries", "Code", "Performance", "Security", "DevOps", "Database", "Testing", "UI/UX", "Deployment"];
 export default categories;

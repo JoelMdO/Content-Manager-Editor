@@ -62,20 +62,31 @@ export async function POST(req: Request): Promise<any> {
                         type = type;
                     break;
                     case "playbook-search":
+                    case "playbook-search-bar":
+                    case "playbook-search-category":
                         console.log('called playbook_search at api/hub POST');
-                        // Sanitize data.
-                        const dataSanitizeResponse = sanitizeData(postData, "text");
-                        if((await dataSanitizeResponse).status != 200){
-                            return NextResponse.json({ status: 403, message: "Unauthorized" });
-                        }
                         //Retrieve the authorization session token from the headers
                         sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
                         console.log('sessionI for playbook', sessionId);
                         
                         if (sessionId) {
-                            postData = {sessionId: sessionId, data: postData};
-                        } else {
-         
+                            // Sanitize data.
+                            let dataToSanitize: string | Object;
+                            if(type === "playbook-search"){
+                                dataToSanitize = type;
+                            } else {
+                                dataToSanitize = postData;
+                            }    
+                            const dataSanitizeResponse = sanitizeData(dataToSanitize, "text");
+                                if((await dataSanitizeResponse).status != 200){
+                                return NextResponse.json({ status: 403, message: "Unauthorized" });
+                            }
+                            if(type === "playbook-search"){
+                                postData = {sessionId: sessionId, data: "", type: type};
+                            } else {
+                                postData = {sessionId: sessionId, data: postData, type: type};
+                            }
+                            } else {
                             return NextResponse.json({ status: 401, message: "User without a valid session" });
                         }
                         type = type;
@@ -159,6 +170,12 @@ export async function POST(req: Request): Promise<any> {
         }else if (jsonResponse.message === "Data saved successfully"){
             const body = jsonResponse.body;
             return NextResponse.json({ status: jsonResponse.status, message: "Data saved successfully", body: body });
+        ///-----------------------------------------------
+        /// From api/search return the meta.
+        ///-----------------------------------------------
+        }else if (jsonResponse.message === "Data found successfully"){
+        const body = jsonResponse.body;
+        return NextResponse.json({ status: jsonResponse.status, message: "Data found successfully", body: body });
         } else {
         return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
         }

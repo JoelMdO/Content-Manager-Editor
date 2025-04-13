@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbFireStore } from "../../../../firebase";
 import { collection, addDoc } from 'firebase/firestore';
+import generateSearchIndex from "@/utils/api/generate_search_index";
 
 export async function POST(req: Request): Promise<Response> {
     
@@ -15,6 +16,8 @@ export async function POST(req: Request): Promise<Response> {
     console.log('data', data);
     
     const {title, category, tags, steps, notes, codeSnippets, references, lastUpdated} = data;
+    // Doc to create index for easy search.
+    const doc = {title: title, tags: tags, category: category};
     console.log('title', title);
      
      const dbRef = await addDoc(collection(dbFireStore, 'playbook'), {     
@@ -25,6 +28,7 @@ export async function POST(req: Request): Promise<Response> {
       notes,
       codeSnippets,
       references,
+      searchIndex: generateSearchIndex(doc),
       lastUpdated});
 
      console.log('response Mong', dbRef.id);

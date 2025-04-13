@@ -2,9 +2,10 @@ import {useRouter} from "next/navigation";
 
 interface RouteButtonProps {
   type?: string;
+  'data-cy'?: string;
 }
 
-const RouteButton: React.FC<RouteButtonProps> = ({type}) => {
+const RouteButton: React.FC<RouteButtonProps> = ({type, 'data-cy': dataCity}) => {
     const router = useRouter();
     const url = process.env.NEXT_PUBLIC_url_api;
     // Define the button type
@@ -42,7 +43,7 @@ const RouteButton: React.FC<RouteButtonProps> = ({type}) => {
     }}
     //
     return (
-    <button className={`${features} py-3 px-4 rounded mt-2`} type= "button" onClick={()=> 
+    <button className={`${features} py-3 px-4 rounded mt-2`} data-cy={dataCity} type= "button" onClick={()=> 
       handleClick()}>{label}</button>
   );
 }

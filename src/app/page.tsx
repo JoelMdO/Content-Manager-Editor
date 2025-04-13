@@ -11,11 +11,12 @@ const Login: React.FC = () => {
     ///=================================================== 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    const router = useRouter();
     //handleLogin with Firebase authentication
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         const response = await callHub("auth", {email, password});
+        console.log('response', response);
         
         if (response.status !== 200) {
             errorAlert("auth", "", "Email or Password incorrect");
@@ -24,8 +25,12 @@ const Login: React.FC = () => {
         successAlert("auth", response.message);
         const sessionId = response.sessionId;
         
-        sessionStorage.setItem("sessionId", sessionId);
-        window.location.href = "/home";
+        if (sessionId) {
+            sessionStorage.setItem("sessionId", sessionId);
+        } else {
+            console.error("Session ID is undefined");
+        }
+        router.push("/home");
     };
     //
     ///--------------------------------------------------------
