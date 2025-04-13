@@ -54,23 +54,24 @@ if (isSubRequest) {
 ///----------------------------------------------------------------
 ///------ Add headers ----------------
 ///----------------------------------------------------------------
-    response.headers = {
-      ...response.headers,
-    'Content-Security-Policy':
-    `default-src 'self';
-    script-src 'self';
-    style-src 'self';
-    img-src 'self';
-    font-src 'self';
-    connect-src 'self' ${database_url};
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';            
-    frame-ancestors 'self';
-    upgrade-insecure-requests;
-    block-all-mixed-content;
-    .replace(/\s{2,}/g, ' ').trim();`,
-    }
+response.headers.set(
+  'Content-Security-Policy',
+  `
+  default-src 'self';
+  script-src 'self';
+  style-src 'self';
+  img-src 'self';
+  font-src 'self';
+  connect-src 'self' ${database_url} ${database_2_url};
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';            
+  frame-ancestors 'self';
+  upgrade-insecure-requests;
+  block-all-mixed-content;
+  `.replace(/\s{2,}/g, ' ').trim()
+);
+return response;
     return response;
 };
 
