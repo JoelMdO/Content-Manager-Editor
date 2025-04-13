@@ -7,11 +7,7 @@ interface LogoButtonProps {
     type: string;
 }
 //
-interface LogoButtonProps {
-    type: string;
-}
-//
-const LogoButton: React.FC<any> = () => {
+const LogoButton: React.FC<any> = ({type}) => {
     //
     ///========================================================
     // Logo button to allow the user to contact me
@@ -65,7 +61,8 @@ const LogoButton: React.FC<any> = () => {
         <>
             <div className="relative group">
             <button
-                className={"h-[40px] text-black text-[0.60rem] md:text-base font-light rounded flex items-center justify-center md:gap-2 gap-1 mt-4"}
+                type= "button"
+                className={" text-black text-[0.60rem] md:text-base font-light rounded flex items-center justify-center md:gap-2 gap-1"}
                 onClick={() => {
                         setTimeout(() => {
                             emailMe();

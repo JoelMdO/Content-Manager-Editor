@@ -110,6 +110,8 @@ const apiRoutes = async (postData: any): Promise<any> => {
             credentials = "include";
             break;
             case "playbook-search":
+            case "playbook-search-bar":
+            case "playbook-search-category":    
                 endPoint = "search";
                 console.log('calling search');
                 ///-----------------------------------------------
@@ -125,10 +127,10 @@ const apiRoutes = async (postData: any): Promise<any> => {
                     }
                 console.log('doing the rest of playbook after 200 ok');
                 
-                body = JSON.stringify(data.data);
+                body = JSON.stringify(postData);
                 headers["Content-Type"] = "application/json";
                 credentials = "include";
-                break;    
+                break;
         default:
             return {status: 205, message: "type not found"};
     }

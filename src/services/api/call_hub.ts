@@ -49,14 +49,26 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             credentials = "include";
+            break;
         //## PLAYBOOK SEARCH
+         // When a value is typed on the search bar
+        case "playbook-search-bar":
+         // When the readPlaybook page is mounted.   
         case "playbook-search":
+         // When user searchs by category
+        case "playbook-search-category":
             console.log('called playbook-search from callHub');
-            body = JSON.stringify({data: data, type: type});
             sessionId = sessionStorage.getItem('sessionId');
+            //
+            if(type === "playbook-search-bar"){
+            body = JSON.stringify({data: data, type: type});
+            } else {
+            body = JSON.stringify({data: "", type: type});    
+            }
+            //
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
-            credentials = "include";
+            credentials = "include";    
         default:
             body = JSON.stringify({data: data, type: type});
             headers["Content-Type"] = "application/json";
