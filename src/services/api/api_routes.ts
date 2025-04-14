@@ -82,9 +82,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
             sessionId = data;
             const responseSessionCheck = await sessionCheck(sessionId);
             const auth = {user: responseSessionCheck.user!, sessionId: sessionId};
-            sessionId = data;
-            const responseSessionCheck = await sessionCheck(sessionId);
-            const auth = {user: responseSessionCheck.user!, sessionId: sessionId};
             body = JSON.stringify(auth);
             headers["Content-Type"] = "application/json";
             credentials = "include";
