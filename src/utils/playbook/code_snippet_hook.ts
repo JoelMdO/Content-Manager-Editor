@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react";
-import insertLink from "../dashboard/insert_link";
 import { sanitizeData } from "../dashboard/sanitize";
 import errorAlert from "@/components/alerts/error";
-import { debounce } from "lodash";
 
 export type CodeSnippet = {
   language: string;

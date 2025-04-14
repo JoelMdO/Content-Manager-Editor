@@ -1,17 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash, Save, Link as LinkIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import categories from '../../utils/categories';
-import { useCodeSnippets } from '../../utils/playbook/code_snippet_hook';
-import { useReferences } from '../../utils/playbook/references_hook';
-import handleSubmit from '../../utils/playbook/handleSubmit';
+import React from 'react';
 import dynamic from "next/dynamic";
 //
 const LogOutButton = dynamic(() => import('../../components/buttons/logout_buttons'), { ssr: false });
 const LogoButton = dynamic(() => import('../../components/buttons/logo_button'), { ssr: false });
-const InopButton = dynamic(() => import('../../components/buttons/inop_button'), { ssr: false });
 const BackPageButton = dynamic(() => import('../../components/buttons/back_page_button'), { ssr: false });
 const PlaybookForm = dynamic(()=> import('../../components/playbook/playbook_form'), {ssr: false})
 //

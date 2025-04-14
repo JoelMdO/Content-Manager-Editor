@@ -7,7 +7,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
     /// Function to redirect the api endpoints, includes the fecthing
     ///=============================================================
     const {data, type} = postData;  
-    const url = process.env.NEXT_PUBLIC_url_api; //TODO change env file with url on deployment.
+    const url = process.env.NEXT_PUBLIC_url_api;
     let endPoint: string = "";
     let body: string | FormData = new FormData();
     let headers: HeadersInit = {};

@@ -1,19 +1,15 @@
 'use client'
-import React, { useCallback, useEffect, useState } from 'react';
-import { Search, Tag, Clock, Link, Bookmark, Info, ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Tag, Clock, Link } from 'lucide-react';
 import BackPageButton from '../../components/buttons/back_page_button';
 import LogOutButton from '../../components/buttons/logout_buttons';
 import LogoButton from '../../components/buttons/logo_button';
 import categories from '../../utils/categories';
 import CustomButton from '../../components/buttons/custom_buttons';
 import callHub from '@/services/api/call_hub';
-import { dbFireStore } from '../../../firebase';
 import dynamic from 'next/dynamic';
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { PlaybookFormProps } from '../../components/playbook/playbook_form';
 import errorAlert from '@/components/alerts/error';
 import debouncedSearch from '@/utils/playbook/debounce_search';
-import { debounce } from 'lodash';
 import { useRouter } from 'next/navigation';
 //
 const  PlaybookForm = dynamic(() => import('../../components/playbook/playbook_form'), { ssr: false });

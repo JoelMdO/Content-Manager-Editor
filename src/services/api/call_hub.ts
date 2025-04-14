@@ -1,4 +1,4 @@
-import errorAlert from "@/components/alerts/error";
+
 import createFormData from "../../utils/images_edit/create_formData";
 
 const callHub = async (type: string, data?: any) : Promise<{status: number, message: any, sessionId?: string, body?: any}> => {

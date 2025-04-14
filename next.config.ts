@@ -1,12 +1,5 @@
-import withPWA from 'next-pwa';
 import TerserPlugin from 'terser-webpack-plugin';
 
-const pwaNextConfig = withPWA({
-    dest: "public",
-    disable: true,
-    register: true,
-    skipWaiting: true,
-});
 //
 
 const nextConfig = {    
@@ -61,4 +54,4 @@ webpack: (config: any) => {
 };
 
 
-export default pwaNextConfig(nextConfig);
+export default nextConfig;

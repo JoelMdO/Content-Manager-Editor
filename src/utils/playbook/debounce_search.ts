@@ -1,8 +1,6 @@
 import callHub from "@/services/api/call_hub";
 import { debounce} from "lodash";
 
-import { useCallback, useMemo } from "react";
-
 export default function debouncedSearch( val: string, setEntries: (entries: any) => void, setZeroSearchData: (isZeroSearchData: boolean) => void, entries: any[]) {
   const debouncedFunction = debounce(async (val: string) => {
     console.log("Calling debounce with:", val);

@@ -1,8 +1,7 @@
 'use client';
 import { useCodeSnippets } from '../../utils/playbook/code_snippet_hook';
 import { useReferences } from '../../utils/playbook/references_hook';
-import { ArrowLeft, Plus, Trash, Save, Link as LinkIcon } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Trash, Save, Link as LinkIcon } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import categories from '../../utils/categories';
 import handleSubmit from '../../utils/playbook/handleSubmit';

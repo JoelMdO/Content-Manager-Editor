@@ -27,8 +27,6 @@ const LinkButton: React.FC<LinkButtonProps> = ({editorRefs=null, index=0}) => {
             link_url = linkInputRef.current.value;
         }
     };
-    // redux
-    const dispatch = useDispatch<AppDispatch>();
     //
     ///--------------------------------------------------------
     // UI with a button to add a link

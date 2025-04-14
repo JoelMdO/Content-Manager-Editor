@@ -1,5 +1,5 @@
 import { dbFireStore } from '../../../firebase';
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 export default async function handleNoteClick (id: string) {
     const docRef = doc(dbFireStore, "playbook", id);

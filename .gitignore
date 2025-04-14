@@ -24,7 +24,8 @@
 # misc
 .DS_Store
 *.pem
-.vscode
+/.vscode/
+/docs/
 
 # debug
 npm-debug.log*
@@ -47,3 +48,6 @@ src/components/loading_toastouse
 .vscode
 cypress
 cypress.config.ts
+docs
+.hintrc
+

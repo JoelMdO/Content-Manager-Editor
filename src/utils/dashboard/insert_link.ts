@@ -1,5 +1,4 @@
 import callHub from "../../services/api/call_hub";
-import { AppDispatch } from "../../services/store";
 import linkWrapperHtml from "./wrapper_html";
 
 

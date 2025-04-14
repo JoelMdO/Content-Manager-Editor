@@ -6,12 +6,6 @@ import generateSearchIndex from "@/utils/api/generate_search_index";
 export async function POST(req: Request): Promise<Response> {
     
     console.log('at save POST');
-    
-    const uri = process.env.NEXT_PUBLIC_Mongo_uri;
-    // const client = new MongoClient(uri!);
-    // await client.connect();
-    // const db = client.db(process.env.NEXT_PUBLIC_Mongo_db);
-    // const collection = db.collection(process.env.NEXT_PUBLIC_Mongo_collection!);
     const data = await req.json();
     console.log('data', data);
     
