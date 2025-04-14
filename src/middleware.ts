@@ -71,9 +71,8 @@ if (isSubRequest) {
       `.replace(/\s{2,}/g, ' ').trim()
     );
     return response;
-}
+};
 
 export const config = {
   matcher: ['/api/post', '/api/save', '/dashboard', '/playbook', '/read-playbook'],
 };
-

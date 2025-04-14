@@ -1,7 +1,7 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../firebase";   
 import { NextResponse } from "next/server";
-import generateSession from "@/services/authentication/generate_session";
+import generateSession from "../../services/authentication/generate_session";
 import { database } from "../../../firebase";
 import { ref, update } from "firebase/database";
 

@@ -14,6 +14,8 @@
     "@reduxjs/toolkit": "^2.5.1",
     "@supabase/supabase-js": "^2.48.1",
     "@types/lodash": "^4.17.15",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "cloudinary": "^2.6.0",
     "firebase": "^11.3.0",
     "firebase-admin": "^13.2.0",
@@ -22,6 +24,7 @@
     "lucide-react": "^0.487.0",
     "mongodb": "^6.15.0",
     "next": "^15.2.4",
+    "next-pwa": "^5.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
@@ -30,13 +33,15 @@
     "server-only": "^0.0.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "sweetalert2": "^11.17.2"
+    "sweetalert2": "^11.17.2",
+    "terser-webpack-plugin": "^5.3.14"
   },
   "devDependencies": {
     "@cypress/react": "^9.0.1",
     "@cypress/webpack-dev-server": "^4.0.2",
     "@tailwindcss/postcss": "^4.0.5",
     "@types/js-cookie": "^3.0.6",
+    "@types/next-pwa": "^5.6.9",
     "@types/sanitize-html": "^2.13.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "autoprefixer": "^10.4.20",

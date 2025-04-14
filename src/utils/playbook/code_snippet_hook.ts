@@ -66,6 +66,11 @@ export const useCodeSnippets = () => {
             console.error(response.message);
           }
         });
+        event.preventDefault(); // Prevent default paste behavior
+        } else {
+            errorAlert("Snippet Paste","non200", "Link not valid");
+            console.error(response.message);
+        }
       }
     }
   };

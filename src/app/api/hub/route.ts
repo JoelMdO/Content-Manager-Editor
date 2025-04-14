@@ -1,6 +1,6 @@
 import apiRoutes  from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
-import { sanitizeData } from "@/utils/dashboard/sanitize";
+import { sanitizeData } from "../../../utils/dashboard/sanitize";
 
 export async function POST(req: Request): Promise<any> {
     //
@@ -28,7 +28,7 @@ export async function POST(req: Request): Promise<any> {
                     return NextResponse.json({ status: 403, message: "Unauthorized" });
                 }
                 console.log('type', type);
-                
+ 
                 switch(type){
                     ///### LOGOUT
                     case "logout":

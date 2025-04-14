@@ -1,4 +1,4 @@
-import firebaseAuth from "@/lib/firebase/firebase_auth";
+import firebaseAuth from "../../../lib/firebase/firebase_auth";
 import { NextResponse } from "next/server";
 // 
 

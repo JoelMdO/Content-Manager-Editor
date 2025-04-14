@@ -1,11 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import emailMe from "@/utils/buttons/email_me";
+import emailMe from "../../utils/buttons/email_me";
 
-//
-interface LogoButtonProps {
-    type: string;
-}
 //
 interface LogoButtonProps {
     type: string;
@@ -74,6 +70,7 @@ const LogoButton: React.FC<LogoButtonProps> = ({type}) => {
                         <Image src={image} style={{display:"block"}} className={`md:w-[${widthM}] md:h-[${heightM}] w-[${widthS}] h-[${heightS}] cursor-pointer`} width={widthDefault} height={heightDefault} alt={"logoJoel"}/>
                         {type === "playbook" ? null :
                         <p className={`text-xs ${textColor}`}>2025</p>}</button>
+            </button>
             <div className="w-[120px] absolute mb-2 origin-bottom bg-gray-800 text-white py-2 pl-2 rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">Let's connect!</div>
             </div>
         </>
