@@ -9,7 +9,7 @@ export async function POST(req: Request): Promise<Response> {
     const data = await req.json();
     console.log('data', data);
     
-    const {title, category, tags, steps, notes, codeSnippets, references, lastUpdated} = data;
+    const {title, category, tags, steps, notes, codeSnippets, references, lastUpdated, useRecord} = data;
     // Doc to create index for easy search.
     const doc = {title: title, tags: tags, category: category};
     console.log('title', title);
@@ -23,7 +23,8 @@ export async function POST(req: Request): Promise<Response> {
       codeSnippets,
       references,
       searchIndex: generateSearchIndex(doc),
-      lastUpdated});
+      lastUpdated,
+      useRecord});
 
      console.log('response Mong', dbRef.id);
      

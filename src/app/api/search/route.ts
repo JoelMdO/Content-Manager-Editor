@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbFireStore } from '../../../../firebase';
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, getDocsFromCache, orderBy, limit } from "firebase/firestore";
 
 export async function POST(req: Request): Promise<Response> {
 
@@ -23,8 +23,21 @@ export async function POST(req: Request): Promise<Response> {
         } else if (data.type === "playbook-search-category") {
             snaps = await getDocs(query(db, where("category", "==", data.data.data)));
         } else {
-            snaps = await getDocs(collection(dbFireStore, "playbook"));
-        }
+            // Get data from catche
+            const cachedSnap = await getDocsFromCache(collection(db, 'playbook'));
+            if (!cachedSnap.empty) {
+            snaps = cachedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } else {
+            /// Fetch data for the last 4 more used    
+            const q = query(collection(db, 'playbook'), orderBy('useRecord', 'desc'), limit(4));
+            snaps = await getDocs(q);
+            // snaps = await getDocs(collection(dbFireStore, "playbook"));
+            if (snaps.empty){
+            const q = query(collection(db, 'playbook'), limit(4));
+            snaps = await getDocs(q);    
+            }
+            }
+        }    
         //
         meta = snaps.docs.map((doc: any) => ({
             id: doc.id,
