@@ -5,24 +5,29 @@ import successAlert from "../components/alerts/sucess";
 import errorAlert from "../components/alerts/error";
 import LogoButton from "../components/buttons/logo_button";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/buttons/saving";
 
 const Login: React.FC = () => {
     ///===================================================
     // User Login UI
     ///=================================================== 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const router = useRouter();
     //handleLogin with Firebase authentication
     const handleLogin = async (e: React.FormEvent) => {
+        setIsSubmitted(true);
         e.preventDefault();
         const response = await callHub("auth", {email, password});
         console.log('response', response);
         
         if (response.status !== 200) {
+            setIsSubmitted(false);
             errorAlert("auth", "", "Email or Password incorrect");
             return;
         }
+        setIsSubmitted(false);
         successAlert("auth", response.message);
         const sessionId = response.sessionId;
         
@@ -64,7 +69,9 @@ const Login: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button type="submit" className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px]">Login</button>
+                <button type="submit" className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px]">
+                {isSubmitted? (<Loader type="Logging you..." />) : ("Login")}
+                </button>
                 
             </form>
         </div>
