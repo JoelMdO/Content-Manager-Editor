@@ -1,5 +1,3 @@
-import { text } from "stream/consumers";
-
 interface LoaderProps {
     type: string;
 }

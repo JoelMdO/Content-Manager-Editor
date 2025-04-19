@@ -11,8 +11,6 @@ debouncedUpdateStore: (title: string, body: string) => void
 // the user types or modifies the content. 
 ///========================================================
 const dbName = sessionStorage.getItem("db");
-console.log('dbName at handleCotent Change', dbName);
-
 //
 if (index === 0) {
     // Title

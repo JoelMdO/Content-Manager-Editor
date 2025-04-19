@@ -1,7 +1,5 @@
 import React, {ChangeEvent, useRef, useState} from "react";
 import uploadImage from "../../utils/images_edit/upload_image";
-import { AppDispatch } from "../../services/store";
-import { useDispatch } from "react-redux";
 import Image from "next/image";
 import successAlert from "../alerts/sucess";
 import errorAlert from "../alerts/error";

@@ -11,11 +11,6 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
     let sessionId: string | null = "";
     let url: string;
     //
-    console.log('called callHub');
-    if(type === "post"){
-    console.log('data at callHub', data);}
-    
-    
     ///-----------------------------------------------
     /// Build the body of the request as each one it has
     /// different structure. 
@@ -31,8 +26,6 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         case "post":
             const formData = await createFormData(type, data);
             sessionId = sessionStorage.getItem('sessionId');
-            console.log('sessionID at callhub', sessionId);
-            
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             body = formData;
             credentials = "include";
@@ -47,7 +40,6 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             break;
         //## PLAYBOOK SAVE
         case "playbook-save":
-            console.log('called playbook-save from callHub');
             body = JSON.stringify({data: data, type: type});
             sessionId = sessionStorage.getItem('sessionId');
             headers["Content-Type"] = "application/json";
@@ -61,7 +53,6 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         case "playbook-search":
          // When user searchs by category
         case "playbook-search-category":
-            console.log('called playbook-search from callHub');
             sessionId = sessionStorage.getItem('sessionId');
             //
             if(type === "playbook-search-bar"){
@@ -76,7 +67,6 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         case "auth-middleware":
             body = JSON.stringify({data: data, type: type});
             sessionId = data.sessionId;
-            console.log('sessionID at callHub', sessionId);
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             credentials = "include";
@@ -93,12 +83,8 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
     //  otherwise a normal api/call is send. 
     ///-------------------------------------------------------- 
         if (type === "auth-middleware"){
-            console.log('doing callHub "auth-middleware"');
-            
             url = `${process.env.NEXT_PUBLIC_url_api}/api/hub`;
         } else {
-            console.log('doing api/hub');
-            
             url = 'api/hub';
         }
     //    
@@ -110,14 +96,11 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         credentials: credentials
     });
         const jsonResponse = await response.json();
-        console.log('jsonResponse at callHub', jsonResponse);
         
         ///-----------------------------------------------
         /// From api/auth return the sessionId.
         ///-----------------------------------------------
         if(jsonResponse.message === "User authenticated"){
-            console.log('doing ok auth');
-            
             const sessionId = jsonResponse.sessionId;
             return { status: jsonResponse.status, message: "User authenticated", sessionId: sessionId };
         ///-----------------------------------------------

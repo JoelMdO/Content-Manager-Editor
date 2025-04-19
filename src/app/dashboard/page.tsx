@@ -8,7 +8,6 @@ import LogOutButton from "../../components/buttons/logout_buttons";
 import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
 import { handleContentChange } from "../../utils/dashboard/handle_content_change";
 import dbSelector from "../../components/alerts/db_selector";
-import { SquareChevronLeft, SquareChevronRight} from 'lucide-react';
 import { useRouter } from "next/navigation";
 import HomeButton from "../../components/buttons/home_button";
 

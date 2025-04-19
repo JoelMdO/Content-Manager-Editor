@@ -13,49 +13,31 @@ let rateLimitResponse: NextResponse;
 let response: NextResponse = NextResponse.next();
 const database_url = process.env.NEXT_PUBLIC_databaseURL;
 const database_2_url = process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL;
-console.log('pathname', path);
-console.log('database', database_2_url, 'database2', database_url);
 
-
-// if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
-//   //Get the previous path
-//     console.log('doing /path', path);
-//     console.log('Headers:', Object.fromEntries(req.headers.entries()));
-//     const headers=  Object.fromEntries(req.headers.entries());
-//     const next_url = headers["next-url"];
-//     console.log('next_url', next_url);
-
+if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
+  //Get the previous path
+    const headers=  Object.fromEntries(req.headers.entries());
+    const next_url = headers["next-url"];
     
-//     if(next_url == '/home'){
-//       const url = req.nextUrl; // Access the full URL
-//       const sessionId = url.searchParams.get('id');  
-//       const response = await callHub("auth-middleware", {auth: true, sessionId: sessionId});
-//   // const referrer = req.headers.get("referer");
-//   // console.log('referrre', referrer);
+    if(next_url == '/home'){
+      const url = req.nextUrl; // Access the full URL
+      const sessionId = url.searchParams.get('id');  
+      const response = await callHub("auth-middleware", {auth: true, sessionId: sessionId});
   
-//   // const referrerUrl = referrer ? new URL(referrer) : null;
-//   // const referrerPAth = referrerUrl?.pathname;
-//   // console.log('refpath', referrerPAth);
-  
-//   // console.log(`access to ${path} from referrer ${referrerPAth}`);
-//   // if (referrerPAth === '/home'){
-//   console.log('response at middleware', response);
-  
-//     if(response.status === 200){
-//     return NextResponse.next();
-//   } else {
-//     return NextResponse.redirect(new URL('/', req.url));
-//   }
-//   } else {
-//     return NextResponse.redirect(new URL('/', req.url));
-//   }
-// }
+    if(response.status === 200){
+    return NextResponse.next();
+  } else {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+  } else {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+}
 //
 const header = req.headers;
 const isSubRequest = header.get('x-middleware-subrequest');
 if (isSubRequest) {
   const origin = header.get('origin') || header.get('referer');
-  console.log('origin at middlewre', origin);
   
   const url = process.env.NEXT_PUBLIC_api_url;
 

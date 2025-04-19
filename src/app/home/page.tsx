@@ -14,7 +14,6 @@ const Home: React.FC = () => {
 
     useEffect (()=>{
       const playbook_item = sessionStorage.getItem("playbook-item");
-      console.log('playbok', playbook_item);
       
       if(playbook_item){  
         setThereIsPlaybook(true);

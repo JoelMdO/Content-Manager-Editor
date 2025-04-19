@@ -1,6 +1,4 @@
 import React, {useRef} from "react";
-import { AppDispatch } from "../../services/store";
-import { useDispatch} from "react-redux";
 import Image from "next/image";
 import insertLink from "../../utils/dashboard/insert_link";
 import successAlert from "../alerts/sucess";

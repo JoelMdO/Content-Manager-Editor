@@ -6,8 +6,6 @@ import sessionCheck from "@/services/authentication/session_check";
 export async function POST(req: Request): Promise<Response> {
     const body = await req.json();
     const { email, password, reauth, sessionId } = body;
-    console.log('reauth', reauth);
-    console.log('sessionId', sessionId);
     
     
     ///========================================================
@@ -15,7 +13,7 @@ export async function POST(req: Request): Promise<Response> {
     // from the middleware.
     ///========================================================
     if(reauth){
-        console.log('doing reauth');
+
         const response = await sessionCheck(sessionId);
 
         if(response.status === 200){

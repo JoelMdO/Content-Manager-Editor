@@ -2,7 +2,6 @@ import { database } from "../../../../firebaseMain";
 import { databaseDecav } from "../../../../firebaseDecav";
 import { ref, update} from "firebase/database";
 import { NextResponse } from "next/server";
-// import { supabase } from "../../../lib/supabase_client";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
 import { forEach } from "lodash";
 import replaceSrcWithImagePlaceholders from "../../../utils/images_edit/replace_src_on_img";
@@ -13,13 +12,9 @@ export async function POST(req: Request): Promise<Response> {
     ///---------------------------------------------------
     ///
     /// Variables.
-    console.log('at post api/POST');
-    
     const imageUrls: { url: string }[] = [];
     const formData = await req.formData();
-    const dbName = formData.get("dbName")as string;
-    console.log('dbNAme at POST', dbName);
-    
+    const dbName = formData.get("dbName")as string;    
     interface Article{
         id: string;
         title: string;
@@ -123,11 +118,6 @@ export async function POST(req: Request): Promise<Response> {
         const dbNameData = formData.get("dbName") as string;
         const dbNameObj = JSON.parse(dbNameData);
         const dbNameContent = dbNameObj.content;
-        console.log('dbnameData', dbNameData);
-        console.log('dbnameobj', dbNameObj);
-        console.log('dbnameconten', dbNameContent);
-        
-        
         
         //
         article.id = idContent;
@@ -161,7 +151,6 @@ export async function POST(req: Request): Promise<Response> {
             });
         // Replace src of the each image with the corresponded url:
         body = replaceSrcWithImagePlaceholders(body, images);
-        console.log('body at POST', body);
         
         const articleData = {
             id,
@@ -174,16 +163,14 @@ export async function POST(req: Request): Promise<Response> {
         // const articleDataJson = JSON.stringify(articleData);
             let db: any;
             if(dbNameContent === "DeCav"){
-                console.log('doing DeCAV');
                 db = databaseDecav;                    
             } else {
-                console.log('doing Joel');
                 db = database;
             }
             try{
             const dbRef = ref(db, `articles/${id}`);
-            const dbResponse = await update(dbRef, articleData);
-            console.log('dbResponse at POST', dbResponse);
+            await update(dbRef, articleData);
+            
             return NextResponse.json({status:200, message: "Data saved successfully", body: body}); 
             }catch (error){
             return NextResponse.json({status:500, message: "Error saving data ", error});     
@@ -191,8 +178,6 @@ export async function POST(req: Request): Promise<Response> {
             
                 
         }catch (error) {
-            console.log('error at POST', error);
-            
             return NextResponse.json({ status: 500, message: `Error processing request. ${error}` });
         }
     } catch (error) {

@@ -1,7 +1,6 @@
 import apiRoutes  from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
 import { sanitizeData } from "../../../utils/dashboard/sanitize";
-import sessionCheck from "@/services/authentication/session_check";
 
 export async function POST(req: Request): Promise<any> {
     //
@@ -10,16 +9,12 @@ export async function POST(req: Request): Promise<any> {
     const contentType = req.headers.get('Content-Type') || '';
     let sessionId: string = "";
     //
-    console.log('api/hub at POST');
-    
-    //
     try {
         ///-----------------------------------------------
         /// Check the content type to see if the request 
         /// comes without files only text
         ///-----------------------------------------------    
             if (contentType.includes("application/json")){
-                console.log('called contentType application/ api/bub');
                 
                 const getPostData = await req.json();
                 postData = getPostData.data;
@@ -27,12 +22,8 @@ export async function POST(req: Request): Promise<any> {
                 switch(type){
                     ///### LOGOUT
                     case "logout":
-                        console.log('called logout at api/hub POST');
-                        
                         //Retrieve the authorization session token from the headers
                         sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
-                        console.log('sessionIdForLogout', sessionId);
-                        
                         if (sessionId) {
                             postData = sessionId;
                         } else {
@@ -42,12 +33,8 @@ export async function POST(req: Request): Promise<any> {
                         type = type;
                     break;
                     case "playbook-save":
-                        console.log('called playbook_saved at api/hub POST');
-                        
                         //Retrieve the authorization session token from the headers
                         sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
-                        console.log('sessionI for playbook', sessionId);
-                        
                         if (sessionId) {
                             postData = {sessionId: sessionId, data: postData};
                         } else {
@@ -59,11 +46,8 @@ export async function POST(req: Request): Promise<any> {
                     case "playbook-search":
                     case "playbook-search-bar":
                     case "playbook-search-category":
-                        console.log('called playbook_search at api/hub POST');
                         //Retrieve the authorization session token from the headers
                         sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
-                        console.log('sessionI for playbook', sessionId);
-                        
                         if (sessionId) {
                             // Sanitize data.
                             let dataToSanitize: string | Object;
@@ -132,8 +116,6 @@ export async function POST(req: Request): Promise<any> {
                 /// Sanitize the data
                 const responseAfterSanitize = sanitizeData(formData, "post"); 
                 if ((await responseAfterSanitize).status === 200) { 
-                console.log('postData at api/hub', postData);
-                      
                 postData = formData;
                 type = "post";
                 } else {

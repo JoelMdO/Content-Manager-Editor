@@ -18,10 +18,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
     ///-----------------------------------------------
     /// Api endpoints, per type.
     ///-----------------------------------------------
-    console.log('type at apiRoutes', type);
-    console.log('data at apiRouotes', data);
-    
-    
     
     switch(type){
         //## SANITIZE LINK
@@ -43,7 +39,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
             ///-----------------------------------------------
             sessionId = data.get("session");
             const response = await sessionCheck(sessionId);
-                console.log("authJson after reauthenticate at apiRoutes", response)
                 if (response.status !== 200) {
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                 }
@@ -88,19 +83,15 @@ const apiRoutes = async (postData: any): Promise<any> => {
         break;
         case "playbook-save":
             endPoint = "save";
-            console.log('calling save');
             ///-----------------------------------------------
             /// Verify sessionId if its valid through the sessionCheck function
             ///-----------------------------------------------
             sessionId = data.sessionId;
-            console.log('sessionID at apiRoutes playbook', sessionId);
             const responsePlay = await sessionCheck(sessionId);
-                console.log("authJson after reauthenticate at apiRoutes", responsePlay)
                 if (responsePlay.status !== 200) {
                     console.log('response not 200 playbook');
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                 }
-            console.log('doing the rest of playbook after 200 ok');
             
             body = JSON.stringify(data.data);
             headers["Content-Type"] = "application/json";
@@ -110,19 +101,14 @@ const apiRoutes = async (postData: any): Promise<any> => {
             case "playbook-search-bar":
             case "playbook-search-category":    
                 endPoint = "search";
-                console.log('calling search');
                 ///-----------------------------------------------
                 /// Verify sessionId if its valid through the sessionCheck function
                 ///-----------------------------------------------
                 sessionId = data.sessionId;
-                console.log('sessionID at apiRoutes playbook search', sessionId);
                 const responsePlaySearch = await sessionCheck(sessionId);
-                    console.log("authJson after reauthenticate at apiRoutes", responsePlaySearch)
                     if (responsePlaySearch.status !== 200) {
-                        console.log('response not 200 playbook');
                         return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                     }
-                console.log('doing the rest of playbook after 200 ok');
                 
                 body = JSON.stringify(postData);
                 headers["Content-Type"] = "application/json";
@@ -134,7 +120,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
     ///-----------------------------------------------
     /// Call the corresponding API endpoint
     ///-----------------------------------------------
-        console.log('calling endpoint', endPoint);
         
         const response = await fetch(`${url}/api/${endPoint}`, {
             method: 'POST',
@@ -144,7 +129,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
         });
         // Wait for the JSON response
         const jsonResponse = await response.json();
-        console.log('jsonResponse at apiRpiutes', jsonResponse);
         
         ///-----------------------------------------------
         /// From api/auth return the sessionId.
@@ -162,8 +146,6 @@ const apiRoutes = async (postData: any): Promise<any> => {
         /// From api/search return the meta.
         ///-----------------------------------------------
         }else if (jsonResponse.message === "Data found successfully"){
-            console.log('doing data search and found');
-            
         const body = jsonResponse.body;
         return NextResponse.json({ status: jsonResponse.status, message: "Data found successfully", body: body });
         } else {

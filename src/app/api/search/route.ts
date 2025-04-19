@@ -4,34 +4,29 @@ import { collection, getDocs, query, where, getDocsFromCache, orderBy, limit } f
 
 export async function POST(req: Request): Promise<Response> {
 
-    console.log('at search POST');
-    const data = await req.json();
-    
+    const data = await req.json();    
     let meta: object = {};
-    
     const db = collection(dbFireStore, 'playbook');
-    console.log('data type', data.type);
     let snaps: any;
-    
+    //
     try {
         if (data.type === "playbook-search-bar") {
-            console.log('doing search bar');
-            console.log('data at search bar', data.data);
-            console.log('data the data', data.data.data);
+
             snaps = await getDocs(query(db, where("searchIndex", "array-contains", data.data.data)));
 
         } else if (data.type === "playbook-search-category") {
             snaps = await getDocs(query(db, where("category", "==", data.data.data)));
         } else {
+
             // Get data from catche
             const cachedSnap = await getDocsFromCache(collection(db, 'playbook'));
             if (!cachedSnap.empty) {
             snaps = cachedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             } else {
+                
             /// Fetch data for the last 4 more used    
             const q = query(collection(db, 'playbook'), orderBy('useRecord', 'desc'), limit(4));
             snaps = await getDocs(q);
-            // snaps = await getDocs(collection(dbFireStore, "playbook"));
             if (snaps.empty){
             const q = query(collection(db, 'playbook'), limit(4));
             snaps = await getDocs(q);    
