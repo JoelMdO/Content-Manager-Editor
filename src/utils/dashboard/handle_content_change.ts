@@ -10,15 +10,18 @@ debouncedUpdateStore: (title: string, body: string) => void
 // Function to handler the content change on the editor, when 
 // the user types or modifies the content. 
 ///========================================================
+const dbName = sessionStorage.getItem("db");
+console.log('dbName at handleCotent Change', dbName);
 
+//
 if (index === 0) {
     // Title
-    sessionStorage.setItem("tempTitle", content);
-    debouncedUpdateStore(content, sessionStorage.getItem("tempBody") || "");
+    sessionStorage.setItem(`tempTitle-${dbName}`, content);
+    debouncedUpdateStore(content, sessionStorage.getItem(`tempBody-${dbName}`) || "");
 } else {
     // Article
     const htmlCleaned = removeBase64FromImgTags(content);
-    sessionStorage.setItem("tempBody", htmlCleaned);
-    debouncedUpdateStore(sessionStorage.getItem("tempTitle") || "", htmlCleaned);
+    sessionStorage.setItem(`tempBody-${dbName}`, htmlCleaned);
+    debouncedUpdateStore(sessionStorage.getItem(`tempTitle-${dbName}`) || "", htmlCleaned);
 }
 };

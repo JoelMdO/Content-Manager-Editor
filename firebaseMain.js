@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app";
 import { getDatabase} from "firebase/database";
 import { getAuth } from "firebase/auth";
@@ -22,11 +21,12 @@ measurementId: process.env.NEXT_PUBLIC_FIREBASE_measurementId
 
 // Initialize Firebaseconst 
 const app = initializeApp(firebaseConfig);
-//
+
 // Get a reference to the database service
 const database = getDatabase(app);
 const auth = getAuth(app);
 const dbFireStore = initializeFirestore(app, {
-    localCache: persistentLocalCache(),
-  });
+  localCache: persistentLocalCache(),
+});
+
 export { database, auth, dbFireStore };

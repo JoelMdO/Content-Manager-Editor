@@ -1,5 +1,5 @@
 import 'server-only';
-import { database } from "../../firebase";
+import { database } from "../../firebaseMain";
 import { ref, get } from "firebase/database";
 
 

@@ -130,12 +130,10 @@ const apiRoutes = async (postData: any): Promise<any> => {
                 break;
         default:
             return {status: 205, message: "type not found"};
-    }
+    };
     ///-----------------------------------------------
     /// Call the corresponding API endpoint
     ///-----------------------------------------------
-        console.log('calling endpoint', endPoint);
-        
         console.log('calling endpoint', endPoint);
         
         const response = await fetch(`${url}/api/${endPoint}`, {

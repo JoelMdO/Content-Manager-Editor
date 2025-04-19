@@ -1,20 +1,36 @@
 import firebaseAuth from "../../../lib/firebase/firebase_auth";
 import { NextResponse } from "next/server";
+import sessionCheck from "@/services/authentication/session_check";
 // 
-
-
 
 export async function POST(req: Request): Promise<Response> {
     const body = await req.json();
-    const { email, password, reauth } = body;
+    const { email, password, reauth, sessionId } = body;
+    console.log('reauth', reauth);
+    console.log('sessionId', sessionId);
+    
+    
+    ///========================================================
+    // Perform a  reauthentication when the token is received
+    // from the middleware.
+    ///========================================================
+    if(reauth){
+        console.log('doing reauth');
+        const response = await sessionCheck(sessionId);
+
+        if(response.status === 200){
+            return  NextResponse.json({status: 400, message: "User not longer authenticated. Please sign again."});
+        }
+        return NextResponse.json({ status: 200, message: "User authenticated" });
+    }
     ///--------------------------------------------------------------------------------------------
-    ///First Sign in with Firebase authentication.
+    /// IF not session or token arlready, sign in with Firebase authentication.
     ///--------------------------------------------------------------------------------------------
     const auth = await firebaseAuth(email, password);
-    const response = await auth.json();
+    const fireAuthResponse = await auth.json();
     
-    if (response.status === 200){
-        return NextResponse.json({ status: 200, message: "User authenticated", session: response.sessionId });
+    if (fireAuthResponse.status === 200){
+           return NextResponse.json({ status: 200, message: "User authenticated", session: fireAuthResponse.sessionId });;
     }else {
     return NextResponse.json({ status: auth.status, message: auth.message });
     }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { dbFireStore } from "../../../../firebase";
+import { dbFireStore } from "../../../../firebaseMain";
 import { collection, addDoc } from 'firebase/firestore';
 import generateSearchIndex from "@/utils/api/generate_search_index";
 

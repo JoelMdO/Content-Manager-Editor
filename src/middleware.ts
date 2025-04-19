@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import rateLimit from './services/api/rate_limit';
-
+import { auth } from './services/authentication/admin_config';
+import callHub from './services/api/call_hub';
 //
 export async function middleware(req: NextRequest) {
 
@@ -11,23 +12,44 @@ const path = req.nextUrl.pathname;
 let rateLimitResponse: NextResponse;
 let response: NextResponse = NextResponse.next();
 const database_url = process.env.NEXT_PUBLIC_databaseURL;
-const database_2_url = process.env.NEXT_PUBLIC_Mongo_uri;
+const database_2_url = process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL;
 console.log('pathname', path);
+console.log('database', database_2_url, 'database2', database_url);
 
-if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
-  //Get the previous path
-  console.log('doing /path', path);
+
+// if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
+//   //Get the previous path
+//     console.log('doing /path', path);
+//     console.log('Headers:', Object.fromEntries(req.headers.entries()));
+//     const headers=  Object.fromEntries(req.headers.entries());
+//     const next_url = headers["next-url"];
+//     console.log('next_url', next_url);
+
+    
+//     if(next_url == '/home'){
+//       const url = req.nextUrl; // Access the full URL
+//       const sessionId = url.searchParams.get('id');  
+//       const response = await callHub("auth-middleware", {auth: true, sessionId: sessionId});
+//   // const referrer = req.headers.get("referer");
+//   // console.log('referrre', referrer);
   
-  const referrer = req.headers.get("referer") || "";
-  const referrerUrl = referrer ? new URL(referrer) : null;
-  const referrerPAth = referrerUrl?.pathname || "";
-  console.log(`access to ${path} from referrer ${referrerPAth}`);
-  if (referrerPAth === '/'){
-    return NextResponse.next();
-  } else {
-    return NextResponse.redirect(new URL('/', req.url));
-  }
-}
+//   // const referrerUrl = referrer ? new URL(referrer) : null;
+//   // const referrerPAth = referrerUrl?.pathname;
+//   // console.log('refpath', referrerPAth);
+  
+//   // console.log(`access to ${path} from referrer ${referrerPAth}`);
+//   // if (referrerPAth === '/home'){
+//   console.log('response at middleware', response);
+  
+//     if(response.status === 200){
+//     return NextResponse.next();
+//   } else {
+//     return NextResponse.redirect(new URL('/', req.url));
+//   }
+//   } else {
+//     return NextResponse.redirect(new URL('/', req.url));
+//   }
+// }
 //
 const header = req.headers;
 const isSubRequest = header.get('x-middleware-subrequest');

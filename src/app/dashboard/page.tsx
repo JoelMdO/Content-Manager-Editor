@@ -1,14 +1,16 @@
 'use client'
 import React, { useRef, useState, useEffect } from "react";
 import { handleKeyBoardActions } from "../../utils/dashboard/handle_keyboard_actions";
-import { useDispatch} from "react-redux";
-import { AppDispatch } from "../../services/store";
 import dynamic from "next/dynamic";
 import { handleClear } from "../../utils/dashboard/handler_clear";
 import { handleSave } from "../../utils/dashboard/handle_save"; 
 import LogOutButton from "../../components/buttons/logout_buttons";
 import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
 import { handleContentChange } from "../../utils/dashboard/handle_content_change";
+import dbSelector from "../../components/alerts/db_selector";
+import { SquareChevronLeft, SquareChevronRight} from 'lucide-react';
+import { useRouter } from "next/navigation";
+import HomeButton from "../../components/buttons/home_button";
 
 const ImageButton = dynamic(() => import("../../components/buttons/image_button"), { ssr: false });
 const LinkButton = dynamic(() => import("../../components/buttons/link_button"), { ssr: false });
@@ -22,8 +24,9 @@ const ArticlePage: React.FC = () => {
   const [isPlaceHolderTitle, setPlaceHolderTitle] = useState<boolean>(true);
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const editorRefs = useRef<(HTMLDivElement| null)[]>([]);
-  const dispatch = useDispatch<AppDispatch>();
+  const [isDecav, setIsDecav] = useState<boolean>(false);
   const pageRef = useRef(null);
+  const [dbName, setdbName] = useState<string>("");
   //
   ///======================================================
   // Check if an article is already created on page load
@@ -32,23 +35,32 @@ const ArticlePage: React.FC = () => {
   // Create article ID only once when component mounts
   let savedBody: string = "";
   let savedTitle: string = "";
+  const router = useRouter();
 
   useEffect(() => {
-      // Check if the article has already been created
-      const article = sessionStorage.getItem("articleContent");
-      if (article !== null || article !== undefined){
-        try{
-        const jsonArticle = JSON.parse(article!);
-        savedTitle = jsonArticle[0]?.content;
-        savedBody = jsonArticle[2]?.content;
-      // Remove the sesstion Storage after the page is mounted and if exist the article is created
-      sessionStorage.removeItem("tempTitle");
-      sessionStorage.removeItem("tempBody");
-      sessionStorage.removeItem("articleContent");
-      }catch (error){
-      }}
-  }, []);
+      dbSelector();
+      // Read the sessionStorage as per the corresponded db.
+    let articleStored: string | null;
+    let dbNameToSearch = "DeCav";
+      articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
 
+    if (articleStored == null || articleStored == undefined){
+      articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
+    } 
+    
+    try{
+      const jsonArticle = JSON.parse(articleStored!);
+      savedTitle = jsonArticle[0]?.content;
+      savedBody = jsonArticle[2]?.content;
+    // Remove the sesstion Storage after the page is mounted and if exist the article is created
+    sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
+    sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
+    sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
+    }catch (error){
+    }
+},[]);
+  //
+   
   ///---------------------------------------------------
   //  Cleanup debounce on unmount
   ///---------------------------------------------------
@@ -81,26 +93,31 @@ const ArticlePage: React.FC = () => {
     <div ref={pageRef} className="flex flex-col md:flex-row h-screen bg-black">
       {/* Left Menu on Tablet / Desktop*/}
       <aside className="hidden w-[25%] h-full bg-gray-800 text-white md:flex items-center flex-col">
-        <ImageButton editorRefs={editorRefs} index={1}/>
-        <LinkButton editorRefs={editorRefs} index={1} />
+        <ImageButton editorRefs={editorRefs} index={1} data-cy={"image-button"}/>
+        <LinkButton editorRefs={editorRefs} index={1} data-cy="link-button"/>
         <FontStyleUI/>
-        <CustomButton type='post' onClick={() => handleSave(debouncedUpdateStore)}/>
+        <CustomButton type='post' data-cy={"submit-article"} onClick={() => handleSave(debouncedUpdateStore)}/>
         <CustomButton type='clear' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/>
+        <HomeButton/>
         <LogOutButton />
       </aside>
       {/* Menu Mobile*/}
-      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row fixed">
+      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row">
         <div className="flex items-center flex-col">
           <div className="flex flex-row space-x-2">
-        <ImageButton editorRefs={editorRefs} index={1}/>
-        <LinkButton editorRefs={editorRefs} index={1} /></div>
+        <ImageButton editorRefs={editorRefs} index={1} />
+        <LinkButton editorRefs={editorRefs} index={1} />
+          </div>
         <CustomButton type='clear' onClick={()=> handleClear(setTheTitle, setTheBody, editorRefs)}/></div>
         <FontStyleUI/>
+          <div className="flex flex-col justify-center gap-y-2 items-center">
         <CustomButton type='post' onClick={()=> handleSave(debouncedUpdateStore)}/>
         <LogOutButton />
+        <HomeButton type="mobile"/>
+          </div>
       </nav>
       {/* Main Content */}
-      <main className="flex-1 p-4 pt-[20vh] md:pt-2 md:w-[75%] overflow-y-auto min-h-screen">
+      <main className="flex-1 p-4 pt-2 md:w-[75%] overflow-y-auto min-h-screen">
       <div className="border border-gray-600 border-1px">
       {["Title", "Article"].map((placeholder, index) => (
         // <div key={index} style={{ userSelect: "text", cursor: "text" }}

@@ -5,7 +5,7 @@ import successAlert from "../components/alerts/sucess";
 import errorAlert from "../components/alerts/error";
 import LogoButton from "../components/buttons/logo_button";
 import { useRouter } from "next/navigation";
-import Loader from "@/components/buttons/saving";
+import Loader from "@/components/buttons/loader_saving";
 
 const Login: React.FC = () => {
     ///===================================================
@@ -69,8 +69,8 @@ const Login: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button type="submit" className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px]">
-                {isSubmitted? (<Loader type="Logging you..." />) : ("Login")}
+                <button type="submit" className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center">
+                {isSubmitted? (<Loader type="Logging..." />) : ("Login")}
                 </button>
                 
             </form>

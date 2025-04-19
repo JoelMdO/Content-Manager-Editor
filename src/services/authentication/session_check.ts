@@ -1,8 +1,8 @@
 import "server-only";
-import admin from "firebase-admin";
 import getSessionBySessionId from "./get_session_by_id";
 import readLog from "./read_log";
 import getSessionPlate from "./get_session_plate";
+import { admin } from './admin_config';
 
 async function sessionCheck(sessionId: string, id?: string, title?: string, body?: string, images?: object, bold?: string[], italic?: string[]) : Promise<{status: number; message: string; user?: string}> {
     //==================================================
@@ -25,29 +25,8 @@ async function sessionCheck(sessionId: string, id?: string, title?: string, body
     const log = readLog(logRes);
     const token = log;
     ///==================================================
-    /// Initialize SDK for server
-    ///--------------------------------------------------
-    if(!admin.apps.length){
-    const serviceAccount = {
-        "type": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_type,
-        "project_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_project_id,
-        "private_key_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_private_key_id,
-        "private_key": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_private_key!.replace(/\\n/g, '\n'),
-        "client_email": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_email,
-        "client_id": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_id,
-        "auth_uri": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_auth_uri,
-        "token_uri": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_token_uri,
-        "auth_provider_x509_cert_url": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_auth_provider_x509_cert_url,
-        "client_x509_cert_url": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_client_x509_cert_url,
-        "universe_domain": process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_universe_domain
-    }
-    const account =JSON.parse(JSON.stringify(serviceAccount));
-    admin.initializeApp({
-    credential: admin.credential.cert(account),
-    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_databaseURL
-    });}
-    //==================================================
-    // Verify the user ID
+    /// Use SDK for server (admin)
+    /// Verify the user ID
     //==================================================
     let user: string; 
     ///==================================================

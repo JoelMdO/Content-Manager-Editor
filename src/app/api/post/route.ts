@@ -1,4 +1,5 @@
-import { database } from "../../../../firebase";
+import { database } from "../../../../firebaseMain";
+import { databaseDecav } from "../../../../firebaseDecav";
 import { ref, update} from "firebase/database";
 import { NextResponse } from "next/server";
 // import { supabase } from "../../../lib/supabase_client";
@@ -12,8 +13,13 @@ export async function POST(req: Request): Promise<Response> {
     ///---------------------------------------------------
     ///
     /// Variables.
+    console.log('at post api/POST');
+    
     const imageUrls: { url: string }[] = [];
     const formData = await req.formData();
+    const dbName = formData.get("dbName")as string;
+    console.log('dbNAme at POST', dbName);
+    
     interface Article{
         id: string;
         title: string;
@@ -67,7 +73,7 @@ export async function POST(req: Request): Promise<Response> {
                         invalidate: true,
                         resource_type: "auto",
                         filename_override: fileName,
-                        folder: "DeCav", 
+                        folder: dbName, 
                         use_filename: true,
                         },
                         (uploadError, result) => {
@@ -113,6 +119,16 @@ export async function POST(req: Request): Promise<Response> {
         const boldData = formData.get("bold") as string;
         const boldObj = JSON.parse(boldData);
         const boldContent = boldObj.content;
+
+        const dbNameData = formData.get("dbName") as string;
+        const dbNameObj = JSON.parse(dbNameData);
+        const dbNameContent = dbNameObj.content;
+        console.log('dbnameData', dbNameData);
+        console.log('dbnameobj', dbNameObj);
+        console.log('dbnameconten', dbNameContent);
+        
+        
+        
         //
         article.id = idContent;
         article.title = titleContent;
@@ -129,10 +145,8 @@ export async function POST(req: Request): Promise<Response> {
         let bold = article.bold;  
         let italic = article.italic;
         //
-        const userId = formData.get("session")as string;
-
+        
         try{
-        const dbRef = ref(database, `articles/${id}`);
         const arrayData = [images, bold, italic];
         forEach(arrayData, (value) => {
             if(Array.isArray(value) && value.length === 0){
@@ -147,6 +161,7 @@ export async function POST(req: Request): Promise<Response> {
             });
         // Replace src of the each image with the corresponded url:
         body = replaceSrcWithImagePlaceholders(body, images);
+        console.log('body at POST', body);
         
         const articleData = {
             id,
@@ -157,11 +172,27 @@ export async function POST(req: Request): Promise<Response> {
             italic
         };
         // const articleDataJson = JSON.stringify(articleData);
-        
-        await update(dbRef, {
-            articleData});
-            return NextResponse.json({status:200, message: "Data saved successfully", body: body});
+            let db: any;
+            if(dbNameContent === "DeCav"){
+                console.log('doing DeCAV');
+                db = databaseDecav;                    
+            } else {
+                console.log('doing Joel');
+                db = database;
+            }
+            try{
+            const dbRef = ref(db, `articles/${id}`);
+            const dbResponse = await update(dbRef, articleData);
+            console.log('dbResponse at POST', dbResponse);
+            return NextResponse.json({status:200, message: "Data saved successfully", body: body}); 
+            }catch (error){
+            return NextResponse.json({status:500, message: "Error saving data ", error});     
+            }
+            
+                
         }catch (error) {
+            console.log('error at POST', error);
+            
             return NextResponse.json({ status: 500, message: `Error processing request. ${error}` });
         }
     } catch (error) {

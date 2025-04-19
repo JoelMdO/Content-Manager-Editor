@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { dbFireStore } from '../../../../firebase';
+import { dbFireStore } from '../../../../firebaseMain';
 import { collection, getDocs, query, where, getDocsFromCache, orderBy, limit } from "firebase/firestore";
 
 export async function POST(req: Request): Promise<Response> {

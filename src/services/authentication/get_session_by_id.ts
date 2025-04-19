@@ -1,5 +1,5 @@
 import { ref, get } from "firebase/database";
-import { database } from "../../../firebase";
+import { database } from "../../../firebaseMain";
 
 async function getSessionBySessionId(sessionId: string, type?: string) {
   ///========================================================

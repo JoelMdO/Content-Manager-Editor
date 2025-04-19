@@ -1,7 +1,8 @@
-import { auth } from "../../../firebase"; 
+import { auth } from "../../../firebaseMain"; 
 import { signOut } from "firebase/auth";
-import { database } from "../../../firebase";
+import { database } from "../../../firebaseMain";
 import { ref, remove } from "firebase/database";
+import { destroyCookie } from "nookies";
 
 const handleLogout = async (data: { user: string; sessionId: string }) => {
     ///========================================================
@@ -29,6 +30,7 @@ const handleLogout = async (data: { user: string; sessionId: string }) => {
     // Above can be not mandatory to be accomplished due to session
     // authentication, but signout will be.
     await signOut(auth);
+    destroyCookie(null, 'authToken', { path: '/' });
 }
 
 export default handleLogout;

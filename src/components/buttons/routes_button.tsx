@@ -39,7 +39,8 @@ const RouteButton: React.FC<RouteButtonProps> = ({type, 'data-cy': dataCity}) =>
         router.push(`${url}${path}?modal=true`)
       }else{
         console.log('route others');
-      router.push(`${url}${path}`)
+        const sessionId = sessionStorage.getItem('sessionId');
+        router.push(`${url}${path}?id=${sessionId}`);
     }}
     //
     return (

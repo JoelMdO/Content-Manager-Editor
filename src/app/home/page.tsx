@@ -39,7 +39,7 @@ const Home: React.FC = () => {
       <main className="flex-1 p-4 pt-[20vh] md:pt-2 md:w-[75%] overflow-y-auto min-h-screen items-center">
          <h1 className="text-white pt-5 font-bold font-roboto text-xl">Home</h1>
          <div className="flex flex-col justify-center items-center h-[90%] w-full">
-         <div className="flex flex-col w-[80%] md:w-[50%] h-[30%] bg-transparent border-slate-500 border md:mt-5 mt-2">
+         <div className="flex flex-col w-[90%] md:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-5 mt-2">
             <h1 className="text-white pt-6 pl-2 text-xl font-roboto">Playbook</h1>
             <p className="text-gray-500 text-xs pl-2">Your quick access to software engineer code solutions.</p>
             {thereIsPlaybook && <RouteButton type="with-item-playbook" />}
@@ -48,11 +48,11 @@ const Home: React.FC = () => {
             <RouteButton type="read-playbook" />
          </div>
          </div>
-         <div className="flex flex-col w-[80%] md:w-[50%] h-[30%] bg-transparent border-slate-500 border md:mt-8 mt-3 align-middle">
+         <div className="flex flex-col w-[90%] md:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-8 mt-3 align-middle">
             <h1 className="text-white pt-6 pl-2 text-xl font-roboto">CMS</h1>
             <p className="text-gray-500 text-xs pl-2">Write an article or continue working on one.</p>
             <div className="flex flex-row self-center pt-2">
-            <RouteButton type="dashboard" />
+            <RouteButton type="dashboard" data-cy="route-button-dashboard"/>
             <InopButton type="load_article" />
          </div>
          </div>

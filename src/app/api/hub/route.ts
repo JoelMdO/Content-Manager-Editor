@@ -1,6 +1,7 @@
 import apiRoutes  from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
 import { sanitizeData } from "../../../utils/dashboard/sanitize";
+import sessionCheck from "@/services/authentication/session_check";
 
 export async function POST(req: Request): Promise<any> {
     //
@@ -86,6 +87,17 @@ export async function POST(req: Request): Promise<any> {
                         type = type;
                         postData = postData;
                     break;
+                    case "auth-middleware" :
+                        sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
+                        if (sessionId) {
+                            postData = {sessionId: sessionId, data: postData};
+                        } else {
+         
+                            return NextResponse.json({ status: 401, message: "User without a valid session" });
+                        }
+                        type = "auth";
+                        postData = postData;
+                    break;
                     default:
                         postData = postData;
                         type = type;
@@ -119,7 +131,9 @@ export async function POST(req: Request): Promise<any> {
                 }
                 /// Sanitize the data
                 const responseAfterSanitize = sanitizeData(formData, "post"); 
-                if ((await responseAfterSanitize).status === 200) {       
+                if ((await responseAfterSanitize).status === 200) { 
+                console.log('postData at api/hub', postData);
+                      
                 postData = formData;
                 type = "post";
                 } else {

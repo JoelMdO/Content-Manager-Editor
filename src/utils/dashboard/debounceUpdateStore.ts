@@ -16,7 +16,8 @@ export const debouncedUpdateStore = debounce(
     //----------------------------------------------------
     // Remove previous Title and Body content before adding the new one
     //----------------------------------------------------
-    let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
+    const dbName = sessionStorage.getItem("db");
+    let articleContent = JSON.parse(sessionStorage.getItem(`articleContent-${dbName}`) || "[]");
 
     if (newTitle !== "") {
       // Ensure only the latest title and id    
@@ -37,7 +38,7 @@ export const debouncedUpdateStore = debounce(
     articleContent.push({ type: "body", content: newBody });
     }
 
-    sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
+    sessionStorage.setItem(`articleContent-${dbName}`, JSON.stringify(articleContent));
 },
   500 // Wait 500ms after last change before updating store
 );

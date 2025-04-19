@@ -9,12 +9,13 @@ const FontStyleUI: React.FC = () => {
 
     return (
         <>
-        <div className="mt-4 flex flex-col">
-            <label className="text-white">Font Style</label>
-            <div className="flex-row space-x-3">
-            <button className="mt-2 text-lg text-white border-2 border-green w-8 h-9 " onClick={() => handleFontChange("bold", dispatch)}>B</button>
-            <button className="italic mt-2 text-lg text-white border-2 border-green w-8 h-9" onClick={() => handleFontChange("italic", dispatch)}>I</button>
-        </div></div>
+        <div className="mt-4 flex flex-col justify-center items-center md:justify-normal md:items-start">
+            <span className="text-white md:text-base text-xs flex justify-center">Font Style</span>
+            <div className="flex md:flex-row flex-col md:space-x-3">
+            <button type ="button" className="mt-2 text-lg text-white border-2 border-green w-8 h-9 " onClick={() => handleFontChange("bold", dispatch)}>B</button>
+            <button type = "button" className="italic mt-2 text-lg text-white border-2 border-green w-8 h-9" onClick={() => handleFontChange("italic", dispatch)}>I</button>
+            </div>
+        </div>
         </>
     );
 };

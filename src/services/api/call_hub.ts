@@ -9,8 +9,12 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
     let sessionId: string | null = "";
+    let url: string;
     //
     console.log('called callHub');
+    if(type === "post"){
+    console.log('data at callHub', data);}
+    
     
     ///-----------------------------------------------
     /// Build the body of the request as each one it has
@@ -27,7 +31,8 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         case "post":
             const formData = await createFormData(type, data);
             sessionId = sessionStorage.getItem('sessionId');
-            sessionId = sessionStorage.getItem('sessionId');
+            console.log('sessionID at callhub', sessionId);
+            
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             body = formData;
             credentials = "include";
@@ -35,7 +40,6 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         //## LOGOUT
         case "logout":  
             body = JSON.stringify({data: "", type: type});
-            sessionId = sessionStorage.getItem('sessionId');
             sessionId = sessionStorage.getItem('sessionId');
             sessionStorage.removeItem('sessionId');
             headers["Content-Type"] = "application/json";
@@ -68,15 +72,38 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             //
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
-            credentials = "include";    
+            credentials = "include";
+        case "auth-middleware":
+            body = JSON.stringify({data: data, type: type});
+            sessionId = data.sessionId;
+            console.log('sessionID at callHub', sessionId);
+            headers["Content-Type"] = "application/json";
+            headers = { ...headers, Authorization: `Bearer ${sessionId}` };
+            credentials = "include";
+        break;        
         default:
             body = JSON.stringify({data: data, type: type});
             headers["Content-Type"] = "application/json";
             break;
     }
     //
+    ///--------------------------------------------------------
+    //  if callHub is used to check if user is already authenticated
+    //  so as the call is from the middleware full url is passed
+    //  otherwise a normal api/call is send. 
+    ///-------------------------------------------------------- 
+        if (type === "auth-middleware"){
+            console.log('doing callHub "auth-middleware"');
+            
+            url = `${process.env.NEXT_PUBLIC_url_api}/api/hub`;
+        } else {
+            console.log('doing api/hub');
+            
+            url = 'api/hub';
+        }
+    //    
     try{
-    const response = await fetch('api/hub', {
+    const response = await fetch(url, {
         method: 'POST',
         body: body,
         headers: headers,

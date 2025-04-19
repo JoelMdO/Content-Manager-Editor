@@ -18,9 +18,10 @@ interface ButtonProps {
     setEntries?: React.Dispatch<React.SetStateAction<any[]>>;
     setUpdateNote?: React.Dispatch<React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>>;
     setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
+    'data-cy'?: string;
 }
 //
-const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating}) => {
+const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating, 'data-cy': dataCity}) => {
     ///========================================================
     // Custom Buttons used on dashboard page at this stage is only
     // for Post (Save the article)
@@ -42,8 +43,9 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
     const italic = useSelector((state: any) => state.data_state?.fontStyle);
     const bold = useSelector((state: any) => state.data_state?.fontWeight);
     console.log('type at custom button', type);
-    
     //
+    console.log('isClicked', isClicked);
+    
     //
     switch (type) {
         case "post":
@@ -52,11 +54,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             hover_color= "bg-green-light";
             icon='/inbox.png';
             position='';
-            text = "Post";
-            color = "bg-green";
-            hover_color= "bg-green-light";
-            icon='/inbox.png';
-            position='';
+            textColor = isClicked? "text-black" : textColor; 
         break;
         case "new":
             isNew = true;
@@ -126,11 +124,6 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             color = "bg-blue";
             icon='/clear.png';
             position='';
-            text = "Clear";
-            hover_color= "bg-green";
-            color = "bg-blue";
-            icon='/clear.png';
-            position='';
         break;
         
     }
@@ -141,18 +134,16 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
         <>
             {isLink?   <Link href="/playbook"/> :
             <button
-                type = "button"                
+                type = "button"       
+                data-cy={dataCity}         
                 className={`${height} ${width} ${textColor} ${otherFeatures} ${shadow} ${position} ${isClicked? "text-black":{textColor}} ${textSmallSize} md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1  ${isClicked? "bg-cream" : `${color}`} hover:${hover_color}`}
                 onClick={() => {
-                    if (onClick) onClick(); 
                     if (onClick) onClick(); 
                         setTimeout(() => {
                         if(type === "post"){
                             ///For Posting the article
-                            setLoading(true);
                             setIsClicked(true);
                             setLoading(true);
-                            setIsClicked(true);
                             saveButtonClicked(italic, bold)
                             .then((response) => {     
                                 if (response.status === 200) {
@@ -161,7 +152,8 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                                 successAlert("saved");
                                 //From posting the new body article to be updated on the session storage. 
                                 if(response.body){
-                                    let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
+                                    const dbName = sessionStorage.getItem("db");
+                                    let articleContent = JSON.parse(sessionStorage.getItem(`articleContent-${dbName}`) || "[]");
                                     articleContent.push({ type: "body", content: response.body});
                                 }
                                 } else if (response.message === "User not authenticated" || response.status === 401) {
@@ -178,7 +170,6 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                             }).catch((error) => {
                                 errorAlert("saved", "error", error);
                             })
-                        } else if (type === "logo"){
                         } else if (type === "logo"){
                             ///To connect with me on Logo click
                             emailMe();
@@ -208,7 +199,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                         }
                         }, 1000);}}   >
                         {isNew? null : 
-                        <Image src={icon} style={{display:isClicked? "none" :"block"}} className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt={`${text}-icon`}/>}{isClicked? "Posting" : `${text}`}
+                        <Image src={icon} style={{display:isClicked? "none" :"block"}} className={`md:w-6 md:h-6 w-3 h-3 cursor-pointer ${textColor}`}width={12} height={12} alt={`${text}-icon`}/>}{isClicked? "Posting" : `${text}`}
             </button>}
         </>
     );

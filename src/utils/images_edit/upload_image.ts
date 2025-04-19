@@ -10,7 +10,7 @@ interface TrackedImage {
 }
 //
 
-const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivElement|null, dispatch: AppDispatch): Promise<any> => {
+const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivElement|null, dbName: string): Promise<any> => {
     ///========================================================
     // Function to upload an image
     ///========================================================
@@ -56,7 +56,7 @@ const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivE
             if (responseSaveImage.status === 205) 
             return responseSaveImage;
             // Get current article content from sessionStorage
-            let articleContent = JSON.parse(sessionStorage.getItem("articleContent") || "[]");
+            let articleContent = JSON.parse(sessionStorage.getItem(`articleContent-${dbName}`) || "[]");
             // Add image data (file and blobUrl) to articleContent
             articleContent.push({
                 type: "image",
@@ -64,7 +64,7 @@ const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivE
                 fileName: file.name,
                 blobUrl: objectUrl, // Temporary preview URL
             });
-            sessionStorage.setItem("articleContent", JSON.stringify(articleContent));
+            sessionStorage.setItem(`articleContent-${dbName}`, JSON.stringify(articleContent));
             //Clic handler to make the image selectable
             img.onclick = (e) => {
             const selection = window.getSelection();
@@ -77,10 +77,10 @@ const uploadImage = async (e: ChangeEvent<HTMLInputElement>, editorRef: HTMLDivE
             img.oncontextmenu = (e) => {
                 e.preventDefault(); // Prevent context menu from opening
                 const currentImages: TrackedImage[] = JSON.parse(
-                    sessionStorage.getItem("editorImages") || '[]'
+                    sessionStorage.getItem(`editorImages-${dbName}`) || '[]'
                 );
                 const updatedImages = currentImages.filter(img => img.id !== imageId);
-                sessionStorage.setItem("editorImages", JSON.stringify(updatedImages));
+                sessionStorage.setItem(`editorImages-${dbName}`, JSON.stringify(updatedImages));
                 // Find and remove the correct reference element
                 const imgRefToDelete = document.querySelector(`p:contains('${imageId}')`);
                 if (imgRefToDelete) imgRefToDelete.remove();

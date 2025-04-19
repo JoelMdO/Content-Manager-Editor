@@ -16,6 +16,10 @@ const Colors = {
     gray_forms: '#B0B9AE',
     red: '#FF0000',
     cream: '#FBFFE4',
+    blur_bg_toast : "#B0B9AE",
+    decav_toast_color: "#F0CD6F",
+    joel_toast_color: "#55D3F0",
+    blur_toast_color: "#8F92A2"
 };
 
 export default Colors;

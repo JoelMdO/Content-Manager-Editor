@@ -21,7 +21,7 @@ const replaceSrcWithImagePlaceholders = (htmlContent: string, images: Array<{url
     });
 
     if (!newHtmlContent.trim().startsWith("<div>")){
-        return `<div>${newHtmlContent}`;
+        return `<div>${newHtmlContent}</div>`;
     } else {
         return newHtmlContent;
     }

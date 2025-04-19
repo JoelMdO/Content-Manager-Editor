@@ -32,7 +32,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "firebase.js",
+    "firebaseMain.js",
     "next-env.d.ts",
     "src/app/store.ts",
     "src/services/handle_image.js",
