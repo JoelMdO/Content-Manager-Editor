@@ -1,7 +1,11 @@
-
 import { initializeApp } from "firebase/app";
 import { getDatabase} from "firebase/database";
 import { getAuth } from "firebase/auth";
+import {
+    getFirestore,
+    initializeFirestore,
+    persistentLocalCache,
+  } from "firebase/firestore";
 
 // Replace with your Firebase project configuration
 const firebaseConfig = {
@@ -17,8 +21,12 @@ measurementId: process.env.NEXT_PUBLIC_FIREBASE_measurementId
 
 // Initialize Firebaseconst 
 const app = initializeApp(firebaseConfig);
-//
+
 // Get a reference to the database service
 const database = getDatabase(app);
 const auth = getAuth(app);
-export { database, auth };
+const dbFireStore = initializeFirestore(app, {
+  localCache: persistentLocalCache(),
+});
+
+export { database, auth, dbFireStore };

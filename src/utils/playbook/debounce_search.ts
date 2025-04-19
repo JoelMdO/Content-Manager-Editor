@@ -1,0 +1,22 @@
+import callHub from "@/services/api/call_hub";
+import { debounce} from "lodash";
+
+export default function debouncedSearch( val: string, setEntries: (entries: any) => void, setZeroSearchData: (isZeroSearchData: boolean) => void, entries: any[]) {
+  const debouncedFunction = debounce(async (val: string) => {
+    console.log("Calling debounce with:", val);
+    const response = await callHub("playbook-search-bar", val);
+    if (response.status === 200) {
+      console.log('response.bd at debounce', response.body);
+      
+      setEntries(response.body);
+      setZeroSearchData(false);
+    } else {
+      if (entries.length <= 0) {
+        setZeroSearchData(true);
+      }
+      console.log("Error fetching entries:", response.message);
+    }
+  }, 500);
+
+  debouncedFunction(val);
+}

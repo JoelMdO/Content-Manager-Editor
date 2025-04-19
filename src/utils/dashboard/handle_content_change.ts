@@ -1,11 +1,8 @@
+import removeBase64FromImgTags from "./remove_img_base64";
 
 export const handleContentChange = (
 index: number,
 content: string,
-setIsTitle: (value: boolean) => void,
-setTheTitle: (value: string) => void,
-setIsArticle: (value: boolean) => void,
-setTheBody: (value: string) => void,
 debouncedUpdateStore: (title: string, body: string) => void
 ) => {
 
@@ -13,18 +10,18 @@ debouncedUpdateStore: (title: string, body: string) => void
 // Function to handler the content change on the editor, when 
 // the user types or modifies the content. 
 ///========================================================
+const dbName = sessionStorage.getItem("db");
+console.log('dbName at handleCotent Change', dbName);
 
+//
 if (index === 0) {
     // Title
-    setIsTitle(false);
-    setTheTitle(content);
-    sessionStorage.setItem("tempTitle", content);
-    debouncedUpdateStore(content, sessionStorage.getItem("tempBody") || "");
+    sessionStorage.setItem(`tempTitle-${dbName}`, content);
+    debouncedUpdateStore(content, sessionStorage.getItem(`tempBody-${dbName}`) || "");
 } else {
     // Article
-    setIsArticle(false);
-    setTheBody(content);
-    sessionStorage.setItem("tempBody", content);
-    debouncedUpdateStore(sessionStorage.getItem("tempTitle") || "", content);
+    const htmlCleaned = removeBase64FromImgTags(content);
+    sessionStorage.setItem(`tempBody-${dbName}`, htmlCleaned);
+    debouncedUpdateStore(sessionStorage.getItem(`tempTitle-${dbName}`) || "", htmlCleaned);
 }
 };

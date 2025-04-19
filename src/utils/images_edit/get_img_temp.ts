@@ -11,7 +11,7 @@ const getImageTemporally = async (fileName: string) => {
     request.onsuccess = (event) => {
     const db = (event.target as IDBOpenDBRequest).result;
     if (!window.indexedDB) {
-        console.error("IndexedDB is not supported by your browser.");
+
     }
     //
     // Check if "images" store exists before querying
@@ -39,7 +39,6 @@ const getImageTemporally = async (fileName: string) => {
         return {status: 205, message:"Error retrieving image", file: null};
     };
     }} catch (error) {
-    console.error(error);
     return {status: 500, message: error };
 }})};
 

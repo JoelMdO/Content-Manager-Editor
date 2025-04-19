@@ -1,7 +1,7 @@
-import React, {ChangeEvent, useEffect, useRef, useState} from "react";
+import React, {ChangeEvent, useRef, useState} from "react";
 import uploadImage from "../../utils/images_edit/upload_image";
 import { AppDispatch } from "../../services/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Image from "next/image";
 import successAlert from "../alerts/sucess";
 import errorAlert from "../alerts/error";
@@ -9,9 +9,10 @@ import errorAlert from "../alerts/error";
 interface ButtonProps {
     editorRefs?: React.RefObject<(HTMLDivElement | null)[]>;
     index?: number;
+    'data-cy'?: string;
 }
 
-const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
+const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0, 'data-cy':dataCy}) => {
     ///========================================================
     // To load images and store them in IndexedDB for later save on db.
     ///========================================================
@@ -21,8 +22,6 @@ const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     // States
     const [saveButtonClicked, setSaveButtonClicked] = useState(false);
-    // redux
-    const dispatch = useDispatch<AppDispatch>();
     //Functions for button click.
     const handleButtonClick = () => {
         setSaveButtonClicked(true);
@@ -31,7 +30,8 @@ const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
     //Functions for input file loading.
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (editorRef) {
-        uploadImage(e, editorRef, dispatch)
+        const dbName = sessionStorage.getItem("db");
+        uploadImage(e, editorRef, dbName!)
             .then((response) => {
             setSaveButtonClicked(false);
             if (response.status === 200) {
@@ -53,18 +53,21 @@ const ImageButton: React.FC<ButtonProps> = ({editorRefs=null, index=0}) => {
     return ( 
         <>
             <button
+                type="button"
                 className={`h-[40px] w-[9em] shadow-md shadow-black ${saveButtonClicked ? "bg-cream" : "bg-blue"} hover:bg-green ${saveButtonClicked ? "text-black" : "text-white"} text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`}
+                data-cy={dataCy}
                 onClick={() => {
                     handleButtonClick();
                     }}>
             <Image src="/upload-outline.png" className="md:w-6 md:h-6 w-3 h-3 cursor-pointer" width={12} height={12} alt="uploaded-image"/>Add Image
             </button>
+            <label>
             <input
                 type="file"
-                ref={fileInputRef}
+                ref={fileInputRef}  
                 onChange={handleFileChange}
                 accept="image/*"
-                className="hidden" />
+                className="hidden" /></label>
         </>
     );
     

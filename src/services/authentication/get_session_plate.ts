@@ -1,4 +1,4 @@
-import { database } from "../../../firebase";
+import { database } from "../../../firebaseMain";
 import { ref, get } from "firebase/database";
 const getSessionPlate = async (sessionId: string) => {
     ///========================================================

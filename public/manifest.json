@@ -1,0 +1,17 @@
+{
+    "name": "Content Managment Editor",
+    "short_name": "CMS",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "description": "Your Content Management Editor, to create articles ready to be published on any blog, a Developer Playbook for have logs of software development avoiding to search every time on the web or asking the AI ",
+    "icons": [
+        {
+            "src": "./favicon.ico",
+            "sizes": "48x48",
+            "type": "image/x-icon"
+        }
+    ],
+    "screenshots":[]
+}

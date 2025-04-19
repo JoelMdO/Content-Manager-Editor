@@ -11,12 +11,14 @@ const createFormData = async (type: string, data: any) => {
     const article = JSON.stringify(data.find((item: any)=> item.type === "body"));
     const italic = JSON.stringify(data.find((item: any)=> item.type ===  "italic"));
     const bold = JSON.stringify(data.find((item: any)=> item.type ===  "bold"));
+    const dbName = JSON.stringify(data.find((item: any)=> item.type ===  "dbName"));
     formData.append('title', title);
     formData.append('id', id);
     formData.append('article', article);
     formData.append('type', type);
     formData.append('italic', italic);
     formData.append('bold', bold);
+    formData.append('dbName', dbName);
     //
     // Filter if any image on the data
     const imagePromises = data.filter((item: any) => item.type === "image") // Filter images only
