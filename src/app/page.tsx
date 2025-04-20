@@ -15,7 +15,10 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState<string>("");
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const router = useRouter();
+    
+    ///--------------------------------------------------------
     //handleLogin with Firebase authentication
+    ///--------------------------------------------------------
     const handleLogin = async (e: React.FormEvent) => {
         setIsSubmitted(true);
         e.preventDefault();
@@ -32,7 +35,6 @@ const Login: React.FC = () => {
         
         if (sessionId) {
             sessionStorage.setItem("sessionId", sessionId);
-        } else {
         }
         router.push("/home");
     };

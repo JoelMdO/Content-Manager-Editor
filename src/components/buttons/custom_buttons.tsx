@@ -8,6 +8,7 @@ import saveButtonClicked from "../../utils/buttons/save_button_clicked";
 import emailMe from "@/utils/buttons/email_me";
 import Link from "next/link";
 import handleNoteClick from "../../utils/playbook/handle_note_click";
+import { log } from "node:console";
 
 interface ButtonProps {
     type: string;
@@ -19,9 +20,10 @@ interface ButtonProps {
     setUpdateNote?: React.Dispatch<React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>>;
     setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
     'data-cy'?: string;
+    resetForm?: () => void;
 }
 //
-const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating, 'data-cy': dataCity}) => {
+const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, setViewDetails, setEntries, setUpdateNote, setIsCreating, 'data-cy': dataCity, resetForm}) => {
     ///========================================================
     // Custom Buttons used on dashboard page at this stage is only
     // for Post (Save the article)
@@ -90,6 +92,7 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
             width = "";
         break;
         case "new-playbook":
+        case "new-playbook-at-readplaybook":
             text= "Cancel";
             isNew = true;
             color = "bg-gray-300";
@@ -189,6 +192,10 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                         } else if (type === "updatePlaybook"){
                             setUpdateNote!({isUpdateNote: false, noteId: ""});
                         } else if (type === "new-playbook") {
+                         
+                           resetForm!();
+                           router.push('/home');
+                        } else if (type === "new-playbook-at-readplaybook"){
                             setIsCreating!(false);
                         } else {
                             ///No action as clear function is on dashboard/page.tsx

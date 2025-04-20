@@ -3,7 +3,7 @@ import { useCodeSnippets } from '../../utils/playbook/code_snippet_hook';
 import { useReferences } from '../../utils/playbook/references_hook';
 import { Plus, Trash, Save, Link as LinkIcon } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import categories from '../../utils/categories';
+import categories from '../../constants/categories';
 import handleSubmit from '../../utils/playbook/handleSubmit';
 import { useRouter } from 'next/navigation';
 import CustomButton from '../buttons/custom_buttons';
@@ -52,7 +52,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
       const [title, setTitle] = useState<string>('');
       const [category, setCategory] = useState<string>('');
       const [isEditing, setIsEditing] = useState<boolean>(true);
-      const [isCategories, setCategories] = useState<string[]>(categories);
       const [tags, setTags] = useState<string[]>([]);
       const [steps, setSteps] = useState<string[]>([]);
       const [tagInput, setTagInput] = useState('');
@@ -61,7 +60,7 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
       const [isSaving, setIsSaving] = useState(false);
       const [saveSuccess, setSaveSuccess] = useState(false);
       //
-      const resetForm = () => {
+    const resetForm = () => {
         setTitle('');
         setCategory('');
         setTags([]);
@@ -71,6 +70,7 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
         codeSnippets.forEach((_, index) => removeCodeSnippet(index));
         references.forEach((_, index) => removeReference(index));
     };
+    
     //
      useEffect(() => {
           ///--------------------------------------------------------
@@ -78,11 +78,15 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
           // user can keep filling the card, user will be redirected to this
           // form and by obtaining the modal = true, the data will be loaded.
           ///--------------------------------------------------------
+          let mockData: any;
+
           if(modal){
+
             const data = sessionStorage.getItem("playbook-item");
+            
             if(data){
               const jsonData = JSON.parse(data);
-              const mockData = {
+              mockData = {
                 title: jsonData.title,
                 category: jsonData.category,
                 tags: jsonData.tags,
@@ -91,39 +95,55 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
                 references: jsonData.references,
                 notes: jsonData.notes,
               };
-            
-              // Set individual state values
-              setTitle(mockData.title);
-              setCategory(mockData.category);
-              setTags(mockData.tags);
-              setSteps(mockData.steps);
-              setNotes(mockData.notes);
-              mockData.codeSnippets.forEach((snippet: { language: string; }, index: number) => updateCodeSnippet(index, 'language', snippet.language));
-              mockData.codeSnippets.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
-              mockData.references.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
-              mockData.references.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
             } else {
-              // TODO data is not available, create a redirect to start new due to error on loading data form sessionStorage.
-            }
-        } else if (meta) {
+              mockData = {
+                title: "Retrieved data not Found",
+                category: "",
+                tags: "",
+                steps: "",
+                codeSnippets: "",
+                references: "",
+                notes: "",
+              };}
+              // Set individual state values
+        setTitle(mockData.title);
+        setCategory(mockData.category);
+        setTags(mockData.tags);
+        setSteps(mockData.steps);
+        setNotes(mockData.notes);
+        mockData.codeSnippets.forEach((snippet: { language: string; }, index: number) => updateCodeSnippet(index, 'language', snippet.language));
+        mockData.codeSnippets.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
+        mockData.references.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
+        mockData.references.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
+          
+         } else if (meta) {
           ///--------------------------------------------------------
           // Used when the user wants to update an already saved card with data
           // meta data will be send as props.
           ///--------------------------------------------------------
-            
-         setTitle(meta!.title);
-         setCategory(meta!.category);
-         setTags(meta!.tags!);
-         setSteps(meta!.steps!);
-         setNotes(meta!.notes!);
-         meta!.codeSnippets!.forEach((snippet: { language: string; }, index: number) => updateCodeSnippet(index, 'language', snippet.language));
-         meta!.codeSnippets!.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
-         meta!.references!.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
-         meta!.references!.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
-        } else {
+            mockData = {
+              title: meta!.title,
+              category: meta!.category,
+              tags: meta!.tags,
+              steps: meta!.steps,
+              codeSnippets: meta!.codeSnippets,
+              references: meta!.references,
+              notes: meta!.notes,
+            };
+          // Set individual state values
+        setTitle(mockData.title);
+        setCategory(mockData.category);
+        setTags(mockData.tags);
+        setSteps(mockData.steps);
+        setNotes(mockData.notes);
+        mockData.codeSnippets.forEach((snippet: { language: string; }, index: number) => updateCodeSnippet(index, 'language', snippet.language));
+        mockData.codeSnippets.forEach((snippet: { code: string; }, index: number) => updateCodeSnippet(index, 'code', snippet.code));
+        mockData.references.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
+        mockData.references.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
+        }  else {
          setIsEditing(false);
         }
-    
+        
      }, []);
     //
 
@@ -183,7 +203,7 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
                 </div>
                 {/* Right Column - Notes */}
                 <div>
-                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">Notes & Additional Context</label>
+                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">Summary</label>
                   <textarea
                     id="notes"
                     className={`w-full p-3 border border-gray-300 ${color_bg_inputs} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 placeholder:text-black`}
@@ -326,7 +346,7 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
             
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-3 border-t pt-6">
-              <CustomButton type={type!} setUpdateNote={setUpdateNote} setIsCreating={setIsCreating}/>
+              <CustomButton type={type!} setUpdateNote={setUpdateNote} setIsCreating={setIsCreating} resetForm={resetForm}/>
               <button 
                 type="submit" 
                 className="px-6 py-3 bg-blue text-white rounded-md hover:bg-blue-700 flex items-center"

@@ -19,9 +19,7 @@ const InopButton: React.FC<ButtonProps> = ({ type }) => {
             break;
     }   
     // Function to handle button click
-    const handleClick = () => {
-        console.log(type);
-    };
+    const handleClick = () => {};
 
   return (
     <>

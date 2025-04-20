@@ -10,11 +10,6 @@ const logout = async () => {
     const auth = getAuth();
     await signOut(auth); // Firebase sign out
 
-      // Clear the authentication cookies
-    const cookieStore = await cookies();
-    cookieStore.delete("token");
-    cookieStore.delete("start");
-
       // Redirect to login page
     router.push("/");
     } catch (error) {

@@ -6,12 +6,13 @@ interface RouteButtonProps {
 }
 
 const RouteButton: React.FC<RouteButtonProps> = ({type, 'data-cy': dataCity}) => {
+    //
     const router = useRouter();
     const url = process.env.NEXT_PUBLIC_url_api;
-    // Define the button type
     let path: string = "";
     let label: string = "";
     let features: string = "bg-gray-500 text-white";
+    //
     // Define the button type
     switch (type) {
         case "playbook":
@@ -37,7 +38,7 @@ const RouteButton: React.FC<RouteButtonProps> = ({type, 'data-cy': dataCity}) =>
       if(type === "with-item-playbook"){
         router.push(`${url}${path}?modal=true`)
       }else{
-        const sessionId = sessionStorage.getItem('sessionId');
+        const sessionId = sessionStorage.getItem("sessionId");
         router.push(`${url}${path}?id=${sessionId}`);
     }}
     //

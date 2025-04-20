@@ -59,8 +59,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>,
       setIsSaving(false);
       if(response.message === "Reauthentication failed"){
         const dataString = JSON.stringify(data);
-        console.log('data', data);
-        console.log('dataString', dataString);
         sessionStorage.setItem("playbook-item", dataString);
         errorAlert("Saving data Playbook", "playbook", "Reauthentication failed");
         router.push("/");

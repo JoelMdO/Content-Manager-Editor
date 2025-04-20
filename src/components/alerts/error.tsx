@@ -1,6 +1,7 @@
+import { Router } from 'next/router';
 import Swal from 'sweetalert2';
 
-const errorAlert = (type: string, status: string = "", message: string = "") => {
+const errorAlert = (type: string, status: string = "", message: string = "", router?: any) => {
     ///=============================================================
     // Error Alerts with use of sweetalert
     ///=============================================================
@@ -21,10 +22,6 @@ const errorAlert = (type: string, status: string = "", message: string = "") => 
         case "logout":
         text = `Attempt to logout failed ${message}.`;
         break;
-        case "playbook":
-        text = `${message}, please log in again`;
-        button_text = "Go to Login";
-        confirmButtonColor = "green";
         case "playbook":
         text = `${message}, please log in again`;
         button_text = "Go to Login";
@@ -52,7 +49,12 @@ const errorAlert = (type: string, status: string = "", message: string = "") => 
         title: text,
         showConfirmButton: true,
         confirmButtonText: button_text,
-        confirmButtonColor: 'red'});
+        confirmButtonColor: confirmButtonColor})
+    .then((result)=>{
+        if(result.isConfirmed && status === "playbook"){
+            router.push('/');
+        }
+    });
 }
 
 export default errorAlert

@@ -24,7 +24,7 @@ const Playbook: React.FC = () => {
       
       {/* Main Form */}
       <main className="pt-28 container mx-auto px-4">
-        <PlaybookForm data-cy="playbook-form" />
+        <PlaybookForm type="new-playbook" data-cy="playbook-form" />
       </main>
     </div>
   );

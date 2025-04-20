@@ -1,5 +1,4 @@
 import { ChangeEvent } from "react";
-import { AppDispatch } from "../../services/store";
 import callHub from "../../services/api/call_hub";
 import saveImageTemporally from "./save_img_temp";
 //
