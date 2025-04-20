@@ -33,12 +33,10 @@ const RouteButton: React.FC<RouteButtonProps> = ({type, 'data-cy': dataCity}) =>
     }
     // 
     const handleClick = ()=>{
-      console.log('button clicked editing');
       
       if(type === "with-item-playbook"){
         router.push(`${url}${path}?modal=true`)
       }else{
-        console.log('route others');
         const sessionId = sessionStorage.getItem('sessionId');
         router.push(`${url}${path}?id=${sessionId}`);
     }}

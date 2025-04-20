@@ -4,7 +4,6 @@ import { doc, getDoc } from "firebase/firestore";
 export default async function handleNoteClick (id: string) {
     const docRef = doc(dbFireStore, "playbook", id);
     const snap = await getDoc(docRef);
-    console.log('snap handleNoteClick',snap);
     
     if(snap.exists()){
     const meta = {
@@ -18,11 +17,9 @@ export default async function handleNoteClick (id: string) {
       references: snap.data().references,
       notes: snap.data().notes
     };
-    console.log('meta at handleNoteClick', meta);
     
     return meta;
   } else {
-    console.error("Document not found.");
     return null;
   }
 };

@@ -37,14 +37,12 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
     const [isClicked, setIsClicked] = useState(false);
     const [loading, setLoading] = useState(false);
     const [noteViewMode, setNoteViewMode] = useState<"view" | "edit">("view");
-    // const [isNew, setNew] = useState(false);
+    
     let isNew: boolean = false, isLink: boolean = false;
     // Retrieve text styles from Redux for saving on saveButtonClicked
     const italic = useSelector((state: any) => state.data_state?.fontStyle);
     const bold = useSelector((state: any) => state.data_state?.fontWeight);
-    console.log('type at custom button', type);
     //
-    console.log('isClicked', isClicked);
     
     //
     switch (type) {
@@ -186,11 +184,9 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                               });
                             }else {
                                 //Send the update to allow update the playbook note.
-                                console.log('doing update button');
                                 setUpdateNote!({isUpdateNote: true, noteId: id!});
                             }
                         } else if (type === "updatePlaybook"){
-                            console.log('"updatePlaybook"');
                             setUpdateNote!({isUpdateNote: false, noteId: ""});
                         } else if (type === "new-playbook") {
                             setIsCreating!(false);

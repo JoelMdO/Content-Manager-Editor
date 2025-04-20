@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import generateSession from "../../services/authentication/generate_session";
 import { database } from "../../../firebaseMain";
 import { ref, update } from "firebase/database";
-import { setCookie } from "nookies";
 
 const firebaseAuth = async (email: string, password: string): Promise<any> =>{
         

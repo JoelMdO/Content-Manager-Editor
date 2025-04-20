@@ -1,7 +1,6 @@
-import {NextRouter} from 'next/router';
 import Swal from 'sweetalert2';
 
-const errorAlert = (type: string, status: string = "", message: string = "", router?: any) => {
+const errorAlert = (type: string, status: string = "", message: string = "") => {
     ///=============================================================
     // Error Alerts with use of sweetalert
     ///=============================================================

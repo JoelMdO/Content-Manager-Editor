@@ -33,7 +33,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
     const router = useRouter();
     const searchParams = useSearchParams();
     const modal = searchParams.get('modal');
-    console.log("Modal param:", modal);
     //
     const {
         codeSnippets,
@@ -92,7 +91,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
                 references: jsonData.references,
                 notes: jsonData.notes,
               };
-              console.log('mockData', mockData);
             
               // Set individual state values
               setTitle(mockData.title);
@@ -112,7 +110,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
           // Used when the user wants to update an already saved card with data
           // meta data will be send as props.
           ///--------------------------------------------------------
-            console.log('meta at playbook form', meta);
             
          setTitle(meta!.title);
          setCategory(meta!.category);
@@ -124,7 +121,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
          meta!.references!.forEach((reference: { title: string; }, index: number) => updateReference(index, 'title', reference.title));
          meta!.references!.forEach((reference: { link: string; }, index: number) => updateReference(index, 'link', reference.link));
         } else {
-          console.log('doing', type);
          setIsEditing(false);
         }
     
@@ -261,13 +257,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
                       />
                     </div>
                   </div>
-
-                  {/* {snippet.image ? (
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                        <img src={snippet.image} alt="Pasted snippet" className="w-full h-auto rounded-md" />
-                    </div>
-                  ) : ( */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Code</label>
                     <textarea
@@ -337,14 +326,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
             
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-3 border-t pt-6">
-              {/* <Link href="/playbook">
-                <button 
-                  type="button" 
-                  className="px-6 py-3 bg-gray-300 border border-gray-300 text-gray-700 rounded-md hover:bg-blue-light"
-                >
-                  Cancel
-                </button>
-              </Link> */}
               <CustomButton type={type!} setUpdateNote={setUpdateNote} setIsCreating={setIsCreating}/>
               <button 
                 type="submit" 
@@ -353,13 +334,6 @@ export default function PlaybookForm({ type, meta, setUpdateNote, 'data-cy': dat
               >
                 {isSaving ? (
                   <Loader type="Saving..." />
-                  // <>
-                  //   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  //     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  //     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  //   </svg>
-                  //   Saving...
-                  // </>
                 ) : (
                   <>
                     <Save size={18} className="mr-2" />

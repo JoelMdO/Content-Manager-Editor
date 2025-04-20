@@ -20,7 +20,6 @@ const Login: React.FC = () => {
         setIsSubmitted(true);
         e.preventDefault();
         const response = await callHub("auth", {email, password});
-        console.log('response', response);
         
         if (response.status !== 200) {
             setIsSubmitted(false);
@@ -34,7 +33,6 @@ const Login: React.FC = () => {
         if (sessionId) {
             sessionStorage.setItem("sessionId", sessionId);
         } else {
-            console.error("Session ID is undefined");
         }
         router.push("/home");
     };

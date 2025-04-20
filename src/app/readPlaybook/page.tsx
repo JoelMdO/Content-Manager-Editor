@@ -46,16 +46,15 @@ const ReadPlaybookPage: React.FC = ()=>{
       ///--------------------------------------------------------
       // Fetch Titles, category and tags when the page loads.
       ///--------------------------------------------------------
-      console.log('doing use effect');
       
       const fetchData = async () => {
       setIsLoading(true);
       const response = await callHub("playbook-search");
-      console.log('response', response);
+      
       setIsLoading(false);
       if(response.status === 200){
       const meta = response.body;
-      console.log('meta', meta);
+      
           setEntries(meta);
       } else if (response.status === 401){
         errorAlert("", "playbook", response.message, router);
@@ -71,40 +70,37 @@ const ReadPlaybookPage: React.FC = ()=>{
         const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               entry.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
         const matchesCategory = selectedCategory === "All" || entry.category === selectedCategory;
-        console.log(entry.title, { matchesSearch, matchesCategory });
         return matchesSearch && matchesCategory;
       });
   //
 
   async function handleInputChange(selectValue: string) {
     //TODO separate to another file.
-    console.log("searching", selectValue);
     setSearchTerm(selectValue);
     debouncedSearch(selectValue, setEntries, setZeroSearchData, entries);
   }
   //
   async function handleSelectChange(selectedValue: string) {
     //TODO separate to another file.
-    console.log("searching", selectedValue);
+    
     const response = await callHub("playbook-search-category", selectedValue);
     if (response.status === 200) {
-      console.log('response.bd at debounce', response.body);
       
       setEntries(response.body);
       setZeroSearchData(false);
+
     } else {
       if (entries.length <= 0) {
         setZeroSearchData(true);
       }
-      console.log("Error fetching entries:", response.message);
     }
   }
   //
   let isMetaToUpdate;  
   if(isUpdateNote.isUpdateNote){
-      console.log('doing entry for setMeta after isUpdateNote is true');
       
     const entry = entries.find(e => e.id === isUpdateNote.noteId);
+
     if (entry) {
     isMetaToUpdate = {
         id: entry.id,
@@ -118,16 +114,9 @@ const ReadPlaybookPage: React.FC = ()=>{
         notes: entry.notes || '',
       };
     }
-    console.log('entry on isUpdateNote', entry);
+    
   };
-  //
-  console.log({
-    isCreating,
-    isUpdateNote: isUpdateNote.isUpdateNote,
-    isZeroSearchData,
-    isLoading,
-    filteredEntriesLength: filteredEntries.length,
-  });
+
   //
   return (
     <div className="flex flex-col min-h-screen bg-blue">
@@ -160,18 +149,14 @@ const ReadPlaybookPage: React.FC = ()=>{
                   className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => {
-                    console.log('searching', e.target.value);
                     handleInputChange(e.target.value);
-
                   }}
                   onPaste={async (e) => {
                     const pastedText = e.clipboardData.getData("text");
-                    console.log("Pasted:", pastedText);
                     const response = await callHub("playbook-search-bar", pastedText);
                     if (response.status === 200) {
                       setEntries(response.message);
                     } else {
-                      console.error('Error fetching entries:', response.message);
                     }
                   }}
                 />

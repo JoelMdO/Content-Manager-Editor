@@ -1,8 +1,5 @@
 import 'animate.css';
-import { NextRouter } from 'next/router';
 import Swal from 'sweetalert2';
-import Colors from '@/utils/colors';
-import { SetStateAction } from 'react';
 
 const dbSelector = () => {
     ///=============================================================

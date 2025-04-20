@@ -23,16 +23,13 @@ export const useCodeSnippets = () => {
   const updateCodeSnippet = useCallback((index: number, field: string, value: string) => {
     // 
     const existingSnippet = codeSnippets[index] ?? { language: "", code: "", image: "" };
-    console.log('snippet existingSnippt', existingSnippet);
       const updatedSnippets = [...codeSnippets];
-      console.log('updateSnip-bef', updatedSnippets);
       
       //
       updatedSnippets[index] = {
         ...existingSnippet,
         [field]: value
       };
-      console.log('updatedSnip-aft', updatedSnippets);
       setCodeSnippets(updatedSnippets)
   }, []);
 
@@ -54,7 +51,6 @@ export const useCodeSnippets = () => {
         return;
       } else {
         const data = item.getAsString.name;
-        console.log('data', data);
         const response = await sanitizeData(data, "text"); 
         if (response.status === 200) {
             const updatedSnippets = [...codeSnippets];
@@ -62,7 +58,6 @@ export const useCodeSnippets = () => {
             setCodeSnippets(updatedSnippets);
         } else {
             errorAlert("Snippet Paste","non200", "Link not valid");
-            console.error(response.message);
         }
       }
     }

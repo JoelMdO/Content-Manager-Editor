@@ -62,7 +62,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>,
         console.log('data', data);
         console.log('dataString', dataString);
         sessionStorage.setItem("playbook-item", dataString);
-        errorAlert("Saving data Playbook", "playbook", "Reauthentication failed", router);
+        errorAlert("Saving data Playbook", "playbook", "Reauthentication failed");
+        router.push("/");
       } else {
         errorAlert("Saving data Playbook", "non200", response.message);
       }
