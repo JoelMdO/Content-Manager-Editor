@@ -1,6 +1,6 @@
 import { database } from "../../../../firebaseMain";
 import { databaseDecav } from "../../../../firebaseDecav";
-import { ref, update} from "firebase/database";
+import { ref, update, set} from "firebase/database";
 import { NextResponse } from "next/server";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
 import { forEach } from "lodash";
@@ -150,15 +150,28 @@ export async function POST(req: Request): Promise<Response> {
             });
         // Replace src of the each image with the corresponded url:
         body = replaceSrcWithImagePlaceholders(body, images);
+        // Convert images, bold and italic to object
+        function toFirebaseObject(array: any) {
+            return array.reduce((obj: any, value: any, index:number) => {
+              obj[index] = value;
+              return obj;
+            }, {});
+        }
+        
+        const imagesAsObject = toFirebaseObject(images);
+        const boldAsObject = toFirebaseObject(bold);
+        const italicAsObject = toFirebaseObject(italic);
         
         const articleData = {
-            id,
-            title,
-            body,
-            images,
-            bold,
-            italic
+            "id": id,
+            "title": title,
+            "body": body,
+            "italic": italicAsObject,
+            "bold": boldAsObject,
+            "images": imagesAsObject
         };
+        //
+       
         // const articleDataJson = JSON.stringify(articleData);
             let db: any;
             if(dbNameContent === "DeCav"){
@@ -168,7 +181,7 @@ export async function POST(req: Request): Promise<Response> {
             }
             try{
             const dbRef = ref(db, `articles/${id}`);
-            await update(dbRef, articleData);
+            await set(dbRef, articleData);
             
             return NextResponse.json({status:200, message: "Data saved successfully", body: body}); 
             }catch (error){

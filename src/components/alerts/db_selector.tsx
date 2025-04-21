@@ -11,7 +11,6 @@ const dbSelector = () => {
     // Sweetalert
     ///------------------------------
         Swal.mixin({
-            toast: true,
             position: "center",
             showCancelButton: true,
             showConfirmButton: true,

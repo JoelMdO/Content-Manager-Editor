@@ -23,15 +23,6 @@ const dataSlice = createSlice({
   name: "data_state",
   initialState,
   reducers: {
-    addId: (state, action: PayloadAction<{id:string}>) => {
-      state.id = action.payload.id;
-    },
-    addTitle: (state, action: PayloadAction<{title: string}>) => {
-      state.titles= action.payload.title;
-    },  
-    addBodyArticle: (state, action: PayloadAction<{body: string}>) => {
-      state.body = action.payload.body;
-    },
     addFontStyle: (state, action: PayloadAction<{text: string}>) => {
       state.fontStyle.push(action.payload.text);
     }, 
@@ -47,5 +38,5 @@ const dataSlice = createSlice({
   }
 });
 
-export const { addId, addTitle, addBodyArticle, addFontStyle, addFontWeight, deleteFontStyle, deleteFontWeight} = dataSlice.actions;
+export const { addFontStyle, addFontWeight, deleteFontStyle, deleteFontWeight} = dataSlice.actions;
 export default dataSlice.reducer;

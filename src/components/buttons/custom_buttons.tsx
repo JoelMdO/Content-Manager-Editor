@@ -9,6 +9,7 @@ import emailMe from "@/utils/buttons/email_me";
 import Link from "next/link";
 import handleNoteClick from "../../utils/playbook/handle_note_click";
 import { log } from "node:console";
+import { set } from "lodash";
 
 interface ButtonProps {
     type: string;
@@ -177,8 +178,22 @@ const CustomButton: React.FC<ButtonProps> = ({type, onClick, isCreating, id, set
                         } else if (type === "view-note"){
                             setNoteViewMode((prev) => (prev === "view" ? "edit" : "view"));
                             if (noteViewMode === "view") {
-                                setViewDetails!(true);
+                                //Set the card loading to true to show the loader.
+                                setEntries!((prevEntries) =>
+                                    prevEntries.map((entry) =>
+                                      entry.id === id ? { ...entry, loading: true } : entry
+                                    )
+                                  );
+
                                 handleNoteClick(id!).then((meta) => {
+                                //Set the card loading to false to hide the loader.
+                                    setViewDetails!(true);
+                                    setEntries!((prevEntries) =>
+                                    prevEntries.map((entry) =>
+                                        entry.id === id ? { ...entry, loading: false } : entry
+                                    )
+                                    );
+                                // Show the data if response is not null.    
                                 if (meta) {
                                   setEntries!((prev) =>
                                     prev.map((entry) => (entry.id === id ? meta : entry))

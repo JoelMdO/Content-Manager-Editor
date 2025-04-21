@@ -44,7 +44,7 @@ const Home: React.FC = () => {
             {thereIsPlaybook && <RouteButton type="with-item-playbook" />}
             <div className="flex flex-row self-center pt-2 gap-x-4 ">
             <RouteButton type="playbook" data-cy="route-button-playbook" />
-            <RouteButton type="read-playbook" />
+            <RouteButton type="read-playbook" data-cy="route-button-read-playbook"/>
          </div>
          </div>
          <div className="flex flex-col w-[90%] md:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-8 mt-3 align-middle">
