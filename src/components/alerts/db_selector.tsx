@@ -11,7 +11,6 @@ const dbSelector = () => {
     // Sweetalert
     ///------------------------------
         Swal.mixin({
-            toast: true,
             position: "center",
             showCancelButton: true,
             showConfirmButton: true,
@@ -47,13 +46,12 @@ const dbSelector = () => {
             no-repeat
             `
         }).then((result) => {
-          console.log('result');
           
             if (result.isConfirmed) {
-              console.log('dbSelector is Confirmed');
+              
               sessionStorage.setItem("db", "DeCav");
             }else if (result.dismiss === Swal.DismissReason.cancel) {
-              console.log('dbSelector dismiss or cancel');
+              
               sessionStorage.setItem("db", "Joel");
             }
         });

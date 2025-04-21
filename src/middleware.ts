@@ -14,14 +14,16 @@ let response: NextResponse = NextResponse.next();
 const database_url = process.env.NEXT_PUBLIC_databaseURL;
 const database_2_url = process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL;
 
-if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
+
+if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/readPlaybook')) {
   //Get the previous path
     const headers=  Object.fromEntries(req.headers.entries());
     const next_url = headers["next-url"];
-    
+   
     if(next_url == '/home'){
       const url = req.nextUrl; // Access the full URL
       const sessionId = url.searchParams.get('id');  
+      
       const response = await callHub("auth-middleware", {auth: true, sessionId: sessionId});
   
     if(response.status === 200){
@@ -37,6 +39,7 @@ if(path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsW
 const header = req.headers;
 const isSubRequest = header.get('x-middleware-subrequest');
 if (isSubRequest) {
+ 
   const origin = header.get('origin') || header.get('referer');
   
   const url = process.env.NEXT_PUBLIC_api_url;
@@ -74,5 +77,5 @@ if (isSubRequest) {
 };
 
 export const config = {
-  matcher: ['/api/post', '/api/save', '/dashboard', '/playbook', '/read-playbook'],
+  matcher: ['/api/post', '/api/save', '/dashboard', '/playbook', '/readPlaybook'],
 };

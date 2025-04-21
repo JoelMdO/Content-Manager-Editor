@@ -38,12 +38,22 @@ const LogOutButton: React.FC<LogoButtonProps> = ({type}) => {
     const icon_mobile = "/window_exit.png";
     const url = process.env.NEXT_PUBLIC_url_api;
     const router = useRouter();
-    //
+    ///--------------------------------------------------------
+    // Handle the logout by deleting session storage for dashboard
+    // other cases only loging out is needed.
+    ///--------------------------------------------------------
     const handleLogout = async () => {
+
     const response =  await callHub('logout');
+    
     /// Remove sessionStorage.
-    sessionStorage.removeItem("tempTitle");
-    sessionStorage.removeItem("tempBody");
+    if (type != "platbook"){
+    const dbName = sessionStorage.getItem("db");
+    sessionStorage.removeItem(`tempTitle-${dbName}`);
+    sessionStorage.removeItem(`tempBody-${dbName}`);
+    }
+
+    // Response management for all cases
     if (response.status == 200){
         router.push(`${url}/`);
     } else {

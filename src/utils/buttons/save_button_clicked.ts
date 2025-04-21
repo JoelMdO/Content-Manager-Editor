@@ -12,7 +12,7 @@ const saveButtonClicked = async (italic: string, bold: string) => {
         {type: "italic", content: italic},
         {type: "bold", content: bold},
         {type: "dbName", content: dbName});
-        
+    
     const response = await callHub("post", articleContent);
         return response;
     //}

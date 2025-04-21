@@ -8,7 +8,6 @@ import LogOutButton from "../../components/buttons/logout_buttons";
 import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
 import { handleContentChange } from "../../utils/dashboard/handle_content_change";
 import dbSelector from "../../components/alerts/db_selector";
-import { useRouter } from "next/navigation";
 import HomeButton from "../../components/buttons/home_button";
 
 const ImageButton = dynamic(() => import("../../components/buttons/image_button"), { ssr: false });
@@ -23,19 +22,15 @@ const ArticlePage: React.FC = () => {
   const [isPlaceHolderTitle, setPlaceHolderTitle] = useState<boolean>(true);
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const editorRefs = useRef<(HTMLDivElement| null)[]>([]);
-  const [isDecav, setIsDecav] = useState<boolean>(false);
   const pageRef = useRef(null);
-  const [dbName, setdbName] = useState<string>("");
+  //
+  let savedBody: string = "";
+  let savedTitle: string = "";
   //
   ///======================================================
   // Check if an article is already created on page load
   // Store articleID in a ref to persist across renders
   ///======================================================
-  // Create article ID only once when component mounts
-  let savedBody: string = "";
-  let savedTitle: string = "";
-  const router = useRouter();
-
   useEffect(() => {
       dbSelector();
       // Read the sessionStorage as per the corresponded db.

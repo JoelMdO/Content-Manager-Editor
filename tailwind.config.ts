@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import colors from "./src/utils/colors";
+import colors from "./src/constants/colors";
 
 export default {
   content: [

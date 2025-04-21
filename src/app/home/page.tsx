@@ -6,12 +6,12 @@ import InopButton from "@/components/buttons/inop_button";
 import RouteButton from "@/components/buttons/routes_button";
 
 const Home: React.FC = () => {
+    
+    const [thereIsPlaybook, setThereIsPlaybook ] = useState<boolean>(false);
     ///--------------------------------------------------------
     // Check if a playbook item is already temporary stored
     // and user was asked to signin again.
     ///--------------------------------------------------------
-    const [thereIsPlaybook, setThereIsPlaybook ] = useState<boolean>(false);
-
     useEffect (()=>{
       const playbook_item = sessionStorage.getItem("playbook-item");
       
@@ -25,12 +25,12 @@ const Home: React.FC = () => {
         <div className="flex flex-col md:flex-row h-screen bg-black">
       {/* Left Menu on Tablet / Desktop*/}
       <aside className="hidden w-[25%] h-full bg-gray-800 bg-opacity-50 text-white md:flex items-center flex-col">
-        <LogoButton type="home" />
+        <LogoButton type="home-web" />
         <LogOutButton />
       </aside>
       {/* Menu Mobile*/}
-      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row fixed">
-        <LogoButton type="home" />
+      <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row fixed items-center align-middle">
+        <LogoButton type="home-mobile" />
         <LogOutButton />
       </nav>
 
@@ -44,7 +44,7 @@ const Home: React.FC = () => {
             {thereIsPlaybook && <RouteButton type="with-item-playbook" />}
             <div className="flex flex-row self-center pt-2 gap-x-4 ">
             <RouteButton type="playbook" data-cy="route-button-playbook" />
-            <RouteButton type="read-playbook" />
+            <RouteButton type="read-playbook" data-cy="route-button-read-playbook"/>
          </div>
          </div>
          <div className="flex flex-col w-[90%] md:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-8 mt-3 align-middle">

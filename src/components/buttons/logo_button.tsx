@@ -7,34 +7,29 @@ interface LogoButtonProps {
     type: string;
 }
 //
-const LogoButton: React.FC<any> = ({type}) => {
+const LogoButton: React.FC<LogoButtonProps> = ({type}) => {
     //
     ///========================================================
     // Logo button to allow the user to contact me
     ///========================================================
     
     let image: string = "/byJoel.png";
-    let widthM = 90;
-    let heightM = 90;
-    let widthS = 80;
-    let heightS = 30;
+    let width = 90;
+    let height = 90;
     let pt = "pt-0";
     switch(type){
-        case "home":
+        case "home-web":
          image = "/JLogo.webp";
-         widthM = 90;
-         heightM = 120;
-         widthS = 90;
-         heightS = 120;
-         pt = "pt-4";
+        break;
+        case "home-mobile":
+         image = "/JLogo.webp";
+         width = 60;
+         height = 60;
+        break;
+        case "playbook-footer":
+         image = image;
         break;
         default:
-         image = image;
-         widthM = widthM;
-         heightM = heightM;
-         widthS = widthS;
-         heightS = heightS;
-         pt = pt;
         break;
     }
     //
@@ -48,10 +43,9 @@ const LogoButton: React.FC<any> = ({type}) => {
                         setTimeout(() => {
                             emailMe();
                         }, 500);}}   >
-                        <Image src={image} style={{display:"block"}} className={`md:w-[${widthM}] md:h-[${heightM}] w-[${widthS}] h-[${heightS}] cursor-pointer`} width={90} height={90} alt={"logoJoel"}/>
-                        <p className="text-xs">2025</p>
+                        <Image src={image} style={{display:"block"}} className={`cursor-pointer`} width={width} height={height} alt={"logoJoel"}/>
+                        <p className="text-xs text-white">2025</p>
             </button>
-            <div className="w-[120px] absolute mb-2 origin-bottom bg-gray-800 text-white py-2 pl-2 rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">Let's connect!</div>
             </div>
         </>
     );

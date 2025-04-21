@@ -9,7 +9,7 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
     let headers: HeadersInit = {};
     let credentials: RequestCredentials = "omit";
     let sessionId: string | null = "";
-    let url: string;
+    let url: string = 'api/hub';
     //
     ///-----------------------------------------------
     /// Build the body of the request as each one it has
@@ -21,7 +21,7 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         case "clean-image": 
             body.append('file', data);
             body.append('type', type);
-            break;
+        break;
         //## POST
         case "post":
             const formData = await createFormData(type, data);
@@ -29,7 +29,7 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             body = formData;
             credentials = "include";
-            break;
+        break;
         //## LOGOUT
         case "logout":  
             body = JSON.stringify({data: "", type: type});
@@ -37,7 +37,7 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             sessionStorage.removeItem('sessionId');
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
-            break;
+        break;
         //## PLAYBOOK SAVE
         case "playbook-save":
             body = JSON.stringify({data: data, type: type});
@@ -45,7 +45,7 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             credentials = "include";
-            break;
+        break;
         //## PLAYBOOK SEARCH
          // When a value is typed on the search bar
         case "playbook-search-bar":
@@ -55,7 +55,7 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
         case "playbook-search-category":
             sessionId = sessionStorage.getItem('sessionId');
             //
-            if(type === "playbook-search-bar"){
+            if(type === "playbook-search-bar" || type === "playbook-search-category"){
             body = JSON.stringify({data: data, type: type});
             } else {
             body = JSON.stringify({data: "", type: type});    
@@ -64,29 +64,26 @@ const callHub = async (type: string, data?: any) : Promise<{status: number, mess
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             credentials = "include";
+        break;
+        //## AUTHENTICATION CHECK
         case "auth-middleware":
-            body = JSON.stringify({data: data, type: type});
             sessionId = data.sessionId;
+            body = JSON.stringify({data: data, type: type});
             headers["Content-Type"] = "application/json";
             headers = { ...headers, Authorization: `Bearer ${sessionId}` };
             credentials = "include";
+            ///--------------------------------------------------------
+            // callHub is used to check if user is already authenticated
+            //  so as the call is from the middleware full url is passed
+            //  otherwise a normal api/call is send. 
+            ///-------------------------------------------------------- 
+            url = `${process.env.NEXT_PUBLIC_url_api}/api/hub`;
         break;        
         default:
             body = JSON.stringify({data: data, type: type});
             headers["Content-Type"] = "application/json";
-            break;
+        break;
     }
-    //
-    ///--------------------------------------------------------
-    //  if callHub is used to check if user is already authenticated
-    //  so as the call is from the middleware full url is passed
-    //  otherwise a normal api/call is send. 
-    ///-------------------------------------------------------- 
-        if (type === "auth-middleware"){
-            url = `${process.env.NEXT_PUBLIC_url_api}/api/hub`;
-        } else {
-            url = 'api/hub';
-        }
     //    
     try{
     const response = await fetch(url, {

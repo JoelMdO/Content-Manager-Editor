@@ -26,7 +26,10 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 const dbFireStore = initializeFirestore(app, {
-  localCache: persistentLocalCache(),
+  localCache: persistentLocalCache({
+    cacheSizeBytes: 200000000,
+    useFetchStreams: true
+  }),
 });
 
 export { database, auth, dbFireStore };

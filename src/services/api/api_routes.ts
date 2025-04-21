@@ -81,6 +81,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
             headers["Content-Type"] = "application/json";
             credentials = "include";
         break;
+        //## PLAYBOOK SAVE
         case "playbook-save":
             endPoint = "save";
             ///-----------------------------------------------
@@ -89,17 +90,19 @@ const apiRoutes = async (postData: any): Promise<any> => {
             sessionId = data.sessionId;
             const responsePlay = await sessionCheck(sessionId);
                 if (responsePlay.status !== 200) {
-                    console.log('response not 200 playbook');
+                    
                     return NextResponse.json({ status: 401, message: "Reauthentication failed" });
                 }
             
             body = JSON.stringify(data.data);
             headers["Content-Type"] = "application/json";
             credentials = "include";
-            break;
-            case "playbook-search":
-            case "playbook-search-bar":
-            case "playbook-search-category":    
+        break;
+          //## PLAYBOOK SEARCH
+        case "playbook-search":
+        case "playbook-search-bar":
+        case "playbook-search-category":
+                    
                 endPoint = "search";
                 ///-----------------------------------------------
                 /// Verify sessionId if its valid through the sessionCheck function
@@ -113,7 +116,7 @@ const apiRoutes = async (postData: any): Promise<any> => {
                 body = JSON.stringify(postData);
                 headers["Content-Type"] = "application/json";
                 credentials = "include";
-                break;
+        break;
         default:
             return {status: 205, message: "type not found"};
     };
@@ -129,7 +132,8 @@ const apiRoutes = async (postData: any): Promise<any> => {
         });
         // Wait for the JSON response
         const jsonResponse = await response.json();
-        
+      
+            
         ///-----------------------------------------------
         /// From api/auth return the sessionId.
         ///-----------------------------------------------

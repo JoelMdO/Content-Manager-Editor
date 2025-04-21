@@ -73,6 +73,7 @@ export async function POST(req: Request): Promise<any> {
                     break;
                     case "auth-middleware" :
                         sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
+                       
                         if (sessionId) {
                             postData = {sessionId: sessionId, data: postData};
                         } else {
