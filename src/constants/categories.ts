@@ -1,2 +1,2 @@
-const categories = ["Authentication", "Bugs", "API", "State Management", "Functions", "Libraries", "Code", "Performance", "Security", "DevOps", "Database", "Testing", "UI/UX", "Deployment"];
+const categories = ["Database", "Deployment", "Git", "NextJs",  "Flutter", "Functions", "Performance", "Python", "React", "Security", "State Management", "Testing", "UI/UX"];
 export default categories;
