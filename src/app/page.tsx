@@ -83,7 +83,7 @@ const Login: React.FC = () => {
             />
             <button
               type="submit"
-              className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center"
+              className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center shadow-md shadow-dark-background"
             >
               {isSubmitted ? <Loader type="Logging..." /> : "Login"}
             </button>
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
           <button
             type="button"
             onClick={() => signIn("google", { callbackUrl: "/home" })}
-            className="bg-blue-light text-white rounded-lg w-[33vw] h-[4.5vh] md:w-[9vw] md:h-[1.7vw] mt-5 flex justify-center items-center"
+            className="bg-blue-light text-white rounded-lg md:w-[170px] h-[30px] w-[120px] mt-5 flex justify-center items-center shadow-md shadow-dark-background"
           >
             <div className="flex flex-row">
               <Image
