@@ -1,14 +1,13 @@
 "use client";
-import { useState } from "react";
-import callHub from "../services/api/call_hub";
+import { useEffect, useState } from "react";
+// import callHub from "../services/api/call_hub";
 import successAlert from "../components/alerts/sucess";
 import errorAlert from "../components/alerts/error";
 import LogoButton from "../components/buttons/logo_button";
 import { useRouter } from "next/navigation";
 import Loader from "../components/buttons/loader_saving";
-import { signInWithGoogle } from "../services/authentication/signin_with_google";
 import Image from "next/image";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 const Login: React.FC = () => {
   ///===================================================
@@ -17,33 +16,42 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmittedGoogle, setIsSubmittedGoogle] = useState<boolean>(false);
   const router = useRouter();
-
   ///--------------------------------------------------------
   //handleLogin with Firebase authentication
   ///--------------------------------------------------------
   const handleLogin = async (e: React.FormEvent) => {
     setIsSubmitted(true);
     e.preventDefault();
-    const response = await callHub("auth", { email, password });
+    // const response = await callHub("auth", { email, password });
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+      callbackUrl: "/home",
+    });
+    console.log("result at handleLogin:", result);
 
-    if (response.status !== 200) {
+    if (!result?.ok) {
+      // if (response.status !== 200) {
       setIsSubmitted(false);
       errorAlert("auth", "", "Email or Password incorrect");
       return;
     }
-    setIsSubmitted(false);
-    successAlert("auth", response.message);
-    const sessionId = response.sessionId;
 
-    if (sessionId) {
-      sessionStorage.setItem("sessionId", sessionId);
-    }
+    setIsSubmitted(false);
+    successAlert("auth", "User authenticated");
+    // const { data: session } = useSession();
+    // const sessionId = session?.user.name;
+
+    // if (sessionId) {
+    //   sessionStorage.setItem("sessionId", sessionId);
+    // }
     router.push("/home");
   };
   //
-  //
+
   ///--------------------------------------------------------
   /// UI with a login form and a contact button for the
   /// user to reach the software engineer.
@@ -90,19 +98,24 @@ const Login: React.FC = () => {
           </form>
           <button
             type="button"
-            onClick={() => signIn("google", { callbackUrl: "/home" })}
+            onClick={() => {
+              setIsSubmittedGoogle(true),
+                signIn("google", { callbackUrl: "/home" });
+            }}
             className="bg-blue-light text-white rounded-lg md:w-[170px] h-[30px] w-[120px] mt-5 flex justify-center items-center shadow-md shadow-dark-background"
           >
             <div className="flex flex-row">
-              <Image
-                src="https://developers.google.com/identity/images/g-logo.png"
-                alt="Google logo"
-                className="w-6 h-6 mr-2 rounded-xl"
-                width={50}
-                height={50}
-              />
-              Sign in
+              {isSubmittedGoogle ? null : (
+                <Image
+                  src="https://developers.google.com/identity/images/g-logo.png"
+                  alt="Google logo"
+                  className="w-6 h-6 mr-2 rounded-xl"
+                  width={50}
+                  height={50}
+                />
+              )}
             </div>
+            {isSubmittedGoogle ? <Loader type="Logging..." /> : "Sign in"}
           </button>
         </div>
       </div>

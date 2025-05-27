@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,9 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -36,13 +30,11 @@
     "next-env.d.ts",
     "src/app/store.ts",
     "src/services/handle_image.js",
-    "src/slices/count_slice.js",
-    "src/slices/image_slice.ts",
+    "src/store/slices/count_slice.js",
+    "src/store/slices/image_slice.ts",
     "test/button.test.jsx",
     "test/decript_test.js",
     "docs/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

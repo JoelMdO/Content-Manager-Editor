@@ -1,66 +1,32 @@
+import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import rateLimit from "./services/api/rate_limit";
-import callHub from "./services/api/call_hub";
-import { withAuth } from "next-auth/middleware";
+import generateNonce from "./utils/nonce";
+// import callHub from "./services/api/call_hub";
+// export { default } from "next-auth/middleware";
 //
-export default withAuth(async function middleware(req: NextRequest) {
-  ///----------------------------------------------------------------
-  // Check in case of subrequest
-  ///----------------------------------------------------------------
+export async function middleware(req: NextRequest) {
+  //   ///----------------------------------------------------------------
+  //   // Check in case of subrequest
+  //   ///----------------------------------------------------------------
   const path = req.nextUrl.pathname;
   let rateLimitResponse: NextResponse;
   let response: NextResponse = NextResponse.next();
-  const database_url = process.env.NEXT_PUBLIC_databaseURL;
+  const database_url = process.env.NEXT_PUBLIC_FIREBASE_databaseURL;
   const database_2_url = process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL;
-  console.log("middleware called");
+  const nonce = generateNonce();
 
-  ///--------------------------------------------------------
-  // Internal checks for the below paths
-  ///--------------------------------------------------------
   if (
     path.startsWith("/dashboard") ||
     path.startsWith("/playbook") ||
     path.startsWith("/readPlaybook")
   ) {
-    //Get the previous path
-    const headers = Object.fromEntries(req.headers.entries());
-    const next_url = headers["next-url"];
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    console.log("Session token at middleware:", token);
 
-    if (next_url == "/home") {
-      const url = req.nextUrl; // Access the full URL
-      const sessionId = url.searchParams.get("id");
-
-      const response = await callHub("auth-middleware", {
-        auth: true,
-        sessionId: sessionId,
-      });
-
-      if (response.status === 200) {
-        return NextResponse.next();
-      } else {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-    } else {
+    if (!token) {
+      console.log("No session token found, redirecting to login.");
       return NextResponse.redirect(new URL("/", req.url));
-    }
-  }
-  //
-  // Allow Firebase auth
-  if (path.startsWith("/__/auth/handler")) {
-    console.log("middlewaare auth/handler");
-
-    return NextResponse.next();
-  }
-  //avoid issue Nextjs
-  const header = req.headers;
-  const isSubRequest = header.get("x-middleware-subrequest");
-  if (isSubRequest) {
-    const origin = header.get("origin") || header.get("referer");
-
-    const url = process.env.NEXT_PUBLIC_api_url;
-
-    if (!origin || origin != url) {
-      return NextResponse.json({ status: 403, error: "Unauthorized request" });
     }
   }
   ///----------------------------------------------------------------
@@ -74,25 +40,33 @@ export default withAuth(async function middleware(req: NextRequest) {
   response.headers.set(
     "Content-Security-Policy",
     `
-      default-src 'self';
-      script-src 'self';
-      style-src 'self';
-      img-src 'self';
-      font-src 'self';
-      connect-src 'self' ${database_url} ${database_2_url};
-      object-src 'none';
-      base-uri 'self';
-      form-action 'self';            
-      frame-ancestors 'self';
-      upgrade-insecure-requests;
-      block-all-mixed-content;
-      `
+    default-src 'self';
+    script-src 'self' 'nonce-${nonce}';
+    style-src 'self';
+    img-src 'self';
+    font-src 'self';
+    connect-src 'self' ${database_url} ${database_2_url};
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'self';
+    upgrade-insecure-requests;
+    block-all-mixed-content;
+    `
       .replace(/\s{2,}/g, " ")
       .trim()
   );
+
+  console.log("Session token valid, allowing access.");
   return response;
-});
+}
 
 export const config = {
-  matcher: ["/api/(post/save)", "/dashboard", "/playbook", "/readPlaybook"],
+  matcher: [
+    "/api/post",
+    "/api/save",
+    "/dashboard",
+    "/playbook",
+    "/readPlaybook",
+  ],
 };

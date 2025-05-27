@@ -42,24 +42,24 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
   // Handle the logout by deleting session storage for dashboard
   // other cases only loging out is needed.
   ///--------------------------------------------------------
-  const handleLogout = async () => {
-    signOut({ callbackUrl: "/login" });
-    const response = await callHub("logout");
+  // const handleLogout = async () => {
+  //   signOut({ callbackUrl: "/" });
+  // const response = await callHub("logout");
 
-    /// Remove sessionStorage.
-    if (type != "platbook") {
-      const dbName = sessionStorage.getItem("db");
-      sessionStorage.removeItem(`tempTitle-${dbName}`);
-      sessionStorage.removeItem(`tempBody-${dbName}`);
-    }
+  // /// Remove sessionStorage.
+  // if (type != "platbook") {
+  //   const dbName = sessionStorage.getItem("db");
+  //   sessionStorage.removeItem(`tempTitle-${dbName}`);
+  //   sessionStorage.removeItem(`tempBody-${dbName}`);
+  // }
 
-    // Response management for all cases
-    if (response.status !== 200) {
-      //   router.push(`${url}/`);
-      // } else {
-      errorAlert("Logout", "logout", response.message);
-    }
-  };
+  // Response management for all cases
+  // if (response.status !== 200) {
+  //   //   router.push(`${url}/`);
+  //   // } else {
+  //   errorAlert("Logout", "logout", response.message);
+  // }
+  //};
   //
   ///--------------------------------------------------------
   // UI logout button
@@ -72,7 +72,7 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
         type="button"
         className={`${mt} ${mb}`}
         onClick={() => {
-          handleLogout();
+          signOut({ callbackUrl: "/" });
           setIsClicked(true);
         }}
       >
