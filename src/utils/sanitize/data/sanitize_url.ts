@@ -1,6 +1,6 @@
 "server-only";
 export function sanitizeUrl(url: string): { status: number; message: string } {
-  let u = decodeURI(url).trim().toLowerCase();
+  const u = decodeURI(url).trim().toLowerCase();
   if (
     u.includes("javascript:") ||
     u.includes("data:") ||
