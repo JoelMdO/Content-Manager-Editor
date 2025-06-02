@@ -1,9 +1,9 @@
-import deleteImageFromIndexDB from "../images_edit/delete_img_from_indexdb";
+import deleteImageFromIndexDB from "./images_edit/delete_img_from_indexdb";
 
 export const handleClear = (
   setTheTitle: (value: string) => void,
   setTheBody: (value: string) => void,
-  editorRefs: React.RefObject<(HTMLDivElement | null)[]>,
+  editorRefs: React.RefObject<(HTMLDivElement | null)[]>
 ) => {
   ///======================================================
   // Clear content from dashboard
@@ -12,7 +12,7 @@ export const handleClear = (
   // Clear title and body state
   setTheTitle("");
   setTheBody("");
-   
+
   // Remove session storage items
   const dbName = sessionStorage.getItem("db");
   sessionStorage.removeItem(`tempTitle-${dbName}`);
@@ -27,6 +27,5 @@ export const handleClear = (
   });
 
   // Delete images from IndexedDB
-  deleteImageFromIndexDB(undefined, "clear-all").then((response: any) => {
-  });
+  deleteImageFromIndexDB(undefined, "clear-all");
 };

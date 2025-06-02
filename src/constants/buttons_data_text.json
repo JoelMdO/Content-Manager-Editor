@@ -1,0 +1,17 @@
+{
+  "buttons": {
+    "home": "Home",
+    "backHome": "Back to Home",
+    "fontStyle": "Font Style",
+    "addImage": "Add Image",
+    "inop": "INOP",
+    "labelReadArticle": "Read Article",
+    "labelEditEntry": "Edit Entry",
+    "labelDefault": "Default Label",
+    "pasteLink": "Paste Link",
+    "addLink": "Add Link",
+    "close": "Close",
+    "submit": "Submit",
+    "year": "2025"
+  }
+}

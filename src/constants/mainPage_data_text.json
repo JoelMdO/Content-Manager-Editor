@@ -1,0 +1,8 @@
+{
+  "mainPage": {
+    "welcome": "Welcome",
+    "Logging": "Logging",
+    "login": "login",
+    "singin": "Sign In"
+  }
+}

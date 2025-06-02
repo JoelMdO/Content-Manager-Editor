@@ -1,19 +1,23 @@
 import callHub from "@/services/api/call_hub";
-import { log } from "node:console";
+import { PlaybookMeta } from "../../types/plabookMeta";
 
-
-async function handleSelectChange(selectedValue: string, setEntries:(entries: any)=>void, setZeroSearchData: (isZeroSearchData: boolean)=> void, entries: any[]) {
-    
-    setEntries([]);
+async function handleSelectChange(
+  selectedValue: string,
+  setEntries: (entries: PlaybookMeta[] | undefined) => void,
+  setZeroSearchData: (isZeroSearchData: boolean) => void
+) {
+  setEntries([]);
+  if (selectedValue === "Select") {
+    setZeroSearchData(false);
+  } else {
     const response = await callHub("playbook-search-category", selectedValue);
     if (response.status === 200) {
-
       setEntries(response.body);
       setZeroSearchData(false);
-
     } else {
-        setZeroSearchData(true);
-      }
-  };
+      setZeroSearchData(true);
+    }
+  }
+}
 
-  export default handleSelectChange;
+export default handleSelectChange;

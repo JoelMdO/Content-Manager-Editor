@@ -1,176 +1,171 @@
-import apiRoutes  from "../../../services/api/api_routes";
+"server-only";
+import apiRoutes from "../../../services/api/api_routes";
 import { NextResponse } from "next/server";
-import { sanitizeData } from "../../../utils/dashboard/sanitize";
+import { sanitizeData } from "../../../utils/sanitize/data/sanitize_data";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../lib/nextauth/auth";
+import createLog from "../../../services/authentication/create_log";
+import { dataType } from "@/types/dataType";
 
-export async function POST(req: Request): Promise<any> {
-    //
-    let postData: string | File | {} = "";
-    let type: string = "clean-image";
-    const contentType = req.headers.get('Content-Type') || '';
-    let sessionId: string = "";
-    //
-    try {
-        ///-----------------------------------------------
-        /// Check the content type to see if the request 
-        /// comes without files only text
-        ///-----------------------------------------------    
-            if (contentType.includes("application/json")){
-                
-                const getPostData = await req.json();
-                postData = getPostData.data;
-                type = getPostData.type;
-                switch(type){
-                    ///### LOGOUT
-                    case "logout":
-                        //Retrieve the authorization session token from the headers
-                        sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
-                        if (sessionId) {
-                            postData = sessionId;
-                        } else {
-         
-                            return NextResponse.json({ status: 401, message: "User without a valid session" });
-                        }
-                        type = type;
-                    break;
-                    case "playbook-save":
-                        //Retrieve the authorization session token from the headers
-                        sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
-                        if (sessionId) {
-                            postData = {sessionId: sessionId, data: postData};
-                        } else {
-         
-                            return NextResponse.json({ status: 401, message: "User without a valid session" });
-                        }
-                        type = type;
-                    break;
-                    case "playbook-search":
-                    case "playbook-search-bar":
-                    case "playbook-search-category":
-                        //Retrieve the authorization session token from the headers
-                        sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
-                        if (sessionId) {
-                            // Sanitize data.
-                            let dataToSanitize: string | Object;
-                            if(type === "playbook-search"){
-                                dataToSanitize = type;
-                            } else {
-                                dataToSanitize = postData;
-                            }    
-                            const dataSanitizeResponse = sanitizeData(dataToSanitize, "text");
-                                if((await dataSanitizeResponse).status != 200){
-                                return NextResponse.json({ status: 403, message: "Unauthorized" });
-                            }
-                            if(type === "playbook-search"){
-                                postData = {sessionId: sessionId, data: "", type: type};
-                            } else {
-                                postData = {sessionId: sessionId, data: postData, type: type};
-                            }
-                            } else {
-                            return NextResponse.json({ status: 401, message: "User without a valid session" });
-                        }
-                        type = type;
-                        postData = postData;
-                    break;
-                    case "auth-middleware" :
-                        sessionId = req.headers.get("Authorization")?.split(" ")[1] || "";
-                       
-                        if (sessionId) {
-                            postData = {sessionId: sessionId, data: postData};
-                        } else {
-         
-                            return NextResponse.json({ status: 401, message: "User without a valid session" });
-                        }
-                        type = "auth";
-                        postData = postData;
-                    break;
-                    default:
-                        postData = postData;
-                        type = type;
-                    break;
-                }
-            }else {
-         ///-----------------------------------------------       
-         /// For request including files.
-         ///-----------------------------------------------   
-            const formData = await req.formData();
-         ///-----------------------------------------------
-         /// Check the type of route the api will take from
-         /// typeofAction (Post, Logout, Clean-File) for
-         /// authentication the type of content is as json
-         ///----------------------------------------------- 
-            const typeOfAction = formData.get("type");
-            const typeSanitizeResponse = sanitizeData(typeOfAction, "text");
-                if((await typeSanitizeResponse).status != 200){
-                    return NextResponse.json({ status: 403, message: "Unauthorized" });
-                }
-            switch(typeOfAction){
-            ///#### POST (Save) 
-            case "post":
-                //Retrieve the authorization session token from the headers
-                const session = req.headers.get("Authorization")?.split(" ")[1];
-                
-                if (session) {
-                    formData.append("session", session);
-                } else {
-                    return NextResponse.json({ status: 401, message: "User without a valid session" });
-                }
-                /// Sanitize the data
-                const responseAfterSanitize = sanitizeData(formData, "post"); 
-                if ((await responseAfterSanitize).status === 200) { 
-                postData = formData;
-                type = "post";
-                } else {
-                return NextResponse.json({ status: 401, message: "Not valid data" });
-                }
-            break;
-            ///### LOGOUT
-            case "logout":
-                //Retrieve the authorization session token from the headers
-                const sessionIdForLougout = req.headers.get("Authorization")?.split(" ")[1];
-                if (sessionIdForLougout) {
-                    postData = sessionIdForLougout;
-                } else {
-                    return NextResponse.json({ status: 401, message: "User without a valid session" });
-                }
-                type = typeOfAction;
-            break;
-            ///### SANITIZE (clean-image).
-            default:
-            const file = formData.get("file");
-            if (!(file instanceof File)) {
-                return NextResponse.json({ status: 400, message: "No file uploaded" });
-            }
-            postData = file;
-            type = "clean-image";
-            break;
-            }}
-        ///-----------------------------------------------
-        /// Redirect the request to the apiRoutes endpoints
-        ///-----------------------------------------------
-        const response = await apiRoutes({data: postData, type: type});
-        const jsonResponse = await response.json();
-        ///-----------------------------------------------
-        /// Response from api/auth return the sessionId.
-        ///-----------------------------------------------
-        if(jsonResponse.message === "User authenticated"){
-            const sessionId = jsonResponse.sessionId;
-            return NextResponse.json({ status: jsonResponse.status, message: "User authenticated", sessionId: sessionId });
-        ///-----------------------------------------------
-        /// From api/post return the body.
-        ///-----------------------------------------------
-        }else if (jsonResponse.message === "Data saved successfully"){
-            const body = jsonResponse.body;
-            return NextResponse.json({ status: jsonResponse.status, message: "Data saved successfully", body: body });
-        ///-----------------------------------------------
-        /// From api/search return the meta.
-        ///-----------------------------------------------
-        }else if (jsonResponse.message === "Data found successfully"){
-        const body = jsonResponse.body;
-        return NextResponse.json({ status: jsonResponse.status, message: "Data found successfully", body: body });
-        } else {
-        return NextResponse.json({status: jsonResponse.status, message: jsonResponse.message});
+export async function POST(req: Request): Promise<NextResponse> {
+  //
+  let dataApiHub: dataType = "";
+  let type: string = "clean-image";
+  let token: string | undefined = "";
+  let sessionId: string | undefined = "";
+  let formData: FormData = new FormData();
+
+  ///___________________________________________________
+  /// Check the content type to see if the request
+  /// comes with file or only text
+  ///___________________________________________________
+  try {
+    const contentType = req.headers.get("Content-Type") || "";
+
+    if (contentType.includes("application/json")) {
+      const getDataAtApiHub = await req.json();
+
+      dataApiHub = getDataAtApiHub.data;
+
+      type = getDataAtApiHub.type;
+      dataApiHub = dataApiHub;
+    } else {
+      /// For request including files.
+      formData = await req.formData();
+      type = formData.get("type") as string;
+
+      if (type !== "post") {
+        dataApiHub = formData.get("file") || "";
+        if (!(dataApiHub instanceof File)) {
+          return NextResponse.json({
+            status: 400,
+            message: "No file uploaded",
+          });
         }
-    } catch (error) {
-        return NextResponse.json({status: 500, message: "Internal Server Error" + error });
+      }
     }
+    ///--------------------------------------------------------
+    // Check if the request is authenticated
+    ///--------------------------------------------------------
+
+    const session = await getServerSession(authOptions);
+
+    if (!session && type !== "sign-in-by-email") {
+      return NextResponse.json({
+        status: 401,
+        message: "User without a valid session",
+      });
+    }
+
+    if (session && type !== "sign-in-by-email") {
+      token = createLog(session?.user.id);
+    }
+
+    if (session && type === "post") {
+      sessionId = session.user?.id;
+    }
+
+    ///-----------------------------------------------
+    /// Sanitize the data received from the request
+    ///-----------------------------------------------
+
+    const statusSanitize = await sanitizeData(dataApiHub, type);
+
+    //
+    if (statusSanitize.status != 200) {
+      return NextResponse.json({ status: 403, message: "Unauthorized data" });
+    }
+    //
+    switch (type) {
+      ///--------------------------------------------------------
+      // For Clean Image and Clean Link, the response should be back to the client
+      // if the sanitization was successful.
+      ///--------------------------------------------------------
+      case "clean-image":
+      case "clean-link":
+        if (statusSanitize.status == 200)
+          return NextResponse.json({
+            status: 200,
+            message: "Data sanitized successfully",
+          });
+        break;
+      ///--------------------------------------------------------
+      // Playbok save
+      ///--------------------------------------------------------
+      case "playbook-save":
+        dataApiHub = statusSanitize.message as dataType;
+        break;
+      ///--------------------------------------------------------
+      // Sign in by email
+      ///--------------------------------------------------------
+      case "sign-in-by-email":
+        if (
+          typeof statusSanitize.message === "object" &&
+          statusSanitize.message !== null &&
+          "email" in statusSanitize.message
+        ) {
+          dataApiHub = {
+            email: (statusSanitize.message as { email: string }).email,
+            password: (statusSanitize.message as { password: string }).password,
+          };
+        } else {
+          return NextResponse.json({
+            status: 400,
+            message: "Invalid sanitized data for sign-in-by-email",
+          });
+        }
+        break;
+      case "post":
+        formData.append("session", sessionId || "");
+
+        dataApiHub = formData;
+
+        type = type;
+      default:
+        dataApiHub = dataApiHub;
+        break;
+    }
+    ///-----------------------------------------------
+    /// Redirect the request to the apiRoutes endpoints
+    ///-----------------------------------------------
+
+    const response = await apiRoutes({
+      token: token,
+      data: dataApiHub,
+      type: type,
+    });
+
+    const jsonResponse = await response.json();
+    ///-----------------------------------------------
+    /// From api/post return the body.
+    ///-----------------------------------------------
+    if (jsonResponse.message === "Data saved successfully") {
+      const body = jsonResponse.body;
+      return NextResponse.json({
+        status: jsonResponse.status,
+        message: "Data saved successfully",
+        body: body,
+      });
+      ///-----------------------------------------------
+      /// From api/search return the meta.
+      ///-----------------------------------------------
+    } else if (jsonResponse.message === "Data found successfully") {
+      const body = jsonResponse.body;
+      return NextResponse.json({
+        status: jsonResponse.status,
+        message: "Data found successfully",
+        body: body,
+      });
+    } else {
+      return NextResponse.json({
+        status: jsonResponse.status,
+        message: jsonResponse.message,
+      });
+    }
+  } catch (error) {
+    return NextResponse.json({
+      status: 500,
+      message: `Internal Server Error: ${error}`,
+    });
+  }
 }
