@@ -9,7 +9,7 @@
     "lint": "next lint",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "vercel-build": "npm install --legacy-peer-deps && next build"
+    "postinstall": "npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@auth/firebase-adapter": "^2.9.0",
