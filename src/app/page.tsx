@@ -56,7 +56,7 @@ const Login: React.FC = () => {
         </div>
         <div className="flex flex-col items-center justify-center min-h-[80vh]">
           <Image
-            src="/yourCMS.png"
+            src="/yourCMS.svg"
             alt="CMS Title"
             width={52}
             height={52}
