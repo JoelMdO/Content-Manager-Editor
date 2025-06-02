@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
-    "postinstall": "npm install --legacy-peer-deps"
+    "cypress:run": "cypress run"
   },
   "dependencies": {
     "@auth/firebase-adapter": "^2.9.0",
