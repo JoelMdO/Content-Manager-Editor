@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import withSessionProvider from "../../utils/withSessionProvider";
+import "../../styles/playbook.css";
 //
 const LogOutButton = dynamic(
   () => import("../../components/buttons/logout_buttons"),
@@ -37,9 +38,9 @@ const Playbook: React.FC = () => {
   }
   //
   return (
-    <div className="min-h-screen bg-blue pb-10">
+    <div className="min-h-screen bg-blue flex flex-col circle-in-hesitate-enter">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50  bg-blue-600 text-white h-[85px] shadow-md flex flex-row justify-between items-center w-full backdrop-blur-md">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white h-[85px] shadow-md flex flex-row justify-between items-center w-full backdrop-blur-md">
         <div className="flex gap-2">
           <BackPageButton />
         </div>
@@ -50,7 +51,7 @@ const Playbook: React.FC = () => {
       </header>
 
       {/* Main Form */}
-      <main className="pt-28 container mx-auto px-4">
+      <main className="flex-1 container mx-auto px-4 pt-20 bg-blue">
         <PlaybookForm type="new-playbook" data-cy="playbook-form" />
       </main>
     </div>

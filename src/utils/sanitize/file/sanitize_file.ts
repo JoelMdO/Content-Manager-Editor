@@ -36,7 +36,7 @@ export async function sanitizeFile(
       return { status: 400, message: "Invalid image content" };
     }
   } catch (error) {
-    return { status: 500, message: "Error processing file" };
+    return { status: 500, message: `Error processing file, ${error}` };
   }
 
   return { status: 200, message: "File valid" };

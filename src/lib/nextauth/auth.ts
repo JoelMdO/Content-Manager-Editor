@@ -23,7 +23,6 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         //
         if (!credentials?.email || !credentials?.password) {
-          console.error("Missing credentials");
           return null;
         }
         const email = credentials?.email;
@@ -53,20 +52,14 @@ export const authOptions: NextAuthOptions = {
     ///--------------------------------------------------------
     // Sign In
     ///--------------------------------------------------------
-    async signIn({ account, user }) {
-      console.log("at signIn", account);
-
+    async signIn({ account }) {
       // For email and password sign-in
       if (account?.type === "credentials") {
-        console.log("→ credentials login accepted");
         return true;
       }
       // For Google sign-in
       if (account?.id_token) {
-        console.log("account", account);
-
         const response = true;
-        console.log("response at auth/nextauth", response);
 
         return response;
       }
@@ -78,7 +71,7 @@ export const authOptions: NextAuthOptions = {
         token.sub = user.id;
         token.name = user.name;
       }
-      console.log("JWT Token:", token);
+
       return token;
     },
     async session({ session, token }) {
@@ -90,7 +83,7 @@ export const authOptions: NextAuthOptions = {
           //Module augmentation
         }
       }
-      console.log("Session:", session);
+
       return session;
     },
   },

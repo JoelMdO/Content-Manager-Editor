@@ -1,12 +1,7 @@
 import { useCallback, useState } from "react";
-import { sanitizeData } from "../sanitize/data/sanitize_data";
+import { sanitizeData } from "../utils/sanitize/data/sanitize_data";
 import errorAlert from "@/components/alerts/error";
-
-export type CodeSnippet = {
-  language: string;
-  code: string;
-  image?: string;
-};
+import { CodeSnippet } from "@/types/codesnippet";
 
 export const useCodeSnippets = () => {
   const [codeSnippets, setCodeSnippets] = useState<CodeSnippet[]>([]);
@@ -37,7 +32,7 @@ export const useCodeSnippets = () => {
       };
       setCodeSnippets(updatedSnippets);
     },
-    []
+    [codeSnippets]
   );
 
   const updateCodeSnippetPaste = async (

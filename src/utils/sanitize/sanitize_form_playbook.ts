@@ -1,34 +1,28 @@
 "server-only";
-
 import { isValidUrl } from "./data/valid_url";
+import { PlaybookMetaWithUseRecord } from "@/types/plabookMeta_with_useRecord";
+import { CodeSnippet } from "@/types/codesnippet";
+import { Reference } from "@/types/references";
 
 ///========================================================
 // Function to sanitize the input data from playbook.
 ///========================================================
-interface sanitizeInputProps {
-  title: string;
-  category: string;
-  tags: Array<string>;
-  steps: Array<string>;
-  notes: string;
-  codeSnippets: Array<object>;
-  references: Array<object>;
-  lastUpdated: string;
-  useRecord: number;
-}
 
-export function sanitizeFormPlaybook(data: sanitizeInputProps): object {
-  const sanitizeString = (str: string) =>
+export function sanitizeFormPlaybook(data: PlaybookMetaWithUseRecord): {
+  status: number;
+  message: PlaybookMetaWithUseRecord;
+} {
+  const sanitizeString = (str: string | undefined) =>
     typeof str === "string"
       ? str.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim().slice(0, 1000)
       : "";
 
-  const sanitizeArray = (arr: any[]) =>
+  const sanitizeArray = (arr: Array<string> | undefined) =>
     Array.isArray(arr)
       ? arr.map((item) => sanitizeString(item)).filter(Boolean)
       : [];
 
-  const sanitizeCodeSnippets = (snippets: any[]) =>
+  const sanitizeCodeSnippets = (snippets: CodeSnippet[] | undefined) =>
     Array.isArray(snippets)
       ? snippets
           .filter((s) => typeof s === "object" && s !== null)
@@ -38,19 +32,17 @@ export function sanitizeFormPlaybook(data: sanitizeInputProps): object {
           }))
       : [];
 
-  const sanitizeReferences = (refs: any[]) =>
-    Array.isArray(refs)
-      ? refs
+  const sanitizeReferences = (references: Reference[] | undefined) =>
+    Array.isArray(references)
+      ? references
           .filter(
-            (r) => typeof r === "object" && r !== null && isValidUrl(r.url)
+            (r) => typeof r === "object" && r !== null && isValidUrl(r.link)
           )
-          .map(({ label, url }) => ({
-            label: sanitizeString(label),
-            url: url.trim(), // assume valid after filter
+          .map(({ title, link }) => ({
+            title: sanitizeString(title),
+            link: link.trim(), // assume valid after filter
           }))
       : [];
-  console.log('"Data at sanitizeFormPlaybook:', data);
-  console.log("data title", data.title);
 
   return {
     status: 200,

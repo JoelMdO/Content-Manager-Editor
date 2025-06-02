@@ -40,7 +40,6 @@ const RouteButton: React.FC<RouteButtonProps> = ({
     if (type === "with-item-playbook") {
       router.push(`${url}${path}?modal=true`);
     } else {
-      // const sessionId = sessionStorage.getItem("sessionId");
       router.push(`${url}${path}`);
     }
   };

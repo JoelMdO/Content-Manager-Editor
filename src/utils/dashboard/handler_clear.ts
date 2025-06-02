@@ -27,5 +27,5 @@ export const handleClear = (
   });
 
   // Delete images from IndexedDB
-  deleteImageFromIndexDB(undefined, "clear-all").then((response: any) => {});
+  deleteImageFromIndexDB(undefined, "clear-all");
 };

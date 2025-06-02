@@ -1,5 +1,4 @@
 "server-only";
-import { forEach } from "lodash";
 import sanitizeHtml from "sanitize-html";
 import { sanitizeUrl } from "./sanitize_url";
 import { isValidUrl } from "./valid_url";
@@ -8,24 +7,20 @@ import { sanitizeFormPlaybook } from "../sanitize_form_playbook";
 import { sanitizeEmail } from "./sanitize_email";
 import { sanitizePassword } from "./sanitize_pwd";
 import { sanitizePost } from "./sanitize_post";
+import { dataType } from "../../../types/dataType";
+import { PlaybookMetaWithUseRecord } from "@/types/plabookMeta_with_useRecord";
 
 export async function sanitizeData(
-  data: any,
+  data: dataType,
   type: string
-): Promise<{ status: number; message: string | Record<string, {}> }> {
+): Promise<{ status: number; message: string | object | dataType }> {
   //
   ///========================================================
   // Function to sanitize Data as strings, links, urls, images, and files.
   ///========================================================
 
-  let sanitizedData: { status: number; message: string | Record<string, any> } =
-    {
-      status: 0,
-      message: "",
-    };
+  let sanitizedData: dataType = { status: 500, message: "unsanitized" };
   let value: string = "";
-  console.log("At Sanitize data type:", type);
-  console.log('"Data at SanitizeData:', data);
 
   ///--------------------------------------------------------
   // Clean Links / URLS
@@ -48,25 +43,34 @@ export async function sanitizeData(
     ///--------------------------------------------------------
     // Clean Images / Files
     ///--------------------------------------------------------
-    sanitizedData = await sanitizeFile(data);
+    if (data instanceof File) {
+      sanitizedData = await sanitizeFile(data);
+    }
     ///--------------------------------------------------------
     // } else if (data instanceof FormData) {
   } else if (type === "post") {
     ///--------------------------------------------------------
     // Clean data article
     ///--------------------------------------------------------
-    console.log('"doing type data instanceof FormData: sanitzing');
 
-    const sanitized = Object.fromEntries(
-      Object.entries(data).map(([key, value]) => [
-        key,
-        sanitizePost(value as string | undefined),
-      ])
-    );
-    sanitizedData = {
-      status: 200,
-      message: sanitized,
-    };
+    if (
+      data !== null &&
+      !(data instanceof File) &&
+      !(data instanceof FormData)
+    ) {
+      const sanitized = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [
+          key,
+          sanitizePost(value as string | undefined),
+        ])
+      );
+      sanitizedData = {
+        status: 200,
+        message: sanitized,
+      };
+    } else {
+      sanitizedData = { status: 400, message: "Invalid post data" };
+    }
     // const titleBeforeSanitize = data.title
     // const idBeforeSanitize = data.get("id");
     // const articleBeforeSanitize = data.get("article");
@@ -95,34 +99,43 @@ export async function sanitizeData(
     ///--------------------------------------------------------
     // Clean Playbook Data
     ///--------------------------------------------------------
-    console.log("doing type playbook-save: sanitzing");
-    console.log("data rtype", typeof data);
 
-    const newSanitizedData = sanitizeFormPlaybook(data) as {
-      status: number;
-      message: string;
-    };
-    sanitizedData = {
-      status: newSanitizedData.status,
-      message: newSanitizedData.message,
-    };
-  } else if (type === "sign-in-by-email") {
-    console.log('"doing type sign-in-by-email');
-
-    const newEmail = sanitizeEmail(data.email);
-    const newPassword = sanitizePassword(data.password);
-    if (newEmail == "" || newPassword == "") {
-      sanitizedData = { status: 400, message: "Invalid text input" };
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      !(data instanceof File) &&
+      !(data instanceof FormData)
+    ) {
+      sanitizedData = sanitizeFormPlaybook(data as PlaybookMetaWithUseRecord);
+    } else {
+      sanitizedData = { status: 400, message: "Invalid playbook data" };
     }
-    sanitizedData = {
-      status: 200,
-      message: { email: newEmail, password: newPassword },
-    };
+  } else if (type === "sign-in-by-email") {
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      "email" in data &&
+      "password" in data
+    ) {
+      const newEmail = sanitizeEmail((data as { email: string }).email);
+      const newPassword = sanitizePassword(
+        (data as { password: string }).password
+      );
+      if (newEmail == "" || newPassword == "") {
+        sanitizedData = { status: 400, message: "Invalid text input" };
+      } else {
+        sanitizedData = {
+          status: 200,
+          message: { email: newEmail, password: newPassword },
+        };
+      }
+    } else {
+      sanitizedData = { status: 400, message: "Invalid sign-in data" };
+    }
   } else {
     ///--------------------------------------------------------
     // Clean Text
     ///--------------------------------------------------------
-    console.log("doing type text at SanitizeData");
 
     if (typeof data === "string") {
       const sanitizedText = sanitizeUrl(data);

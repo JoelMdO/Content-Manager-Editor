@@ -2,16 +2,11 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import rateLimit from "./services/api/rate_limit";
 import generateNonce from "./utils/nonce";
-// import callHub from "./services/api/call_hub";
-// export { default } from "next-auth/middleware";
+
 //
 export async function middleware(req: NextRequest) {
-  //   ///----------------------------------------------------------------
-  //   // Check in case of subrequest
-  //   ///----------------------------------------------------------------
   const path = req.nextUrl.pathname;
-  let rateLimitResponse: NextResponse;
-  let response: NextResponse = NextResponse.next();
+  const response: NextResponse = NextResponse.next();
   const database_url = process.env.NEXT_PUBLIC_FIREBASE_databaseURL;
   const database_2_url = process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL;
   const nonce = generateNonce();
@@ -22,10 +17,8 @@ export async function middleware(req: NextRequest) {
     path.startsWith("/readPlaybook")
   ) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    console.log("Session token at middleware:", token);
 
     if (!token) {
-      console.log("No session token found, redirecting to login.");
       return NextResponse.redirect(new URL("/", req.url));
     }
   }
@@ -33,7 +26,7 @@ export async function middleware(req: NextRequest) {
   ///------ Check for any rate limits on other paths ----------------
   ///----------------------------------------------------------------
   //Apply rate Limit.
-  rateLimitResponse = await rateLimit(req);
+  await rateLimit(req);
   ///----------------------------------------------------------------
   ///------ Add headers ----------------
   ///----------------------------------------------------------------
@@ -57,7 +50,6 @@ export async function middleware(req: NextRequest) {
       .trim()
   );
 
-  console.log("Session token valid, allowing access.");
   return response;
 }
 

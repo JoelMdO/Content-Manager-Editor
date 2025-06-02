@@ -3,7 +3,7 @@ import "./globals.css";
 import ReduxProvider from "../services/redux_provider";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-// import { SessionProvider } from "next-auth/react";
+
 import { Lexend } from "next/font/google";
 
 const lexend = Lexend({
@@ -39,11 +39,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={lexend.className}>
-        {/* <SessionProvider> */}
         <ReduxProvider>{children}</ReduxProvider>
-        {/* </SessionProvider> */}
-        {/* <SpeedInsights />
-          <Analytics/> */}
+
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

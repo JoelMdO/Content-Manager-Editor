@@ -1,7 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-
-interface DataState {
+export interface DataState {
   id: string;
   titles: string;
   body: string;
@@ -17,26 +16,35 @@ const initialState: DataState = {
   articles: [],
   fontStyle: [],
   fontWeight: [],
-}
+};
 
 const dataSlice = createSlice({
   name: "data_state",
   initialState,
   reducers: {
-    addFontStyle: (state, action: PayloadAction<{text: string}>) => {
+    addFontStyle: (state, action: PayloadAction<{ text: string }>) => {
       state.fontStyle.push(action.payload.text);
-    }, 
-    addFontWeight: (state, action: PayloadAction<{text: string}>) => {
-      state.fontWeight.push(action.payload.text);
-    }, 
-    deleteFontStyle: (state, action: PayloadAction<{text: string}>) => {
-    state.fontStyle = state.fontStyle.filter(style => style !== action.payload.text);
     },
-    deleteFontWeight: (state, action: PayloadAction<{text: string}>) => {
-      state.fontWeight = state.fontWeight.filter(weight => weight !== action.payload.text);
-    }
-  }
+    addFontWeight: (state, action: PayloadAction<{ text: string }>) => {
+      state.fontWeight.push(action.payload.text);
+    },
+    deleteFontStyle: (state, action: PayloadAction<{ text: string }>) => {
+      state.fontStyle = state.fontStyle.filter(
+        (style) => style !== action.payload.text
+      );
+    },
+    deleteFontWeight: (state, action: PayloadAction<{ text: string }>) => {
+      state.fontWeight = state.fontWeight.filter(
+        (weight) => weight !== action.payload.text
+      );
+    },
+  },
 });
 
-export const { addFontStyle, addFontWeight, deleteFontStyle, deleteFontWeight} = dataSlice.actions;
+export const {
+  addFontStyle,
+  addFontWeight,
+  deleteFontStyle,
+  deleteFontWeight,
+} = dataSlice.actions;
 export default dataSlice.reducer;

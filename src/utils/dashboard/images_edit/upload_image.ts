@@ -8,12 +8,14 @@ interface TrackedImage {
   fileName: string;
 }
 //
+type UploadImageResult = { status: number; message?: string };
+//
 
 const uploadImage = async (
   e: ChangeEvent<HTMLInputElement>,
   editorRef: HTMLDivElement | null,
   dbName: string
-): Promise<any> => {
+): Promise<UploadImageResult> => {
   ///========================================================
   // Function to upload an image
   ///========================================================
@@ -25,7 +27,8 @@ const uploadImage = async (
     //
     // Store reference before API call
     const editorRefBefore = editorRef;
-    if (!file || !editorRef) return;
+    if (!file || !editorRef)
+      return { status: 400, message: "No file or editor reference provided" };
     // Check if the file is a valid image and if its save it on the server
     const response = await callHub("clean-image", file);
     if (response.status === 200) {
@@ -66,7 +69,7 @@ const uploadImage = async (
         };
         if (responseSaveImage.status === 205) return responseSaveImage;
         // Get current article content from sessionStorage
-        let articleContent = JSON.parse(
+        const articleContent = JSON.parse(
           sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
         );
         // Add image data (file and blobUrl) to articleContent
@@ -111,7 +114,7 @@ const uploadImage = async (
         // Insert the image at cursor position
         const editor = editorRefBefore;
         const selection = window.getSelection();
-        let range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+        const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
 
         if (range) {
           range.deleteContents();
@@ -146,7 +149,7 @@ const uploadImage = async (
       return { status: 205, message: "Image not valid" };
     }
   } catch (error) {
-    return { status: 205, message: error };
+    return { status: 205, message: error as string };
   }
 };
 

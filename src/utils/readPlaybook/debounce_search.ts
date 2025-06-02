@@ -1,16 +1,16 @@
 import callHub from "@/services/api/call_hub";
+import { PlaybookMeta } from "../../types/plabookMeta";
 import { debounce } from "lodash";
 
 const debouncedFunction = debounce(
   async (
     val: string,
-    setEntries: (entries: any) => void,
+    setEntries: (entries: PlaybookMeta[] | undefined) => void,
     setZeroSearchData: (isZeroSearchData: boolean) => void,
-    entries: any[]
+    entries: PlaybookMeta[]
   ) => {
-    console.log("val at debouncedFunction:", val);
-
     const response = await callHub("playbook-search-bar", val);
+
     if (response.status === 200) {
       setEntries(response.body);
       setZeroSearchData(false);
@@ -25,9 +25,9 @@ const debouncedFunction = debounce(
 
 export default function debouncedSearch(
   val: string,
-  setEntries: (entries: any) => void,
+  setEntries: (entries: PlaybookMeta[] | undefined) => void,
   setZeroSearchData: (isZeroSearchData: boolean) => void,
-  entries: any[]
+  entries: PlaybookMeta[]
 ) {
   debouncedFunction(val, setEntries, setZeroSearchData, entries);
 }

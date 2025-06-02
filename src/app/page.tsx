@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
-// import callHub from "../services/api/call_hub";
+import { useState } from "react";
+
 import successAlert from "../components/alerts/sucess";
 import errorAlert from "../components/alerts/error";
 import LogoButton from "../components/buttons/logo_button";
@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Loader from "../components/buttons/loader_saving";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import text from "../constants/mainPage_data_text.json";
 
 const Login: React.FC = () => {
   ///===================================================
@@ -24,17 +25,14 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     setIsSubmitted(true);
     e.preventDefault();
-    // const response = await callHub("auth", { email, password });
     const result = await signIn("credentials", {
       redirect: false,
       email,
       password,
       callbackUrl: "/home",
     });
-    console.log("result at handleLogin:", result);
 
     if (!result?.ok) {
-      // if (response.status !== 200) {
       setIsSubmitted(false);
       errorAlert("auth", "", "Email or Password incorrect");
       return;
@@ -42,12 +40,6 @@ const Login: React.FC = () => {
 
     setIsSubmitted(false);
     successAlert("auth", "User authenticated");
-    // const { data: session } = useSession();
-    // const sessionId = session?.user.name;
-
-    // if (sessionId) {
-    //   sessionStorage.setItem("sessionId", sessionId);
-    // }
     router.push("/home");
   };
   //
@@ -63,12 +55,14 @@ const Login: React.FC = () => {
           <LogoButton type="login" />
         </div>
         <div className="flex flex-col items-center justify-center min-h-[80vh]">
-          <img
+          <Image
             src="/yourCMS.png"
             alt="CMS Title"
+            width={52}
+            height={52}
             className="w-52 h-52 md:w-[18rem] md:h-[15rem] mb-4"
           />
-          <h1 className="text-2xl font-bold pb-4">Welcome!</h1>
+          <h1 className="text-2xl font-bold pb-4">{text.mainPage.welcome}</h1>
           <form
             onSubmit={handleLogin}
             className="flex flex-col align-center items-center space-y-4 border-cyan-200 border-2 rounded-lg p-4 xs:w-[250px] md:w-[360px]"
@@ -93,14 +87,18 @@ const Login: React.FC = () => {
               type="submit"
               className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center shadow-md shadow-dark-background"
             >
-              {isSubmitted ? <Loader type="Logging..." /> : "Login"}
+              {isSubmitted ? (
+                <Loader type={`${text.mainPage.Logging}...`} />
+              ) : (
+                `${text.mainPage.login}`
+              )}
             </button>
           </form>
           <button
             type="button"
             onClick={() => {
-              setIsSubmittedGoogle(true),
-                signIn("google", { callbackUrl: "/home" });
+              setIsSubmittedGoogle(true);
+              signIn("google", { callbackUrl: "/home" });
             }}
             className="bg-blue-light text-white rounded-lg md:w-[170px] h-[30px] w-[120px] mt-5 flex justify-center items-center shadow-md shadow-dark-background"
           >
@@ -115,7 +113,11 @@ const Login: React.FC = () => {
                 />
               )}
             </div>
-            {isSubmittedGoogle ? <Loader type="Logging..." /> : "Sign in"}
+            {isSubmittedGoogle ? (
+              <Loader type={`${text.mainPage.Logging}...`} />
+            ) : (
+              `${text.mainPage.singin}`
+            )}
           </button>
         </div>
       </div>

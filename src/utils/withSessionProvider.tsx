@@ -2,8 +2,10 @@
 
 import { SessionProvider } from "next-auth/react";
 
-const withSessionProvider = (Component: React.FC) => {
-  return function WrappedComponent(props: any) {
+const withSessionProvider = <P extends object>(
+  Component: React.ComponentType<P>
+) => {
+  return function WrappedComponent(props: P) {
     return (
       <SessionProvider>
         <Component {...props} />

@@ -1,8 +1,11 @@
-const createLog = (token: any) => {
+import { User } from "next-auth";
+import { AdapterUser } from "next-auth/adapters";
+import crypto, { CipherGCMTypes, createCipheriv } from "crypto";
+
+const createLog = (token: AdapterUser | string | User) => {
   ///========================================================
   // Create the log object for session
   ///========================================================
-  const crypto = require("crypto");
   const salt = crypto.randomBytes(Number(process.env.saltLength!));
   const iv = crypto.randomBytes(Number(process.env.ivLength!));
   const masterKey = Buffer.from(process.env.secure_key!, "base64");
@@ -13,7 +16,7 @@ const createLog = (token: any) => {
     salt,
     parseInt(process.env.iterations!),
     parseInt(process.env.keyLength!),
-    process.env.digest
+    process.env.digest as string
   );
   //
   // Payload
@@ -24,7 +27,11 @@ const createLog = (token: any) => {
   const payloadString = JSON.stringify(payload);
 
   // Encrypt
-  const cipher = crypto.createCipheriv(process.env.algorithm, key, iv);
+  const cipher = createCipheriv(
+    process.env.algorithm as CipherGCMTypes,
+    key,
+    iv
+  ) as crypto.CipherCCM;
   const encrypted_data = Buffer.concat([
     cipher.update(payloadString, "utf8"),
     cipher.final(),

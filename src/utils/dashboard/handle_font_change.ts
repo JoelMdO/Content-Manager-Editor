@@ -4,7 +4,7 @@ import {
   deleteFontStyle,
   deleteFontWeight,
 } from "../../store/slices/data_slice";
-import { AppDispatch } from "../../services/store";
+import { AppDispatch } from "../../store/store";
 
 export const handleFontChange = (value: string, dispatch: AppDispatch) => {
   ///========================================================
@@ -18,7 +18,7 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
     const range = selection!.getRangeAt(0);
     const selectedText = range.toString().trim();
     //check if the selected text is inside a <span> element
-    let selectedNode = range.startContainer.nextSibling;
+    const selectedNode = range.startContainer.nextSibling;
     // Traverse up to find the nearest <span>
     let spanNode: HTMLElement | null = selectedNode as HTMLElement;
     while (spanNode && spanNode.tagName !== "SPAN") {

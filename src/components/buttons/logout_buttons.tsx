@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import callHub from "../../services/api/call_hub";
-import { useRouter } from "next/navigation";
-import errorAlert from "../alerts/error";
 import { signOut } from "next-auth/react";
 
 interface LogoButtonProps {
@@ -18,6 +15,7 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
   let heightSet = 80;
   let mt = "md:mt-auto";
   let mb = "md:mb-14";
+  //
   switch (type) {
     case "playbook":
       widthSet = 50;
@@ -34,33 +32,9 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
   }
   // States
   const [isClicked, setIsClicked] = useState(false);
-  const icon = "/door_exit.png";
+  const icon = "/exit.svg";
   const icon_mobile = "/window_exit.png";
-  const url = process.env.NEXT_PUBLIC_url_api;
-  const router = useRouter();
-  ///--------------------------------------------------------
-  // Handle the logout by deleting session storage for dashboard
-  // other cases only loging out is needed.
-  ///--------------------------------------------------------
-  // const handleLogout = async () => {
-  //   signOut({ callbackUrl: "/" });
-  // const response = await callHub("logout");
 
-  // /// Remove sessionStorage.
-  // if (type != "platbook") {
-  //   const dbName = sessionStorage.getItem("db");
-  //   sessionStorage.removeItem(`tempTitle-${dbName}`);
-  //   sessionStorage.removeItem(`tempBody-${dbName}`);
-  // }
-
-  // Response management for all cases
-  // if (response.status !== 200) {
-  //   //   router.push(`${url}/`);
-  //   // } else {
-  //   errorAlert("Logout", "logout", response.message);
-  // }
-  //};
-  //
   ///--------------------------------------------------------
   // UI logout button
   ///--------------------------------------------------------

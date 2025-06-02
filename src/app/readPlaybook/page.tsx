@@ -5,15 +5,17 @@ import BackPageButton from "../../components/buttons/back_page_button";
 import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "../../components/buttons/logo_button";
 import categories from "../../constants/categories";
-import CustomButton from "../../components/buttons/custom_buttons";
+import CustomDashboardButton from "../../components/buttons/customDashboard_button";
 import callHub from "../../services/api/call_hub";
 import dynamic from "next/dynamic";
 import errorAlert from "../../components/alerts/error";
 import { useRouter } from "next/navigation";
 import handleInputChange from "../../utils/readPlaybook/handle_input_change";
 import handleSelectChange from "../../utils/readPlaybook/handle_select_change";
-import { readPlaybookText } from "../../constants/readplaybook_text";
+import text from "../../constants/readPlaybook_data_text.json";
 import withSessionProvider from "../../utils/withSessionProvider";
+import { PlaybookMeta } from "../../types/plabookMeta";
+import "../../styles/readPlaybook.css";
 
 //
 const PlaybookForm = dynamic(
@@ -23,33 +25,22 @@ const PlaybookForm = dynamic(
 //
 
 const ReadPlaybookPage: React.FC = () => {
-  interface Entry {
-    id: string;
-    title: string;
-    category: string;
-    tags: string[];
-    lastUpdated: string;
-    notes?: string;
-    steps?: [];
-    codeSnippets?: [{ code: string; language: string }];
-    references?: [{ title: string; link: string }];
-    loading?: boolean;
-  }
   interface UpdateNoteState {
     isUpdateNote: boolean;
     noteId: string | null;
   }
-  const [entries, setEntries] = useState<Entry[]>([]); // for title, id, category and tags.
+  const [entries, setEntries] = useState<PlaybookMeta[] | undefined>([]); // for title, id, category and tags.
   const [isViewDetails, setViewDetails] = useState<boolean>(false);
   const [isUpdateNote, setUpdateNote] = useState<UpdateNoteState>({
     isUpdateNote: false,
     noteId: "",
   });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [isCreating, setIsCreating] = useState(false);
-  const [isZeroSearchData, setZeroSearchData] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [isZeroSearchData, setZeroSearchData] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isEntryLoading, setEntryLoading] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -63,12 +54,14 @@ const ReadPlaybookPage: React.FC = () => {
 
       setIsLoading(false);
       if (response.status === 200) {
-        const meta = response.body.map((entry: Entry) => ({
-          ...entry,
-          // Add `loading` property to each entry so when button view is clicked
-          // one small loader will be shown.
-          loading: false,
-        }));
+        const meta = Array.isArray(response.body)
+          ? response.body.map((entry: PlaybookMeta) => ({
+              ...entry,
+              // Add `loading` property to each entry so when button view is clicked
+              // one small loader will be shown.
+              loading: false,
+            }))
+          : [];
         setEntries(meta);
       } else if (response.status === 401) {
         errorAlert("", "playbook", response.message, router);
@@ -76,17 +69,18 @@ const ReadPlaybookPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [router]);
 
   /// To filter the entries, which received the first load of data from db once the page is loaded
   /// and also when the user user searchs by search bar, it converts the searchTerm (user value to search)
   /// and in lowercase matches the title or tags and shows the cards.
-  const filteredEntries = entries.filter((entry) => {
+  const filteredEntries = entries!.filter((entry) => {
     const matchesSearch =
       entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.tags.some((tag) =>
+      entry.tags.some((tag: string) =>
         tag.toLowerCase().includes(searchTerm.toLowerCase())
       );
+
     const matchesCategory =
       selectedCategory === "All" || entry.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -96,39 +90,40 @@ const ReadPlaybookPage: React.FC = () => {
   //
 
   //
-  let isMetaToUpdate;
+  let isMetaToUpdate: PlaybookMeta | undefined;
   if (isUpdateNote.isUpdateNote) {
-    const entry = entries.find((e) => e.id === isUpdateNote.noteId);
+    const entry = entries!.find((e) => e.id === isUpdateNote.noteId);
 
     if (entry) {
+      setEntryLoading(true);
       isMetaToUpdate = {
         id: entry.id,
         title: entry.title,
         category: entry.category,
         tags: entry.tags,
         lastUpdated: entry.lastUpdated,
+        notes: entry.notes || "",
         steps: entry.steps || [],
         codeSnippets: entry.codeSnippets || [{ code: "", language: "" }],
         references: entry.references || [{ title: "", link: "" }],
-        notes: entry.notes || "",
       };
     }
   }
 
   //
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-blue">
+    <div className="flex flex-col h-screen overflow-hidden bg-blue diamond-hesitate">
       {/* Header */}
       <header className="bg-blue-600 text-white p-4 shadow-md">
         <div className="mx-auto flex justify-between items-center">
           <div className="flex space-x-4 items-center">
             <BackPageButton />
             <h1 className="font-bold md:text-2xl text-sm">
-              {readPlaybookText.h1}
+              {text.readPlaybook.h1}
             </h1>
           </div>
           <div className="flex gap-2 items-center  mr-1">
-            <CustomButton
+            <CustomDashboardButton
               type="new"
               onClick={() => {
                 setIsCreating(!isCreating);
@@ -163,7 +158,7 @@ const ReadPlaybookPage: React.FC = () => {
                       setSearchTerm,
                       setEntries,
                       setZeroSearchData,
-                      entries
+                      entries!
                     );
                   }}
                   onPaste={async (e) => {
@@ -173,7 +168,11 @@ const ReadPlaybookPage: React.FC = () => {
                       pastedText
                     );
                     if (response.status === 200) {
-                      setEntries(response.message);
+                      setEntries(
+                        Array.isArray(response.message)
+                          ? (response.message as PlaybookMeta[])
+                          : []
+                      );
                     } else {
                     }
                   }}
@@ -182,7 +181,7 @@ const ReadPlaybookPage: React.FC = () => {
 
               <div className="flex-shrink-0">
                 <label htmlFor="category-select" className="sr-only">
-                  {readPlaybookText.label}
+                  {text.readPlaybook.label}
                 </label>
                 <select
                   id="category-select"
@@ -193,8 +192,7 @@ const ReadPlaybookPage: React.FC = () => {
                     handleSelectChange(
                       e.target.value,
                       setEntries,
-                      setZeroSearchData,
-                      entries
+                      setZeroSearchData
                     );
                   }}
                 >
@@ -223,7 +221,7 @@ const ReadPlaybookPage: React.FC = () => {
           />
         ) : isZeroSearchData ? (
           <span className="flex text-xs bg-blue-light text-white px-2 py-1 rounded-full h-auto w-full justify-center">
-            {readPlaybookText.noZeroSearchData_span}
+            {text.readPlaybook.noZeroSearchData_span}
           </span>
         ) : isLoading ? (
           <div className="flex justify-center items-center min-h-[60vh]">
@@ -231,7 +229,7 @@ const ReadPlaybookPage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-            {filteredEntries.map((entry: Entry) => (
+            {filteredEntries.map((entry: PlaybookMeta) => (
               <div
                 key={entry.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden shadow-black"
@@ -266,13 +264,13 @@ const ReadPlaybookPage: React.FC = () => {
                   <div className="text-xs text-gray-600 mb-3">
                     <div className="flex items-center">
                       <Clock size={14} className="mr-1" />
-                      {readPlaybookText.divClock} {entry.lastUpdated}
+                      {text.readPlaybook.divClock} {entry.lastUpdated}
                     </div>
                   </div>
 
                   {/*isViewLoading to show a loader meanwhile the snippets and references are loaded 
                   after button view pressed*/}
-                  {entry.loading! ? (
+                  {isEntryLoading! ? (
                     <div className="flex justify-center items-center min-h-[30%]">
                       <div className="w-6 h-6 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
                     </div>
@@ -281,7 +279,7 @@ const ReadPlaybookPage: React.FC = () => {
                     entry.steps != undefined && (
                       <div className="mb-4" data-cy="viewDetails-Steps-div">
                         <h4 className="font-medium text-sm mb-2">
-                          {readPlaybookText.divSteps}
+                          {text.readPlaybook.divSteps}
                         </h4>
                         <ul className="list-disc pl-5 text-sm text-gray-700">
                           {entry.steps!.map((step, i) => (
@@ -295,7 +293,7 @@ const ReadPlaybookPage: React.FC = () => {
                   {isViewDetails && entry.references != undefined && (
                     <div className="mb-4" data-cy="viewDetails-References-div">
                       <h4 className="font-medium text-sm mb-2">
-                        {readPlaybookText.divReferences}
+                        {text.readPlaybook.divReferences}
                       </h4>
                       <ul className="list-none pl-0 text-sm">
                         {entry.references!.map((ref, i) => (
@@ -316,7 +314,7 @@ const ReadPlaybookPage: React.FC = () => {
                   )}
 
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <CustomButton
+                    <CustomDashboardButton
                       type="view-note"
                       id={`${entry.id}`}
                       setEntries={setEntries}
@@ -335,7 +333,7 @@ const ReadPlaybookPage: React.FC = () => {
       {/* Footer */}
       <footer className="bg-gray-100 w-full flex flex-row text-center text-gray-600 text-sm items-center">
         <div className="mx-auto md:text-base text-[10px]">
-          {readPlaybookText.divFooter}
+          {text.readPlaybook.divFooter}
         </div>
         <LogoButton type="playbook-footer" />
       </footer>

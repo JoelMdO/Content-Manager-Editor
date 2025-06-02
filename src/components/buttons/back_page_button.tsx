@@ -1,19 +1,20 @@
-import { ArrowLeft} from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import text from "../../constants/buttons_data_text.json";
 
 const BackPageButton: React.FC = () => {
- return (
+  return (
     <>
-    <div className="flex items-center ml-2">
+      <div className="flex items-center ml-2">
         <Link href="/home" className="mr-4">
-        <div className="flex items-center text-white hover:text-blue-100">
-        <ArrowLeft size={18} className="mr-1" />
-        <span>Back to Home</span>
-        </div>
+          <div className="flex items-center text-white hover:text-blue-100">
+            <ArrowLeft size={18} className="mr-1" />
+            <span>{text.buttons.backHome}</span>
+          </div>
         </Link>
-    </div>
+      </div>
     </>
- )
-}
+  );
+};
 
 export default BackPageButton;

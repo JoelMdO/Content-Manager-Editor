@@ -3,6 +3,7 @@ import uploadImage from "../../utils/dashboard/images_edit/upload_image";
 import Image from "next/image";
 import successAlert from "../alerts/sucess";
 import errorAlert from "../alerts/error";
+import text from "../../constants/buttons_data_text.json";
 
 interface ButtonProps {
   editorRefs?: React.RefObject<(HTMLDivElement | null)[]>;
@@ -73,7 +74,7 @@ const ImageButton: React.FC<ButtonProps> = ({
           height={12}
           alt="uploaded-image"
         />
-        Add Image
+        {text.buttons.addImage}
       </button>
       <label>
         <input

@@ -1,16 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import "server-only";
 
 const duration = Number(process.env.RATE_LIMIT_WINDOW_MINUTES);
 const limit = Number(process.env.MAX_REQUESTS_PER_WINDOW);
 const req = new Map();
 
-export default async function rateLimit(request: any) {
-  let ip =
+export default async function rateLimit(request: NextRequest) {
+  const ip =
     request.headers.get("x-forwarded-for") ||
     request.headers.get("x-real-ip") ||
     "unknown";
-  let pathname = new URL(request.url).pathname;
+  const pathname = new URL(request.url).pathname;
   const currentTime = Date.now();
 
   if (!ip) {
@@ -43,7 +43,7 @@ export default async function rateLimit(request: any) {
     }
   } catch (error) {
     return new NextResponse(
-      JSON.stringify({ error: "Firebase initialization failed" }),
+      JSON.stringify({ error: `Firebase initialization failed: ${error}` }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }

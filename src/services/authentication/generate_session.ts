@@ -2,8 +2,12 @@ import "server-only";
 import admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid";
 import createLog from "./create_log";
+import { generateSessionType } from "@/types/generateSession";
+import crypto from "crypto";
 
-async function generateSession(token: string): Promise<any> {
+async function generateSession(
+  token: string
+): Promise<generateSessionType | { status: number; message: string }> {
   ///==================================================
   /// Initialize SDK for server
   ///--------------------------------------------------
@@ -47,7 +51,7 @@ async function generateSession(token: string): Promise<any> {
   // Generate the session
   //==================================================
   const sessionId = uuidv4();
-  const body_session: Object = {
+  const body_session: object = {
     log,
     createdAt: Date.now(),
     validUntil: Date.now() + 60 * 60 * 1000, // 1 hour
@@ -55,10 +59,11 @@ async function generateSession(token: string): Promise<any> {
   //==================================================
   // Hash session ID
   //==================================================
-  const crypto = require("crypto");
   const hash = crypto.createHash(process.env.HASH_ALGORITHM!);
   hash.update(sessionId);
-  const hashedSessionId = hash.digest(process.env.HASH_DIGEST!);
+  const hashedSessionId = hash.digest(
+    process.env.HASH_DIGEST! as crypto.BinaryToTextEncoding
+  );
   //==================================================
   // Encrypt Payload
   //==================================================

@@ -1,11 +1,12 @@
+import { PlaybookMeta } from "../../types/plabookMeta";
 import debouncedSearch from "./debounce_search";
 
 async function handleInputChange(
   selectValue: string,
   setSearchTerm: (selectValue: string) => void,
-  setEntries: (entries: any) => void,
+  setEntries: (entries: PlaybookMeta[] | undefined) => void,
   setZeroSearchData: (isZeroSearchData: boolean) => void,
-  entries: any[]
+  entries: PlaybookMeta[]
 ) {
   setEntries([]);
   setSearchTerm(selectValue);

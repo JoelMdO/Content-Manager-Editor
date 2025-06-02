@@ -1,9 +1,9 @@
+import crypto, { CipherGCMTypes, createDecipheriv } from "crypto";
 const readLog = (session: string) => {
   ///========================================================
   // Function to read the lgo
   ///========================================================
   //
-  const crypto = require("crypto");
   const buffer = Buffer.from(session, "base64");
   const saltLength = Number(process.env.saltLength);
   const ivLength = Number(process.env.ivLength);
@@ -38,7 +38,7 @@ const readLog = (session: string) => {
     salt,
     Number(process.env.iterations!),
     Number(process.env.keyLength!),
-    process.env.digest
+    process.env.digest!
   );
   //
   if (!iv || iv.length !== ivLength) {
@@ -47,9 +47,13 @@ const readLog = (session: string) => {
     );
   }
   // Decifer the data
-  const decipher = crypto.createDecipheriv(process.env.algorithm, key, iv);
+  const decipher = createDecipheriv(
+    process.env.algorithm as CipherGCMTypes,
+    key,
+    iv
+  ) as crypto.DecipherGCM;
   decipher.setAuthTag(tag);
-  let decrypted = decipher.update(encryptedData, "binary", "utf8");
+  let decrypted = decipher.update(encryptedData, undefined, "utf8");
   decrypted += decipher.final("utf8"); // Complete the decryption
   decrypted = decrypted
     .trim()
@@ -61,16 +65,12 @@ const readLog = (session: string) => {
   const exp = parsed.exp; // from your token
   const now = Date.now();
   const margin = 2 * 60 * 1000; // 2 minutes in milliseconds
-  console.log("exp", exp);
 
   // Check 1: Is the token expired?
   const isExpired = now > exp;
-  console.log("isExpired", isExpired);
-  console.log("isWithin2Minutes", exp - now <= margin);
 
   // Check 2: Is it within the 2-minute valid range?
   const isWithin2Minutes = exp - now <= margin && !isExpired;
-  console.log("isWithin2Minutes 2", isWithin2Minutes);
 
   if (isExpired || !isWithin2Minutes) {
     return false;
