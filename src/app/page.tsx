@@ -60,7 +60,8 @@ const Login: React.FC = () => {
             alt="CMS Title"
             width={52}
             height={52}
-            className="w-52 h-52 md:w-[18rem] md:h-[15rem] mb-4"
+            quality={100}
+            className="md:w-[18rem] md:h-[15rem] mb-4"
           />
           <h1 className="text-2xl font-bold pb-4">{text.mainPage.welcome}</h1>
           <form
