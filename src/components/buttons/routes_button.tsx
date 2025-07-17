@@ -11,7 +11,6 @@ const RouteButton: React.FC<RouteButtonProps> = ({
 }) => {
   //
   const router = useRouter();
-  const url = process.env.NEXT_PUBLIC_url_api;
   let path: string = "";
   let label: string = "";
   let features: string = "bg-gray-500 text-white";
@@ -38,9 +37,9 @@ const RouteButton: React.FC<RouteButtonProps> = ({
   //
   const handleClick = () => {
     if (type === "with-item-playbook") {
-      router.push(`${url}${path}?modal=true`);
+      router.push(`${path}?modal=true`);
     } else {
-      router.push(`${url}${path}`);
+      router.push(path);
     }
   };
   //

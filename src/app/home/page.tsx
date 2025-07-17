@@ -6,6 +6,8 @@ import InopButton from "@/components/buttons/inop_button";
 import RouteButton from "@/components/buttons/routes_button";
 import text from "../../constants/homePage_data_text.json";
 
+import withSessionProvider from "../../utils/withSessionProvider";
+
 const Home: React.FC = () => {
   const [thereIsPlaybook, setThereIsPlaybook] = useState<boolean>(false);
   ///--------------------------------------------------------
@@ -78,4 +80,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default withSessionProvider(Home);

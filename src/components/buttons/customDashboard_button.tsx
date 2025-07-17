@@ -39,7 +39,6 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
   resetForm,
 }) => {
   const textSmallSize = "text-[0.60rem]";
-  const url = process.env.NEXT_PUBLIC_url_api!;
   const router = useRouter();
 
   const [isClicked, setIsClicked] = useState(false);
@@ -91,7 +90,7 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
               response.message === "User not authenticated"
             ) {
               errorAlert("saved", "nonauth", response.message);
-              router.push(`${url}/`);
+              router.push("/");
             } else {
               errorAlert("saved", "non200", response.message);
             }
@@ -154,7 +153,6 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
     resetForm,
     setIsCreating,
     router,
-    url,
   ]);
   //
   ///--------------------------------------------------------
