@@ -97,11 +97,22 @@ const Login: React.FC = () => {
           </form>
           <button
             type="button"
-            onClick={() => {
+            onClick={async () => {
               setIsSubmittedGoogle(true);
-              signIn("google", { callbackUrl: "/home" });
+              try {
+                // Optimized sign-in with immediate redirect
+                await signIn("google", { 
+                  callbackUrl: "/home",
+                  redirect: true 
+                });
+              } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error("Google sign-in error:", error);
+                setIsSubmittedGoogle(false);
+              }
             }}
             className="bg-blue-light text-white rounded-lg md:w-[170px] h-[30px] w-[120px] mt-5 flex justify-center items-center shadow-md shadow-dark-background"
+            disabled={isSubmittedGoogle}
           >
             <div className="flex flex-row">
               {isSubmittedGoogle ? null : (

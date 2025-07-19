@@ -7,6 +7,19 @@ import { authOptions } from "../../../lib/nextauth/auth";
 import createLog from "../../../services/authentication/create_log";
 import { dataType } from "@/types/dataType";
 
+// Session cache to reduce expensive getServerSession calls
+const sessionCache = new Map<string, { session: object | null; expires: number }>();
+
+// Clear expired sessions every 2 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of sessionCache.entries()) {
+    if (value.expires < now) {
+      sessionCache.delete(key);
+    }
+  }
+}, 2 * 60 * 1000);
+
 export async function POST(req: Request): Promise<NextResponse> {
   //
   let dataApiHub: dataType = "";
@@ -45,19 +58,75 @@ export async function POST(req: Request): Promise<NextResponse> {
       }
     }
     ///--------------------------------------------------------
-    // Check if the request is authenticated
+    // Optimized session check with caching
     ///--------------------------------------------------------
+    
+    // Skip session check for sign-in requests
+    if (type === "sign-in-by-email") {
+      // Fast path for login requests
+      const statusSanitize = await sanitizeData(dataApiHub, type);
+      
+      if (statusSanitize.status != 200) {
+        return NextResponse.json({ status: 403, message: "Unauthorized data" });
+      }
+      
+      if (
+        typeof statusSanitize.message === "object" &&
+        statusSanitize.message !== null &&
+        "email" in statusSanitize.message
+      ) {
+        dataApiHub = {
+          email: (statusSanitize.message as { email: string }).email,
+          password: (statusSanitize.message as { password: string }).password,
+        };
+      } else {
+        return NextResponse.json({
+          status: 400,
+          message: "Invalid sanitized data for sign-in-by-email",
+        });
+      }
+      
+      const response = await apiRoutes({
+        token: undefined,
+        data: dataApiHub,
+        type: type,
+      });
 
-    const session = await getServerSession(authOptions);
+      const jsonResponse = await response.json();
+      return NextResponse.json({
+        status: jsonResponse.status,
+        message: jsonResponse.message,
+      });
+    }
 
-    if (!session && type !== "sign-in-by-email") {
+    // For other requests, check session with caching
+    const sessionCacheKey = req.headers.get("authorization") || req.headers.get("cookie") || "default";
+    let session = null;
+    
+    const cached = sessionCache.get(sessionCacheKey);
+    if (cached && cached.expires > Date.now()) {
+      session = cached.session;
+    } else {
+      session = await getServerSession(authOptions);
+      
+      // Cache valid sessions for 30 seconds to reduce Firebase calls
+      if (session) {
+        sessionCache.set(sessionCacheKey, {
+          session,
+          expires: Date.now() + 30 * 1000
+        });
+      }
+    }
+
+    if (!session) {
       return NextResponse.json({
         status: 401,
         message: "User without a valid session",
       });
     }
 
-    if (session && type !== "sign-in-by-email") {
+    // Generate token only when needed
+    if (session) {
       token = createLog(session?.user.id);
     }
 
@@ -94,26 +163,6 @@ export async function POST(req: Request): Promise<NextResponse> {
       ///--------------------------------------------------------
       case "playbook-save":
         dataApiHub = statusSanitize.message as dataType;
-        break;
-      ///--------------------------------------------------------
-      // Sign in by email
-      ///--------------------------------------------------------
-      case "sign-in-by-email":
-        if (
-          typeof statusSanitize.message === "object" &&
-          statusSanitize.message !== null &&
-          "email" in statusSanitize.message
-        ) {
-          dataApiHub = {
-            email: (statusSanitize.message as { email: string }).email,
-            password: (statusSanitize.message as { password: string }).password,
-          };
-        } else {
-          return NextResponse.json({
-            status: 400,
-            message: "Invalid sanitized data for sign-in-by-email",
-          });
-        }
         break;
       case "post":
         formData.append("session", sessionId || "");
