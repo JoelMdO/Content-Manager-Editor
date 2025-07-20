@@ -9,6 +9,7 @@ import Loader from "../components/buttons/loader_saving";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import text from "../constants/mainPage_data_text.json";
+import Dashboard from "./dashboard/page";
 
 const Login: React.FC = () => {
   ///===================================================
@@ -19,6 +20,7 @@ const Login: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isSubmittedGoogle, setIsSubmittedGoogle] = useState<boolean>(false);
   const router = useRouter();
+  const isDev = process.env.NEXT_PUBLIC_NODE_ENV === "development";
   ///--------------------------------------------------------
   //handleLogin with Firebase authentication
   ///--------------------------------------------------------
@@ -48,6 +50,10 @@ const Login: React.FC = () => {
   /// UI with a login form and a contact button for the
   /// user to reach the software engineer.
   ///--------------------------------------------------------
+  if (isDev) {
+    // Directly render dashboard for development
+    return <Dashboard />;
+  }
   return (
     <>
       <div className="relative w-full min-h-screen flex flex-col justify-center px-4 sm:px-8 md:px-16">

@@ -9,6 +9,7 @@ import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore"
 import { handleContentChange } from "../../utils/dashboard/handle_content_change";
 import dbSelector from "../../components/alerts/db_selector";
 import HomeButton from "../../components/buttons/home_button";
+import SectionSelector from "@/components/sections_selector";
 
 const ImageButton = dynamic(
   () => import("../../components/buttons/image_button"),
@@ -27,18 +28,24 @@ const CustomDashboardButton = dynamic(
   { ssr: false }
 );
 
-const ArticlePage: React.FC = () => {
+const Dashboard: React.FC = () => {
   //
-  const [theTitle, setTheTitle] = useState<string>("");
-  const [theBody, setTheBody] = useState<string>("");
+  // const [theTitle, setTheTitle] = useState<string>("");
+  // const [theBody, setTheBody] = useState<string>("");
   const [isPlaceHolderTitle, setPlaceHolderTitle] = useState<boolean>(true);
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
+  const [selectedSection, setSelectedSection] =
+    useState<string>("Select category");
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pageRef = useRef(null);
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
   const dbNameToSearch = useRef<string>("DeCav");
+
+  //
+  let theTitle = savedTitleRef.current;
+  let theBody = savedBodyRef.current;
   //
   ///======================================================
   // Check if an article is already created on page load
@@ -81,16 +88,16 @@ const ArticlePage: React.FC = () => {
   ///========================================================
   // Update the DOM if a previous article session is saved.
   ///========================================================
-  useEffect(() => {
-    if (savedTitleRef.current) {
-      setTheTitle(savedTitleRef.current);
-      setPlaceHolderTitle(false);
-      if (savedBodyRef.current) {
-        setTheBody(savedBodyRef.current);
-        setPlaceHolderArticle(false);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (savedTitleRef.current) {
+  //     setTheTitle(savedTitleRef.current);
+  //     setPlaceHolderTitle(false);
+  //     if (savedBodyRef.current) {
+  //       setTheBody(savedBodyRef.current);
+  //       setPlaceHolderArticle(false);
+  //     }
+  //   }
+  // }, []);
   //
   ///======================================================
   /// UI Editor with a menu with options to insert images,
@@ -104,13 +111,18 @@ const ArticlePage: React.FC = () => {
         className="flex flex-col md:flex-row h-screen bg-black"
       >
         {/* Left Menu on Tablet / Desktop*/}
-        <aside className="hidden w-[25%] h-full bg-gray-800 text-white md:flex items-center flex-col">
+        <aside className="hidden w-[25%] h-full gap-y-2 bg-gray-800 text-white md:flex items-center flex-col">
           <ImageButton
             editorRefs={editorRefs}
             index={1}
             data-cy={"image-button"}
           />
           <LinkButton editorRefs={editorRefs} index={1} data-cy="link-button" />
+          <SectionSelector
+            db={dbNameToSearch.current}
+            selectedSection={selectedSection}
+            setSelectedSection={setSelectedSection}
+          />
           <FontStyleUI />
           <CustomDashboardButton
             type="post"
@@ -119,7 +131,13 @@ const ArticlePage: React.FC = () => {
           />
           <CustomDashboardButton
             type="clear"
-            onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
+            // onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
+            onClick={() => {
+              handleClear(editorRefs);
+              theTitle = "";
+              theBody = "";
+              setSelectedSection("Select category");
+            }}
           />
           <HomeButton />
           <LogOutButton />
@@ -131,9 +149,20 @@ const ArticlePage: React.FC = () => {
               <ImageButton editorRefs={editorRefs} index={1} />
               <LinkButton editorRefs={editorRefs} index={1} />
             </div>
+            <SectionSelector
+              db={dbNameToSearch.current}
+              selectedSection={selectedSection}
+              setSelectedSection={setSelectedSection}
+            />
             <CustomDashboardButton
               type="clear"
-              onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
+              // onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
+              onClick={() => {
+                handleClear(editorRefs);
+                theTitle = "";
+                theBody = "";
+                setSelectedSection("Select category");
+              }}
             />
           </div>
           <FontStyleUI />
@@ -195,4 +224,4 @@ const ArticlePage: React.FC = () => {
   );
 };
 
-export default ArticlePage;
+export default Dashboard;
