@@ -1,8 +1,8 @@
 import deleteImageFromIndexDB from "./images_edit/delete_img_from_indexdb";
 
 export const handleClear = (
-  setTheTitle: (value: string) => void,
-  setTheBody: (value: string) => void,
+  // setTheTitle: (value: string) => void,
+  // setTheBody: (value: string) => void,
   editorRefs: React.RefObject<(HTMLDivElement | null)[]>
 ) => {
   ///======================================================
@@ -10,8 +10,8 @@ export const handleClear = (
   ///======================================================
 
   // Clear title and body state
-  setTheTitle("");
-  setTheBody("");
+  // setTheTitle("");
+  // setTheBody("");
 
   // Remove session storage items
   const dbName = sessionStorage.getItem("db");

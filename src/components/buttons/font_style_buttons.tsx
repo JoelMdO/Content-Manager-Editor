@@ -11,7 +11,7 @@ const FontStyleUI: React.FC = () => {
 
   return (
     <>
-      <div className="mt-4 flex flex-col justify-center items-center md:justify-normal md:items-start">
+      <div className="mt-4 flex flex-col justify-center items-center md:justify-normal md:items-start mb-4">
         <span className="text-white md:text-base text-xs flex justify-center">
           {text.buttons.fontStyle}
         </span>
