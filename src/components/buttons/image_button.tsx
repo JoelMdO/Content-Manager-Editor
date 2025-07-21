@@ -57,7 +57,7 @@ const ImageButton: React.FC<ButtonProps> = ({
     <>
       <button
         type="button"
-        className={`h-[40px] w-[9em] shadow-md shadow-black ${
+        className={`h-[30px] md:h-[40px] w-[9em] shadow-md shadow-black ${
           saveButtonClicked ? "bg-cream" : "bg-blue"
         } hover:bg-green ${
           saveButtonClicked ? "text-black" : "text-white"
