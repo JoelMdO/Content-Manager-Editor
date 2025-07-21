@@ -1,15 +1,16 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import Image from "next/image";
-import successAlert from "../alerts/sucess";
-import errorAlert from "../alerts/error";
+// import successAlert from "../alerts/sucess";
+// import errorAlert from "../alerts/error";
 import { useRouter } from "next/navigation";
-import saveButtonClicked from "../../utils/buttons/save_button_clicked";
-import emailMe from "@/utils/buttons/email_me";
-import handleNoteClick from "../../utils/playbook/handle_note_click";
+// import saveButtonClicked from "../../utils/buttons/save_button_clicked";
+// import emailMe from "@/utils/buttons/email_me";
+// import handleNoteClick from "../../utils/playbook/handle_note_click";
 import { PlaybookMeta } from "../../types/plabookMeta";
 import { RootState } from "@/store/store";
 import { custommButtonStyle } from "../../styles/custom_buttom_style";
+import { buttonLogic } from "@/utils/buttons/customDash_logic";
 
 interface ButtonProps {
   type: string;
@@ -24,6 +25,8 @@ interface ButtonProps {
   setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
   "data-cy"?: string;
   resetForm?: () => void;
+  DRAFT_KEY?: (db: string) => string;
+  dbNameToSearch?: string; // Optional prop for dbNameToSearch
 }
 
 const CustomDashboardButton: React.FC<ButtonProps> = ({
@@ -37,6 +40,8 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
   setIsCreating,
   "data-cy": dataCity,
   resetForm,
+  DRAFT_KEY,
+  dbNameToSearch,
 }) => {
   const textSmallSize = "text-[0.60rem]";
   const router = useRouter();
@@ -68,91 +73,38 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
   // Function to handle the cases of the CustomDashBoardButton
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
-    onClick?.();
-
-    switch (type) {
-      case "post":
-        setIsClicked(true);
-        saveButtonClicked(italic, bold)
-          .then((response) => {
-            setIsClicked(false);
-            if (response.status === 200) {
-              successAlert("saved");
-              if (response.body) {
-                const dbName = sessionStorage.getItem("db");
-                const articleContent = JSON.parse(
-                  sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-                );
-                articleContent.push({ type: "body", content: response.body });
-              }
-            } else if (
-              response.status === 401 ||
-              response.message === "User not authenticated"
-            ) {
-              errorAlert("saved", "nonauth", response.message);
-              router.push("/");
-            } else {
-              errorAlert("saved", "non200", response.message);
-            }
-          })
-          .catch((error) => {
-            setIsClicked(false);
-            errorAlert("saved", "error", error);
-          });
-        break;
-      case "logo":
-        emailMe();
-        break;
-      case "view-note":
-        const toggleMode = noteViewMode === "view" ? "edit" : "view";
-        setNoteViewMode(toggleMode);
-        if (noteViewMode === "view") {
-          setEntries?.((prev) =>
-            prev!.map((entry) =>
-              entry.id === id ? { ...entry, loading: true } : entry
-            )
-          );
-          handleNoteClick(id!).then((meta) => {
-            setViewDetails?.(true);
-            setEntries?.((prev) =>
-              prev!.map((entry) =>
-                entry.id === id ? { ...entry, loading: false } : entry
-              )
-            );
-            if (meta) {
-              setEntries?.((prev) =>
-                prev!.map((entry) => (entry.id === id ? meta : entry))
-              );
-            }
-          });
-        } else {
-          setUpdateNote?.({ isUpdateNote: true, noteId: id! });
-        }
-        break;
-      case "updatePlaybook":
-        setUpdateNote?.({ isUpdateNote: false, noteId: "" });
-        break;
-      case "new-playbook":
-        resetForm?.();
-        router.push("/home");
-        break;
-      case "new-playbook-at-readplaybook":
-        setIsCreating?.(false);
-        break;
-    }
+    buttonLogic({
+      type,
+      setIsClicked,
+      italic,
+      bold,
+      router,
+      noteViewMode,
+      setNoteViewMode,
+      setEntries,
+      setViewDetails,
+      setUpdateNote,
+      id,
+      resetForm,
+      setIsCreating,
+      onClick,
+      DRAFT_KEY,
+      dbNameToSearch,
+    });
   }, [
     type,
-    onClick,
-    noteViewMode,
+    setIsClicked,
     italic,
     bold,
-    id,
+    router,
+    noteViewMode,
+    setNoteViewMode,
     setEntries,
     setViewDetails,
     setUpdateNote,
+    id,
     resetForm,
     setIsCreating,
-    router,
   ]);
   //
   ///--------------------------------------------------------

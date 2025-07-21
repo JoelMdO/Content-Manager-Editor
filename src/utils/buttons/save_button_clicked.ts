@@ -17,6 +17,8 @@ const saveButtonClicked = async (italic: string[], bold: string[]) => {
   );
 
   const response = await callHub("post", articleContent);
+  sessionStorage.clear();
+  localStorage.clear();
   return response;
   //}
 };
