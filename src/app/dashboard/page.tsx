@@ -27,7 +27,9 @@ const CustomDashboardButton = dynamic(
   () => import("../../components/buttons/customDashboard_button"),
   { ssr: false }
 );
+//
 
+//
 const Dashboard: React.FC = () => {
   //
   // const [theTitle, setTheTitle] = useState<string>("");
@@ -42,6 +44,7 @@ const Dashboard: React.FC = () => {
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
   const dbNameToSearch = useRef<string>("DeCav");
+  const DRAFT_KEY = (db: string) => `articleContent-${db}`;
 
   //
   let theTitle = savedTitleRef.current;
@@ -59,23 +62,51 @@ const Dashboard: React.FC = () => {
     dbNameToSearch.current =
       sessionStorage.getItem("db") || dbNameToSearch.current;
     articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
+    console.log("Article found in sessionStorage:", articleStored);
 
-    if (articleStored != null || articleStored != undefined) {
-      articleStored = sessionStorage.getItem(
-        `articleContent-${dbNameToSearch}`
+    if (!articleStored) {
+      //Check localStorage for the article content
+      console.log(
+        "No article found in sessionStorage, checking localStorage..."
       );
 
-      const jsonArticle = JSON.parse(articleStored!);
-      savedTitleRef.current = jsonArticle[0]?.content || "";
-      savedBodyRef.current = jsonArticle[2]?.content || "";
-      // Remove the sesstion Storage after the page is mounted and if exist the article is created
-      sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
-      sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
-      sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
+      articleStored = localStorage.getItem(DRAFT_KEY(dbNameToSearch.current));
+      console.log("Article found in localStorage:", articleStored);
     }
+
+    // articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
+
+    const jsonArticle = JSON.parse(articleStored!);
+    savedTitleRef.current = jsonArticle[0]?.content || "";
+    savedBodyRef.current = jsonArticle[2]?.content || "";
+    // Remove the sesstion Storage after the page is mounted and if exist the article is created
+    sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
+    sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
+    sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
   }, []);
   //
+  // Save to localStorage every 10 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const draft = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
+      if (draft) {
+        localStorage.setItem(DRAFT_KEY(dbNameToSearch.current), draft);
+      }
+    }, 600000); // 10 minutes
+    return () => clearInterval(interval);
+  }, []);
 
+  // Save to localStorage on tab/browser close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const draft = sessionStorage.getItem(DRAFT_KEY(dbNameToSearch.current));
+      if (draft) {
+        localStorage.setItem(DRAFT_KEY(dbNameToSearch.current), draft);
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
   ///---------------------------------------------------
   //  Cleanup debounce on unmount
   ///---------------------------------------------------
@@ -110,7 +141,7 @@ const Dashboard: React.FC = () => {
         ref={pageRef}
         className="flex flex-col md:flex-row h-screen bg-black"
       >
-        {/* Left Menu on Tablet / Desktop*/}
+        {/* TABLET / DESKTOP */}
         <aside className="hidden w-[25%] h-full gap-y-2 bg-gray-800 text-white md:flex items-center flex-col">
           <ImageButton
             editorRefs={editorRefs}
@@ -125,9 +156,9 @@ const Dashboard: React.FC = () => {
           />
           <FontStyleUI />
           <CustomDashboardButton
-            type="post"
-            data-cy={"submit-article"}
-            onClick={() => handleSave(debouncedUpdateStore)}
+            type="save"
+            DRAFT_KEY={DRAFT_KEY}
+            dbNameToSearch={dbNameToSearch.current}
           />
           <CustomDashboardButton
             type="clear"
@@ -139,10 +170,15 @@ const Dashboard: React.FC = () => {
               setSelectedSection("Select category");
             }}
           />
+          <CustomDashboardButton
+            type="post"
+            data-cy={"submit-article"}
+            onClick={() => handleSave(debouncedUpdateStore)}
+          />
           <HomeButton />
           <LogOutButton />
         </aside>
-        {/* Menu Mobile*/}
+        {/* MENU MOBILE */}
         <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row">
           <div className="flex items-center flex-col">
             <div className="flex flex-row space-x-2">
@@ -154,16 +190,23 @@ const Dashboard: React.FC = () => {
               selectedSection={selectedSection}
               setSelectedSection={setSelectedSection}
             />
-            <CustomDashboardButton
-              type="clear"
-              // onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
-              onClick={() => {
-                handleClear(editorRefs);
-                theTitle = "";
-                theBody = "";
-                setSelectedSection("Select category");
-              }}
-            />
+            <div className="flex flex-row w-auto space-x-2">
+              <CustomDashboardButton
+                type="clear"
+                // onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
+                onClick={() => {
+                  handleClear(editorRefs);
+                  theTitle = "";
+                  theBody = "";
+                  setSelectedSection("Select category");
+                }}
+              />
+              <CustomDashboardButton
+                type="save"
+                DRAFT_KEY={DRAFT_KEY}
+                dbNameToSearch={dbNameToSearch.current}
+              />
+            </div>
           </div>
           <FontStyleUI />
           <div className="flex flex-col justify-center gap-y-2 items-center">
@@ -176,7 +219,7 @@ const Dashboard: React.FC = () => {
           </div>
         </nav>
         {/* Main Content */}
-        <main className="flex-1 p-4 pt-2 md:w-[75%] overflow-y-auto h-screen">
+        <main className="flex-1 p-4 pt-2 h-[80dvh] md:w-[80dvh] overflow-y-auto">
           <div className="border border-gray-600 border-1px">
             {["Title", "Article"].map((placeholder, index) => (
               // <div key={index} style={{ userSelect: "text", cursor: "text" }}
@@ -188,9 +231,9 @@ const Dashboard: React.FC = () => {
                   }
                 }}
                 className={`${
-                  placeholder === "Title" ? "h-[10%]" : "h-[100vh]"
-                } ${
-                  placeholder === "Title" ? "font-bold" : "font-normal"
+                  placeholder === "Title"
+                    ? "h-[10dvh] font-bold"
+                    : "h-[70dvh] font-normal overflow-auto"
                 } p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
                 contentEditable={true}
                 onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs)}
