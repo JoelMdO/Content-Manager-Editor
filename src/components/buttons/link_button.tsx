@@ -39,7 +39,7 @@ const LinkButton: React.FC<LinkButtonProps> = ({
     <>
       <button
         type="button"
-        className={`h-[40px] w-[9em] shadow-md shadow-black bg-blue hover:bg-green text-white text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`}
+        className={`h-[30px] md:h-[40px] w-[9em] shadow-md shadow-black bg-blue hover:bg-green text-white text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-4`}
         data-cy={dataCy}
         onClick={() => dialogRef.current?.showModal()}
       >
