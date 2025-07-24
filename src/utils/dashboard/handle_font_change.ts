@@ -1,17 +1,25 @@
-import {
-  addFontStyle,
-  addFontWeight,
-  deleteFontStyle,
-  deleteFontWeight,
-} from "../../store/slices/data_slice";
-import { AppDispatch } from "../../store/store";
+// import {
+//   addFontStyle,
+//   addFontWeight,
+//   deleteFontStyle,
+//   deleteFontWeight,
+// } from "../../store/slices/data_slice";
+// import { AppDispatch } from "../../store/store";
 
-export const handleFontChange = (value: string, dispatch: AppDispatch) => {
+import { ButtonProps } from "@/components/Menu/Menu Button/type/menu_button_type";
+import { set } from "cypress/types/lodash";
+
+// export const handleFontChange = (value: string, dispatch: AppDispatch) => {
+export const handleFontChange = (
+  value: string
+  // setIsFontStylePressed: React.Dispatch<React.SetStateAction<boolean>>
+) => {
   ///========================================================
   // Function to handle when the user select text and wants to
   // change the font style to Bold or Italic.
   ///========================================================
   //
+  // setIsFontStyleOpen(false);
   const selection = window.getSelection();
   if (selection!.rangeCount! > 0) {
     //get range of text selected
@@ -27,6 +35,38 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
     //
     let fontWeight: string = "normal";
     let fontStyle: string = "normal";
+    ///--------------------------------------------------------
+    // Helper for font style to facilitate parsing to markdown
+    ///--------------------------------------------------------
+    // Helper: set data attribute for markdown parsing
+    const setMarkdownAttr = (
+      span: HTMLElement,
+      type: "bold" | "italic" | "underline",
+      enabled: boolean
+    ) => {
+      if (type === "bold") {
+        span.style.fontWeight = enabled ? "bold" : "normal";
+        if (enabled) {
+          span.classList.add("bold");
+        } else {
+          span.classList.remove("bold");
+        }
+      } else if (type === "italic") {
+        span.style.fontStyle = enabled ? "italic" : "normal";
+        if (enabled) {
+          span.classList.add("italic");
+        } else {
+          span.classList.remove("italic");
+        }
+      } else {
+        span.style.textDecoration = enabled ? "underline" : "normal";
+        if (enabled) {
+          span.classList.add("underline");
+        } else {
+          span.classList.remove("underline");
+        }
+      }
+    };
     //First to check if the text has already and style
     //and if text inside a <span> element with the type of font weight.
     if (spanNode && spanNode.tagName === "SPAN") {
@@ -35,19 +75,34 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
         case "italic":
           if (spanNode.style.fontStyle === "normal") {
             spanNode.style.fontStyle = "italic";
-            dispatch(addFontStyle({ text }));
+            setMarkdownAttr(spanNode, "italic", true);
+            // dispatch(addFontStyle({ text }));
           } else {
             spanNode.style.fontStyle = "normal";
-            dispatch(deleteFontStyle({ text }));
+            setMarkdownAttr(spanNode, "italic", false);
+            // dispatch(deleteFontStyle({ text }));
           }
           break;
         case "bold":
           if (spanNode.style.fontWeight === "normal") {
             spanNode.style.fontWeight = "bold";
-            dispatch(addFontWeight({ text }));
+            setMarkdownAttr(spanNode, "bold", true);
+            // dispatch(addFontWeight({ text }));
           } else {
             spanNode.style.fontWeight = "normal";
-            dispatch(deleteFontWeight({ text }));
+            setMarkdownAttr(spanNode, "bold", false);
+            // dispatch(deleteFontWeight({ text }));
+          }
+          break;
+        case "underline":
+          if (spanNode.style.fontWeight === "normal") {
+            spanNode.style.fontWeight = "underline";
+            setMarkdownAttr(spanNode, "underline", true);
+            // dispatch(addFontWeight({ text }));
+          } else {
+            spanNode.style.fontWeight = "normal";
+            setMarkdownAttr(spanNode, "underline", false);
+            // dispatch(deleteFontWeight({ text }));
           }
           break;
         default:
@@ -77,13 +132,13 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
       range.insertNode(span);
       span.appendChild(extractedContent);
       //Update redux with text and style
-      const newText = selectedText ?? "";
-      if (fontStyle === "italic") {
-        dispatch(addFontStyle({ text: newText }));
-      }
-      if (fontWeight === "bold") {
-        dispatch(addFontWeight({ text: newText }));
-      }
+      // const newText = selectedText ?? "";
+      // if (fontStyle === "italic") {
+      //   dispatch(addFontStyle({ text: newText }));
+      // }
+      // if (fontWeight === "bold") {
+      //   dispatch(addFontWeight({ text: newText }));
+      // }
     }
   }
 };

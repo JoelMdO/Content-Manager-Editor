@@ -1,54 +1,59 @@
 "use client";
-import React, { useRef, useState, useEffect } from "react";
-import { handleKeyBoardActions } from "../../utils/dashboard/handle_keyboard_actions";
-import dynamic from "next/dynamic";
-import { handleClear } from "../../utils/dashboard/handler_clear";
-import { handleSave } from "../../utils/dashboard/handle_save";
-import LogOutButton from "../../components/buttons/logout_buttons";
-import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
-import { handleContentChange } from "../../utils/dashboard/handle_content_change";
-import dbSelector from "../../components/alerts/db_selector";
-import HomeButton from "../../components/buttons/home_button";
-import SectionSelector from "@/components/sections_selector";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  // createContext,
+  // useContext,
+} from "react";
+import MenuContext from "../../utils/context/menu_context";
+// Remove ButtonProps import, not needed for context
 
-const ImageButton = dynamic(
-  () => import("../../components/buttons/image_button"),
-  { ssr: false }
+import dynamic from "next/dynamic";
+import dbSelector from "../../components/alerts/db_selector";
+import { ButtonProps } from "@/components/Menu/Menu Button/type/menu_button_type";
+const LogOutButton = dynamic(
+  () => import("../../components/buttons/logout_buttons")
 );
-const LinkButton = dynamic(
-  () => import("../../components/buttons/link_button"),
-  { ssr: false }
+const HomeButton = dynamic(
+  () => import("../../components/buttons/home_button")
 );
-const FontStyleUI = dynamic(
-  () => import("../../components/buttons/font_style_buttons"),
-  { ssr: false }
-);
-const CustomDashboardButton = dynamic(
-  () => import("../../components/buttons/customDashboard_button"),
-  { ssr: false }
+const MenuDesktop = dynamic(() => import("../../components/Menu/menu_desktop"));
+const MenuMobile = dynamic(() => import("@/components/Menu/menu_mobile"));
+
+const DashboardEditor = dynamic(
+  () => import("../../components/dashboard_editor")
 );
 //
+// const MenuContext = createContext<Partial<ButtonProps> | null>(null);
 
+// Do not export useMenuContext from this file
 //
 const Dashboard: React.FC = () => {
   //
-  // const [theTitle, setTheTitle] = useState<string>("");
-  // const [theBody, setTheBody] = useState<string>("");
   const [isPlaceHolderTitle, setPlaceHolderTitle] = useState<boolean>(true);
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const [selectedSection, setSelectedSection] =
-    useState<string>("Select category");
-  const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const pageRef = useRef(null);
+    useState<string>("Select category"); // TODO check if its necesary
+  const [isFontStyleOpen, setIsFontStyleOpen] = useState<boolean>(false);
+  const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
   const dbNameToSearch = useRef<string>("DeCav");
-  const DRAFT_KEY = (db: string) => `articleContent-${db}`;
+  const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const pageRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const sectionsDialogRef = useRef<HTMLDialogElement | null>(null);
+  const stylesDialogRef = useRef<HTMLDialogElement | null>(null);
+  //
+  let DRAFT_KEY: string = "";
+  //
+  // let theTitle = savedTitleRef.current || "";
+  // let theBody = savedBodyRef.current || "";
 
   //
-  let theTitle = savedTitleRef.current;
-  let theBody = savedBodyRef.current;
   //
   ///======================================================
   // Check if an article is already created on page load
@@ -56,79 +61,69 @@ const Dashboard: React.FC = () => {
   ///======================================================
   useEffect(() => {
     dbSelector();
+    //
+    if (window.innerWidth > 768) {
+      setIsMediumScreen(true);
+    }
+
+    //--------------------------------------------------------
     // Read the sessionStorage as per the corresponded db.
+    //--------------------------------------------------------
     let articleStored: string | null;
 
     dbNameToSearch.current =
       sessionStorage.getItem("db") || dbNameToSearch.current;
     articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-    console.log("Article found in sessionStorage:", articleStored);
+    //console.log("Article found in sessionStorage:", articleStored);
 
     if (!articleStored) {
       //Check localStorage for the article content
-      console.log(
-        "No article found in sessionStorage, checking localStorage..."
-      );
-
-      articleStored = localStorage.getItem(DRAFT_KEY(dbNameToSearch.current));
-      console.log("Article found in localStorage:", articleStored);
+      // console.log(
+      //   "No article found in sessionStorage, checking localStorage..."
+      // );
+      DRAFT_KEY = `draft-articleContent-${dbNameToSearch.current}`;
+      articleStored = localStorage.getItem(DRAFT_KEY);
+      //console.log("Article found in localStorage:", articleStored);
     }
 
-    // articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-
-    const jsonArticle = JSON.parse(articleStored!);
-    savedTitleRef.current = jsonArticle[0]?.content || "";
-    savedBodyRef.current = jsonArticle[2]?.content || "";
-    // Remove the sesstion Storage after the page is mounted and if exist the article is created
-    sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
-    sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
-    sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
+    if (articleStored) {
+      // console.log("articleStored to savedTitleRef:", articleStored);
+      const jsonArticle = JSON.parse(articleStored!);
+      savedTitleRef.current = jsonArticle[0]?.content || "";
+      savedBodyRef.current = jsonArticle[2]?.content || "";
+      // Remove the sesstion Storage after the page is mounted and if exist the article is created
+      sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
+      sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
+      sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
+    }
+    // console.log("savedTitleRef at Dashboard:", savedTitleRef.current);
+    // console.log("savedBodyRef at Dashboard:", savedBodyRef.current);
+    // debugger;
+    //
   }, []);
   //
-  // Save to localStorage every 10 minutes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const draft = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-      if (draft) {
-        localStorage.setItem(DRAFT_KEY(dbNameToSearch.current), draft);
-      }
-    }, 600000); // 10 minutes
-    return () => clearInterval(interval);
-  }, []);
-
-  // Save to localStorage on tab/browser close
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      const draft = sessionStorage.getItem(DRAFT_KEY(dbNameToSearch.current));
-      if (draft) {
-        localStorage.setItem(DRAFT_KEY(dbNameToSearch.current), draft);
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
-  ///---------------------------------------------------
-  //  Cleanup debounce on unmount
-  ///---------------------------------------------------
-  useEffect(() => {
-    return () => {
-      debouncedUpdateStore.cancel();
-    };
-  }, []);
-  //
-  ///========================================================
-  // Update the DOM if a previous article session is saved.
-  ///========================================================
-  // useEffect(() => {
-  //   if (savedTitleRef.current) {
-  //     setTheTitle(savedTitleRef.current);
-  //     setPlaceHolderTitle(false);
-  //     if (savedBodyRef.current) {
-  //       setTheBody(savedBodyRef.current);
-  //       setPlaceHolderArticle(false);
-  //     }
-  //   }
-  // }, []);
+  //--------------------------------------------------------
+  // Context creation
+  ///--------------------------------------------------------
+  const menuContextValue: Partial<ButtonProps> = {
+    // setIsFontStyleOpen,
+    setSelectedSection,
+    selectedSection,
+    isMediumScreen,
+    setPlaceHolderArticle,
+    setPlaceHolderTitle,
+    isPlaceHolderTitle,
+    isPlaceHolderArticle,
+    savedTitleRef,
+    savedBodyRef,
+    editorRefs,
+    fileInputRef,
+    dialogRef,
+    sectionsDialogRef,
+    dbNameToSearch: dbNameToSearch.current,
+    DRAFT_KEY,
+    stylesDialogRef,
+  };
   //
   ///======================================================
   /// UI Editor with a menu with options to insert images,
@@ -137,132 +132,56 @@ const Dashboard: React.FC = () => {
   ///======================================================
   return (
     <>
-      <div
-        ref={pageRef}
-        className="flex flex-col md:flex-row h-screen bg-black"
-      >
-        {/* TABLET / DESKTOP */}
-        <aside className="hidden w-[25%] h-full gap-y-2 bg-gray-800 text-white md:flex items-center flex-col">
-          <ImageButton
-            editorRefs={editorRefs}
-            index={1}
-            data-cy={"image-button"}
-          />
-          <LinkButton editorRefs={editorRefs} index={1} data-cy="link-button" />
-          <SectionSelector
-            db={dbNameToSearch.current}
-            selectedSection={selectedSection}
-            setSelectedSection={setSelectedSection}
-          />
-          <FontStyleUI />
-          <CustomDashboardButton
-            type="save"
-            DRAFT_KEY={DRAFT_KEY}
-            dbNameToSearch={dbNameToSearch.current}
-          />
-          <CustomDashboardButton
-            type="clear"
-            // onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
-            onClick={() => {
-              handleClear(editorRefs);
-              theTitle = "";
-              theBody = "";
-              setSelectedSection("Select category");
-            }}
-          />
-          <CustomDashboardButton
-            type="post"
-            data-cy={"submit-article"}
-            onClick={() => handleSave(debouncedUpdateStore)}
-          />
-          <HomeButton />
-          <LogOutButton />
-        </aside>
-        {/* MENU MOBILE */}
-        <nav className="md:hidden w-full h-20vh bg-gray-800 text-white flex justify-around p-2 flex-row">
-          <div className="flex items-center flex-col">
-            <div className="flex flex-row space-x-2">
-              <ImageButton editorRefs={editorRefs} index={1} />
-              <LinkButton editorRefs={editorRefs} index={1} />
-            </div>
-            <SectionSelector
-              db={dbNameToSearch.current}
-              selectedSection={selectedSection}
-              setSelectedSection={setSelectedSection}
+      <MenuContext.Provider value={menuContextValue}>
+        <section
+          ref={pageRef}
+          className="flex flex-col md:flex-row h-screen bg-black"
+        >
+          {/* TABLET / DESKTOP */}
+          <aside className="hidden w-[25vw] h-full gap-y-2 bg-gray-800 text-white md:flex items-center flex-col">
+            <MenuDesktop
+            // editorRefs={editorRefs}
+            // theTitle={theTitle}
+            // theBody={theBody}
+            // setIsFontStyleOpen={setIsFontStyleOpen}
+            // setSelectedSection={setSelectedSection}
+            // selectedSection={selectedSection}
+            // isMediumScreen={isMediumScreen}
+            // dbNameToSearch={dbNameToSearch.current}
             />
-            <div className="flex flex-row w-auto space-x-2">
-              <CustomDashboardButton
-                type="clear"
-                // onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
-                onClick={() => {
-                  handleClear(editorRefs);
-                  theTitle = "";
-                  theBody = "";
-                  setSelectedSection("Select category");
-                }}
-              />
-              <CustomDashboardButton
-                type="save"
-                DRAFT_KEY={DRAFT_KEY}
-                dbNameToSearch={dbNameToSearch.current}
-              />
-            </div>
-          </div>
-          <FontStyleUI />
-          <div className="flex flex-col justify-center gap-y-2 items-center">
-            <CustomDashboardButton
-              type="post"
-              onClick={() => handleSave(debouncedUpdateStore)}
-            />
+            <HomeButton />
             <LogOutButton />
-            <HomeButton type="mobile" />
-          </div>
-        </nav>
-        {/* Main Content */}
-        <main className="flex-1 p-4 pt-2 h-[80dvh] md:w-[80dvh] overflow-y-auto">
-          <div className="border border-gray-600 border-1px">
-            {["Title", "Article"].map((placeholder, index) => (
-              // <div key={index} style={{ userSelect: "text", cursor: "text" }}
-              <div
-                key={index}
-                ref={(el) => {
-                  if (el && !editorRefs.current[index]) {
-                    editorRefs.current[index] = el;
-                  }
-                }}
-                className={`${
-                  placeholder === "Title"
-                    ? "h-[10dvh] font-bold"
-                    : "h-[70dvh] font-normal overflow-auto"
-                } p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
-                contentEditable={true}
-                onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs)}
-                suppressContentEditableWarning={true}
-                onFocus={() =>
-                  index === 0
-                    ? setPlaceHolderTitle(false)
-                    : setPlaceHolderArticle(false)
-                }
-                onInput={(e) => {
-                  // const content = (e.target as HTMLDivElement).innerText;
-                  const content = (e.target as HTMLDivElement).innerHTML;
-                  handleContentChange(index, content, debouncedUpdateStore);
-                }}
-              >
-                {index === 0
-                  ? theTitle ||
-                    (isPlaceHolderTitle && (
-                      <span className="text-gray-400">{`${placeholder} here...`}</span>
-                    ))
-                  : theBody ||
-                    (isPlaceHolderArticle && (
-                      <span className="text-gray-400">{`Write your ${placeholder} here...`}</span>
-                    ))}
+          </aside>
+          {/* MENU MOBILE */}
+          {/* {isFontStyleOpen && <FontStyleUI />} */}
+          <nav className="md:hidden w-full h-[10dvh] bg-gray-800">
+            <div className="w-full flex flex-row justify-between mt-2 px-2">
+              {/* HomeButton at the start (left) */}
+              <div className="flex-shrink-0">
+                <HomeButton type="mobile" />
               </div>
-            ))}
-          </div>
-        </main>
-      </div>
+              {/* LogOutButton at the end (right) */}
+              <div className="flex-shrink-0">
+                <LogOutButton />
+              </div>
+            </div>
+            <MenuMobile
+            // editorRefs={editorRefs}
+            // theTitle={theTitle}
+            // theBody={theBody}
+            // setIsFontStyleOpen={setIsFontStyleOpen}
+            // setSelectedSection={setSelectedSection}
+            // isMediumScreen={isMediumScreen}
+            // selectedSection={selectedSection}
+            // dbNameToSearch={dbNameToSearch.current}
+            />
+          </nav>
+          {/* Main Content */}
+          <main className="flex-1 p-4 pt-2 h-[80dvh] md:h-full md:w-[75vw] overflow-y-auto">
+            <DashboardEditor />
+          </main>
+        </section>
+      </MenuContext.Provider>
     </>
   );
 };

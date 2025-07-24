@@ -1,6 +1,7 @@
 import callHub from "../../services/api/call_hub";
 
-const saveButtonClicked = async (italic: string[], bold: string[]) => {
+// const saveButtonClicked = async (italic: string[], bold: string[]) => {
+const saveButtonClicked = async () => {
   ///========================================================
   // Function to save the article to the database
   ///========================================================
@@ -11,8 +12,8 @@ const saveButtonClicked = async (italic: string[], bold: string[]) => {
     sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
   );
   articleContent.push(
-    { type: "italic", content: italic },
-    { type: "bold", content: bold },
+    // { type: "italic", content: italic },
+    // { type: "bold", content: bold },
     { type: "dbName", content: dbName }
   );
 

@@ -1,13 +1,15 @@
 import "server-only";
 import { database } from "../../../../firebaseMain";
 import { databaseDecav } from "../../../../firebaseDecav";
-import { Database, ref, set } from "firebase/database";
+import { Database, ref, set, update } from "firebase/database";
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
 import { forEach } from "lodash";
 import replaceSrcWithImagePlaceholders from "../../../utils/dashboard/images_edit/replace_src_on_img";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import readLog from "../../../services/authentication/read_log";
+import { convertHtmlToMarkdown } from "@/services/api/html_to_markdown";
+import { sectionsCode } from "../../../constants/sections";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -26,6 +28,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     italic: string[];
     bold: string[];
     images?: { url: string }[];
+    category?: string;
+    version?: string;
+    section?: string;
+    sectionCode?: string;
   }
   //
   // {Validate request origin
@@ -153,7 +159,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     const boldObj = JSON.parse(boldData);
     const dbNameData = formData.get("dbName") as string;
     const dbNameObj = JSON.parse(dbNameData);
-
+    // TODO check
+    const categoryData = formData.get("category") as string;
+    const categoryObj = JSON.parse(categoryData);
+    const versionData = formData.get("version") as string;
+    const versionObj = JSON.parse(versionData);
+    const sectionData = formData.get("section") as string;
+    const sectionObj = JSON.parse(sectionData);
     //
     article.id = idObj;
     article.title = titleObj;
@@ -161,6 +173,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.images = imageUrls;
     article.bold = boldObj;
     article.italic = italicObj;
+    article.category = categoryObj;
+    article.version = versionObj;
+    article.section = sectionObj;
+    //
 
     // SAVE in db.
     const id = article.id;
@@ -169,6 +185,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     let images = article.images;
     let bold = article.bold;
     let italic = article.italic;
+    let category = article.category;
+    let version = article.version;
+    let section = article.section;
     //
 
     try {
@@ -187,41 +206,117 @@ export async function POST(req: NextRequest): Promise<Response> {
       // Replace src of the each image with the corresponded url:
       body = replaceSrcWithImagePlaceholders(body, images);
       // Convert images, bold and italic to object
-      function toFirebaseObject<T extends string | { url: string }>(
-        array: T[]
-      ): Record<number, T> {
-        return array.reduce(
-          (obj: Record<number, T>, value: T, index: number) => {
-            obj[index] = value;
-            return obj;
-          },
-          {}
-        );
-      }
+      // function toFirebaseObject<T extends string | { url: string }>(
+      //   array: T[]
+      // ): Record<number, T> {
+      //   return array.reduce(
+      //     (obj: Record<number, T>, value: T, index: number) => {
+      //       obj[index] = value;
+      //       return obj;
+      //     },
+      //     {}
+      //   );
+      // }
 
-      const imagesAsObject = toFirebaseObject(images);
-      const boldAsObject = toFirebaseObject(bold);
-      const italicAsObject = toFirebaseObject(italic);
-
-      const articleData = {
-        id: id,
-        title: title,
-        body: body,
-        italic: italicAsObject,
-        bold: boldAsObject,
-        images: imagesAsObject,
-      };
+      // const imagesAsObject = toFirebaseObject(images);
+      // const boldAsObject = toFirebaseObject(bold);
+      // const italicAsObject = toFirebaseObject(italic);
+      //
+      ///--------------------------------------------------------
+      // Convert HTML to Markdown
+      ///--------------------------------------------------------
+      const markdownContent = convertHtmlToMarkdown(body, {
+        preserveWhitespace: false, // Clean up extra whitespace
+        includeImageAlt: true, // Include alt text for images
+        preserveImageDimensions: true, // Keep image dimensions as comments
+        convertTables: true, // Convert HTML tables to markdown
+        preserveLineBreaks: true, // Keep line breaks as they are
+      });
+      //
+      console.log("markdownContent:", markdownContent);
+      ///--------------------------------------------------------
+      // Select the correct database to save the article
+      ///--------------------------------------------------------
       //
       let db: Database;
+      let author: string;
+      //
       if (dbNameObj === "DeCav") {
         db = databaseDecav;
+        author = process.env.AUTHOR_DECAV || "Default Author";
       } else {
         db = database;
+        author = process.env.AUTHOR || "Default Author";
       }
+      //
+      const metadata = {
+        author: author,
+        category: category,
+        date: new Date().toISOString(),
+        description: markdownContent.slice(0, 150), // Get first 150 chars as description
+        published: true,
+        tags: [],
+        title: title,
+        version: version,
+      };
+      //
+      const articleData = {
+        id: id,
+        en: markdownContent, //TODO to english
+        es: markdownContent, //TODO to spanish
+        metadata: metadata,
+      };
+      //
+      ///--------------------------------------------------------
+      // Obtain section code
+      ///--------------------------------------------------------
+      let sectionCode: string = "";
+      if (section && sectionsCode.hasOwnProperty(dbNameObj)) {
+        sectionCode =
+          sectionsCode[dbNameObj].find(
+            (sectionCode) => sectionCode.label === section
+          )?.code || "";
+      }
+      //
+      const articlesMenu = {
+        id: id,
+        en: {
+          published: true,
+          resume: markdownContent.slice(0, 150),
+          title: title,
+        }, //TODO to english
+        es: {
+          published: true,
+          resume: markdownContent.slice(0, 150),
+          title: title,
+        }, //TODO to spanish
+        section: section,
+        section_code: sectionCode,
+        slug: id,
+      };
+      //
+      const likes = {
+        id: id,
+        likes: 0,
+      };
+      // const articleData = {
+      //   id: id,
+      //   title: title,
+      //   body: body,
+      //   italic: italicAsObject,
+      //   bold: boldAsObject,
+      //   images: imagesAsObject,
+      // };
       try {
         const dbRef = ref(db, `articles/${id}`);
         await set(dbRef, articleData);
-
+        //
+        const dbRefMenu = ref(db, `articles_menu/${id}`);
+        await set(dbRefMenu, articlesMenu);
+        //
+        const dbLikes = ref(db, `likes/${id}`);
+        await update(dbLikes, likes);
+        //
         return NextResponse.json({
           status: 200,
           message: "Data saved successfully",
