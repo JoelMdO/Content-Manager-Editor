@@ -41,10 +41,9 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
   //
   return (
     <>
-      {" "}
       <button
         type="button"
-        className={`${mt} ${mb}`}
+        className={`${mt} ${mb} md:flex md:flex-col w-[40px] md:w-auto items-center`}
         onClick={() => {
           signOut({ callbackUrl: "/" });
           setIsClicked(true);
@@ -54,8 +53,8 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
         <Image
           src={icon_mobile}
           className="block md:hidden cursor-pointer"
-          width={50}
-          height={60}
+          width={40}
+          height={50}
           alt="logout-button"
         />
         {/* Desktop Icon */}
@@ -69,9 +68,7 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
       </button>
       {type == "playbook" ? null : (
         <>
-          <span className="hidden md:inline">
-            {isClicked ? "Bye!" : "Logout"}
-          </span>
+          <span className="hidden md:inline">{isClicked ? "Bye!" : ""}</span>
           <span className="md:hidden">{isClicked ? "Bye!" : ""}</span>
         </>
       )}

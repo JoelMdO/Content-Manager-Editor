@@ -18,7 +18,7 @@ const HomeButton: React.FC<HomeButtonProps> = ({ type }) => {
     <>
       <button
         type="button"
-        className="flex flex-row md:mt-8 items-center"
+        className="flex flex-row w-[110px] min-w-[90px] mt-2 ml-4 items-center"
         onClick={() => router.push("/home")}
       >
         <SquareChevronLeft className="text-gray-600" size={size} />

@@ -27,10 +27,15 @@ const uploadImage = async (
     //
     // Store reference before API call
     const editorRefBefore = editorRef;
-    if (!file || !editorRef)
+    if (!file || !editorRef) {
+      console.log("no file or not editorRef", file, editorRef);
       return { status: 400, message: "No file or editor reference provided" };
+    }
+
     // Check if the file is a valid image and if its save it on the server
     const response = await callHub("clean-image", file);
+    console.log("Image upload response:", response);
+
     if (response.status === 200) {
       // Set up a FileReader to read the image file source
       const reader = new FileReader();
@@ -51,6 +56,8 @@ const uploadImage = async (
           .toString()
           .slice(-2)}`;
         const imageId = `${formattedDate}-${fileName}`;
+        console.log("Image ID:", imageId);
+
         img.setAttribute("id", imageId); // Set image Id to allow selection
         // Add a reference to the image in the editor
         const imgRef = document.createElement("p");
