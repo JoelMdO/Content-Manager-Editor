@@ -6,12 +6,13 @@ import React, { useState, useEffect } from "react";
 import categories from "../../constants/categories";
 import handleSubmit from "../../utils/playbook/handleSubmit";
 import { useRouter } from "next/navigation";
-import CustomDashboardButton from "../buttons/custom dashboard/button_dashboard";
+// import playbookCustomButton from "../buttons/playbook_custom_button/button_dashboard";
 import { useSearchParams } from "next/navigation";
 import Loader from "../buttons/loader_saving";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { PlaybookMeta } from "@/types/plabookMeta";
 import text from "../../constants/playbook_form_data_text.json";
+import PlaybookCustomButton from "../buttons/playbook_custom_button/button_dashboard";
 //
 export interface PlaybookFormProps {
   type?: string;
@@ -445,7 +446,7 @@ export default function PlaybookForm({
 
           {/* Submit Buttons */}
           <div className="flex justify-end space-x-3 border-t pt-6">
-            <CustomDashboardButton
+            <PlaybookCustomButton
               type={type!}
               setUpdateNote={setUpdateNote!}
               setIsCreating={setIsCreating!}

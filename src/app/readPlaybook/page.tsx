@@ -5,7 +5,7 @@ import BackPageButton from "../../components/buttons/back_page_button";
 import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "../../components/buttons/logo_button";
 import categories from "../../constants/categories";
-import CustomDashboardButton from "../../components/buttons/custom dashboard/button_dashboard";
+// import playbookCustomButton from "../../components/buttons/playbook_custom_button/button_dashboard";
 import callHub from "../../services/api/call_hub";
 import dynamic from "next/dynamic";
 import errorAlert from "../../components/alerts/error";
@@ -16,6 +16,7 @@ import text from "../../constants/readPlaybook_data_text.json";
 import withSessionProvider from "../../utils/withSessionProvider";
 import { PlaybookMeta } from "../../types/plabookMeta";
 import "../../styles/readPlaybook.css";
+import PlaybookCustomButton from "../../components/buttons/playbook_custom_button/button_dashboard";
 
 //
 const PlaybookForm = dynamic(
@@ -123,7 +124,7 @@ const ReadPlaybookPage: React.FC = () => {
             </h1>
           </div>
           <div className="flex gap-2 items-center  mr-1">
-            <CustomDashboardButton
+            <PlaybookCustomButton
               type="new"
               onClick={() => {
                 setIsCreating(!isCreating);
@@ -314,7 +315,7 @@ const ReadPlaybookPage: React.FC = () => {
                   )}
 
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <CustomDashboardButton
+                    <PlaybookCustomButton
                       type="view-note"
                       id={`${entry.id}`}
                       setEntries={setEntries}

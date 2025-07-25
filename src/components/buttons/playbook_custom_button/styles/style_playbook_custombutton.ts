@@ -1,4 +1,4 @@
-type styleCustomDashboardButton = {
+type styleplaybookCustomButton = {
   text: string;
   isNew: boolean;
   color: string;
@@ -12,14 +12,14 @@ type styleCustomDashboardButton = {
   width: string;
 };
 
-export function custommButtonStyle(
+export function playbookButtonStyle(
   type: string,
   isCreating: boolean | undefined
   // isClicked: boolean
-): styleCustomDashboardButton {
+): styleplaybookCustomButton {
   //
 
-  const defaultStyle: styleCustomDashboardButton = {
+  const defaultStyle: styleplaybookCustomButton = {
     text: isCreating ? "Cancel" : "Create New Entry",
     isNew: true,
     color: "bg-blue-light",
@@ -33,7 +33,7 @@ export function custommButtonStyle(
     width: "w-fit",
   };
 
-  const stylesByType: Record<string, Partial<styleCustomDashboardButton>> = {
+  const stylesByType: Record<string, Partial<styleplaybookCustomButton>> = {
     "view-note": {
       text: "View Details",
       isNew: true,

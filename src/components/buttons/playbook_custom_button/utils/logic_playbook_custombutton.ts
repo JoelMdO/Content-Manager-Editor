@@ -7,7 +7,7 @@ import emailMe from "../../utils/email_me";
 // import { customDashLogicProps } from "@/types/customDash_type";
 // import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
 // import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
-import { CustomDashButtonProps } from "../type/type_customdash_button";
+import { CustomDashButtonProps } from "../type/type_playbook_custombutton";
 import handleNoteClick from "@/utils/playbook/handle_note_click";
 
 ///--------------------------------------------------------
@@ -70,10 +70,10 @@ export const newPlaybook = (resetForm?: any, router?: any) => () => {
 export const new_playbook_at_readplaybook = (setIsCreating?: any) => () =>
   setIsCreating?.(false);
 ///--------------------------------------------------------
-// Main Function to handle the cases of the CustomDashBoardButton
+// Main Function to handle the cases of the playbookCustomButton
 ///--------------------------------------------------------
 
-export const customDashButtonLogic = ({
+export const playbookButtonLogic = ({
   type,
   router,
   noteViewMode,
