@@ -1,5 +1,5 @@
 import errorAlert from "@/components/alerts/error";
-import saveButtonClicked from "../../../../utils/buttons/save_button_clicked";
+import saveButtonClicked from "./save_button_clicked";
 import successAlert from "@/components/alerts/sucess";
 // import handleNoteClick from "../../../../utils/playbook/handle_note_click";
 // import emailMe from "../../../../utils/buttons/email_me";
