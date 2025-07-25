@@ -3,7 +3,7 @@ import saveButtonClicked from "./save_button_clicked";
 import successAlert from "@/components/alerts/sucess";
 // import handleNoteClick from "../../../../utils/playbook/handle_note_click";
 // import emailMe from "../../../../utils/buttons/email_me";
-import { useContext } from "react";
+// import { useContext } from "react";
 // import { customDashLogicProps } from "../../../../types/customDash_type";
 import { debouncedUpdateStore } from "../../../../utils/dashboard/debounceUpdateStore";
 // import { autoBatchEnhancer } from "@reduxjs/toolkit";
@@ -11,7 +11,10 @@ import { debouncedUpdateStore } from "../../../../utils/dashboard/debounceUpdate
 import { handleSave } from "../../../../utils/dashboard/handle_save";
 import { ButtonProps } from "../type/type_menu_button";
 import { handleClear } from "../../../../utils/dashboard/handler_clear";
-import MenuContext from "../../../../utils/context/menu_context";
+// import MenuContext from "../../../../utils/context/menu_context";
+import translateButtonClicked from "./translate_button_clicked";
+import router from "next/router";
+import { set } from "cypress/types/lodash";
 // import { useMenuContext } from "@/utils/context/menu_context";
 ///--------------------------------------------------------
 // Post function to handle the save button click
@@ -53,6 +56,7 @@ export const post =
           errorAlert("saved", "error", error);
         });
     };
+///--------------------------------------------------------
 // Save to sessionStorage on every change
 ///--------------------------------------------------------
 export const saveDraft = ({
@@ -133,7 +137,46 @@ const openSelectorDialog = ({
   }
 };
 ///--------------------------------------------------------
-// Main Function to handle the cases of the CustomDashBoardButton
+// Translate to Spanish
+///--------------------------------------------------------
+export const translateToSpanish = ({
+  setTranslationReady,
+  setIsClicked,
+}: Partial<ButtonProps>) => {
+  setIsClicked!(true);
+  console.log('"Translating article to Spanish at logic ...');
+
+  translateButtonClicked()
+    .then((response) => {
+      setIsClicked!(false);
+      if (response.status === 200) {
+        successAlert("translate");
+        setTranslationReady!(true);
+        if (response.body) {
+          const dbName = sessionStorage.getItem("db");
+          const articleContent = JSON.parse(
+            sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+          );
+          articleContent.push({ type: "translation", content: response.body });
+        }
+      } else if (
+        response.status === 401 ||
+        response.message === "User not authenticated"
+      ) {
+        errorAlert("translate", "nonTranslated", response.message);
+        router!.push("/");
+      } else {
+        errorAlert("translate", "nonTranslated", response.message);
+      }
+    })
+    .catch((error) => {
+      setIsClicked!(false);
+      errorAlert("translate", "error", error);
+    });
+  //debugger;
+};
+///--------------------------------------------------------
+// Main Function to handle the cases of the playbookCustomButton
 ///--------------------------------------------------------
 
 export const buttonMenuLogic = ({
@@ -153,6 +196,7 @@ export const buttonMenuLogic = ({
   type,
   stylesDialogRef,
   setIsFontStyleOpen,
+  setTranslationReady,
 }: Partial<ButtonProps>) => {
   // onClick?.();
   console.log(
@@ -182,6 +226,12 @@ export const buttonMenuLogic = ({
       break;
     case "save":
       saveDraft({ dbNameToSearch, DRAFT_KEY, setIsClicked });
+      break;
+    case "translate":
+      translateToSpanish({
+        setIsClicked,
+        setTranslationReady,
+      });
       break;
     case "clear":
       clearUI({

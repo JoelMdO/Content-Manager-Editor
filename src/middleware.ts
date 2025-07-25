@@ -57,6 +57,7 @@ export const config = {
   matcher: [
     "/api/post",
     "/api/save",
+    "/api/translate",
     "/dashboard",
     "/playbook",
     "/readPlaybook",

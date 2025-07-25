@@ -31,6 +31,10 @@ const errorAlert = (
       text = `${message}, please log in again`;
       button_text = "Go to Login";
       confirmButtonColor = "green";
+      break;
+    case "nonTranslated":
+      text = `Translation failed ${message}.`;
+      break;
     default:
       text = `Error uploading the ${type}: ${message}`;
       break;

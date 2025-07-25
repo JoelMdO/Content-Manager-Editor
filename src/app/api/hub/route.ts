@@ -14,6 +14,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   let token: string | undefined = "";
   let sessionId: string | undefined = "";
   let formData: FormData = new FormData();
+  console.log('"Request received at API Hub"');
 
   ///___________________________________________________
   /// Check the content type to see if the request
@@ -34,7 +35,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       formData = await req.formData();
       type = formData.get("type") as string;
 
-      if (type !== "post") {
+      if (type !== "post" && type !== "translate") {
         dataApiHub = formData.get("file") || "";
         if (!(dataApiHub instanceof File)) {
           return NextResponse.json({
@@ -61,7 +62,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       token = createLog(session?.user.id);
     }
 
-    if (session && type === "post") {
+    if ((session && type === "post") || (session && type === "translate")) {
       sessionId = session.user?.id;
     }
 
@@ -76,6 +77,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       return NextResponse.json({ status: 403, message: "Unauthorized data" });
     }
     //
+    console.log("Type of request received at API Hub:", type);
     switch (type) {
       ///--------------------------------------------------------
       // For Clean Image and Clean Link, the response should be back to the client
@@ -116,6 +118,9 @@ export async function POST(req: Request): Promise<NextResponse> {
         }
         break;
       case "post":
+      case "translate":
+        console.log("translate at call hub", dataApiHub);
+
         formData.append("session", sessionId || "");
 
         dataApiHub = formData;

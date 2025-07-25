@@ -11,7 +11,7 @@ export function menuButtonStyle(
   isClicked: boolean
 ): styleMenuButton {
   //
-  console.log("isClicked at buttonstyle:", isClicked);
+  //console.log("isClicked at buttonstyle:", isClicked);
 
   // const defaultProperties = `bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-white hover:text-black hover:to-orange-300  hover:border-amber-500 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em]`; // isClicked ? "bg-cream text-black" : ""
   const defaultProperties = `bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-white hover:text-black hover:to-orange-300  hover:border-amber-500 font-bold mt-4 shadow-md shadow-black`; // isClicked ? "bg-cream text-black" : ""
@@ -52,6 +52,11 @@ export function menuButtonStyle(
       text: "Styles",
       defaultProperties: defaultProperties,
       icon: iconsMenu.styles,
+    },
+    translate: {
+      text: "Translate",
+      defaultProperties: defaultProperties,
+      icon: iconsMenu.translate,
     },
   };
 

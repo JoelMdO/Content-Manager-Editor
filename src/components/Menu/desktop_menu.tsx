@@ -28,6 +28,7 @@ const MenuDesktop = () => {
         )}
         <MenuButton type={"styles"} setIsFontStyleOpen={setIsFontStyleOpen} />
       </div>
+      <MenuButton type={"translate"} />
       <MenuButton type="post" />
     </div>
   );
