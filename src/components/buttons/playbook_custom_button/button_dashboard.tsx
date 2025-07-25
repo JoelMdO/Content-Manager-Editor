@@ -9,9 +9,9 @@ import { useRouter } from "next/navigation";
 // import handleNoteClick from "../../utils/playbook/handle_note_click";
 // import { PlaybookMeta } from "../../../types/plabookMeta";
 // import { RootState } from "@/store/store";
-import { custommButtonStyle } from "./styles/custom_button_style";
-import { customDashButtonLogic } from "./utils/logic_customdash";
-import { CustomDashButtonProps } from "./type/type_customdash_button";
+import { playbookButtonStyle } from "./styles/style_playbook_custombutton";
+import { playbookButtonLogic } from "./utils/logic_playbook_custombutton";
+import { CustomDashButtonProps } from "./type/type_playbook_custombutton";
 
 // interface ButtonProps {
 //   type: string;
@@ -30,7 +30,7 @@ import { CustomDashButtonProps } from "./type/type_customdash_button";
 //   dbNameToSearch?: string; // Optional prop for dbNameToSearch
 // }
 
-const CustomDashboardButton: React.FC<Partial<CustomDashButtonProps>> = ({
+const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   type,
   onClick,
   isCreating,
@@ -64,15 +64,15 @@ const CustomDashboardButton: React.FC<Partial<CustomDashButtonProps>> = ({
     height,
     width,
   } = useMemo(
-    () => custommButtonStyle(type!, isCreating),
+    () => playbookButtonStyle(type!, isCreating),
     [type, isCreating, isClicked]
   );
 
   ///--------------------------------------------------------
-  // Function to handle the cases of the CustomDashBoardButton
+  // Function to handle the cases of the playbookCustomButton
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
-    customDashButtonLogic({
+    playbookButtonLogic({
       type,
       router,
       noteViewMode,
@@ -125,4 +125,4 @@ const CustomDashboardButton: React.FC<Partial<CustomDashButtonProps>> = ({
   );
 };
 
-export default CustomDashboardButton;
+export default PlaybookCustomButton;
