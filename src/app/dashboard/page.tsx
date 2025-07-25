@@ -109,16 +109,19 @@ const ArticlePage: React.FC = () => {
             editorRefs={editorRefs}
             index={1}
             data-cy={"image-button"}
+            data-testid="image-button"
           />
-          <LinkButton editorRefs={editorRefs} index={1} data-cy="link-button" />
-          <FontStyleUI />
+          <LinkButton editorRefs={editorRefs} index={1} data-cy="link-button" data-testid="link-button" />
+          <FontStyleUI data-testid="font-style-ui" />
           <CustomDashboardButton
             type="post"
             data-cy={"submit-article"}
+            data-testid="post-button"
             onClick={() => handleSave(debouncedUpdateStore)}
           />
           <CustomDashboardButton
             type="clear"
+            data-testid="clear-button"
             onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
           />
           <HomeButton />
@@ -153,6 +156,7 @@ const ArticlePage: React.FC = () => {
               // <div key={index} style={{ userSelect: "text", cursor: "text" }}
               <div
                 key={index}
+                data-testid={index === 0 ? "title-editor" : "body-editor"}
                 ref={(el) => {
                   if (el && !editorRefs.current[index]) {
                     editorRefs.current[index] = el;

@@ -4,12 +4,13 @@ import ReduxProvider from "../services/redux_provider";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-import { Lexend } from "next/font/google";
+// Temporarily commented out Google Fonts due to network restrictions
+// import { Lexend } from "next/font/google";
 
-const lexend = Lexend({
-  weight: "400",
-  subsets: ["latin"],
-});
+// const lexend = Lexend({
+//   weight: "400",
+//   subsets: ["latin"],
+// });
 
 export const metadata: Metadata = {
   title: "Your Content Manager Editor",
@@ -38,7 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={lexend.className}>
+      <body className="">
         <ReduxProvider>{children}</ReduxProvider>
 
         <SpeedInsights />
