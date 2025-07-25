@@ -447,8 +447,8 @@ export default function PlaybookForm({
           <div className="flex justify-end space-x-3 border-t pt-6">
             <CustomDashboardButton
               type={type!}
-              setUpdateNote={setUpdateNote}
-              setIsCreating={setIsCreating}
+              setUpdateNote={setUpdateNote!}
+              setIsCreating={setIsCreating!}
               resetForm={resetForm}
             />
             <button

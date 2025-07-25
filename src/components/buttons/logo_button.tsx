@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import emailMe from "../../utils/buttons/email_me";
+import emailMe from "./utils/email_me";
 import text from "../../constants/buttons_data_text.json";
 
 //

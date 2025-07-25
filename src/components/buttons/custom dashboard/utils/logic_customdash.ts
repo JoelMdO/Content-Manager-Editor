@@ -4,9 +4,11 @@
 // import handleNoteClick from "../playbook/handle_note_click";
 import emailMe from "../../utils/email_me";
 // import { useCallback } from "react";
-import { customDashLogicProps } from "@/types/customDash_type";
+// import { customDashLogicProps } from "@/types/customDash_type";
 // import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
-import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
+// import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
+import { CustomDashButtonProps } from "../type/type_customdash_button";
+import handleNoteClick from "@/utils/playbook/handle_note_click";
 
 ///--------------------------------------------------------
 // Function to handle the view note button click
@@ -19,7 +21,7 @@ export const viewNote =
     setViewDetails,
     setUpdateNote,
     id,
-  }: Partial<customDashLogicProps>) =>
+  }: Partial<CustomDashButtonProps>) =>
   () => {
     const toggleMode = noteViewMode === "view" ? "edit" : "view";
     setNoteViewMode!(toggleMode);
@@ -71,9 +73,8 @@ export const new_playbook_at_readplaybook = (setIsCreating?: any) => () =>
 // Main Function to handle the cases of the CustomDashBoardButton
 ///--------------------------------------------------------
 
-export const buttonLogic = ({
+export const customDashButtonLogic = ({
   type,
-  setIsClicked,
   router,
   noteViewMode,
   setNoteViewMode,
@@ -84,9 +85,7 @@ export const buttonLogic = ({
   resetForm,
   setIsCreating,
   onClick,
-}: // DRAFT_KEY,
-// dbNameToSearch,
-ButtonProps) => {
+}: Partial<CustomDashButtonProps>) => {
   onClick?.();
   switch (type) {
     case "logo":
