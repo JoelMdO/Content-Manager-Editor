@@ -1,0 +1,16 @@
+{
+  "testArticle": {
+    "title": "AI from the ground up",
+    "body": "Transform your web, Salesforce, and mobile app quality. Test faster, increase reliability, and gain confidence across every release.",
+    "link": "https://tailwindcss.com/docs/font-size",
+    "boldText": "Salesforce",
+    "underlineText": "Test faster"
+  },
+  "testUser": {
+    "email": "test@example.com",
+    "mockToken": "mock-auth-token-12345"
+  },
+  "testDatabase": {
+    "name": "DeCav"
+  }
+}

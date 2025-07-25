@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open",
+    "test:e2e:basic": "cypress run --spec 'cypress/e2e/cms-basic-ui.cy.ts'",
+    "test:e2e:full": "cypress run --spec 'cypress/e2e/cms-full-workflow.cy.ts'"
   },
   "dependencies": {
     "@auth/firebase-adapter": "^2.9.0",

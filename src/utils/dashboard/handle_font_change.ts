@@ -27,6 +27,7 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
     //
     let fontWeight: string = "normal";
     let fontStyle: string = "normal";
+    let textDecoration: string = "none";
     //First to check if the text has already and style
     //and if text inside a <span> element with the type of font weight.
     if (spanNode && spanNode.tagName === "SPAN") {
@@ -50,6 +51,14 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
             dispatch(deleteFontWeight({ text }));
           }
           break;
+        case "underline":
+          if (spanNode.style.textDecoration !== "underline") {
+            spanNode.style.textDecoration = "underline";
+            // Note: You may need to add underline actions to Redux if needed
+          } else {
+            spanNode.style.textDecoration = "none";
+          }
+          break;
         default:
           spanNode.style.fontWeight = "normal";
           spanNode.style.fontStyle = "normal";
@@ -65,6 +74,9 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
         case "bold":
           fontWeight = "bold";
           break;
+        case "underline":
+          textDecoration = "underline";
+          break;
         default:
           fontStyle = "normal";
           fontWeight = "normal";
@@ -74,6 +86,7 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
       const span = document.createElement("span");
       span.style.fontWeight = fontWeight;
       span.style.fontStyle = fontStyle;
+      span.style.textDecoration = textDecoration;
       range.insertNode(span);
       span.appendChild(extractedContent);
       //Update redux with text and style

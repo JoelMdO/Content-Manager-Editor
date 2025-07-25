@@ -32,6 +32,14 @@ const FontStyleUI: React.FC<{ 'data-testid'?: string }> = ({ 'data-testid': data
           >
             I
           </button>
+          <button
+            type="button"
+            data-testid="underline-button"
+            className="underline mt-2 text-lg text-white border-2 border-green w-8 h-9"
+            onClick={() => handleFontChange("underline", dispatch)}
+          >
+            U
+          </button>
         </div>
       </div>
     </>
