@@ -109,16 +109,19 @@ const ArticlePage: React.FC = () => {
             editorRefs={editorRefs}
             index={1}
             data-cy={"image-button"}
+            data-testid="image-button"
           />
-          <LinkButton editorRefs={editorRefs} index={1} data-cy="link-button" />
-          <FontStyleUI />
+          <LinkButton editorRefs={editorRefs} index={1} data-cy="link-button" data-testid="link-button" />
+          <FontStyleUI data-testid="font-style-ui" />
           <CustomDashboardButton
             type="post"
             data-cy={"submit-article"}
+            data-testid="post-button"
             onClick={() => handleSave(debouncedUpdateStore)}
           />
           <CustomDashboardButton
             type="clear"
+            data-testid="clear-button"
             onClick={() => handleClear(setTheTitle, setTheBody, editorRefs)}
           />
           <HomeButton />
@@ -164,6 +167,7 @@ const ArticlePage: React.FC = () => {
                   placeholder === "Title" ? "font-bold" : "font-normal"
                 } p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
                 contentEditable={true}
+                data-testid={placeholder === "Title" ? "title-editor" : "body-editor"}
                 onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs)}
                 suppressContentEditableWarning={true}
                 onFocus={() =>

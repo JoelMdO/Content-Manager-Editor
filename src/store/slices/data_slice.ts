@@ -7,6 +7,7 @@ export interface DataState {
   articles: string[];
   fontStyle: string[];
   fontWeight: string[];
+  textDecoration: string[];
 }
 
 const initialState: DataState = {
@@ -16,6 +17,7 @@ const initialState: DataState = {
   articles: [],
   fontStyle: [],
   fontWeight: [],
+  textDecoration: [],
 };
 
 const dataSlice = createSlice({
@@ -28,6 +30,9 @@ const dataSlice = createSlice({
     addFontWeight: (state, action: PayloadAction<{ text: string }>) => {
       state.fontWeight.push(action.payload.text);
     },
+    addTextDecoration: (state, action: PayloadAction<{ text: string }>) => {
+      state.textDecoration.push(action.payload.text);
+    },
     deleteFontStyle: (state, action: PayloadAction<{ text: string }>) => {
       state.fontStyle = state.fontStyle.filter(
         (style) => style !== action.payload.text
@@ -38,13 +43,20 @@ const dataSlice = createSlice({
         (weight) => weight !== action.payload.text
       );
     },
+    deleteTextDecoration: (state, action: PayloadAction<{ text: string }>) => {
+      state.textDecoration = state.textDecoration.filter(
+        (decoration) => decoration !== action.payload.text
+      );
+    },
   },
 });
 
 export const {
   addFontStyle,
   addFontWeight,
+  addTextDecoration,
   deleteFontStyle,
   deleteFontWeight,
+  deleteTextDecoration,
 } = dataSlice.actions;
 export default dataSlice.reducer;

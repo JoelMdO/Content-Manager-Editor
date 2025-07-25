@@ -102,6 +102,7 @@ const Login: React.FC = () => {
               signIn("google", { callbackUrl: "/home" });
             }}
             className="bg-blue-light text-white rounded-lg md:w-[170px] h-[30px] w-[120px] mt-5 flex justify-center items-center shadow-md shadow-dark-background"
+            data-testid="google-signin-button"
           >
             <div className="flex flex-row">
               {isSubmittedGoogle ? null : (

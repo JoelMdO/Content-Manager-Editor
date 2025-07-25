@@ -69,6 +69,7 @@ const Home: React.FC = () => {
                 <RouteButton
                   type="dashboard"
                   data-cy="route-button-dashboard"
+                  data-testid="dashboard-button"
                 />
                 <InopButton type="load_article" />
               </div>

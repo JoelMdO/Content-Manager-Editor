@@ -1,8 +1,10 @@
 import {
   addFontStyle,
   addFontWeight,
+  addTextDecoration,
   deleteFontStyle,
   deleteFontWeight,
+  deleteTextDecoration,
 } from "../../store/slices/data_slice";
 import { AppDispatch } from "../../store/store";
 
@@ -27,6 +29,7 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
     //
     let fontWeight: string = "normal";
     let fontStyle: string = "normal";
+    let textDecoration: string = "none";
     //First to check if the text has already and style
     //and if text inside a <span> element with the type of font weight.
     if (spanNode && spanNode.tagName === "SPAN") {
@@ -50,9 +53,19 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
             dispatch(deleteFontWeight({ text }));
           }
           break;
+        case "underline":
+          if (spanNode.style.textDecoration === "none" || !spanNode.style.textDecoration) {
+            spanNode.style.textDecoration = "underline";
+            dispatch(addTextDecoration({ text }));
+          } else {
+            spanNode.style.textDecoration = "none";
+            dispatch(deleteTextDecoration({ text }));
+          }
+          break;
         default:
           spanNode.style.fontWeight = "normal";
           spanNode.style.fontStyle = "normal";
+          spanNode.style.textDecoration = "none";
           break;
       }
     } else {
@@ -65,15 +78,20 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
         case "bold":
           fontWeight = "bold";
           break;
+        case "underline":
+          textDecoration = "underline";
+          break;
         default:
           fontStyle = "normal";
           fontWeight = "normal";
+          textDecoration = "none";
           break;
       }
       const extractedContent = range.extractContents();
       const span = document.createElement("span");
       span.style.fontWeight = fontWeight;
       span.style.fontStyle = fontStyle;
+      span.style.textDecoration = textDecoration;
       range.insertNode(span);
       span.appendChild(extractedContent);
       //Update redux with text and style
@@ -83,6 +101,9 @@ export const handleFontChange = (value: string, dispatch: AppDispatch) => {
       }
       if (fontWeight === "bold") {
         dispatch(addFontWeight({ text: newText }));
+      }
+      if (textDecoration === "underline") {
+        dispatch(addTextDecoration({ text: newText }));
       }
     }
   }
