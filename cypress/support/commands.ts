@@ -64,3 +64,47 @@ Cypress.Commands.add('typeInEditor', (content: string, index: number) => {
     cy.wrap($el).focus().type(content, { delay: 50 })
   })
 })
+
+// Select text within an element
+Cypress.Commands.add('selectText', { prevSubject: 'element' }, (subject, text: string) => {
+  cy.wrap(subject).then($el => {
+    const element = $el[0]
+    const textContent = element.textContent || ''
+    const startIndex = textContent.indexOf(text)
+    
+    if (startIndex !== -1) {
+      const range = document.createRange()
+      const selection = window.getSelection()
+      
+      // Find the text node containing our text
+      const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT,
+        null
+      )
+      
+      let textNode: Node | null = null
+      let currentOffset = 0
+      
+      while (walker.nextNode()) {
+        const node = walker.currentNode
+        const nodeText = node.textContent || ''
+        
+        if (currentOffset + nodeText.length > startIndex) {
+          textNode = node
+          break
+        }
+        currentOffset += nodeText.length
+      }
+      
+      if (textNode) {
+        const nodeStartIndex = startIndex - currentOffset
+        range.setStart(textNode, nodeStartIndex)
+        range.setEnd(textNode, nodeStartIndex + text.length)
+        
+        selection?.removeAllRanges()
+        selection?.addRange(range)
+      }
+    }
+  })
+})

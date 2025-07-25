@@ -1,15 +1,8 @@
 // cypress/support/component.ts
 import './commands'
-import { mount } from 'cypress/react18'
 
-// Augment the Cypress namespace to include type definitions for
-// your custom command.
-declare global {
-  namespace Cypress {
-    interface Chainable {
-      mount: typeof mount
-    }
-  }
-}
+// Simple component support file for E2E focused testing
+// Component testing setup is optional for this project
 
-Cypress.Commands.add('mount', mount)
+// Basic Cypress commands and setup
+export {}

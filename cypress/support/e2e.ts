@@ -49,6 +49,12 @@ declare global {
        * @example cy.typeInEditor('content', 0)
        */
       typeInEditor(content: string, index: number): Chainable<void>
+      
+      /**
+       * Custom command to select text in an element
+       * @example cy.get('element').selectText('text to select')
+       */
+      selectText(text: string): Chainable<void>
     }
   }
 }
