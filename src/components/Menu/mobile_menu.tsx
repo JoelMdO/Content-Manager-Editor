@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import MenuButton from "./Menu Button/buttons_menu";
 import {
-  ButtonProps,
+  // ButtonProps,
   iconsMenu,
 } from "@/components/Menu/Menu Button/type/type_menu_button";
 import FontStyleUI from "./Menu Button/font_style_buttons";
-import MenuContext from "../../utils/context/menu_context";
+// import MenuContext from "../../utils/context/menu_context";
 
 //--------------------------------------------------------
 const MenuMobile = () => {
