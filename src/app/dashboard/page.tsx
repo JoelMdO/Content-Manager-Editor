@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import dbSelector from "../../components/alerts/db_selector";
 import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
 import DraftArticle from "@/components/draft_article/draft_article";
+// import { useGetDraftArticleHook } from "@/hooks/useDraftArticle";
 const ImageInput = dynamic(
   () => import("@/components/Menu/Menu Button/image_input")
 );
@@ -47,7 +48,9 @@ const Dashboard: React.FC = () => {
     useState<string>("Select category"); // TODO check if its necesary
   // const [isFontStyleOpen, setIsFontStyleOpen] = useState<boolean>(false);
   const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
-  // const [isClicked, setIsClicked] = useState<boolean>(false);
+  const [translationReady, setTranslationReady] = useState(false);
+  const [isDraftArticleButtonClicked, setDraftArticleButtonClicked] =
+    useState<boolean>(false);
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
@@ -58,8 +61,9 @@ const Dashboard: React.FC = () => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const sectionsDialogRef = useRef<HTMLDialogElement | null>(null);
   const stylesDialogRef = useRef<HTMLDialogElement | null>(null);
+  const [DRAFT_KEY, setDraftKey] = useState(`draft-articleContent-DeCav`);
   //
-  let DRAFT_KEY: string = "";
+
   //
   // let theTitle = savedTitleRef.current || "";
   // let theBody = savedBodyRef.current || "";
@@ -67,8 +71,7 @@ const Dashboard: React.FC = () => {
   //
   //
   ///======================================================
-  // Check if an article is already created on page load
-  // Store articleID in a ref to persist across renders
+  // Check if screen is desktop and database selector
   ///======================================================
   useEffect(() => {
     dbSelector();
@@ -76,42 +79,50 @@ const Dashboard: React.FC = () => {
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
+    console.log("dbNameToSearch.current:", dbNameToSearch.current);
 
-    //--------------------------------------------------------
-    // Read the sessionStorage as per the corresponded db.
-    //--------------------------------------------------------
-    // let articleStored: string | null;
-
-    // dbNameToSearch.current =
-    //   sessionStorage.getItem("db") || dbNameToSearch.current;
-    // articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-    //console.log("Article found in sessionStorage:", articleStored);
-
-    // if (!articleStored) {
-    //Check localStorage for the article content
-    // console.log(
-    //   "No article found in sessionStorage, checking localStorage..."
-    // );
-    DRAFT_KEY = `draft-articleContent-${dbNameToSearch.current}`;
-    // articleStored = localStorage.getItem(DRAFT_KEY);
-    //console.log("Article found in localStorage:", articleStored);
-    //}
-
-    // if (articleStored) {
-    // console.log("articleStored to savedTitleRef:", articleStored);
-    // const jsonArticle = JSON.parse(articleStored!);
-    // savedTitleRef.current = jsonArticle[0]?.content || "";
-    // savedBodyRef.current = jsonArticle[2]?.content || "";
-    // Remove the sesstion Storage after the page is mounted and if exist the article is created
-    // sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
-    // sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
-    // sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
-    //}
-    // console.log("savedTitleRef at Dashboard:", savedTitleRef.current);
-    // console.log("savedBodyRef at Dashboard:", savedBodyRef.current);
-    // debugger;
-    //
+    setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
+    console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
   }, []);
+  //--------------------------------------------------------
+  // Read the sessionStorage as per the corresponded db.
+  //--------------------------------------------------------
+  // const { savedTitleRef, savedBodyRef } = useGetDraftArticleHook(
+  //   dbNameToSearch.current,
+  //   DRAFT_KEY
+  // );
+  // let articleStored: string | null;
+
+  // dbNameToSearch.current =
+  //   sessionStorage.getItem("db") || dbNameToSearch.current;
+  // articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
+  //console.log("Article found in sessionStorage:", articleStored);
+
+  // if (!articleStored) {
+  //Check localStorage for the article content
+  // console.log(
+  //   "No article found in sessionStorage, checking localStorage..."
+  // );
+  // DRAFT_KEY = `draft-articleContent-${dbNameToSearch.current}`;
+  // articleStored = localStorage.getItem(DRAFT_KEY);
+  //console.log("Article found in localStorage:", articleStored);
+  //}
+
+  // if (articleStored) {
+  // console.log("articleStored to savedTitleRef:", articleStored);
+  // const jsonArticle = JSON.parse(articleStored!);
+  // savedTitleRef.current = jsonArticle[0]?.content || "";
+  // savedBodyRef.current = jsonArticle[2]?.content || "";
+  // Remove the sesstion Storage after the page is mounted and if exist the article is created
+  // sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
+  // sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
+  // sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
+  //}
+  // console.log("savedTitleRef at Dashboard:", savedTitleRef.current);
+  // console.log("savedBodyRef at Dashboard:", savedBodyRef.current);
+  // debugger;
+  //
+  //
   //
   //--------------------------------------------------------
   // Context creation
@@ -131,11 +142,14 @@ const Dashboard: React.FC = () => {
     fileInputRef,
     dialogRef,
     sectionsDialogRef,
-    dbNameToSearch: dbNameToSearch.current,
+    dbNameToSearch,
+    setDraftKey,
     DRAFT_KEY,
     stylesDialogRef,
-    // setIsClicked,
-    // isClicked,
+    translationReady,
+    setTranslationReady,
+    isDraftArticleButtonClicked,
+    setDraftArticleButtonClicked,
   };
   //
   ///======================================================

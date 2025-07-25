@@ -1,59 +1,67 @@
 import MenuContext from "@/utils/context/menu_context";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ButtonProps } from "../Menu/Menu Button/type/type_menu_button";
 
 const DraftArticle = () => {
   //
   // CONTEXT
   //=========================================================
-  const { dbNameToSearch, DRAFT_KEY, savedTitleRef, savedBodyRef } = useContext(
-    MenuContext
-  ) as ButtonProps;
+  const {
+    dbNameToSearch,
+    DRAFT_KEY,
+    savedTitleRef,
+    savedBodyRef,
+    setDraftArticleButtonClicked,
+  } = useContext(MenuContext) as ButtonProps;
   const newSavedTitleRef = useRef<string>("");
   const newSavedBodyRef = useRef<string>("");
   //
-  let text: string = "Without Draft Articles";
+  const [text, setText] = useState<string>("Without Draft Articles");
   //
   useEffect(() => {
     //
     //--------------------------------------------------------
     // Read the sessionStorage as per the corresponded db.
     //--------------------------------------------------------
-    let articleStored: string | null;
-
-    // dbNameToSearch.current =
-    //   sessionStorage.getItem("db") || dbNameToSearch.current;
-    articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-    console.log("Article found in sessionStorage:", articleStored);
+    let articleStored: string | null = sessionStorage.getItem(
+      `articleContent-${dbNameToSearch}`
+    );
+    console.log("articleStored from session at draft article:", articleStored);
 
     if (!articleStored) {
-      //Check localStorage for the article content
-      // console.log(
-      //   "No article found in sessionStorage, checking localStorage..."
-      // );
-      //   DRAFT_KEY = `draft-articleContent-${dbNameToSearch.current}`;
-      articleStored = localStorage.getItem(DRAFT_KEY);
-      //console.log("Article found in localStorage:", articleStored);
-    }
+      console.log("DRAFT_KEY at draft article:", DRAFT_KEY);
 
+      articleStored = localStorage.getItem(DRAFT_KEY);
+      console.log(
+        "articleStored from localStorage at draft article:",
+        articleStored
+      );
+    }
     if (articleStored) {
-      // console.log("articleStored to savedTitleRef:", articleStored);
-      const jsonArticle = JSON.parse(articleStored!);
-      newSavedTitleRef.current = jsonArticle[0]?.content || "";
-      newSavedBodyRef.current = jsonArticle[2]?.content || "";
-      // Remove the sesstion Storage after the page is mounted and if exist the article is created
+      const jsonArticle = JSON.parse(articleStored);
+      console.log("jsonArticle at draft article:", jsonArticle);
+
+      newSavedTitleRef.current =
+        jsonArticle.find((item: any) => item.type === "title")?.content || "";
+      newSavedBodyRef.current =
+        jsonArticle.find((item: any) => item.type === "body")?.content || "";
+      console.log("savedTitleRef at draftarticle:", newSavedTitleRef.current);
+      console.log("savedBodyRef at draftarticle:", newSavedBodyRef.current);
+      //
+      setText(newSavedTitleRef.current);
+      //
       sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
       sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
       sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
-      text = savedTitleRef.current;
+    } else {
+      setText("Without Draft Articles");
     }
-    console.log("savedTitleRef at Dashboard:", savedTitleRef.current);
-    console.log("savedBodyRef at Dashboard:", savedBodyRef.current);
-    console.log("text at Dashboard:", text);
-
-    //debugger;
     //
-  }, []);
+
+    console.log("text at draft article:", text);
+
+    //
+  }, [dbNameToSearch, DRAFT_KEY]);
   //
   //--------------------------------------------------------
   // Update UI
@@ -61,6 +69,7 @@ const DraftArticle = () => {
   const handleClick = () => {
     savedTitleRef.current = newSavedTitleRef.current;
     savedBodyRef.current = newSavedBodyRef.current;
+    setDraftArticleButtonClicked(true);
   };
   //
   return (
