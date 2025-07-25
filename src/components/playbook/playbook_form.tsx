@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import categories from "../../constants/categories";
 import handleSubmit from "../../utils/playbook/handleSubmit";
 import { useRouter } from "next/navigation";
-import CustomDashboardButton from "../buttons/customDashboard_button";
+import CustomDashboardButton from "../buttons/custom dashboard/button_dashboard";
 import { useSearchParams } from "next/navigation";
 import Loader from "../buttons/loader_saving";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";

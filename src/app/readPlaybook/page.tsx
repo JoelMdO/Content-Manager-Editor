@@ -5,7 +5,7 @@ import BackPageButton from "../../components/buttons/back_page_button";
 import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "../../components/buttons/logo_button";
 import categories from "../../constants/categories";
-import CustomDashboardButton from "../../components/buttons/Custom Dahsboard/customDashboard_button";
+import CustomDashboardButton from "../../components/buttons/custom dashboard/button_dashboard";
 import callHub from "../../services/api/call_hub";
 import dynamic from "next/dynamic";
 import errorAlert from "../../components/alerts/error";
