@@ -6,7 +6,7 @@
 // } from "../../store/slices/data_slice";
 // import { AppDispatch } from "../../store/store";
 
-import { ButtonProps } from "@/components/Menu/Menu Button/type/menu_button_type";
+import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
 import { set } from "cypress/types/lodash";
 
 // export const handleFontChange = (value: string, dispatch: AppDispatch) => {

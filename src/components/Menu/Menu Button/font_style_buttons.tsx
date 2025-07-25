@@ -5,8 +5,8 @@ import text from "../../../constants/buttons_data_text.json";
 import LinkDialog from "./link_dialog";
 import { useContext, useState } from "react";
 import MenuContext from "../../../utils/context/menu_context";
-import { ButtonProps } from "./type/menu_button_type";
-import { menuButtonStyle } from "./style/menu_button_style";
+import { ButtonProps } from "./type/type_menu_button";
+import { menuButtonStyle } from "./style/style_menu_button";
 
 const FontStyleUI: React.FC<{
   setIsFontStyleOpen: React.Dispatch<React.SetStateAction<boolean>>;

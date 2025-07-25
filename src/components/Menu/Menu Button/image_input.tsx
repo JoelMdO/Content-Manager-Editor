@@ -1,14 +1,20 @@
 import { ChangeEvent, useContext } from "react";
 import MenuContext from "../../../utils/context/menu_context";
-import { ButtonProps } from "./type/menu_button_type";
+import { ButtonProps } from "./type/type_menu_button";
 import uploadImage from "@/utils/dashboard/images_edit/upload_image";
 import successAlert from "@/components/alerts/sucess";
 import errorAlert from "@/components/alerts/error";
 
-const ImageInput = ({ index }: { index: number }) => {
+const ImageInput = ({
+  index,
+}: // setIsClicked,
+{
+  index: number;
+  // setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   //CONTEXT
   //===========================================================
-  const { editorRefs, setIsClicked, fileInputRef } = useContext(
+  const { editorRefs, fileInputRef, setIsClicked } = useContext(
     MenuContext
   ) as ButtonProps;
   //
@@ -26,7 +32,7 @@ const ImageInput = ({ index }: { index: number }) => {
       console.log("editorRef:", editorRef);
 
       const dbName = sessionStorage.getItem("db");
-      debugger;
+      //debugger;
       uploadImage(e, editorRef, dbName!)
         .then((response) => {
           setIsClicked(false);

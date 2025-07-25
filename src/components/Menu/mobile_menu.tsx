@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import MenuButton from "./Menu Button/menu_buttons";
+import { useContext, useEffect, useState } from "react";
+import MenuButton from "./Menu Button/buttons_menu";
 import {
   ButtonProps,
   iconsMenu,
-} from "@/components/Menu/Menu Button/type/menu_button_type";
+} from "@/components/Menu/Menu Button/type/type_menu_button";
 import FontStyleUI from "./Menu Button/font_style_buttons";
+import MenuContext from "../../utils/context/menu_context";
 
 //--------------------------------------------------------
 const MenuMobile = () => {
@@ -12,6 +13,7 @@ const MenuMobile = () => {
   //console.log("selectedSection at menumobile:", selectedSection);
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [isStylesOpen, setIsFontStyleOpen] = useState<boolean>(false);
+  // const { isClicked, setIsClicked } = useContext(MenuContext) as ButtonProps;
   // function toggleMenu() {
   //   const menu = document.getElementById("menuItems");
   //   if (menu) {
