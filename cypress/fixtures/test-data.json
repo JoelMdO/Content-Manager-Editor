@@ -1,0 +1,16 @@
+{
+  "testUser": {
+    "email": "test@example.com",
+    "name": "Test User"
+  },
+  "testContent": {
+    "title": "My CMS Test Article Title",
+    "article": "This is my test article content. I will add a link to Tailwind CSS documentation.",
+    "link": "https://tailwindcss.com/docs/font-size"
+  },
+  "storageKeys": {
+    "draft": "draft-articleContent-DeCav",
+    "session": "articleContent-DeCav",
+    "database": "DeCav"
+  }
+}
