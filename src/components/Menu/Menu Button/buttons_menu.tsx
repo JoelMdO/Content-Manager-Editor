@@ -118,6 +118,7 @@ const MenuButton = ({
       <button
         type="button"
         data-cy={dataCity}
+        data-testid={`menu-button-${type}`}
         className={`${
           isClicked
             ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"

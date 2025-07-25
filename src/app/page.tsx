@@ -104,6 +104,7 @@ const Login: React.FC = () => {
           </form>
           <button
             type="button"
+            data-testid="google-login-button"
             onClick={() => {
               setIsSubmittedGoogle(true);
               signIn("google", { callbackUrl: "/home" });

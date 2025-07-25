@@ -67,6 +67,7 @@ const DashboardEditor = () => {
       {["Title", "Article"].map((placeholder, index) => (
         <div
           key={index}
+          data-testid={index === 0 ? "editor-title" : "editor-article"}
           ref={(el) => {
             // if (el && !editorRefs!.current[index]) {
             if (editorRefs && !editorRefs!.current[index]) {

@@ -38,6 +38,7 @@ const LinkDialog = ({
   return (
     <dialog
       ref={dialogRef}
+      data-testid="link-dialog"
       className="modal bg-blue w-[60vw] md:w-[50vw] g:w-[30vw] h-[20%] rounded shadow-lg z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
       data-cy="dialog-link"
     >
@@ -51,6 +52,7 @@ const LinkDialog = ({
         <input
           ref={linkInputRef}
           type="text"
+          data-testid="link-input"
           className="input input-bordered border-green w-[90%] h-[40px]"
           placeholder=" Paste the link/url"
           data-cy="dialog-input-link"
@@ -61,6 +63,7 @@ const LinkDialog = ({
           <button
             className="btn border-green text-white border-b-2"
             type="submit"
+            data-testid="link-submit-button"
             onClick={(e) => {
               e.preventDefault();
               insertLink("cms", link_url, editorRef)

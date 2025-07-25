@@ -53,6 +53,7 @@ const ImageInput = ({
     <label>
       <input
         type="file"
+        data-testid="image-upload-input"
         ref={fileInputRef}
         onChange={handleFileChange}
         accept="image/*"

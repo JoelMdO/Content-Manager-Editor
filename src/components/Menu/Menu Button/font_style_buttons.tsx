@@ -41,6 +41,7 @@ const FontStyleUI: React.FC<{
             <button
               key={font.value}
               type="button"
+              data-testid={`font-style-${font.value}`}
               className={`${
                 isPressed
                   ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"
