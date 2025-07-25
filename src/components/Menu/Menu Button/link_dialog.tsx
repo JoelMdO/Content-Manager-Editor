@@ -3,17 +3,25 @@ import successAlert from "../../alerts/sucess";
 import errorAlert from "../../alerts/error";
 import text from "../../../constants/buttons_data_text.json";
 import { useContext, useRef } from "react";
-import { ButtonProps } from "./type/menu_button_type";
+import { ButtonProps } from "./type/type_menu_button";
 import MenuContext from "../../../utils/context/menu_context";
 
-const LinkDialog = ({ index }: { index: number }) => {
+const LinkDialog = ({
+  index,
+}: // setIsClicked,
+{
+  index?: number;
+  // setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   ///========================================================
   // To load links and store them in IndexedDB for later save on db.
   ///========================================================
   //
   //CONTEXT
   //=========================================================
-  const { editorRefs, dialogRef } = useContext(MenuContext) as ButtonProps;
+  const { editorRefs, dialogRef, setIsClicked } = useContext(
+    MenuContext
+  ) as ButtonProps;
   // Ensure dialogRef is defined
   console.log("link dialog", index, "dialogref ", dialogRef);
 
@@ -30,7 +38,7 @@ const LinkDialog = ({ index }: { index: number }) => {
   return (
     <dialog
       ref={dialogRef}
-      className="modal bg-blue md:w-[30%] w-[60%] h-[20%] rounded shadow-lg z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      className="modal bg-blue w-[60vw] md:w-[50vw] g:w-[30vw] h-[20%] rounded shadow-lg z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
       data-cy="dialog-link"
     >
       <form
@@ -59,6 +67,7 @@ const LinkDialog = ({ index }: { index: number }) => {
                 .then((response) => {
                   linkInputRef.current!.value = "";
                   dialogRef!.current?.close();
+                  // setIsClicked(false);
                   if (response.status === 200) {
                     successAlert("link");
                   } else {
@@ -77,7 +86,10 @@ const LinkDialog = ({ index }: { index: number }) => {
           <button
             className="btn border-blue-light text-white border-b-2"
             type="button"
-            onClick={() => dialogRef!.current?.close()}
+            onClick={() => {
+              dialogRef!.current?.close();
+              // setIsClicked(false);
+            }}
           >
             {text.buttons.close}
           </button>

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { sections, SectionsType } from "../../constants/sections";
-import { ButtonProps } from "./Menu Button/type/menu_button_type";
+import { ButtonProps } from "./Menu Button/type/type_menu_button";
 import MenuContext from "../../utils/context/menu_context";
 
 const SectionSelector = () => {
@@ -104,12 +104,12 @@ const SectionSelector = () => {
     <>
       <dialog
         ref={sectionsDialogRef}
-        className="modal  bg-white/50 border border-gold md:w-[30vw] lg:w-[20vw] w-[40vw] h-[30dvh] rounded shadow-lg md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 absolute right-[20dvh] top-[20dvh]"
+        className="z-50 bg-white/50 border border-gold md:w-[40vw] lg:w-[20vw] w-[55vw] h-[30dvh] rounded shadow-lg absolute xs:left-[18dvh] xs:top-[25dvh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
       >
         <div className="w-full h-auto flex flex-col items-center">
-          <span className="text-white text-center font-medium text-sm md:text-lg mt-2">{`Select a section for ${db}`}</span>
+          <span className="text-white text-center font-medium text-sm md:text-base g:text-lg mt-2">{`Select a section for ${db}`}</span>
           <select
-            className={`h-[40px] w-[30vw] md:w-[20vw] lg:w-[15vw] shadow-md shadow-black bg-blue hover:bg-green text-white text-[0.60rem] md:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-8`}
+            className={`h-[40px] w-[30vw] md:w-[20vw] lg:w-[15vw] shadow-md shadow-black bg-blue hover:bg-green text-white text-xs md:text-base g:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-8`}
             id="section-selector"
             aria-label="Select article category"
             onChange={handleChange}

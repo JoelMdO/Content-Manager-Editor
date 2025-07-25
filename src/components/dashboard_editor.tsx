@@ -2,7 +2,7 @@ import { debouncedUpdateStore } from "@/utils/dashboard/debounceUpdateStore";
 import { useContext, useEffect, useRef } from "react";
 import { handleKeyBoardActions } from "../utils/dashboard/handle_keyboard_actions";
 import { handleContentChange } from "../utils/dashboard/handle_content_change";
-import { ButtonProps } from "./Menu/Menu Button/type/menu_button_type";
+import { ButtonProps } from "./Menu/Menu Button/type/type_menu_button";
 import { use } from "chai";
 import MenuContext from "@/utils/context/menu_context";
 

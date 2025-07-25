@@ -50,8 +50,9 @@ const Login: React.FC = () => {
   /// UI with a login form and a contact button for the
   /// user to reach the software engineer.
   ///--------------------------------------------------------
+  //TODO dont delete on test only on production
   if (isDev) {
-    // Directly render dashboard for development
+    //Directly render dashboard for development
     return <Dashboard />;
   }
   return (

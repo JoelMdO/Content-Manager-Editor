@@ -2,11 +2,11 @@ import React, {
   useMemo,
   useState,
   useCallback,
-  useRef,
+  // useRef,
   useContext,
   // ChangeEvent,
 } from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 // import Image from "next/image";
 // import successAlert from "../alerts/sucess";
 // import errorAlert from "../alerts/error";
@@ -17,9 +17,9 @@ import { useRouter } from "next/navigation";
 // import { PlaybookMeta } from "../../types/plabookMeta";
 // import { RootState } from "@/store/store";
 // import { custommButtonStyle } from "../Custom Dahsboard/styles/custom_button_style";
-import { buttonMenuLogic } from "./utils/menu_button_logic";
-import { ButtonProps } from "./type/menu_button_type";
-import { menuButtonStyle } from "./style/menu_button_style";
+import { buttonMenuLogic } from "./utils/logic_menu_button";
+import { ButtonProps } from "./type/type_menu_button";
+import { menuButtonStyle } from "./style/style_menu_button";
 // import uploadImage from "@/utils/dashboard/images_edit/upload_image";
 // import successAlert from "@/components/alerts/sucess";
 // import errorAlert from "@/components/alerts/error";
@@ -28,7 +28,7 @@ import ImageInput from "./image_input";
 import LinkDialog from "./link_dialog";
 import SectionSelector from "../sections_selector";
 import MenuContext from "../../../utils/context/menu_context";
-import FontStyleUI from "@/components/Menu/Menu Button/font_style_buttons";
+// import FontStyleUI from "@/components/Menu/Menu Button/font_style_buttons";
 // import { useMenuContext } from "@/utils/context/menu_context";
 
 const MenuButton = ({
@@ -57,6 +57,8 @@ const MenuButton = ({
     setSelectedSection,
     sectionsDialogRef,
     stylesDialogRef,
+    // setIsClicked,
+    // isClicked,
   } = useContext(MenuContext) as ButtonProps;
   // CONSTANTS
   //=========================================================
@@ -126,31 +128,6 @@ const MenuButton = ({
     setIsCreating,
     editorRefs,
   ]);
-  // ///--------------------------------------------------------
-  // // Function to handle the cases of the MenuButtons
-  // ///--------------------------------------------------------
-  // const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   if (editorRef) {
-  //     console.log("editorRef:", editorRef);
-
-  //     const dbName = sessionStorage.getItem("db");
-  //     uploadImage(e, editorRef, dbName!)
-  //       .then((response) => {
-  //         setIsClicked(false);
-  //         if (response.status === 200) {
-  //           successAlert("image");
-  //         } else {
-  //           errorAlert("image", "non200", response.message);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log("Error uploading image:", error);
-
-  //         setIsClicked(false);
-  //         errorAlert("image", "error", error);
-  //       });
-  //   }
-  // };
   //
   ///--------------------------------------------------------
   // UI of the button
@@ -163,7 +140,7 @@ const MenuButton = ({
         className={`${
           isClicked
             ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"
-            : "bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-white"
+            : "bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-black"
         } hover:border-orange-300 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
           handleClick();
@@ -179,29 +156,25 @@ const MenuButton = ({
           <span className="flex text-xs">{text}</span>
         </div>
       </button>
-      {type === "sections" && (
+      {/* {type === "sections" && (
         <SectionSelector
         // sectionsDialogRef={sectionsDialogRef}
         // db={dbNameToSearch as string}
         // selectedSection={selectedSection}
         // setSelectedSection={setSelectedSection}
         />
-      )}
-      {type === "image" && (
+      )} */}
+      {/* {type === "image" && (
         <ImageInput
           index={index!}
+          setIsClicked={setIsClicked}
           // fileInputRef={fileInputRef}
           // handleFileChange={handleFileChange}
         />
-      )}
-      {type === "link" && (
-        <LinkDialog
-          index={index!}
-          // editorRefs={editorRefs}
-          // index={index}
-          // dialogRef={dialogRef}
-        />
-      )}
+      )} */}
+      {/* {type === "link" && (
+        <LinkDialog index={index!} setIsClicked={setIsClicked} />
+      )} */}
     </>
   );
 };

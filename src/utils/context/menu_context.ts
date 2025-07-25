@@ -1,4 +1,4 @@
-import { ButtonProps } from "../../components/Menu/Menu Button/type/menu_button_type";
+import { ButtonProps } from "../../components/Menu/Menu Button/type/type_menu_button";
 import { createContext, useContext } from "react";
 
 // Create MenuContext

@@ -29,6 +29,7 @@ export interface ButtonProps {
   setIsFontStyleOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isMediumScreen: boolean;
   setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  isClicked: boolean;
   // italic: string[];
   // bold: string[];
   router: any;

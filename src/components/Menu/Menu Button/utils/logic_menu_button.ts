@@ -9,7 +9,7 @@ import { debouncedUpdateStore } from "../../../../utils/dashboard/debounceUpdate
 // import { autoBatchEnhancer } from "@reduxjs/toolkit";
 // import FontStyleUI from "../../../buttons/font_style_buttons";
 import { handleSave } from "../../../../utils/dashboard/handle_save";
-import { ButtonProps } from "../type/menu_button_type";
+import { ButtonProps } from "../type/type_menu_button";
 import { handleClear } from "../../../../utils/dashboard/handler_clear";
 import MenuContext from "../../../../utils/context/menu_context";
 // import { useMenuContext } from "@/utils/context/menu_context";
@@ -73,7 +73,7 @@ export const saveDraft = ({
 
     localStorage.setItem(DRAFT_KEY!, draft);
   }
-  debugger;
+  //debugger;
 };
 ///--------------------------------------------------------
 // Clear the UI
@@ -127,8 +127,10 @@ const openSelectorDialog = ({
   setIsClicked,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  console.log("Opening dialog...", sectionsDialogRef?.current);
-  sectionsDialogRef!.current?.showModal();
+  if (sectionsDialogRef?.current) {
+    console.log("Opening dialog...", sectionsDialogRef?.current);
+    sectionsDialogRef!.current?.showModal();
+  }
 };
 ///--------------------------------------------------------
 // Main Function to handle the cases of the CustomDashBoardButton
@@ -165,6 +167,8 @@ export const buttonMenuLogic = ({
       loadImage({ fileInputRef, setIsClicked });
       break;
     case "link":
+      console.log('"Opening link dialog...");', dialogRef);
+
       openLinkDialog({ dialogRef, setIsClicked });
       break;
     case "sections":
