@@ -9,7 +9,7 @@ import Loader from "../components/buttons/loader_saving";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import text from "../constants/mainPage_data_text.json";
-import Dashboard from "./dashboard/page";
+import Home from "./home/page";
 
 const Login: React.FC = () => {
   ///===================================================
@@ -53,7 +53,7 @@ const Login: React.FC = () => {
   //TODO dont delete on test only on production
   if (isDev) {
     //Directly render dashboard for development
-    return <Dashboard />;
+    return <Home />;
   }
   return (
     <>
