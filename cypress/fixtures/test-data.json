@@ -1,0 +1,27 @@
+{
+  "testUser": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "image": "https://example.com/avatar.jpg"
+  },
+  "testContent": {
+    "title": "AI from the ground up",
+    "body": "Transform your web, Salesforce, and mobile app quality. Test faster, increase reliability, and gain confidence across every release.",
+    "link": "https://tailwindcss.com/docs/font-size"
+  },
+  "apiResponses": {
+    "successfulSave": {
+      "success": true,
+      "message": "Article saved successfully",
+      "id": "test-article-123"
+    },
+    "session": {
+      "user": {
+        "name": "Test User",
+        "email": "test@example.com",
+        "image": "https://example.com/avatar.jpg"
+      },
+      "expires": "2024-12-31T23:59:59.999Z"
+    }
+  }
+}
