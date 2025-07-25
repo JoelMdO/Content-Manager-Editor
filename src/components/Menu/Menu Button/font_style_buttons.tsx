@@ -1,11 +1,11 @@
 import { handleFontChange } from "../../../utils/dashboard/handle_font_change";
 // import { AppDispatch } from "../../store/store";
-import { useDispatch } from "react-redux";
-import text from "../../../constants/buttons_data_text.json";
-import LinkDialog from "./link_dialog";
-import { useContext, useState } from "react";
-import MenuContext from "../../../utils/context/menu_context";
-import { ButtonProps } from "./type/type_menu_button";
+// import { useDispatch } from "react-redux";
+// import text from "../../../constants/buttons_data_text.json";
+// import LinkDialog from "./link_dialog";
+import { useState } from "react";
+// import MenuContext from "../../../utils/context/menu_context";
+// import { ButtonProps } from "./type/type_menu_button";
 import { menuButtonStyle } from "./style/style_menu_button";
 
 const FontStyleUI: React.FC<{

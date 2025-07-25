@@ -41,13 +41,8 @@ const MenuButton = ({
   console.log("type at menubutton:", type);
   const {
     editorRefs,
-    isCreating,
     "data-cy": dataCity,
-    setViewDetails,
-    setUpdateNote,
     id,
-    resetForm,
-    setIsCreating,
     fileInputRef,
     dialogRef,
     dbNameToSearch,
@@ -88,7 +83,7 @@ const MenuButton = ({
   // sectionsType.current = type as string;
   const { text, icon } = useMemo(
     () => menuButtonStyle(type!, isClicked),
-    [type, isCreating, isClicked]
+    [type, isClicked]
   );
 
   ///--------------------------------------------------------
@@ -113,21 +108,7 @@ const MenuButton = ({
       stylesDialogRef,
       setIsFontStyleOpen,
     });
-  }, [
-    type,
-    setIsClicked,
-    // italic,
-    // bold,
-    router,
-    noteViewMode,
-    setNoteViewMode,
-    setViewDetails,
-    setUpdateNote,
-    id,
-    resetForm,
-    setIsCreating,
-    editorRefs,
-  ]);
+  }, [type, setIsClicked, id, editorRefs]);
   //
   ///--------------------------------------------------------
   // UI of the button
