@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import Image from "next/image";
 // import successAlert from "../alerts/sucess";
 // import errorAlert from "../alerts/error";
@@ -7,29 +7,30 @@ import { useRouter } from "next/navigation";
 // import saveButtonClicked from "../../utils/buttons/save_button_clicked";
 // import emailMe from "@/utils/buttons/email_me";
 // import handleNoteClick from "../../utils/playbook/handle_note_click";
-import { PlaybookMeta } from "../../../types/plabookMeta";
+// import { PlaybookMeta } from "../../../types/plabookMeta";
 // import { RootState } from "@/store/store";
 import { custommButtonStyle } from "./styles/custom_button_style";
-import { buttonLogic } from "./utils/logic_customdash";
+import { customDashButtonLogic } from "./utils/logic_customdash";
+import { CustomDashButtonProps } from "./type/type_customdash_button";
 
-interface ButtonProps {
-  type: string;
-  onClick?: () => void;
-  isCreating?: boolean;
-  id?: string;
-  setViewDetails?: React.Dispatch<React.SetStateAction<boolean>>;
-  setEntries?: React.Dispatch<React.SetStateAction<PlaybookMeta[] | undefined>>;
-  setUpdateNote?: React.Dispatch<
-    React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>
-  >;
-  setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
-  "data-cy"?: string;
-  resetForm?: () => void;
-  DRAFT_KEY?: (db: string) => string;
-  dbNameToSearch?: string; // Optional prop for dbNameToSearch
-}
+// interface ButtonProps {
+//   type: string;
+//   onClick?: () => void;
+//   isCreating?: boolean;
+//   id?: string;
+//   setViewDetails?: React.Dispatch<React.SetStateAction<boolean>>;
+//   setEntries?: React.Dispatch<React.SetStateAction<PlaybookMeta[] | undefined>>;
+//   setUpdateNote?: React.Dispatch<
+//     React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>
+//   >;
+//   setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
+//   "data-cy"?: string;
+//   resetForm?: () => void;
+//   DRAFT_KEY?: (db: string) => string;
+//   dbNameToSearch?: string; // Optional prop for dbNameToSearch
+// }
 
-const CustomDashboardButton: React.FC<ButtonProps> = ({
+const CustomDashboardButton: React.FC<Partial<CustomDashButtonProps>> = ({
   type,
   onClick,
   isCreating,
@@ -40,8 +41,6 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
   setIsCreating,
   "data-cy": dataCity,
   resetForm,
-  DRAFT_KEY,
-  dbNameToSearch,
 }) => {
   const textSmallSize = "text-[0.60rem]";
   const router = useRouter();
@@ -65,7 +64,7 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
     height,
     width,
   } = useMemo(
-    () => custommButtonStyle(type, isCreating),
+    () => custommButtonStyle(type!, isCreating),
     [type, isCreating, isClicked]
   );
 
@@ -73,11 +72,8 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
   // Function to handle the cases of the CustomDashBoardButton
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
-    buttonLogic({
+    customDashButtonLogic({
       type,
-      setIsClicked,
-      italic,
-      bold,
       router,
       noteViewMode,
       setNoteViewMode,
@@ -88,14 +84,9 @@ const CustomDashboardButton: React.FC<ButtonProps> = ({
       resetForm,
       setIsCreating,
       onClick,
-      DRAFT_KEY,
-      dbNameToSearch,
     });
   }, [
     type,
-    setIsClicked,
-    italic,
-    bold,
     router,
     noteViewMode,
     setNoteViewMode,
