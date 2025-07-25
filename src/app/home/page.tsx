@@ -42,7 +42,7 @@ const Home: React.FC = () => {
             {text.homePage.home}
           </h1>
           <div className="flex flex-col justify-center items-center h-[90%] w-full">
-            <div className="flex flex-col w-[90%] md:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-5 mt-2">
+            <div className="flex flex-col w-[90%] md:w-[60%] g:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-5 mt-2">
               <h1 className="text-white pt-6 pl-2 text-xl font-roboto">
                 {text.homePage.playbook}
               </h1>
@@ -50,7 +50,7 @@ const Home: React.FC = () => {
                 {text.homePage.slogan}
               </p>
               {thereIsPlaybook && <RouteButton type="with-item-playbook" />}
-              <div className="flex flex-row self-center pt-2 gap-x-4 ">
+              <div className="flex flex-row self-center pt-2 gap-4">
                 <RouteButton type="playbook" data-cy="route-button-playbook" />
                 <RouteButton
                   type="read-playbook"
@@ -58,7 +58,7 @@ const Home: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex flex-col w-[90%] md:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-8 mt-3 align-middle">
+            <div className="flex flex-col w-[90%] md:w-[60%] g:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-8 mt-3 align-middle">
               <h1 className="text-white pt-6 pl-2 text-xl font-roboto">
                 {text.homePage.CMS}
               </h1>
