@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 // import handleNoteClick from "../../utils/playbook/handle_note_click";
 // import { PlaybookMeta } from "../../types/plabookMeta";
 // import { RootState } from "@/store/store";
-// import { custommButtonStyle } from "../Custom Dahsboard/styles/custom_button_style";
+// import { playbookButtonStyle } from "../Custom Dahsboard/styles/custom_button_style";
 import { buttonMenuLogic } from "./utils/logic_menu_button";
 import { ButtonProps } from "./type/type_menu_button";
 import { menuButtonStyle } from "./style/style_menu_button";
@@ -38,7 +38,7 @@ const MenuButton = ({
 }: Partial<ButtonProps>) => {
   // CONTEXT
   //=========================================================
-  console.log("type at menubutton:", type);
+  //console.log("type at menubutton:", type);
   const {
     editorRefs,
     "data-cy": dataCity,
@@ -79,7 +79,7 @@ const MenuButton = ({
   // const italic = useSelector((state: RootState) => state.data_state?.fontStyle);
   // const bold = useSelector((state: RootState) => state.data_state?.fontWeight);
 
-  console.log("isCreating:", isClicked);
+  //console.log("isCreating:", isClicked);
   // sectionsType.current = type as string;
   const { text, icon } = useMemo(
     () => menuButtonStyle(type!, isClicked),

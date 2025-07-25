@@ -66,6 +66,7 @@ const MenuMobile = () => {
               setIsFontStyleOpen={setIsFontStyleOpen}
             />
           </div>
+          <MenuButton type={"translate"} />
           <MenuButton type={"post"} />
         </div>
       </div>

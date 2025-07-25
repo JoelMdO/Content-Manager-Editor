@@ -40,6 +40,9 @@ const callHub = async (
       break;
     //## POST
     case "post":
+    case "translate":
+      console.log("doing translate at callhub", data);
+
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
         : data !== undefined

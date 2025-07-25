@@ -25,6 +25,9 @@ const successAlert = (
     case "auth":
       text = `Welcome!! \n${data!}`;
       break;
+    case "translate":
+      text = `Article translated`;
+      break;
     default:
       text = "Image uploaded";
       break;

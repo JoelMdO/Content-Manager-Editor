@@ -7,6 +7,7 @@ export interface ButtonProps {
   id: string;
   "data-cy": string;
   DRAFT_KEY: string;
+  setDraftKey: React.Dispatch<React.SetStateAction<string>>;
   dbNameToSearch: string | React.RefObject<string>;
   editorRefs: React.RefObject<(HTMLDivElement | null)[]>;
   index: number;
@@ -31,6 +32,10 @@ export interface ButtonProps {
   setPlaceHolderArticle: React.Dispatch<React.SetStateAction<boolean>>;
   isPlaceHolderTitle: boolean;
   isPlaceHolderArticle: boolean;
+  translationReady: boolean;
+  setTranslationReady: React.Dispatch<React.SetStateAction<boolean>>;
+  isDraftArticleButtonClicked: boolean;
+  setDraftArticleButtonClicked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const iconsMenu = {
@@ -44,6 +49,7 @@ export const iconsMenu = {
   styles: "🪄",
   menu: "🧰",
   clear: "🌪",
+  translate: "🌐",
 };
 export const menuButtonTypes = [
   "save",
@@ -55,4 +61,5 @@ export const menuButtonTypes = [
   "sections",
   "styles",
   "clear",
+  "translate",
 ];

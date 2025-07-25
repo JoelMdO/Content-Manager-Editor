@@ -24,8 +24,8 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
   const title = JSON.stringify(getContentByType("title"));
   const id = JSON.stringify(getContentByType("id"));
   const article = JSON.stringify(getContentByType("body"));
-  const italic = JSON.stringify(getContentByType("italic"));
-  const bold = JSON.stringify(getContentByType("bold"));
+  const section = JSON.stringify(getContentByType("section"));
+  // const bold = JSON.stringify(getContentByType("bold"));
   const dbName = JSON.stringify(getContentByType("dbName"));
   // const title = JSON.stringify(data.title);
   // const id = JSON.stringify(data.id);
@@ -37,8 +37,8 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
   formData.append("id", id);
   formData.append("article", article);
   formData.append("type", type);
-  formData.append("italic", italic);
-  formData.append("bold", bold);
+  formData.append("section", section);
+  // formData.append("bold", bold);
   formData.append("dbName", dbName);
   //
   //Filter if any image on the data

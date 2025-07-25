@@ -25,8 +25,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     id: string;
     title: string;
     article: string;
-    italic: string[];
-    bold: string[];
+    // italic: string[];
+    // bold: string[];
     images?: { url: string }[];
     category?: string;
     version?: string;
@@ -65,8 +65,8 @@ export async function POST(req: NextRequest): Promise<Response> {
       id: "",
       title: "",
       article: "",
-      italic: [],
-      bold: [],
+      // italic: [],
+      // bold: [],
       images: [],
     };
     const imageFiles: File[] = [];
@@ -153,17 +153,17 @@ export async function POST(req: NextRequest): Promise<Response> {
     const idObj = JSON.parse(idData);
     const articleData = formData.get("article") as string;
     const bodyObj = JSON.parse(articleData);
-    const italicData = formData.get("italic") as string;
-    const italicObj = JSON.parse(italicData);
-    const boldData = formData.get("bold") as string;
-    const boldObj = JSON.parse(boldData);
+    // const italicData = formData.get("italic") as string;
+    // const italicObj = JSON.parse(italicData);
+    // const boldData = formData.get("bold") as string;
+    // const boldObj = JSON.parse(boldData);
     const dbNameData = formData.get("dbName") as string;
     const dbNameObj = JSON.parse(dbNameData);
-    // TODO check
-    const categoryData = formData.get("category") as string;
-    const categoryObj = JSON.parse(categoryData);
-    const versionData = formData.get("version") as string;
-    const versionObj = JSON.parse(versionData);
+    // // TODO check
+    // const categoryData = formData.get("category") as string;
+    // const categoryObj = JSON.parse(categoryData);
+    // const versionData = formData.get("version") as string;
+    // const versionObj = JSON.parse(versionData);
     const sectionData = formData.get("section") as string;
     const sectionObj = JSON.parse(sectionData);
     //
@@ -171,10 +171,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.title = titleObj;
     article.article = bodyObj;
     article.images = imageUrls;
-    article.bold = boldObj;
-    article.italic = italicObj;
-    article.category = categoryObj;
-    article.version = versionObj;
+    // article.bold = boldObj;
+    // article.italic = italicObj;
+    // article.category = categoryObj;
+    // article.version = versionObj;
     article.section = sectionObj;
     //
 
@@ -183,23 +183,24 @@ export async function POST(req: NextRequest): Promise<Response> {
     const title = article.title;
     let body = article.article;
     let images = article.images;
-    let bold = article.bold;
-    let italic = article.italic;
-    let category = article.category;
-    let version = article.version;
+    // let bold = article.bold;
+    // let italic = article.italic;
+    // let category = article.category;
+    // let version = article.version;
     let section = article.section;
     //
 
     try {
-      const arrayData = [images, bold, italic];
+      // const arrayData = [images, bold, italic];
+      const arrayData = [images];
       forEach(arrayData, (value) => {
         if (Array.isArray(value) && value.length === 0) {
           if (value === images) {
             images = [{ url: "nil" }];
-          } else if (value === bold) {
-            bold = ["nil"];
-          } else {
-            italic = ["nil"];
+            // } else if (value === bold) {
+            //   bold = ["nil"];
+            // } else {
+            //   italic = ["nil"];
           }
         }
       });
@@ -222,6 +223,12 @@ export async function POST(req: NextRequest): Promise<Response> {
       // const boldAsObject = toFirebaseObject(bold);
       // const italicAsObject = toFirebaseObject(italic);
       //
+      ///--------------------------------------------------------
+      // Find Category and Section Code
+      ///--------------------------------------------------------
+      const category = sectionsCode[dbNameObj].find(
+        (item) => item.label === section
+      );
       ///--------------------------------------------------------
       // Convert HTML to Markdown
       ///--------------------------------------------------------
@@ -248,7 +255,9 @@ export async function POST(req: NextRequest): Promise<Response> {
         db = database;
         author = process.env.AUTHOR || "Default Author";
       }
-      //
+      ///--------------------------------------------------------
+      // Create Metadata Object
+      ///--------------------------------------------------------
       const metadata = {
         author: author,
         category: category,
@@ -257,7 +266,6 @@ export async function POST(req: NextRequest): Promise<Response> {
         published: true,
         tags: [],
         title: title,
-        version: version,
       };
       //
       const articleData = {

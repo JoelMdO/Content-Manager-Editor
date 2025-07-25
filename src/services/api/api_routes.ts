@@ -22,6 +22,9 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     switch (type) {
       //## POST
       case "post":
+      case "translate":
+        console.log('"doing translate at api routes');
+
         endPoint = type;
         body = data as FormData;
         headers["Authorization"] = `Bearer ${token}`;
