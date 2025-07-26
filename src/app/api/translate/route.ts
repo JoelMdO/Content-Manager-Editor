@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
       const aiPrompt = `Translate the following text to Spanish: Title{ ${title} } Body{ ${body} } Section{ ${section} }`;
       const url = process.env.SERVER_URL;
       const key = process.env.KEY_AI;
-      const token = jwt.sign({ role: "admin" }, key!, { expiresIn: "1h" });
+      const token = tokenReceived;
       //
       const newUrl = `${url}${request.url?.replace("/api/ask", "") || ""}`;
       //
@@ -168,11 +168,16 @@ export async function POST(request: NextRequest) {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          "X-Request-Type": "translation",
+          "X-Service": "cms-translate",
+          "X-Source-DB": dbName,
         },
         body: JSON.stringify({
           model: process.env.AI_MODEL,
           prompt: aiPrompt,
           stream: false,
+          source_service: "cms",
+          request_type: "translation",
         }),
       });
       //
