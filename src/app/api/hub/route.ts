@@ -1,17 +1,19 @@
 "server-only";
 import apiRoutes from "../../../services/api/api_routes";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sanitizeData } from "../../../utils/sanitize/data/sanitize_data";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/nextauth/auth";
 import createLog from "../../../services/authentication/create_log";
 import { dataType } from "@/types/dataType";
+import { getToken, JWT } from "next-auth/jwt";
 
-export async function POST(req: Request): Promise<NextResponse> {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   //
   let dataApiHub: dataType = "";
   let type: string = "clean-image";
   let token: string | undefined = "";
+  let nextAuthToken: string | undefined = "";
   let sessionId: string | undefined = "";
   let formData: FormData = new FormData();
   console.log('"Request received at API Hub"');
@@ -25,8 +27,10 @@ export async function POST(req: Request): Promise<NextResponse> {
 
     if (contentType.includes("application/json")) {
       const getDataAtApiHub = await req.json();
+      console.log("getDataAtApiHub:", getDataAtApiHub);
 
       dataApiHub = getDataAtApiHub.data;
+      console.log("dataApiHub:", dataApiHub);
 
       type = getDataAtApiHub.type;
       dataApiHub = dataApiHub;
@@ -48,23 +52,23 @@ export async function POST(req: Request): Promise<NextResponse> {
     ///--------------------------------------------------------
     // Check if the request is authenticated
     ///--------------------------------------------------------
+    //TODO change on production
+    // const session = await getServerSession(authOptions);
 
-    const session = await getServerSession(authOptions);
+    // if (!session && type !== "sign-in-by-email") {
+    //   return NextResponse.json({
+    //     status: 401,
+    //     message: "User without a valid session",
+    //   });
+    // }
 
-    if (!session && type !== "sign-in-by-email") {
-      return NextResponse.json({
-        status: 401,
-        message: "User without a valid session",
-      });
-    }
+    // if (session && type !== "sign-in-by-email") {
+    //   token = createLog(session?.user.id);
+    // }
 
-    if (session && type !== "sign-in-by-email") {
-      token = createLog(session?.user.id);
-    }
-
-    if ((session && type === "post") || (session && type === "translate")) {
-      sessionId = session.user?.id;
-    }
+    // if ((session && type === "post") || (session && type === "translate")) {
+    //   sessionId = session.user?.id;
+    // }
 
     ///-----------------------------------------------
     /// Sanitize the data received from the request
@@ -118,14 +122,30 @@ export async function POST(req: Request): Promise<NextResponse> {
         }
         break;
       case "post":
+        formData.append("session", sessionId || "");
+        dataApiHub = formData;
+        type = type;
+        break;
       case "translate":
         console.log("translate at call hub", dataApiHub);
-
         formData.append("session", sessionId || "");
-
         dataApiHub = formData;
-
         type = type;
+        //TODO change on production
+        // const next = await getToken({
+        //   req: req,
+        //   secret: process.env.NEXTAUTH_SECRET,
+        // });
+        // nextAuthToken = next?.accessToken;
+        // console.log("🔍 Full token object:", JSON.stringify(next, null, 2));
+        // console.log("🔍 Access token exists:", !!next?.accessToken);
+        // console.log("🔍 Access token value:", next?.accessToken);
+
+        // if (!nextAuthToken) {
+        //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        // }
+        // console.log("token at callhub:", nextAuthToken);
+        break;
       default:
         dataApiHub = dataApiHub;
         break;
@@ -136,19 +156,23 @@ export async function POST(req: Request): Promise<NextResponse> {
 
     const response = await apiRoutes({
       token: token,
+      JWT: nextAuthToken,
       data: dataApiHub,
       type: type,
     });
 
     const jsonResponse = await response.json();
     ///-----------------------------------------------
-    /// From api/post return the body.
+    /// From api/post and api/translate return the body.
     ///-----------------------------------------------
-    if (jsonResponse.message === "Data saved successfully") {
+    if (
+      jsonResponse.message === "Data saved successfully" ||
+      jsonResponse.message === "Data translated successfully"
+    ) {
       const body = jsonResponse.body;
       return NextResponse.json({
         status: jsonResponse.status,
-        message: "Data saved successfully",
+        message: jsonResponse.message,
         body: body,
       });
       ///-----------------------------------------------

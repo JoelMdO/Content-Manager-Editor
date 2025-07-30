@@ -9,7 +9,10 @@ import Loader from "../components/buttons/loader_saving";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import text from "../constants/mainPage_data_text.json";
-import Home from "./home/page";
+import Dashboard from "./dashboard/page";
+// import Home from "./home/page";
+// import TranslationLoader from "@/components/loaders/translation_loader";
+// import AutoSaveScreen from "@/components/loaders/auto_save";
 
 const Login: React.FC = () => {
   ///===================================================
@@ -51,10 +54,10 @@ const Login: React.FC = () => {
   /// user to reach the software engineer.
   ///--------------------------------------------------------
   // //TODO dont delete on test only on production
-  // if (isDev) {
-  //   //Directly render dashboard for development
-  //   return <Home />;
-  // }
+  if (isDev) {
+    //Directly render dashboard for development
+    return <Dashboard />;
+  }
   return (
     <>
       <div className="relative w-full min-h-screen flex flex-col justify-center px-4 sm:px-8 md:px-16">

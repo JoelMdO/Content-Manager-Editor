@@ -36,21 +36,14 @@ export interface ButtonProps {
   setTranslationReady: React.Dispatch<React.SetStateAction<boolean>>;
   isDraftArticleButtonClicked: boolean;
   setDraftArticleButtonClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  isTranslating: boolean;
+  setTranslating: React.Dispatch<React.SetStateAction<boolean>>;
+  setLastAutoSave: React.Dispatch<React.SetStateAction<Date | null>>;
+  lastAutoSave: Date | null;
+  language: "en" | "es";
+  setLanguage: React.Dispatch<React.SetStateAction<"en" | "es">>;
 }
 
-export const iconsMenu = {
-  save: "💾",
-  link: "🔗",
-  image: "🖼️",
-  post: "📤",
-  articles: "📰",
-  font: "🎨",
-  sections: "▼",
-  styles: "🪄",
-  menu: "🧰",
-  clear: "🌪",
-  translate: "🌐",
-};
 export const menuButtonTypes = [
   "save",
   "post",

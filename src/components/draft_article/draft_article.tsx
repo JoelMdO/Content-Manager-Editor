@@ -26,27 +26,27 @@ const DraftArticle = () => {
     let articleStored: string | null = sessionStorage.getItem(
       `articleContent-${dbNameToSearch}`
     );
-    console.log("articleStored from session at draft article:", articleStored);
+    // console.log("articleStored from session at draft article:", articleStored);
 
     if (!articleStored) {
-      console.log("DRAFT_KEY at draft article:", DRAFT_KEY);
+      //  console.log("DRAFT_KEY at draft article:", DRAFT_KEY);
 
       articleStored = localStorage.getItem(DRAFT_KEY);
-      console.log(
-        "articleStored from localStorage at draft article:",
-        articleStored
-      );
+      // console.log(
+      //   "articleStored from localStorage at draft article:",
+      //   articleStored
+      // );
     }
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
-      console.log("jsonArticle at draft article:", jsonArticle);
+      // console.log("jsonArticle at draft article:", jsonArticle);
 
       newSavedTitleRef.current =
         jsonArticle.find((item: any) => item.type === "title")?.content || "";
       newSavedBodyRef.current =
         jsonArticle.find((item: any) => item.type === "body")?.content || "";
-      console.log("savedTitleRef at draftarticle:", newSavedTitleRef.current);
-      console.log("savedBodyRef at draftarticle:", newSavedBodyRef.current);
+      //  console.log("savedTitleRef at draftarticle:", newSavedTitleRef.current);
+      //  console.log("savedBodyRef at draftarticle:", newSavedBodyRef.current);
       //
       setText(newSavedTitleRef.current);
       //
@@ -58,7 +58,7 @@ const DraftArticle = () => {
     }
     //
 
-    console.log("text at draft article:", text);
+    //srqconsole.log("text at draft article:", text);
 
     //
   }, [dbNameToSearch, DRAFT_KEY]);
@@ -79,7 +79,7 @@ const DraftArticle = () => {
       </h1>
       <button
         type="button"
-        className="w-[40vw] md:w-[22vw] g:w-[20vw] h-[3dvh] md:h-[5dvh] text-xs md:text-sm g:text-lg bg-gray-400 text-black rounded-3xl"
+        className="w-[40vw] md:w-[22vw] g:w-[20vw] h-[3dvh] md:h-[5dvh] text-[clamp(0.6rem,0.8rem,1rem)] bg-gray-400 text-black rounded-3xl overflow-hidden whitespace-nowrap text-ellipsis"
         onClick={handleClick}
       >
         {text}

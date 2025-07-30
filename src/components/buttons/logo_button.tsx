@@ -56,6 +56,7 @@ const LogoButton: React.FC<LogoButtonProps> = ({ type }) => {
             width={width}
             height={height}
             alt={"logoJoel"}
+            priority={true}
           />
           <p className="text-xs text-white">{text.buttons.year}</p>
         </button>

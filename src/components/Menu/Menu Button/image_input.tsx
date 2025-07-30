@@ -18,18 +18,18 @@ const ImageInput = ({
     MenuContext
   ) as ButtonProps;
   //
-  console.log("editorRef at ImageInput:", editorRefs);
+  //console.log("editorRef at ImageInput:", editorRefs);
 
   ///--------------------------------------------------------
   // Function to handle the cases of the MenuButtons
   ///--------------------------------------------------------
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("fdoing handling change");
+    //console.log("fdoing handling change");
 
     const editorRef = editorRefs?.current ? editorRefs.current[index] : null;
 
     if (editorRef) {
-      console.log("editorRef:", editorRef);
+      // console.log("editorRef:", editorRef);
 
       const dbName = sessionStorage.getItem("db");
       //debugger;
@@ -43,7 +43,7 @@ const ImageInput = ({
           }
         })
         .catch((error) => {
-          console.log("Error uploading image:", error);
+          //   console.log("Error uploading image:", error);
           errorAlert("image", "error", error);
         });
     }

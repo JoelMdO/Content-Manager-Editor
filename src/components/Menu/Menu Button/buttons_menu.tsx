@@ -52,6 +52,8 @@ const MenuButton = ({
     setSelectedSection,
     sectionsDialogRef,
     stylesDialogRef,
+    setTranslating,
+    setTranslationReady,
     // setIsClicked,
     // isClicked,
   } = useContext(MenuContext) as ButtonProps;
@@ -107,6 +109,8 @@ const MenuButton = ({
       type,
       stylesDialogRef,
       setIsFontStyleOpen,
+      setTranslating,
+      setTranslationReady,
     });
   }, [type, setIsClicked, id, editorRefs]);
   //

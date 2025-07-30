@@ -7,7 +7,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
   ///=============================================================
   /// Function to redirect the api endpoints, includes the fecthing
   ///=============================================================
-  const { token, data, type } = postData;
+  const { JWT, token, data, type } = postData;
   const url = process.env.NEXT_PUBLIC_url_api;
   let endPoint: string = "";
   let body: dataType | string | FormData = new FormData();
@@ -23,20 +23,21 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       //## POST
       case "post":
       case "translate":
-        console.log('"doing translate at api routes');
+        console.log('"doing translate at api routes', JWT!);
 
         endPoint = type;
         body = data as FormData;
-        headers["Authorization"] = `Bearer ${token}`;
+        body.append("token", token || "");
+        headers["Authorization"] = `Bearer ${JWT!}`;
         credentials = "include";
         break;
-      //## AUTH THROUGH EMAIL AND FIREBASE
-      case "sign-in-by-email":
-        endPoint = "signin";
-        body = JSON.stringify(data);
-        headers["Content-Type"] = "application/json";
-        credentials = "include";
-        break;
+      // //## AUTH THROUGH EMAIL AND FIREBASE
+      // case "sign-in-by-email":
+      //   endPoint = "signin";
+      //   body = JSON.stringify(data);
+      //   headers["Content-Type"] = "application/json";
+      //   credentials = "include";
+      //   break;
       //## PLAYBOOK SAVE
       case "playbook-save":
         endPoint = "save";
@@ -70,13 +71,16 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     // Wait for the JSON response
     const jsonResponse = await response.json();
     ///-----------------------------------------------
-    /// From api/post return the body.
+    /// From api/post and api/translate return the body.
     ///-----------------------------------------------
-    if (jsonResponse.message === "Data saved successfully") {
+    if (
+      jsonResponse.message === "Data saved successfully" ||
+      jsonResponse.message === "Data translated successfully"
+    ) {
       const body = jsonResponse.body;
       return NextResponse.json({
         status: jsonResponse.status,
-        message: "Data saved successfully",
+        message: jsonResponse.message,
         body: body,
       });
       ///-----------------------------------------------
@@ -90,6 +94,8 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         body: body,
       });
     } else {
+      console.log("response at apiRoutes:", jsonResponse);
+
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,

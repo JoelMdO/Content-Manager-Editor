@@ -3,7 +3,7 @@ import MenuButton from "./Menu Button/buttons_menu";
 import {
   // ButtonProps,
   iconsMenu,
-} from "@/components/Menu/Menu Button/type/type_menu_button";
+} from "../../constants/icons";
 import FontStyleUI from "./Menu Button/font_style_buttons";
 // import MenuContext from "../../utils/context/menu_context";
 

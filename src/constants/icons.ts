@@ -1,0 +1,15 @@
+export const iconsMenu = {
+  save: "💾",
+  link: "🔗",
+  image: "🖼️",
+  post: "📤",
+  articles: "📰",
+  font: "🎨",
+  sections: "▼",
+  styles: "🪄",
+  menu: "🧰",
+  clear: "🌪",
+  translate: "🌐",
+  english: "🇺🇸",
+  spanish: "🇲🇽",
+};

@@ -1,4 +1,4 @@
-import { iconsMenu } from "@/components/Menu/Menu Button/type/type_menu_button";
+import { iconsMenu } from "../../../../constants/icons";
 
 type styleMenuButton = {
   text: string;

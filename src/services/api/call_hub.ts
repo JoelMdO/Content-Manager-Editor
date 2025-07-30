@@ -1,7 +1,8 @@
-import { PlaybookMeta } from "@/types/plabookMeta";
+import { PlaybookMeta } from "../../types/plabookMeta";
 import createFormData from "../../utils/dashboard/images_edit/create_formData";
-import { FormDataItem } from "@/types/formData";
-import { callHubType } from "@/types/callHubType";
+import { FormDataItem } from "../../types/formData";
+import { callHubType } from "../../types/callHubType";
+import { TranslateType } from "../../types/translate_type";
 
 const callHub = async (
   type: string,
@@ -10,12 +11,12 @@ const callHub = async (
   status: number;
   message: string | unknown;
   sessionId?: string;
-  body?: PlaybookMeta[] | undefined;
+  body?: PlaybookMeta[] | TranslateType | undefined;
 }> => {
   ///=============================================================
   /// Function to orchestrate the api endpoints as hub.
   ///=============================================================
-  let body: FormData | string = new FormData();
+  let body: FormData | string | callHubType | undefined = new FormData();
   const headers: HeadersInit = {};
   let credentials: RequestCredentials = "omit";
   const url = `${process.env.NEXT_PUBLIC_url_api}/api/hub`;
@@ -41,18 +42,23 @@ const callHub = async (
     //## POST
     case "post":
     case "translate":
-      console.log("doing translate at callhub", data);
-
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
         : data !== undefined
         ? [data as FormDataItem]
         : [];
       const formData = await createFormData(type, formDataItems);
+      // console.log("formData at callhub:", formData);
 
       body = formData;
       credentials = "include";
       break;
+    // case "translate":
+    //   console.log("doing translate at callhub", data);
+    //   body = JSON.stringify(data);
+    //   headers["Content-Type"] = "application/json";
+    //   credentials = "include";
+    //   break;
     default:
       body = JSON.stringify({ data: data, type: type });
       headers["Content-Type"] = "application/json";
