@@ -16,24 +16,24 @@ export function useGetInitialArticleDraft() {
     let articleStored: string | null = sessionStorage.getItem(
       `articleContent-${dbNameToSearch}`
     );
-    console.log("articleStored from session:", articleStored);
+    // console.log("articleStored from session:", articleStored);
 
     if (!articleStored) {
-      console.log("DRAFT_KEY:", DRAFT_KEY);
+      // console.log("DRAFT_KEY:", DRAFT_KEY);
 
       articleStored = localStorage.getItem(DRAFT_KEY);
-      console.log("articleStored from localStorage:", articleStored);
+      // console.log("articleStored from localStorage:", articleStored);
     }
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
-      console.log("jsonArticle:", jsonArticle);
+      // console.log("jsonArticle:", jsonArticle);
 
       savedTitleRef.current =
         jsonArticle.find((item: any) => item.type === "title")?.content || "";
       savedBodyRef.current =
         jsonArticle.find((item: any) => item.type === "body")?.content || "";
-      console.log("savedTitleRef.current:", savedTitleRef.current);
-      console.log("savedBodyRef.current:", savedBodyRef.current);
+      // console.log("savedTitleRef.current:", savedTitleRef.current);
+      // console.log("savedBodyRef.current:", savedBodyRef.current);
 
       sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
       sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);

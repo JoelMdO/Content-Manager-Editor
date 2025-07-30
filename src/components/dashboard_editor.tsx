@@ -8,8 +8,11 @@ import MenuContext from "@/utils/context/menu_context";
 import { useGetInitialArticleDraft } from "../hooks/useGetInitialArticleDraft";
 // import { subtle } from "crypto";
 import { useTranslatedArticleDraft } from "@/hooks/useTranslatedArticleDraft";
+import TranslationLoader from "./loaders/translation_loader";
+import AutoSaveScreen from "./loaders/auto_save";
 
 const DashboardEditor = () => {
+  //
   //
   const {
     savedTitleRef,
@@ -21,54 +24,119 @@ const DashboardEditor = () => {
     setPlaceHolderTitle,
     isPlaceHolderTitle,
     isPlaceHolderArticle,
-    translationReady,
     isDraftArticleButtonClicked,
+    isTranslating,
+    setLastAutoSave,
+    language,
   } = useContext(MenuContext) as ButtonProps;
   //
   //
   //console.log("savedTitleRef at dashboard_editor:", savedTitleRef);
-  //console.log("savedBodyRef at dashboard_editor:", savedBodyRef); // todo checking values when coming from localstorage
+  //console.log("savedBodyRef at dashboard_editor:", savedBodyRef);
   //debugger;
+  ///--------------------------------------------------------
+  // Get the translated article draft
+  ///--------------------------------------------------------
+  useTranslatedArticleDraft(); // TODO working on translated received as JSON so easy to reuse
   //--------------------------------------------------------
   // Read the sessionStorage on page initial load, based on the corresponded db.
   // And retrieve if any article is already created.
   //--------------------------------------------------------
   // useGetInitialArticleDraft();
   useEffect(() => {
-    console.log("reloading dashboard_editor");
+    //console.log("reloading dashboard_editor");
   }, [isDraftArticleButtonClicked]);
   ///--------------------------------------------------------
   // Get the translated article draft
   ///--------------------------------------------------------
-  useEffect(() => {
-    if (translationReady) {
-      // console.log("Translation is ready, fetching translated draft...");
-      // Fetch the translated article draft
-      useTranslatedArticleDraft();
-    }
-  }, [translationReady]);
+  // useEffect(() => {
+  //   if (translationReady) {
+  // console.log("Translation is ready, fetching translated draft...");
+  // Fetch the translated article draft
+  // useTranslatedArticleDraft();
+  //}
+  // }, [translationReady]);
   ///--------------------------------------------------------
   // Save to localStorage every 10 minutes
   ///--------------------------------------------------------
+  // useEffect(() => {
+  //   console.log("Saving draft to localStorage every 10 minutes");
+
+  //   const interval = setInterval(() => {
+  //     const draft = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
+  //     const draftEsp = sessionStorage.getItem(
+  //       `articleContent-${dbNameToSearch}-es`
+  //     );
+  //     console.log("Saving draft to localStorage:", draft);
+  //     console.log("DRAFT KEY ar savung every 10vminutes:", DRAFT_KEY);
+
+  //     //
+  //     if (draft) {
+  //       localStorage.setItem(DRAFT_KEY!, draft);
+  //     }
+  //     if (draftEsp) {
+  //       localStorage.setItem(
+  //         `draft-articleContent-${dbNameToSearch}-es`,
+  //         draftEsp
+  //       );
+  //     }
+  //   }, 600000); // 10 minutes
+  //   return () => clearInterval(interval);
+  // }, []);
+  ///--------------------------------------------------------
+  // Save to localStorage every 10 minutes (only if content exists)
+  ///--------------------------------------------------------
   useEffect(() => {
+    // console.log(
+    //   "Setting up auto-save every 10 minutes for db:",
+    //   dbNameToSearch
+    // );
+
     const interval = setInterval(() => {
-      const draft = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-      const draftEsp = sessionStorage.getItem(
-        `articleContent-${dbNameToSearch}-es`
-      );
-      //
-      if (draft) {
-        localStorage.setItem(DRAFT_KEY!, draft);
+      // Get current content from the editor divs
+      const currentTitle = editorRefs?.current[0]?.innerHTML || "";
+      const currentBody = editorRefs?.current[1]?.innerHTML || "";
+
+      // Remove placeholder text for comparison
+      const cleanTitle = currentTitle
+        .replace(/<span class="text-gray-400">.*?<\/span>/g, "")
+        .trim();
+      const cleanBody = currentBody
+        .replace(/<span class="text-gray-400">.*?<\/span>/g, "")
+        .trim();
+
+      // Only save if there's actual content
+      let articleData = [];
+      if (cleanTitle || cleanBody) {
+        if (language === "en") {
+          articleData = [
+            { type: "title", content: currentTitle },
+            { type: "body", content: currentBody },
+            { type: "images", content: [] },
+          ];
+
+          const articleJson = JSON.stringify(articleData);
+          localStorage.setItem(DRAFT_KEY!, articleJson);
+        } else {
+          articleData = [
+            { type: "es-title", content: currentTitle },
+            { type: "es-body", content: currentBody },
+          ];
+
+          const articleJson = JSON.stringify(articleData);
+          localStorage.setItem(DRAFT_KEY!, articleJson);
+          // console.log("✅ Auto-saved content to localStorage:", {
+          //   title: cleanTitle ? "Has content" : "Empty",
+          //   body: cleanBody ? "Has content" : "Empty",
+          //   timestamp: new Date().toISOString(),
+          // });
+        }
+        setLastAutoSave(new Date());
       }
-      if (draftEsp) {
-        localStorage.setItem(
-          `draft-articleContent-${dbNameToSearch}-es`,
-          draftEsp
-        );
-      }
-    }, 600000); // 10 minutes
+    }, 60000); // 1 minute //TODO change to 10 minutes.
+
     return () => clearInterval(interval);
-  }, []);
+  }, [dbNameToSearch, DRAFT_KEY, editorRefs]);
   ///--------------------------------------------------------
   // Save to localStorage on tab/browser close
   ///--------------------------------------------------------
@@ -111,6 +179,7 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   return (
     <div className="border border-gray-600 border-1px">
+      {isTranslating && <TranslationLoader />}
       {["Title", "Article"].map((placeholder, index) => (
         <div
           key={index}

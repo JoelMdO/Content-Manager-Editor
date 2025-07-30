@@ -240,7 +240,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         preserveLineBreaks: true, // Keep line breaks as they are
       });
       //
-      console.log("markdownContent:", markdownContent);
+      //console.log("markdownContent:", markdownContent);
       ///--------------------------------------------------------
       // Select the correct database to save the article
       ///--------------------------------------------------------

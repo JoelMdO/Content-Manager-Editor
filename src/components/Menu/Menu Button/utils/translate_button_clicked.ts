@@ -24,7 +24,7 @@ const translateButtonClicked = async () => {
   }
 
   articleContent.push({ type: "dbName", content: dbName });
-  console.log("Article content to translate:", articleContent);
+  console.log("Article content to translate before callhub:", articleContent);
 
   const response = await callHub("translate", articleContent);
   console.log("Response from translation:", response);

@@ -66,7 +66,12 @@ export const authOptions: NextAuthOptions = {
       // Return false if sign-in is not allowed
       return false;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+      }
+
       if (user) {
         token.sub = user.id;
         token.name = user.name;
@@ -90,4 +95,8 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  // jwt: { //TODO remove on production and change to 1 hr.
+  //   // The maximum age of the NextAuth.js issued JWT in seconds
+  //   maxAge: 60 * 60 * 24 * 30, // 30 days
+  // },
 };

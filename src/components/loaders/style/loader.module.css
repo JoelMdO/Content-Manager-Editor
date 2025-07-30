@@ -1,0 +1,23 @@
+.flag {
+  animation: fadeInSlide 2s infinite;
+}
+
+.flag_mex {
+  animation: fadeInSlide 2s infinite;
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeInSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(0) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(20px) scale(0.8);
+  }
+}

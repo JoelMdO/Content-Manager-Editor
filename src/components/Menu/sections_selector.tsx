@@ -41,7 +41,7 @@ const SectionSelector = () => {
       if (!dialog) return;
       if (event.target === dialog) {
         dialog.close();
-        console.log("Dialog closed");
+        // console.log("Dialog closed");
         setSelectedSection!("Select category");
       }
     }
@@ -76,16 +76,16 @@ const SectionSelector = () => {
   //
   //
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log("doing handleChange");
-    console.log("db sections selector:", db);
+    // console.log("doing handleChange");
+    // console.log("db sections selector:", db);
     setSelectedSection!(e.target.value);
     let articleContent: { type: string; content: string }[] = [];
     //
     articleContent = JSON.parse(
       sessionStorage.getItem(`articleContent-${db}`) || "[]"
     );
-    console.log("Selected section:", e.target.value);
-    console.log("articleContent before:", articleContent);
+    // console.log("Selected section:", e.target.value);
+    // console.log("articleContent before:", articleContent);
 
     //
     articleContent.push({ type: "section", content: e.target.value });
@@ -93,7 +93,7 @@ const SectionSelector = () => {
       `articleContent-${db}`,
       JSON.stringify(articleContent)
     );
-    console.log("articleContent after:", articleContent);
+    // console.log("articleContent after:", articleContent);
 
     // Clear the section selector dialog
     sectionsDialogRef?.current?.close();

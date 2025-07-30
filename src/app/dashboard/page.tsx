@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import dbSelector from "../../components/alerts/db_selector";
 import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
 import DraftArticle from "@/components/draft_article/draft_article";
+import AutoSaveScreen from "@/components/loaders/auto_save";
 // import { useGetDraftArticleHook } from "@/hooks/useDraftArticle";
 const ImageInput = dynamic(
   () => import("@/components/Menu/Menu Button/image_input")
@@ -51,6 +52,9 @@ const Dashboard: React.FC = () => {
   const [translationReady, setTranslationReady] = useState(false);
   const [isDraftArticleButtonClicked, setDraftArticleButtonClicked] =
     useState<boolean>(false);
+  const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
+  const [isTranslating, setTranslating] = useState(false);
+  const [language, setLanguage] = useState<"en" | "es">("en");
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
@@ -79,10 +83,10 @@ const Dashboard: React.FC = () => {
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
-    console.log("dbNameToSearch.current:", dbNameToSearch.current);
+    //console.log("dbNameToSearch.current:", dbNameToSearch.current);
 
     setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
-    console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
+    //console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
   }, []);
   //--------------------------------------------------------
   // Read the sessionStorage as per the corresponded db.
@@ -150,6 +154,12 @@ const Dashboard: React.FC = () => {
     setTranslationReady,
     isDraftArticleButtonClicked,
     setDraftArticleButtonClicked,
+    setTranslating,
+    isTranslating,
+    lastAutoSave,
+    setLastAutoSave,
+    setLanguage,
+    language, // This will be set later
   };
   //
   ///======================================================
@@ -167,6 +177,7 @@ const Dashboard: React.FC = () => {
           {/* TABLET / DESKTOP */}
           <aside className="hidden md:flex w-[25vw] h-full gap-y-2 bg-gray-800 text-white items-center flex-col">
             <DraftArticle />
+            {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
             <MenuDesktop
             // editorRefs={editorRefs}
             // theTitle={theTitle}
@@ -188,8 +199,9 @@ const Dashboard: React.FC = () => {
               <div className="flex-shrink-0">
                 <HomeButton type="mobile" />
               </div>
-              <div className="flex-grow text-center">
+              <div className="flex-grow text-center flex flex-col">
                 <DraftArticle />
+                {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
               </div>
               {/* LogOutButton at the end (right) */}
               <div className="flex-shrink-0">

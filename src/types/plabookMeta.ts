@@ -11,4 +11,6 @@ export interface PlaybookMeta {
   steps?: string[];
   codeSnippets?: CodeSnippet[];
   references?: Reference[];
+  body?: string;
+  section?: string;
 }

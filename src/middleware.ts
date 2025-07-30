@@ -11,17 +11,19 @@ export async function middleware(req: NextRequest) {
   const database_2_url = process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL;
   const nonce = generateNonce();
 
-  if (
-    path.startsWith("/dashboard") ||
-    path.startsWith("/playbook") ||
-    path.startsWith("/readPlaybook")
-  ) {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  //TODO change on production
+  // if (
+  //   path.startsWith("/dashboard") ||
+  //   path.startsWith("/playbook") ||
+  //   path.startsWith("/readPlaybook")
+  // ) {
 
-    if (!token) {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
-  }
+  //   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+  //   if (!token) {
+  //     return NextResponse.redirect(new URL("/", req.url));
+  //   }
+  // }
   ///----------------------------------------------------------------
   ///------ Check for any rate limits on other paths ----------------
   ///----------------------------------------------------------------

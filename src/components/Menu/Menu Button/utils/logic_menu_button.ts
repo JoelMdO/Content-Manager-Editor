@@ -34,6 +34,7 @@ export const post =
           setIsClicked!(false);
           if (response.status === 200) {
             successAlert("saved");
+            //TODO check if needed to be saved again
             if (response.body) {
               const dbName = sessionStorage.getItem("db");
               const articleContent = JSON.parse(
@@ -63,21 +64,64 @@ export const saveDraft = ({
   dbNameToSearch,
   DRAFT_KEY,
   setIsClicked,
+  language,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  console.log("saving draft");
-  console.log("dbNameToSearch:", dbNameToSearch);
-  console.log("DRAFT_KEY:", DRAFT_KEY);
+  // console.log("saving draft");
+  // console.log("dbNameToSearch:", dbNameToSearch);
+  // console.log("DRAFT_KEY:", DRAFT_KEY);
 
-  const draft = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-  console.log("draft:", draft);
+  const dbName =
+    typeof dbNameToSearch === "string"
+      ? dbNameToSearch
+      : dbNameToSearch?.current;
+  ///--------------------------------------------------------
+  // Load if any draft on sessionStorage
+  ///--------------------------------------------------------
+  const draft = sessionStorage.getItem(`articleContent-${dbName}`);
 
   if (draft) {
-    console.log("Saving draft to localStorage:", draft);
+    const articleContent = JSON.parse(draft);
+    // console.log("articleContent:", articleContent);
+    const newTitle =
+      articleContent.find((item: any) => item.type === "title")?.content || "";
+    const newBody =
+      articleContent.find((item: any) => item.type === "body")?.content || "";
+    const newTitleEsp =
+      articleContent.find((item: any) => item.type === "es-title")?.content ||
+      "";
+    const newBodyEsp =
+      articleContent.find((item: any) => item.type === "es-body")?.content ||
+      "";
 
-    localStorage.setItem(DRAFT_KEY!, draft);
+    //Check if the draft has been already saved on the localStorage
+    const existingDraft = localStorage.getItem(DRAFT_KEY!);
+
+    if (existingDraft) {
+      const draftContent = JSON.parse(existingDraft);
+      // console.log("Draft content found:", draftContent);
+      // Remove the current language's title/body
+      const filtered = draftContent.filter(
+        (item: any) =>
+          item.type !== (language === "en" ? "title" : "es-title") &&
+          item.type !== (language === "en" ? "body" : "es-body")
+      );
+
+      // Add the new content
+      filtered.push({
+        type: language === "en" ? "title" : "es-title",
+        content: newTitle,
+      });
+      filtered.push({
+        type: language === "en" ? "body" : "es-body",
+        content: newBody,
+      });
+    } else {
+      //  console.log("Saving draft to localStorage:", draft);
+      localStorage.setItem(DRAFT_KEY!, draft);
+    }
+    //debugger;
   }
-  //debugger;
 };
 ///--------------------------------------------------------
 // Clear the UI
@@ -90,7 +134,7 @@ export const clearUI = ({
   setIsClicked,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  console.log("Clearing UI with:", editorRefs, savedTitleRef, savedBodyRef);
+  // console.log("Clearing UI with:", editorRefs, savedTitleRef, savedBodyRef);
 
   handleClear(editorRefs!);
   savedTitleRef!.current = "";
@@ -101,7 +145,7 @@ export const clearUI = ({
 // Load Image
 ///--------------------------------------------------------
 const loadImage = ({ fileInputRef, setIsClicked }: Partial<ButtonProps>) => {
-  setIsClicked!(true);
+  // setIsClicked!(true);
   fileInputRef!.current?.click();
 };
 ///--------------------------------------------------------
@@ -109,7 +153,7 @@ const loadImage = ({ fileInputRef, setIsClicked }: Partial<ButtonProps>) => {
 ///--------------------------------------------------------
 const openLinkDialog = ({ dialogRef, setIsClicked }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  console.log("Opening dialog...", dialogRef?.current);
+  // console.log("Opening dialog...", dialogRef?.current);
   dialogRef!.current?.showModal();
 };
 ///--------------------------------------------------------
@@ -132,7 +176,7 @@ const openSelectorDialog = ({
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
   if (sectionsDialogRef?.current) {
-    console.log("Opening dialog...", sectionsDialogRef?.current);
+    //  console.log("Opening dialog...", sectionsDialogRef?.current);
     sectionsDialogRef!.current?.showModal();
   }
 };
@@ -142,23 +186,64 @@ const openSelectorDialog = ({
 export const translateToSpanish = ({
   setTranslationReady,
   setIsClicked,
+  setTranslating,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
   console.log('"Translating article to Spanish at logic ...');
-
+  setTranslating!(true);
   translateButtonClicked()
     .then((response) => {
       setIsClicked!(false);
+      setTranslating!(false);
       if (response.status === 200) {
         successAlert("translate");
-        setTranslationReady!(true);
         if (response.body) {
           const dbName = sessionStorage.getItem("db");
+          console.log("Translating article for database:", dbName);
+
+          // Get existing content
           const articleContent = JSON.parse(
             sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
           );
-          articleContent.push({ type: "translation", content: response.body });
+          console.log("Current article content:", articleContent);
+
+          // Check if translation already exists
+          // Remove all previous es-title, es-body, es-section items
+          const filteredContent = articleContent.filter(
+            (item: any) =>
+              item.type !== "es-title" &&
+              item.type !== "es-body" &&
+              item.type !== "es-section"
+          );
+          //
+          const translated = (response.body as any).translated_text;
+          const title = translated.title || "";
+          const body = translated.body || "";
+          const section = translated.section || "";
+
+          // Add new translation
+          filteredContent.push({ type: "es-title", content: title });
+          filteredContent.push({ type: "es-body", content: body });
+          filteredContent.push({ type: "es-section", content: section });
+
+          // Store updated content in sessionStorage
+          sessionStorage.setItem(
+            `articleContent-${dbName}`,
+            JSON.stringify(filteredContent)
+          );
+
+          // Also update localStorage if needed
+          localStorage.setItem(
+            `articleContent-${dbName}`,
+            JSON.stringify(filteredContent)
+          );
+          //
+
+          articleContent.push({ type: "es-title", content: title });
+          articleContent.push({ type: "es-body", content: body });
+          articleContent.push({ type: "es-section", content: section });
         }
+        setTranslationReady!(true);
       } else if (
         response.status === 401 ||
         response.message === "User not authenticated"
@@ -197,26 +282,28 @@ export const buttonMenuLogic = ({
   stylesDialogRef,
   setIsFontStyleOpen,
   setTranslationReady,
+  setTranslating,
+  language,
 }: Partial<ButtonProps>) => {
   // onClick?.();
-  console.log(
-    "type at button logic:",
-    type,
-    "sectionsDialogRef:",
-    sectionsDialogRef
-  );
+  // console.log(
+  //   "type at button logic:",
+  //   type,
+  //   "sectionsDialogRef:",
+  //   sectionsDialogRef
+  // );
 
   switch (type) {
     case "image":
       loadImage({ fileInputRef, setIsClicked });
       break;
     case "link":
-      console.log('"Opening link dialog...");', dialogRef);
+      // console.log('"Opening link dialog...");', dialogRef);
 
       openLinkDialog({ dialogRef, setIsClicked });
       break;
     case "sections":
-      console.log('"Opening sections dialog...");', sectionsDialogRef);
+      // console.log('"Opening sections dialog...");', sectionsDialogRef);
 
       openSelectorDialog({ sectionsDialogRef, setIsClicked });
       break;
@@ -225,12 +312,13 @@ export const buttonMenuLogic = ({
       post({ setIsClicked, router });
       break;
     case "save":
-      saveDraft({ dbNameToSearch, DRAFT_KEY, setIsClicked });
+      saveDraft({ dbNameToSearch, DRAFT_KEY, language, setIsClicked });
       break;
     case "translate":
       translateToSpanish({
         setIsClicked,
         setTranslationReady,
+        setTranslating,
       });
       break;
     case "clear":

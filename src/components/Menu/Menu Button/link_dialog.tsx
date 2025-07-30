@@ -23,7 +23,7 @@ const LinkDialog = ({
     MenuContext
   ) as ButtonProps;
   // Ensure dialogRef is defined
-  console.log("link dialog", index, "dialogref ", dialogRef);
+  //console.log("link dialog", index, "dialogref ", dialogRef);
 
   // Ensure safe access to editorRefs
   const editorRef = editorRefs?.current ? editorRefs.current[index!] : null;
