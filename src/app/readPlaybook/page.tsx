@@ -10,13 +10,13 @@ import callHub from "../../services/api/call_hub";
 import dynamic from "next/dynamic";
 import errorAlert from "../../components/alerts/error";
 import { useRouter } from "next/navigation";
-import handleInputChange from "../../utils/readPlaybook/handle_input_change";
-import handleSelectChange from "../../utils/readPlaybook/handle_select_change";
+import handleInputChange from "../../components/playbook/utils/readPlaybook/handle_input_change";
+import handleSelectChange from "../../components/playbook/utils/readPlaybook/handle_select_change";
 import text from "../../constants/readPlaybook_data_text.json";
 import withSessionProvider from "../../utils/withSessionProvider";
-import { PlaybookMeta } from "../../types/plabookMeta";
+import { PlaybookMeta } from "../../components/playbook/types/plabookMeta";
 import "../../styles/readPlaybook.css";
-import PlaybookCustomButton from "../../components/buttons/playbook_custom_button/button_dashboard";
+import PlaybookCustomButton from "../../components/playbook/playbook_custom_button/button_dashboard";
 
 //
 const PlaybookForm = dynamic(

@@ -7,7 +7,10 @@ const TranslationLoader = () => {
   const { translation, translation_text } = text.dashboard;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div
+      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100"
+      data-cy="translation-loader"
+    >
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4">
         {/* Main text */}
         <div className="text-center mb-8">

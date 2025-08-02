@@ -54,10 +54,10 @@ const Login: React.FC = () => {
   /// user to reach the software engineer.
   ///--------------------------------------------------------
   // //TODO dont delete on test only on production
-  if (isDev) {
-    //Directly render dashboard for development
-    return <Dashboard />;
-  }
+  // if (isDev) {
+  //   //Directly render dashboard for development
+  //   return <Dashboard />;
+  // }
   return (
     <>
       <div className="relative w-full min-h-screen flex flex-col justify-center px-4 sm:px-8 md:px-16">
@@ -107,6 +107,7 @@ const Login: React.FC = () => {
           </form>
           <button
             type="button"
+            data-cy="google-signin-button"
             onClick={() => {
               setIsSubmittedGoogle(true);
               signIn("google", { callbackUrl: "/home" });
