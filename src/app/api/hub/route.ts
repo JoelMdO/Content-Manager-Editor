@@ -52,23 +52,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///--------------------------------------------------------
     // Check if the request is authenticated
     ///--------------------------------------------------------
-    //TODO change on production
-    // const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
 
-    // if (!session && type !== "sign-in-by-email") {
-    //   return NextResponse.json({
-    //     status: 401,
-    //     message: "User without a valid session",
-    //   });
-    // }
+    if (!session && type !== "sign-in-by-email") {
+      return NextResponse.json({
+        status: 401,
+        message: "User without a valid session",
+      });
+    }
 
-    // if (session && type !== "sign-in-by-email") {
-    //   token = createLog(session?.user.id);
-    // }
+    if (session && type !== "sign-in-by-email") {
+      token = createLog(session?.user.id);
+    }
 
-    // if ((session && type === "post") || (session && type === "translate")) {
-    //   sessionId = session.user?.id;
-    // }
+    if ((session && type === "post") || (session && type === "translate")) {
+      sessionId = session.user?.id;
+    }
 
     ///-----------------------------------------------
     /// Sanitize the data received from the request
@@ -131,20 +130,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
-        //TODO change on production
-        // const next = await getToken({
-        //   req: req,
-        //   secret: process.env.NEXTAUTH_SECRET,
-        // });
-        // nextAuthToken = next?.accessToken;
-        // console.log("🔍 Full token object:", JSON.stringify(next, null, 2));
-        // console.log("🔍 Access token exists:", !!next?.accessToken);
-        // console.log("🔍 Access token value:", next?.accessToken);
+        const next = await getToken({
+          req: req,
+          secret: process.env.NEXTAUTH_SECRET,
+        });
+        nextAuthToken = next?.accessToken;
+        console.log("🔍 Full token object:", JSON.stringify(next, null, 2));
+        console.log("🔍 Access token exists:", !!next?.accessToken);
+        console.log("🔍 Access token value:", next?.accessToken);
 
-        // if (!nextAuthToken) {
-        //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        // }
-        // console.log("token at callhub:", nextAuthToken);
+        if (!nextAuthToken) {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        console.log("token at callhub:", nextAuthToken);
         break;
       default:
         dataApiHub = dataApiHub;

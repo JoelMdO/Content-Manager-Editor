@@ -1,18 +1,18 @@
 "use client";
-import { useCodeSnippets } from "../../hooks/code_snippet_hook";
+import { useCodeSnippets } from "../playbook/hooks/code_snippet_hook";
 import { useReferences } from "../../hooks/references_hook";
 import { Plus, Trash, Save, Link as LinkIcon } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import categories from "../../constants/categories";
-import handleSubmit from "../../utils/playbook/handleSubmit";
+import handleSubmit from "../playbook/utils/handleSubmit";
 import { useRouter } from "next/navigation";
 // import playbookCustomButton from "../buttons/playbook_custom_button/button_dashboard";
 import { useSearchParams } from "next/navigation";
 import Loader from "../buttons/loader_saving";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { PlaybookMeta } from "@/types/plabookMeta";
+import { PlaybookMeta } from "../playbook/types/plabookMeta";
 import text from "../../constants/playbook_form_data_text.json";
-import PlaybookCustomButton from "../buttons/playbook_custom_button/button_dashboard";
+import PlaybookCustomButton from "./playbook_custom_button/button_dashboard";
 //
 export interface PlaybookFormProps {
   type?: string;

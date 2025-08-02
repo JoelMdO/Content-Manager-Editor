@@ -6,23 +6,23 @@ import React, {
   // createContext,
   // useContext,
 } from "react";
-import MenuContext from "../../utils/context/menu_context";
+import MenuContext from "../../components/dashboard/menu/button_menu/context/menu_context";
 // Remove ButtonProps import, not needed for context
 
 import dynamic from "next/dynamic";
 import dbSelector from "../../components/alerts/db_selector";
-import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
-import DraftArticle from "@/components/draft_article/draft_article";
+import { ButtonProps } from "@/components/dashboard/menu/button_menu/type/type_menu_button";
+import DraftArticle from "@/components/dashboard/draft_article/draft_article";
 import AutoSaveScreen from "@/components/loaders/auto_save";
 // import { useGetDraftArticleHook } from "@/hooks/useDraftArticle";
 const ImageInput = dynamic(
-  () => import("@/components/Menu/Menu Button/image_input")
+  () => import("../../components/dashboard/menu/button_menu/image_input")
 );
 const LinkDialog = dynamic(
-  () => import("@/components/Menu/Menu Button/link_dialog")
+  () => import("../../components/dashboard/menu/button_menu/link_dialog")
 );
 const SectionSelector = dynamic(
-  () => import("../../components/Menu/sections_selector")
+  () => import("../../components/dashboard/menu/button_menu/sections_selector")
 );
 const LogOutButton = dynamic(
   () => import("../../components/buttons/logout_buttons")
@@ -30,11 +30,15 @@ const LogOutButton = dynamic(
 const HomeButton = dynamic(
   () => import("../../components/buttons/home_button")
 );
-const MenuDesktop = dynamic(() => import("../../components/Menu/desktop_menu"));
-const MenuMobile = dynamic(() => import("@/components/Menu/mobile_menu"));
+const MenuDesktop = dynamic(
+  () => import("../../components/dashboard/menu/desktop_menu")
+);
+const MenuMobile = dynamic(
+  () => import("../../components/dashboard/menu/mobile_menu")
+);
 
 const DashboardEditor = dynamic(
-  () => import("../../components/dashboard_editor")
+  () => import("../../components/dashboard/dashboard_editor")
 );
 //
 // const MenuContext = createContext<Partial<ButtonProps> | null>(null);

@@ -1,6 +1,6 @@
-import { PlaybookMeta } from "../../types/plabookMeta";
-import createFormData from "../../utils/dashboard/images_edit/create_formData";
-import { FormDataItem } from "../../types/formData";
+import { PlaybookMeta } from "../../components/playbook/types/plabookMeta";
+import createFormData from "../../components/dashboard/menu/button_menu/utils/images_edit/create_formData";
+import { FormDataItem } from "../../components/dashboard/menu/button_menu/type/formData";
 import { callHubType } from "../../types/callHubType";
 import { TranslateType } from "../../types/translate_type";
 

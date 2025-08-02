@@ -1,4 +1,4 @@
-import { PlaybookMetaWithUseRecord } from "./plabookMeta_with_useRecord";
+import { PlaybookMetaWithUseRecord } from "../components/playbook/types/plabookMeta_with_useRecord";
 
 export type dataType =
   | string

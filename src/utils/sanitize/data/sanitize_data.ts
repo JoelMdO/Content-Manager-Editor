@@ -8,7 +8,7 @@ import { sanitizeEmail } from "./sanitize_email";
 import { sanitizePassword } from "./sanitize_pwd";
 import { sanitizePost } from "./sanitize_post";
 import { dataType } from "../../../types/dataType";
-import { PlaybookMetaWithUseRecord } from "@/types/plabookMeta_with_useRecord";
+import { PlaybookMetaWithUseRecord } from "../../../components/playbook/types/plabookMeta_with_useRecord";
 
 export async function sanitizeData(
   data: dataType,
