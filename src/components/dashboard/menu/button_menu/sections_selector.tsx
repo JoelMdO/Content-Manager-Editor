@@ -12,24 +12,36 @@ const SectionSelector = () => {
   ) as ButtonProps;
   let { dbNameToSearch } = useContext(MenuContext) as ButtonProps;
 
-  //console.log(
-  //   "db at sections selector:",
-  //   dbNameToSearch,
-  //   "sections:",
-  //   selectedSection,
-  //   "sectionsDialogRef:",
-  //   sectionsDialogRef
-  // );
+  console.log(
+    "db at sections selector:",
+    dbNameToSearch,
+    "sections:",
+    selectedSection,
+    "sectionsDialogRef:",
+    sectionsDialogRef
+  );
 
   //
-  let db = (dbNameToSearch as string) || "DeCav";
+  //------------------------------------------
+  // Purpose: Safely get db value from dbNameToSearch, handling both string and RefObject<string>.
+  //------------------------------------------
+  // let db = (dbNameToSearch.current) || "DeCav";
+
+  let dbName =
+    typeof dbNameToSearch === "string"
+      ? dbNameToSearch
+      : dbNameToSearch.current || "";
   const typedSections = sections as SectionsType;
-  if (Object.prototype.hasOwnProperty.call(typedSections, db!)) {
-    db = db;
+  console.log("dbName", typeof dbName);
+
+  console.log("db", dbName);
+
+  if (Object.prototype.hasOwnProperty.call(typedSections, dbName!)) {
+    dbName = dbName;
   }
   const [isClicked, setIsClicked] = useState(false);
   //console.log("sections", sectionsDialogRef);
-  //console.log("db at sections searcher:", db);
+  //console.log("dbName at sections searcher:", dbName);
 
   //
   ///--------------------------------------------------------
@@ -77,12 +89,12 @@ const SectionSelector = () => {
   //
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     // console.log("doing handleChange");
-    // console.log("db sections selector:", db);
+    // console.log("dbName sections selector:", dbName);
     setSelectedSection!(e.target.value);
     let articleContent: { type: string; content: string }[] = [];
     //
     articleContent = JSON.parse(
-      sessionStorage.getItem(`articleContent-${db}`) || "[]"
+      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
     );
     // console.log("Selected section:", e.target.value);
     // console.log("articleContent before:", articleContent);
@@ -90,7 +102,7 @@ const SectionSelector = () => {
     //
     articleContent.push({ type: "section", content: e.target.value });
     sessionStorage.setItem(
-      `articleContent-${db}`,
+      `articleContent-${dbName}`,
       JSON.stringify(articleContent)
     );
     // console.log("articleContent after:", articleContent);
@@ -107,7 +119,7 @@ const SectionSelector = () => {
         className="z-50 bg-white/50 border border-gold md:w-[40vw] lg:w-[20vw] w-[55vw] h-[30dvh] rounded shadow-lg absolute xs:left-[18dvh] xs:top-[25dvh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
       >
         <div className="w-full h-auto flex flex-col items-center">
-          <span className="text-white text-center font-medium text-sm md:text-base g:text-lg mt-2">{`Select a section for ${db}`}</span>
+          <span className="text-white text-center font-medium text-sm md:text-base g:text-lg mt-2">{`Select a section for ${dbName}`}</span>
           <select
             className={`h-[40px] w-[30vw] md:w-[20vw] lg:w-[15vw] shadow-md shadow-black bg-blue hover:bg-green text-white text-xs md:text-base g:text-lg font-bold rounded text-center flex items-center justify-center md:gap-2 gap-1 mt-8`}
             id="section-selector"
@@ -117,8 +129,8 @@ const SectionSelector = () => {
           >
             <option>{selectedSection}</option>
             {/*GUARD TO AVOID CALL MAP IF NO SECTIONS OR NOT AN ARRAY*/}
-            {Array.isArray(typedSections[db as string]) &&
-              typedSections[db as string].map(
+            {Array.isArray(typedSections[dbName as string]) &&
+              typedSections[dbName as string].map(
                 (section: string, index: number) => (
                   <option key={index} value={section}>
                     {section}

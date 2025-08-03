@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
-  const dbNameToSearch = useRef<string>("DeCav");
+  const dbNameToSearch = useRef<string>("");
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pageRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,12 +83,13 @@ const Dashboard: React.FC = () => {
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
-    //console.log("dbNameToSearch.current:", dbNameToSearch.current);
-
+    //   //console.log("dbNameToSearch.current:", dbNameToSearch.current);
+    dbNameToSearch.current = sessionStorage.getItem("db") as string;
+    console.log("dbNameToSearch.current first render:", dbNameToSearch.current);
     setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
-    //console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
   }, []);
-
+  //
+  //TODO second phase add a section selector on change of dbNameToSearch
   //--------------------------------------------------------
   // Context creation
   ///--------------------------------------------------------
