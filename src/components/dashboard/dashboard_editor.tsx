@@ -47,6 +47,8 @@ const DashboardEditor = () => {
   // useGetInitialArticleDraft();
   useEffect(() => {
     //console.log("reloading dashboard_editor");
+    console.log("savedTitleRef at dashboard_editor:", savedTitleRef);
+    console.log("savedBodyRef at dashboard_editor:", savedBodyRef);
   }, [isDraftArticleButtonClicked]);
   ///--------------------------------------------------------
   // Get the translated article draft
@@ -280,7 +282,7 @@ const DashboardEditor = () => {
     }, 60000); // 1 minute //TODO change to 10 minutes.
 
     return () => clearInterval(interval);
-  }, [dbNameToSearch, DRAFT_KEY, editorRefs]);
+  }, [dbNameToSearch, DRAFT_KEY]);
   ///--------------------------------------------------------
   // Save to localStorage on tab/browser close
   ///--------------------------------------------------------
@@ -288,11 +290,11 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   // Get changes on savedBodyRef when a draft click is made to load the article
   ///--------------------------------------------------------
-  useEffect(() => {
-    if (editorRefs.current && savedBodyRef.current) {
-      editorRefs.current[1]!.innerHTML = savedBodyRef.current;
-    }
-  }, [savedBodyRef.current]);
+  // useEffect(() => {
+  //   if (editorRefs.current && savedBodyRef.current) {
+  //     editorRefs.current[1]!.innerHTML = savedBodyRef.current;
+  //   }
+  // }, [savedBodyRef.current]);
   ///---------------------------------------------------
   //  Cleanup debounce on unmount
   ///---------------------------------------------------

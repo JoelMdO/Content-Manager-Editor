@@ -5,11 +5,13 @@ import { ButtonProps } from "../../menu/button_menu/type/type_menu_button";
 //=========================================================
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
-  newSavedTitleRef: React.RefObject<string>;
+  newSavedTitleRef?: React.RefObject<string>;
   DRAFT_KEY: string;
   savedTitleRef: React.RefObject<string | null>;
   savedBodyRef: React.RefObject<string | null>;
-  setDraftArticleButtonClicked: (clicked: boolean) => void;
+  setDraftArticleButtonClicked?: (clicked: boolean) => void;
+  tag: string;
+  newTitleRef?: string;
 };
 
 // Updated function to accept a single props object
@@ -19,17 +21,30 @@ export const handleClick = async ({
   savedTitleRef,
   savedBodyRef,
   setDraftArticleButtonClicked,
+  tag,
+  newTitleRef,
 }: HandleClickProps) => {
   //
-  savedTitleRef.current = newSavedTitleRef.current;
+  let dbFieldName: string = "body";
+  if (tag === "translated") {
+    savedTitleRef.current = newTitleRef!;
+    console.log('"tag" is translated');
+    dbFieldName = "es-body";
+  } else {
+    savedTitleRef.current = newSavedTitleRef!.current;
+  }
+  console.log("DRAFT_KEY at handleClick:", DRAFT_KEY);
+
   const articleStored = localStorage.getItem(DRAFT_KEY);
   //
   if (articleStored) {
     const jsonArticle = JSON.parse(articleStored);
     //console.log("article at draft article:", jsonArticle);
-
+    //
     let preSavedBodyRef =
-      jsonArticle.find((item: any) => item.type === "body")?.content || "";
+      jsonArticle.find((item: any) => item.type === dbFieldName)?.content || "";
+    console.log('"preSavedBodyRef" before replacing images:', preSavedBodyRef);
+
     //-------------------------------------------------------------------------------------
     // Purpose: Load images from IndexedDB and replace <img src="{image_url_placeholder}">
     // with the blob URL for preview in the content editor.
@@ -88,9 +103,9 @@ export const handleClick = async ({
         });
         //console.log('"images" from IndexedDB:', images);
       } catch (dbErr) {
-        //console.error("Error opening IndexedDB or retrieving images:", dbErr);
+        console.error("Error opening IndexedDB or retrieving images:", dbErr);
       }
-      //console.log('"images" from IndexedDB:', images);
+      console.log('"images" from IndexedDB:', images);
 
       if (images.length > 0) {
         //console.log("images more than 1 at indexDb");
@@ -110,7 +125,7 @@ export const handleClick = async ({
 
           // Only generate blobUrl for valid images
           const blobUrl = URL.createObjectURL(image.data);
-          //console.log("blobUrl at draft article:", blobUrl);
+          console.log("blobUrl at draft article:", blobUrl);
 
           preSavedBodyRef = preSavedBodyRef.replace(
             regex,
@@ -120,7 +135,7 @@ export const handleClick = async ({
       }
       //console.log("preSavedBodyRef after replacing images:", preSavedBodyRef);
     } catch (err) {
-      //console.error("Error loading images from IndexedDB:", err);
+      console.error("Error loading images from IndexedDB:", err);
     }
     //-------------------------------------------------------------------------------------
     // Replace tags with line breaks
@@ -130,10 +145,14 @@ export const handleClick = async ({
       .replace(/<br\s*\/?>/g, "___LINE_BREAK___")
       // .replace(/<(?!img|span|a\\b)[^>]*>/g, "")
       .replace(/___LINE_BREAK___/g, "<br>");
-    //console.log("preSavedBodyRef after replacing tags:", preSavedBodyRef);
+    console.log("preSavedBodyRef after replacing tags:", preSavedBodyRef);
 
     // Update the body reference
     savedBodyRef.current = preSavedBodyRef;
-    setDraftArticleButtonClicked(true);
+    // if (tag === "draft") {
+    console.log("savedBodyRef at handleClick:", savedBodyRef.current);
+
+    setDraftArticleButtonClicked!(true);
+    //}
   }
 };
