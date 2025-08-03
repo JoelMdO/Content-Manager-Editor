@@ -20,12 +20,13 @@ export const handleClick = async ({
   savedBodyRef,
   setDraftArticleButtonClicked,
 }: HandleClickProps) => {
+  //
   savedTitleRef.current = newSavedTitleRef.current;
   const articleStored = localStorage.getItem(DRAFT_KEY);
-
+  //
   if (articleStored) {
     const jsonArticle = JSON.parse(articleStored);
-    console.log("article at draft article:", jsonArticle);
+    //console.log("article at draft article:", jsonArticle);
 
     let preSavedBodyRef =
       jsonArticle.find((item: any) => item.type === "body")?.content || "";
@@ -42,9 +43,9 @@ export const handleClick = async ({
             const db = (event.target as IDBOpenDBRequest).result;
             if (!db.objectStoreNames.contains("images")) {
               db.createObjectStore("images", { keyPath: "id" });
-              console.log("✅ Created 'images' store");
+              //console.log("✅ Created 'images' store");
             } else {
-              console.log("ℹ️ 'images' store already exists in upgrade.");
+              //console.log("ℹ️ 'images' store already exists in upgrade.");
             }
           };
           request.onsuccess = (event) =>
@@ -58,25 +59,25 @@ export const handleClick = async ({
 
         const transaction = db.transaction("images", "readonly");
         const store = transaction.objectStore("images");
-        console.log("Object stores:", db.objectStoreNames);
+        //console.log("Object stores:", db.objectStoreNames);
         images = await new Promise<any[]>((resolve, reject) => {
           const allImages: any[] = [];
           const request = store.getAll();
           request.onsuccess = () => {
-            console.log("🧾 store.getAll result:", request.result);
+            //console.log("🧾 store.getAll result:", request.result);
           };
           const cursorRequest = store.openCursor();
           cursorRequest.onsuccess = (event) => {
             const cursor = (event.target as IDBRequest<IDBCursorWithValue>)
               .result;
-            console.log('"cursor" at draft article:', cursor);
+            //console.log('"cursor" at draft article:', cursor);
 
             if (cursor) {
-              console.log("Found cursor value:", cursor.value);
+              //console.log("Found cursor value:", cursor.value);
               allImages.push(cursor.value);
               cursor.continue();
             } else {
-              console.log("Finished reading from cursor.");
+              //console.log("Finished reading from cursor.");
               resolve(allImages);
             }
             db.close();
@@ -85,33 +86,41 @@ export const handleClick = async ({
             reject("Failed to retrieve images from IndexedDB");
           db.close();
         });
-        console.log('"images" from IndexedDB:', images);
+        //console.log('"images" from IndexedDB:', images);
       } catch (dbErr) {
-        console.error("Error opening IndexedDB or retrieving images:", dbErr);
+        //console.error("Error opening IndexedDB or retrieving images:", dbErr);
       }
-      console.log('"images" from IndexedDB:', images);
+      //console.log('"images" from IndexedDB:', images);
 
       if (images.length > 0) {
-        console.log("images more than 1 at indexDb");
+        //console.log("images more than 1 at indexDb");
+        //console.log(
+        //  '"preSavedBodyRef" before replacing images:',
+        //   preSavedBodyRef
+        // );
 
         for (const image of images) {
-          const regex = '<img src="{image_url_placeholder}">';
+          // const regex = '<img src="{image_url_placeholder}">';
+          // Create a regex to match the <img> tag and its associated <p> tag with the image.fileName
+          const regex = new RegExp(
+            `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${image.id}</p>`,
+            "g"
+          );
+          //console.log("regex at images article:", regex);
+
           // Only generate blobUrl for valid images
           const blobUrl = URL.createObjectURL(image.data);
-          console.log("blobUrl at draft article:", blobUrl);
+          //console.log("blobUrl at draft article:", blobUrl);
 
           preSavedBodyRef = preSavedBodyRef.replace(
             regex,
-            `<img src="${blobUrl}" alt="${image.fileName}" width="25%"/>`
-          );
-          console.log(
-            "preSavedBodyRef after replacing images:",
-            preSavedBodyRef
+            `<img src="${blobUrl}" alt="${image.id}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${image.id}</p>`
           );
         }
       }
+      //console.log("preSavedBodyRef after replacing images:", preSavedBodyRef);
     } catch (err) {
-      console.error("Error loading images from IndexedDB:", err);
+      //console.error("Error loading images from IndexedDB:", err);
     }
     //-------------------------------------------------------------------------------------
     // Replace tags with line breaks
@@ -119,9 +128,9 @@ export const handleClick = async ({
     preSavedBodyRef = preSavedBodyRef
       .replace(/<\/div>/g, "___LINE_BREAK___")
       .replace(/<br\s*\/?>/g, "___LINE_BREAK___")
-      .replace(/<(?!img|span|a\\b)[^>]*>/g, "")
+      // .replace(/<(?!img|span|a\\b)[^>]*>/g, "")
       .replace(/___LINE_BREAK___/g, "<br>");
-    console.log("preSavedBodyRef after replacing tags:", preSavedBodyRef);
+    //console.log("preSavedBodyRef after replacing tags:", preSavedBodyRef);
 
     // Update the body reference
     savedBodyRef.current = preSavedBodyRef;

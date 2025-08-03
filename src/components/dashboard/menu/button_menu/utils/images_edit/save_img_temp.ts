@@ -1,4 +1,4 @@
-const saveImageTemporally = async (file: File) =>
+const saveImageTemporally = async (file: File, imageId: string) =>
   new Promise((resolve, reject) => {
     ///========================================================
     // Function to save an image to the IndexedDB
@@ -38,7 +38,7 @@ const saveImageTemporally = async (file: File) =>
 
             // Convert Blob to File
             const imageFile = new File([blob], file.name, { type: file.type });
-            store.put({ id: file.name, data: imageFile });
+            store.put({ id: imageId, fileName: file.name, data: imageFile });
             added = true;
           } else {
             reject({ status: 205, message: `Error reading file data` });
@@ -80,8 +80,9 @@ const saveImageTemporally = async (file: File) =>
 
       return { status: 200, message: `Image saved to the IndexedDB` };
     } catch (error) {
-      console.error("Error during IndexedDB operation:", error);
-      console.error("Error details:", JSON.stringify(error, null, 2));
+      //console.error("Error during IndexedDB operation:", error);
+      //console.error("Error details:", JSON.stringify(error, null, 2));
+      return { status: 500, message: `Error saving image ${error}` };
     }
   });
 

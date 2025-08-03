@@ -55,7 +55,7 @@ const uploadImage = async (
           .toString()
           .slice(-2)}`;
         const imageId = `${formattedDate}-${fileName}`;
-        console.log("Image ID:", imageId);
+        //console.log("Image ID:", imageId);
 
         img.setAttribute("id", imageId); // Set image Id to allow selection
         // Add a reference to the image in the editor
@@ -70,7 +70,10 @@ const uploadImage = async (
         // Create a temporary blob URL for image preview
         const objectUrl = URL.createObjectURL(file);
         // Save updated image temporally
-        const responseSaveImage = (await saveImageTemporally(file)) as {
+        const responseSaveImage = (await saveImageTemporally(
+          file,
+          imageId
+        )) as {
           status: number;
         };
         if (responseSaveImage.status === 205) return responseSaveImage;

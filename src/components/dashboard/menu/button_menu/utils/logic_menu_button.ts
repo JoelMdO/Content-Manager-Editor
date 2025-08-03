@@ -14,6 +14,7 @@ import { handleClear } from "./handler_clear";
 // import MenuContext from "../../../../utils/context/menu_context";
 import translateButtonClicked from "./translate_button_clicked";
 import router from "next/router";
+import saveArticle from "@/components/dashboard/utils/save_article";
 // import { set } from "cypress/types/lodash";
 // import { useMenuContext } from "@/utils/context/menu_context";
 ///--------------------------------------------------------
@@ -81,92 +82,14 @@ export const saveDraft = ({
   ///--------------------------------------------------------
   // Load if any draft on sessionStorage
   ///--------------------------------------------------------
-  console.log("dbName at saveDraft:", dbName);
-
-  const draft = sessionStorage.getItem(`articleContent-${dbName}`);
-  // const draft = sessionStorage.getItem(`articleContent-null`);
-  console.log("draft at saveDraft", draft);
-  console.log("DRFT_KEY at saveDraft:", DRAFT_KEY);
-
-  if (draft) {
-    const articleContent = JSON.parse(draft);
-    console.log("is draft");
-
-    // console.log("articleContent:", articleContent);
-    const newId =
-      articleContent.find((item: any) => item.type === "id")?.content || "";
-    const newTitle =
-      articleContent.find((item: any) => item.type === "title")?.content || "";
-    const newBody =
-      articleContent.find((item: any) => item.type === "body")?.content || "";
-    const newTitleEsp =
-      articleContent.find((item: any) => item.type === "es-title")?.content ||
-      "";
-    const newBodyEsp =
-      articleContent.find((item: any) => item.type === "es-body")?.content ||
-      "";
-    const images = articleContent.filter((item: any) => item.type === "image");
-    console.log("images", images);
-    console.log("body", newBody);
-
-    //Check if the draft has been already saved on the localStorage
-    const existingDraft = localStorage.getItem(DRAFT_KEY!);
-    console.log("existingDraft", existingDraft);
-
-    if (existingDraft) {
-      const draftContent = JSON.parse(existingDraft);
-      // console.log("Draft content found:", draftContent);
-      // Remove the current language's title/body
-      const filtered = draftContent.filter(
-        (item: any) =>
-          item.type !== (language === "en" ? "title" : "es-title") &&
-          item.type !== (language === "en" ? "body" : "es-body") &&
-          item.type !== "image"
-      );
-
-      // Add the new content
-      filtered.push({
-        type: language === "en" ? "title" : "es-title",
-        content: language === "en" ? newTitle : newTitleEsp,
-      });
-      filtered.push({
-        type: language === "en" ? "body" : "es-body",
-        content: language === "en" ? newBody : newBodyEsp,
-      });
-
-      // Add images to the draft
-      images.forEach((image: any) => {
-        filtered.push({ ...image });
-      });
-
-      // Save the draft to localStorage
-      localStorage.setItem(DRAFT_KEY!, JSON.stringify(filtered));
-    } else {
-      // If no existing draft, create a new one
-      const newDraft = [
-        {
-          type: language === "en" ? "title" : "es-title",
-          content: language === "en" ? newTitle : newTitleEsp,
-        },
-        {
-          type: language === "en" ? "body" : "es-body",
-          content: language === "en" ? newBody : newBodyEsp,
-        },
-        ...images,
-        newId, // Add images to the new draft
-      ];
-      // Save the new draft to localStorage and sessionStorage
-      localStorage.removeItem(DRAFT_KEY!);
-      localStorage.setItem(DRAFT_KEY!, JSON.stringify(newDraft));
-      sessionStorage.removeItem(`articleContent-${dbName}`);
-      sessionStorage.setItem(
-        `articleContent-${dbName}`,
-        JSON.stringify(newDraft)
-      );
-      //}
-      //debugger;
-    }
-  }
+  //console.log("dbName at saveDraft:", dbName);
+  saveArticle({
+    dbName,
+    currentTitle: "",
+    currentBody: "",
+    language,
+    DRAFT_KEY,
+  });
 };
 ///--------------------------------------------------------
 // Clear the UI
