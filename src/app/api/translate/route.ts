@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
         }
       });
       // Replace src of the each image with the corresponded url:
-      body = replaceSrcWithImagePlaceholders(body, images);
+      body = replaceSrcWithImagePlaceholders(body, images, "translate");
       console.log("body after replaceSrcWithImagePlaceholders:", body);
 
       // //

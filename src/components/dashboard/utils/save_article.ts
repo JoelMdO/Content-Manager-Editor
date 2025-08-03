@@ -47,6 +47,12 @@ const saveArticle = ({
     jsonArticle.find((item: any) => item.type === "body")?.content || "";
   // console.log("storedTitle at auto-save:", storedTitle);
   // console.log("storedBody at auto-save:", storedBody);
+  if (language === "es") {
+    localStoredTitle =
+      jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
+    localStoredBody =
+      jsonArticle.find((item: any) => item.type === "es-body")?.content || "";
+  }
   //
   // Load if any draft on sessionStorage
   //------------------------------------------
@@ -59,6 +65,15 @@ const saveArticle = ({
     "";
   let sessionStoredBody =
     sessionJsonArticle.find((item: any) => item.type === "body")?.content || "";
+  //
+  if (language === "es") {
+    sessionStoredTitle =
+      sessionJsonArticle.find((item: any) => item.type === "es-title")
+        ?.content || "";
+    sessionStoredBody =
+      sessionJsonArticle.find((item: any) => item.type === "es-body")
+        ?.content || "";
+  }
   // Purpose: Compare textTitle and textBody with local Storage storedTitleRef and storedBodyRef
   //------------------------------------------
   const titles = [sessionStoredTitle, localStoredTitle];

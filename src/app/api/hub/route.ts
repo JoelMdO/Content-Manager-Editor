@@ -126,7 +126,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         type = type;
         break;
       case "translate":
-        console.log("translate at call hub", dataApiHub);
+        console.log("translate at api hub", dataApiHub);
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;

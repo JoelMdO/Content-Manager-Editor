@@ -72,6 +72,7 @@ const DraftArticle = () => {
             savedTitleRef: savedTitleRef,
             savedBodyRef: savedBodyRef,
             setDraftArticleButtonClicked: setDraftArticleButtonClicked,
+            tag: "draft", // Assuming 'draft' is the tag for draft articles
           });
         }}
       >
