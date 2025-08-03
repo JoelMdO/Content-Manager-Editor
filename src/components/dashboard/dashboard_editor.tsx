@@ -68,11 +68,24 @@ const DashboardEditor = () => {
         : dbNameToSearch?.current || "";
 
     const interval = setInterval(() => {
+      // Purpose: Check if the currentTitle contains a placeholder "Title" or a gray placeholder span.
+      //---------------------------------------------------------------------------------------------
       // Get current content from the editor divs
-      //------------------------------------------
       let currentTitle = editorRefs?.current[0]?.innerHTML || "";
       let currentBody = editorRefs?.current[1]?.innerHTML || "";
-      console.log("currentBody at auto-save:", currentBody);
+      //console.log("currentBody at auto-save:", currentBody);
+      // Check for placeholders in the title
+      const hasTitlePlaceholder =
+        /<span class="text-gray-400">.*?<\/span>/g.test(currentTitle) &&
+        currentTitle.includes("Title");
+      console.log("hasTitlePlaceholdertitle:", hasTitlePlaceholder);
+      if (hasTitlePlaceholder) return;
+      // Check for placeholders in the body
+      const hasBodyPlaceholder =
+        /<span class="text-gray-400">.*?<\/span>/g.test(currentBody) &&
+        currentBody.includes("Article");
+      console.log("hasBodyPlaceholderBody:", hasBodyPlaceholder);
+      if (hasBodyPlaceholder) return;
 
       // Load if any draft on localStorage
       //------------------------------------------
@@ -80,33 +93,32 @@ const DashboardEditor = () => {
         `draft-articleContent-${dbName}`
       );
       const jsonArticle = JSON.parse(localStoreText || "[]");
-      console.log("article at draft article:", jsonArticle);
+      //console.log("article at draft article:", jsonArticle);
 
-      let storedTitle =
+      let localStoredTitle =
         jsonArticle.find((item: any) => item.type === "title")?.content || "";
-      let storedBody =
+      let localStoredBody =
         jsonArticle.find((item: any) => item.type === "body")?.content || "";
-      console.log("storedTitle at auto-save:", storedTitle);
-      console.log("storedBody at auto-save:", storedBody);
-
-      // Purpose: Check if the currentTitle contains a placeholder "Title" or a gray placeholder span.
+      // console.log("storedTitle at auto-save:", storedTitle);
+      // console.log("storedBody at auto-save:", storedBody);
+      //
+      // Load if any draft on sessionStorage
       //------------------------------------------
+      const sessionStoreText = sessionStorage.getItem(
+        `articleContent-${dbName}`
+      );
+      const sessionJsonArticle = JSON.parse(sessionStoreText || "[]");
+      //console.log("article at draft article:", jsonArticle);
 
-      const hasTitlePlaceholder =
-        /<span class="text-gray-400">.*?<\/span>/g.test(currentTitle) ||
-        currentTitle.includes("Title");
-      console.log("hasTitlePlaceholdertitle:", hasTitlePlaceholder);
-
-      if (hasTitlePlaceholder) return;
-      const hasBodyPlaceholder =
-        /<span class="text-gray-400">.*?<\/span>/g.test(currentBody) ||
-        currentBody.includes("Article");
-      console.log("hasBodyPlaceholderBody:", hasBodyPlaceholder);
-      if (hasBodyPlaceholder) return;
-
+      let sessionStoredTitle =
+        sessionJsonArticle.find((item: any) => item.type === "title")
+          ?.content || "";
+      let sessionStoredBody =
+        sessionJsonArticle.find((item: any) => item.type === "body")?.content ||
+        "";
       // Purpose: Compare textTitle and textBody with local Storage storedTitleRef and storedBodyRef
       //------------------------------------------
-      const titles = [currentTitle, storedTitle];
+      const titles = [sessionStoredTitle, localStoredTitle];
       console.log("titles at auto-save befpre map:", titles);
 
       const cleanTitleText = titles.map((title) => {
@@ -120,13 +132,15 @@ const DashboardEditor = () => {
       });
       console.log("Title 1:", cleanTitleText[0]);
       console.log("Title 2:", cleanTitleText[1]);
-
+      //
+      //
       if (cleanTitleText[0] !== cleanTitleText[1]) {
         console.log("different title:", cleanTitleText[0]);
         currentTitle = cleanTitleText[0];
       }
       //
-      const content = [currentBody, storedBody];
+      const content = [sessionStoredBody, localStoredBody];
+      let images: object[] = [];
       console.log("content at auto-save before map:", content);
 
       const cleanBodyText = content.map((body) => {
@@ -137,19 +151,7 @@ const DashboardEditor = () => {
           .trim();
         // .replace(/<img\b[^>]*\bsrc=["']blob:[^"']*["'][^>]*>/gi, "")
       });
-
-      if (cleanBodyText[0] !== cleanBodyText[1]) {
-        console.log(
-          "different cleanBody:",
-          // cleanBodyText[0],
-          "currentBody:",
-          currentBody
-        );
-        currentBody = cleanBodyText[0].replace(
-          /<img[^>]*?>/gi,
-          '<img src="{image_url_placeholder}">'
-        );
-      }
+      //
 
       if (
         cleanTitleText[0] === cleanTitleText[1] &&
@@ -158,6 +160,69 @@ const DashboardEditor = () => {
         console.log("⏳ No content changes detected — skipping auto-save.");
         return;
       }
+      //
+      if (cleanBodyText[0] !== cleanBodyText[1]) {
+        console.log(
+          "different cleanBody:"
+          // cleanBodyText[0],
+          // "currentBody:",
+          // currentBody
+        );
+        //
+        currentBody = cleanBodyText[0].replace(
+          /<img[^>]*?>/gi,
+          '<img src="{image_url_placeholder}">'
+        );
+        // Check on images
+        const sessionStoredImages = JSON.parse(
+          sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+        ).filter((item: any) => item.type === "image");
+        const localStoredImages = JSON.parse(
+          localStorage.getItem(`draft-articleContent-${dbName}`) || "[]"
+        ).filter((item: any) => item.type === "image");
+        const areArraysEqual =
+          JSON.stringify(sessionStoredImages.sort()) ===
+          JSON.stringify(localStoredImages.sort());
+        console.log("sessionStoredImages:", sessionStoredImages);
+        console.log("localStoredImages:", localStoredImages);
+
+        console.log("Are arrays equal (ignoring order)?", areArraysEqual);
+        if (!areArraysEqual) {
+          //==========================================
+          // Original Code (Preserved for Reference)
+          //==========================================
+          // images = sessionStoredImages.filter((item: any) =>
+          //   localStoredImages.some(
+          //     (localItem: any) =>
+          //       JSON.stringify(localItem) === JSON.stringify(item)
+          //   )
+          // );
+
+          //------------------------------------------
+          // Purpose: Find images that are present in either sessionStoredImages or localStoredImages but not both, based on unique imageId and fileName.
+          //------------------------------------------
+          images = [
+            ...sessionStoredImages.filter(
+              (sessionImg: any) =>
+                !localStoredImages.some(
+                  (localImg: any) =>
+                    sessionImg.imageId === localImg.imageId &&
+                    sessionImg.fileName === localImg.fileName
+                )
+            ),
+            ...localStoredImages.filter(
+              (localImg: any) =>
+                !sessionStoredImages.some(
+                  (sessionImg: any) =>
+                    localImg.imageId === sessionImg.imageId &&
+                    localImg.fileName === sessionImg.fileName
+                )
+            ),
+          ];
+          console.log("images at auto-save:", images);
+        }
+        //
+      }
       // console.log("cleanTitle:", cleanTitle);
       // console.log("cleanBody:", cleanBody);
       let articleData = [];
@@ -165,11 +230,8 @@ const DashboardEditor = () => {
       //------------------------------------------
       // Purpose: Safely get the db name from either a string or a ref object for sessionStorage key.
       //------------------------------------------
-      console.log("Body 1 ready to save:", currentBody);
-      console.log("Title 2 ready to save:", currentTitle);
-      const images = JSON.parse(
-        sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-      ).filter((item: any) => item.type === "images");
+      //console.log("Body 1 ready to save:", currentBody);
+      //console.log("Title 2 ready to save:", currentTitle);
       const id = JSON.parse(
         sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
       ).filter((item: any) => item.type === "id");
