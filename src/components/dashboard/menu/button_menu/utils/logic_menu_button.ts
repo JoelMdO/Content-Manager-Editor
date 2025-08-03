@@ -42,6 +42,9 @@ export const post =
               );
               articleContent.push({ type: "body", content: response.body });
             }
+            //Delete indexDB and localStorage
+            indexedDB.deleteDatabase("imageStore");
+            localStorage.clear();
           } else if (
             response.status === 401 ||
             response.message === "User not authenticated"
