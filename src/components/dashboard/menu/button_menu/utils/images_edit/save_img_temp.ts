@@ -1,67 +1,82 @@
-const saveImageTemporally = async (file: File) => 
-    new Promise((resolve, reject) => {
+const saveImageTemporally = async (file: File) =>
+  new Promise((resolve, reject) => {
     ///========================================================
     // Function to save an image to the IndexedDB
     ///========================================================
     // Open the IndexedDB with the name "imageStore" and version 1
     const request = window.indexedDB.open("imageStore", 1);
     if (!window.indexedDB) {
-        reject({status: 205, message: `Store index not supported`});
+      reject({ status: 205, message: `Store index not supported` });
+      return;
     }
     //
     request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        db.createObjectStore("images", { keyPath: "id" });
+      const db = (event.target as IDBOpenDBRequest).result;
+      db.createObjectStore("images", { keyPath: "id" });
     };
 
     request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
+      const db = (event.target as IDBOpenDBRequest).result;
 
-        const reader = new FileReader();
-        let added: boolean = false;
-        reader.onload = (e) => {
-            const transaction = db.transaction("images", "readwrite");
-            const store = transaction.objectStore("images");
-            // Convert Base64 to Blob
-            const result = e.target?.result;
-            if (typeof result === 'string') {
-                const byteCharacters = atob(result.split(',')[1]); 
-                const byteArrays = [];
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteArrays.push(byteCharacters.charCodeAt(i));
-                }
-                const byteArray = new Uint8Array(byteArrays);
-                const blob = new Blob([byteArray], { type: file.type });
+      const reader = new FileReader();
+      let added: boolean = false;
+      reader.onload = (e) => {
+        const transaction = db.transaction("images", "readwrite");
+        const store = transaction.objectStore("images");
+        // Convert Base64 to Blob
+        const result = e.target?.result;
+        if (typeof result === "string") {
+          const byteCharacters = atob(result.split(",")[1]);
+          const byteArrays = [];
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteArrays.push(byteCharacters.charCodeAt(i));
+          }
+          const byteArray = new Uint8Array(byteArrays);
+          const blob = new Blob([byteArray], { type: file.type });
 
-                // Convert Blob to File
-                const imageFile = new File([blob], file.name, { type: file.type });
-                store.put({ id: file.name, data: imageFile });
-                added = true;
-            } else {
-                reject({status: 205, message: `Error reading file data`});
-            }
+          // Convert Blob to File
+          const imageFile = new File([blob], file.name, { type: file.type });
+          store.put({ id: file.name, data: imageFile });
+          added = true;
+        } else {
+          reject({ status: 205, message: `Error reading file data` });
+          db.close();
+        }
         transaction.oncomplete = () => {
-            if(added) {
-                resolve({status: 200, message: `Image saved to the IndexedDB ${file.name}`});
-            } else {
-                reject({status: 205, message: `Error saving image to the IndexedDB`});
-            }
+          if (added) {
+            resolve({
+              status: 200,
+              message: `Image saved to the IndexedDB ${file.name}`,
+            });
+            db.close();
+          } else {
+            reject({
+              status: 205,
+              message: `Error saving image to the IndexedDB`,
+            });
+            db.close();
+          }
         };
         transaction.onerror = () => {
-                reject({status: 205, message: `Error saving image to the IndexedDB`});
+          reject({
+            status: 205,
+            message: `Error saving image to the IndexedDB`,
+          });
+          db.close();
         };
-    };
+      };
 
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     };
 
     request.onerror = (event) => {
-        reject ({status: 205, message: `Error saving image to the IndexedDB ${event}`});
+      reject({
+        status: 205,
+        message: `Error saving image to the IndexedDB ${event}`,
+      });
     };
-    
 
-    
-    return {status: 200, message: `Image saved to the IndexedDB`};
-});
+    return { status: 200, message: `Image saved to the IndexedDB` };
+  });
 
 export default saveImageTemporally;

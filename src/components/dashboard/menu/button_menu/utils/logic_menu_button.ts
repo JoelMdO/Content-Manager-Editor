@@ -1,5 +1,5 @@
 import errorAlert from "@/components/alerts/error";
-import saveButtonClicked from "./save_button_clicked";
+import postButtonClicked from "./post_button_clicked";
 import successAlert from "@/components/alerts/sucess";
 // import handleNoteClick from "../../../../utils/playbook/handle_note_click";
 // import emailMe from "../../../../utils/buttons/email_me";
@@ -8,7 +8,7 @@ import successAlert from "@/components/alerts/sucess";
 import { debouncedUpdateStore } from "../../../utils/debounceUpdateStore";
 // import { autoBatchEnhancer } from "@reduxjs/toolkit";
 // import FontStyleUI from "../../../buttons/font_style_buttons";
-import { handleSave } from "./handle_save";
+import { handlePost } from "./handle_post";
 import { ButtonProps } from "../type/type_menu_button";
 import { handleClear } from "./handler_clear";
 // import MenuContext from "../../../../utils/context/menu_context";
@@ -26,10 +26,10 @@ export const post =
     ({ setIsClicked, router }: Partial<ButtonProps>) =>
     () => {
       //
-      handleSave(debouncedUpdateStore);
+      handlePost(debouncedUpdateStore);
       setIsClicked!(true);
-      // saveButtonClicked(italic!, bold!)
-      saveButtonClicked()
+      // postButtonClicked(italic!, bold!)
+      postButtonClicked()
         .then((response) => {
           setIsClicked!(false);
           if (response.status === 200) {
@@ -78,11 +78,20 @@ export const saveDraft = ({
   ///--------------------------------------------------------
   // Load if any draft on sessionStorage
   ///--------------------------------------------------------
+  console.log("dbName at saveDraft:", dbName);
+
   const draft = sessionStorage.getItem(`articleContent-${dbName}`);
+  // const draft = sessionStorage.getItem(`articleContent-null`);
+  console.log("draft at saveDraft", draft);
+  console.log("DRFT_KEY at saveDraft:", DRAFT_KEY);
 
   if (draft) {
     const articleContent = JSON.parse(draft);
+    console.log("is draft");
+
     // console.log("articleContent:", articleContent);
+    const newId =
+      articleContent.find((item: any) => item.type === "id")?.content || "";
     const newTitle =
       articleContent.find((item: any) => item.type === "title")?.content || "";
     const newBody =
@@ -93,9 +102,13 @@ export const saveDraft = ({
     const newBodyEsp =
       articleContent.find((item: any) => item.type === "es-body")?.content ||
       "";
+    const images = articleContent.filter((item: any) => item.type === "image");
+    console.log("images", images);
+    console.log("body", newBody);
 
     //Check if the draft has been already saved on the localStorage
     const existingDraft = localStorage.getItem(DRAFT_KEY!);
+    console.log("existingDraft", existingDraft);
 
     if (existingDraft) {
       const draftContent = JSON.parse(existingDraft);
@@ -104,23 +117,52 @@ export const saveDraft = ({
       const filtered = draftContent.filter(
         (item: any) =>
           item.type !== (language === "en" ? "title" : "es-title") &&
-          item.type !== (language === "en" ? "body" : "es-body")
+          item.type !== (language === "en" ? "body" : "es-body") &&
+          item.type !== "image"
       );
 
       // Add the new content
       filtered.push({
         type: language === "en" ? "title" : "es-title",
-        content: newTitle,
+        content: language === "en" ? newTitle : newTitleEsp,
       });
       filtered.push({
         type: language === "en" ? "body" : "es-body",
-        content: newBody,
+        content: language === "en" ? newBody : newBodyEsp,
       });
+
+      // Add images to the draft
+      images.forEach((image: any) => {
+        filtered.push({ ...image });
+      });
+
+      // Save the draft to localStorage
+      localStorage.setItem(DRAFT_KEY!, JSON.stringify(filtered));
     } else {
-      //  console.log("Saving draft to localStorage:", draft);
-      localStorage.setItem(DRAFT_KEY!, draft);
+      // If no existing draft, create a new one
+      const newDraft = [
+        {
+          type: language === "en" ? "title" : "es-title",
+          content: language === "en" ? newTitle : newTitleEsp,
+        },
+        {
+          type: language === "en" ? "body" : "es-body",
+          content: language === "en" ? newBody : newBodyEsp,
+        },
+        ...images,
+        newId, // Add images to the new draft
+      ];
+      // Save the new draft to localStorage and sessionStorage
+      localStorage.removeItem(DRAFT_KEY!);
+      localStorage.setItem(DRAFT_KEY!, JSON.stringify(newDraft));
+      sessionStorage.removeItem(`articleContent-${dbName}`);
+      sessionStorage.setItem(
+        `articleContent-${dbName}`,
+        JSON.stringify(newDraft)
+      );
+      //}
+      //debugger;
     }
-    //debugger;
   }
 };
 ///--------------------------------------------------------
@@ -144,7 +186,8 @@ export const clearUI = ({
 ///--------------------------------------------------------
 // Load Image
 ///--------------------------------------------------------
-const loadImage = ({ fileInputRef }: Partial<ButtonProps>) => {
+const loadImage = ({ fileInputRef, setIsClicked }: Partial<ButtonProps>) => {
+  setIsClicked!(true);
   fileInputRef!.current?.click();
 };
 ///--------------------------------------------------------
@@ -233,7 +276,7 @@ export const translateToSpanish = ({
 
           // Also update localStorage if needed
           localStorage.setItem(
-            `articleContent-${dbName}`,
+            `draft-articleContent-${dbName}`,
             JSON.stringify(filteredContent)
           );
           //
@@ -260,7 +303,7 @@ export const translateToSpanish = ({
   //debugger;
 };
 ///--------------------------------------------------------
-// Main Function to handle the cases of the playbookCustomButton
+// Main Function to handle the cases of the Menu Buttons
 ///--------------------------------------------------------
 
 export const buttonMenuLogic = ({
@@ -294,7 +337,7 @@ export const buttonMenuLogic = ({
 
   switch (type) {
     case "image":
-      loadImage({ fileInputRef });
+      loadImage({ fileInputRef, setIsClicked });
       break;
     case "link":
       // console.log('"Opening link dialog...");', dialogRef);

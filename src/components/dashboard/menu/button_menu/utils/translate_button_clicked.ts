@@ -1,6 +1,6 @@
 import callHub from "../../../../../services/api/call_hub";
 
-// const saveButtonClicked = async (italic: string[], bold: string[]) => {
+// const postButtonClicked = async (italic: string[], bold: string[]) => {
 const translateButtonClicked = async () => {
   ///========================================================
   // Function to translate the article to the database

@@ -34,7 +34,6 @@ const uploadImage = async (
 
     // Check if the file is a valid image and if its save it on the server
     const response = await callHub("clean-image", file);
-    // console.log("Image upload response:", response);
 
     if (response.status === 200) {
       // Set up a FileReader to read the image file source
@@ -56,7 +55,7 @@ const uploadImage = async (
           .toString()
           .slice(-2)}`;
         const imageId = `${formattedDate}-${fileName}`;
-        // console.log("Image ID:", imageId);
+        console.log("Image ID:", imageId);
 
         img.setAttribute("id", imageId); // Set image Id to allow selection
         // Add a reference to the image in the editor

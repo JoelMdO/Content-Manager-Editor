@@ -9,6 +9,7 @@ import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_co
 // import { subtle } from "crypto";
 import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
 import TranslationLoader from "../loaders/translation_loader";
+import removeBase64FromImgTags from "./menu/button_menu/utils/remove_img_base64";
 // import AutoSaveScreen from "../loaders/auto_save";
 
 const DashboardEditor = () => {
@@ -57,82 +58,159 @@ const DashboardEditor = () => {
   //}
   // }, [translationReady]);
   ///--------------------------------------------------------
-  // Save to localStorage every 10 minutes
-  ///--------------------------------------------------------
-  // useEffect(() => {
-  //   console.log("Saving draft to localStorage every 10 minutes");
-
-  //   const interval = setInterval(() => {
-  //     const draft = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-  //     const draftEsp = sessionStorage.getItem(
-  //       `articleContent-${dbNameToSearch}-es`
-  //     );
-  //     console.log("Saving draft to localStorage:", draft);
-  //     console.log("DRAFT KEY ar savung every 10vminutes:", DRAFT_KEY);
-
-  //     //
-  //     if (draft) {
-  //       localStorage.setItem(DRAFT_KEY!, draft);
-  //     }
-  //     if (draftEsp) {
-  //       localStorage.setItem(
-  //         `draft-articleContent-${dbNameToSearch}-es`,
-  //         draftEsp
-  //       );
-  //     }
-  //   }, 600000); // 10 minutes
-  //   return () => clearInterval(interval);
-  // }, []);
-  ///--------------------------------------------------------
   // Save to localStorage every 10 minutes (only if content exists)
   ///--------------------------------------------------------
   useEffect(() => {
-    // console.log(
-    //   "Setting up auto-save every 10 minutes for db:",
-    //   dbNameToSearch
-    // );
+    console.log("Setting up auto-save every 1 minutes for db:", dbNameToSearch);
+    const dbName =
+      typeof dbNameToSearch === "string"
+        ? dbNameToSearch
+        : dbNameToSearch?.current || "";
 
     const interval = setInterval(() => {
       // Get current content from the editor divs
-      const currentTitle = editorRefs?.current[0]?.innerHTML || "";
-      const currentBody = editorRefs?.current[1]?.innerHTML || "";
+      //------------------------------------------
+      let currentTitle = editorRefs?.current[0]?.innerHTML || "";
+      let currentBody = editorRefs?.current[1]?.innerHTML || "";
+      console.log("currentBody at auto-save:", currentBody);
 
-      // Remove placeholder text for comparison
-      const cleanTitle = currentTitle
-        .replace(/<span class="text-gray-400">.*?<\/span>/g, "")
-        .trim();
-      const cleanBody = currentBody
-        .replace(/<span class="text-gray-400">.*?<\/span>/g, "")
-        .trim();
+      // Load if any draft on localStorage
+      //------------------------------------------
+      const localStoreText = localStorage.getItem(
+        `draft-articleContent-${dbName}`
+      );
+      const jsonArticle = JSON.parse(localStoreText || "[]");
+      console.log("article at draft article:", jsonArticle);
 
-      // Only save if there's actual content
-      let articleData = [];
-      if (cleanTitle || cleanBody) {
-        if (language === "en") {
-          articleData = [
-            { type: "title", content: currentTitle },
-            { type: "body", content: currentBody },
-            { type: "images", content: [] },
-          ];
+      let storedTitle =
+        jsonArticle.find((item: any) => item.type === "title")?.content || "";
+      let storedBody =
+        jsonArticle.find((item: any) => item.type === "body")?.content || "";
+      console.log("storedTitle at auto-save:", storedTitle);
+      console.log("storedBody at auto-save:", storedBody);
 
-          const articleJson = JSON.stringify(articleData);
-          localStorage.setItem(DRAFT_KEY!, articleJson);
-        } else {
-          articleData = [
-            { type: "es-title", content: currentTitle },
-            { type: "es-body", content: currentBody },
-          ];
+      // Purpose: Check if the currentTitle contains a placeholder "Title" or a gray placeholder span.
+      //------------------------------------------
 
-          const articleJson = JSON.stringify(articleData);
-          localStorage.setItem(DRAFT_KEY!, articleJson);
-          // console.log("✅ Auto-saved content to localStorage:", {
-          //   title: cleanTitle ? "Has content" : "Empty",
-          //   body: cleanBody ? "Has content" : "Empty",
-          //   timestamp: new Date().toISOString(),
-          // });
-        }
-        setLastAutoSave(new Date());
+      const hasTitlePlaceholder =
+        /<span class="text-gray-400">.*?<\/span>/g.test(currentTitle) ||
+        currentTitle.includes("Title");
+      console.log("hasTitlePlaceholdertitle:", hasTitlePlaceholder);
+
+      if (hasTitlePlaceholder) return;
+      const hasBodyPlaceholder =
+        /<span class="text-gray-400">.*?<\/span>/g.test(currentBody) ||
+        currentBody.includes("Article");
+      console.log("hasBodyPlaceholderBody:", hasBodyPlaceholder);
+      if (hasBodyPlaceholder) return;
+
+      // Purpose: Compare textTitle and textBody with local Storage storedTitleRef and storedBodyRef
+      //------------------------------------------
+      const titles = [currentTitle, storedTitle];
+      console.log("titles at auto-save befpre map:", titles);
+
+      const cleanTitleText = titles.map((title) => {
+        // If title is a RefObject, use its current value; otherwise, use as is
+        const strTitle =
+          typeof title === "string" ? title : title?.current || "";
+        return strTitle
+          .replace(/<span class="text-gray-400">.*?<\/span>/g, "")
+          .replace(/<[^>]*>/g, "")
+          .trim();
+      });
+      console.log("Title 1:", cleanTitleText[0]);
+      console.log("Title 2:", cleanTitleText[1]);
+
+      if (cleanTitleText[0] !== cleanTitleText[1]) {
+        console.log("different title:", cleanTitleText[0]);
+        currentTitle = cleanTitleText[0];
       }
+      //
+      const content = [currentBody, storedBody];
+      console.log("content at auto-save before map:", content);
+
+      const cleanBodyText = content.map((body) => {
+        const strBody = typeof body === "string" ? body : body?.current || "";
+        return strBody
+          .replace(/<span class="text-gray-400">.*?<\/span>/g, "")
+          .replace(/<img[^>]*?>/gi, "")
+          .trim();
+        // .replace(/<img\b[^>]*\bsrc=["']blob:[^"']*["'][^>]*>/gi, "")
+      });
+
+      if (cleanBodyText[0] !== cleanBodyText[1]) {
+        console.log(
+          "different cleanBody:",
+          // cleanBodyText[0],
+          "currentBody:",
+          currentBody
+        );
+        currentBody = cleanBodyText[0].replace(
+          /<img[^>]*?>/gi,
+          '<img src="{image_url_placeholder}">'
+        );
+      }
+
+      if (
+        cleanTitleText[0] === cleanTitleText[1] &&
+        cleanBodyText[0] === cleanBodyText[1]
+      ) {
+        console.log("⏳ No content changes detected — skipping auto-save.");
+        return;
+      }
+      // console.log("cleanTitle:", cleanTitle);
+      // console.log("cleanBody:", cleanBody);
+      let articleData = [];
+      //Load current images if any
+      //------------------------------------------
+      // Purpose: Safely get the db name from either a string or a ref object for sessionStorage key.
+      //------------------------------------------
+      console.log("Body 1 ready to save:", currentBody);
+      console.log("Title 2 ready to save:", currentTitle);
+      const images = JSON.parse(
+        sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+      ).filter((item: any) => item.type === "images");
+      const id = JSON.parse(
+        sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+      ).filter((item: any) => item.type === "id");
+      //console.log("images at auto-save:", images);
+      //console.log("id at auto-save:", id);
+      // console.log("images at auto-save:", images);
+      const htmlCleanedBody = removeBase64FromImgTags(currentBody);
+      console.log("htmlCleanedBody at auto-save:", htmlCleanedBody);
+
+      if (language === "en") {
+        //
+        articleData = [
+          { type: "title", content: currentTitle },
+          { type: "body", content: htmlCleanedBody },
+          ...images,
+          ...id,
+        ];
+        console.log("Auto-saving content to localStorage: EN", articleData);
+
+        const articleJson = JSON.stringify(articleData);
+        console.log("Article JSON at auto-save:", articleJson);
+
+        localStorage.setItem(DRAFT_KEY!, articleJson);
+      } else {
+        articleData = [
+          { type: "es-title", content: currentTitle },
+          { type: "es-body", content: htmlCleanedBody },
+          ...images,
+          ...id,
+        ];
+
+        const articleJson = JSON.stringify(articleData);
+        localStorage.setItem(DRAFT_KEY!, articleJson);
+        // console.log("✅ Auto-saved content to localStorage:", {
+        //   title: cleanTitle ? "Has content" : "Empty",
+        //   body: cleanBody ? "Has content" : "Empty",
+        //   timestamp: new Date().toISOString(),
+        // });
+      }
+      setLastAutoSave(new Date());
+      //}
     }, 60000); // 1 minute //TODO change to 10 minutes.
 
     return () => clearInterval(interval);
@@ -140,30 +218,15 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   // Save to localStorage on tab/browser close
   ///--------------------------------------------------------
+  //TODO: Implement this feature
+  ///--------------------------------------------------------
+  // Get changes on savedBodyRef when a draft click is made to load the article
+  ///--------------------------------------------------------
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      const draft = sessionStorage.getItem(DRAFT_KEY!);
-      const draftEsp = sessionStorage.getItem(
-        `articleContent-${dbNameToSearch}-es`
-      );
-      //
-      if (draft) {
-        localStorage.setItem(DRAFT_KEY!, draft);
-      }
-      if (draftEsp) {
-        localStorage.setItem(
-          `draft-articleContent-${dbNameToSearch}-es`,
-          draftEsp
-        );
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
-  ///--------------------------------------------------------
-  // Get translated article draft
-  ///--------------------------------------------------------
-
+    if (editorRefs.current && savedBodyRef.current) {
+      editorRefs.current[1]!.innerHTML = savedBodyRef.current;
+    }
+  }, [savedBodyRef.current]);
   ///---------------------------------------------------
   //  Cleanup debounce on unmount
   ///---------------------------------------------------

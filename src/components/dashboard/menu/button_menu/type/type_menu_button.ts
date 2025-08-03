@@ -41,6 +41,10 @@ export interface ButtonProps {
   lastAutoSave: Date | null;
   language: "en" | "es";
   setLanguage: React.Dispatch<React.SetStateAction<"en" | "es">>;
+  setIsMenuClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  tag: string;
+  text: string;
+  setText: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const menuButtonTypes = [

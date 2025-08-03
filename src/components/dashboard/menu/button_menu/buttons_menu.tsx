@@ -11,7 +11,7 @@ import React, {
 // import successAlert from "../alerts/sucess";
 // import errorAlert from "../alerts/error";
 import { useRouter } from "next/navigation";
-// import saveButtonClicked from "../../utils/buttons/save_button_clicked";
+// import postButtonClicked from "../../utils/buttons/save_button_clicked";
 // import emailMe from "@/utils/buttons/email_me";
 // import handleNoteClick from "../../utils/playbook/handle_note_click";
 // import { PlaybookMeta } from "../../types/plabookMeta";
@@ -35,6 +35,8 @@ const MenuButton = ({
   type,
   index,
   setIsFontStyleOpen,
+  setIsMenuClicked,
+  tag,
 }: Partial<ButtonProps>) => {
   // CONTEXT
   //=========================================================
@@ -63,7 +65,7 @@ const MenuButton = ({
   // States
   //=========================================================
   const [isClicked, setIsClicked] = useState(false);
-  const [noteViewMode, setNoteViewMode] = useState<"view" | "edit">("view");
+  // const [noteViewMode, setNoteViewMode] = useState<"view" | "edit">("view");
   //
   // Ensure safe access to editorRefs for Image and Link buttons
   let editorRef: HTMLDivElement | null = null;
@@ -128,9 +130,16 @@ const MenuButton = ({
         } hover:border-orange-300 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
           handleClick();
-          if (type !== "post") {
+          if (type !== "post" && type !== "styles") {
             setTimeout(() => {
+              console.log('"MenuButton" setIsClicked to false');
               setIsClicked(false);
+              console.log("tag:", tag);
+
+              if (tag !== "desktop") {
+                setIsMenuClicked!(false);
+              }
+              console.log("isClicked after setTimeout:", isClicked);
             }, 2000);
           }
         }}

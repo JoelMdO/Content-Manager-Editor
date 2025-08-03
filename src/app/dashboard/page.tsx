@@ -58,6 +58,7 @@ const Dashboard: React.FC = () => {
     useState<boolean>(false);
   const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
   const [isTranslating, setTranslating] = useState(false);
+  const [text, setText] = useState<string>("Without Draft Articles");
   const [language, setLanguage] = useState<"en" | "es">("en");
   //
   const savedTitleRef = useRef<string>("");
@@ -69,13 +70,8 @@ const Dashboard: React.FC = () => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const sectionsDialogRef = useRef<HTMLDialogElement | null>(null);
   const stylesDialogRef = useRef<HTMLDialogElement | null>(null);
+
   const [DRAFT_KEY, setDraftKey] = useState(`draft-articleContent-DeCav`);
-  //
-
-  //
-  // let theTitle = savedTitleRef.current || "";
-  // let theBody = savedBodyRef.current || "";
-
   //
   //
   ///======================================================
@@ -92,46 +88,7 @@ const Dashboard: React.FC = () => {
     setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
     //console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
   }, []);
-  //--------------------------------------------------------
-  // Read the sessionStorage as per the corresponded db.
-  //--------------------------------------------------------
-  // const { savedTitleRef, savedBodyRef } = useGetDraftArticleHook(
-  //   dbNameToSearch.current,
-  //   DRAFT_KEY
-  // );
-  // let articleStored: string | null;
 
-  // dbNameToSearch.current =
-  //   sessionStorage.getItem("db") || dbNameToSearch.current;
-  // articleStored = sessionStorage.getItem(`articleContent-${dbNameToSearch}`);
-  //console.log("Article found in sessionStorage:", articleStored);
-
-  // if (!articleStored) {
-  //Check localStorage for the article content
-  // console.log(
-  //   "No article found in sessionStorage, checking localStorage..."
-  // );
-  // DRAFT_KEY = `draft-articleContent-${dbNameToSearch.current}`;
-  // articleStored = localStorage.getItem(DRAFT_KEY);
-  //console.log("Article found in localStorage:", articleStored);
-  //}
-
-  // if (articleStored) {
-  // console.log("articleStored to savedTitleRef:", articleStored);
-  // const jsonArticle = JSON.parse(articleStored!);
-  // savedTitleRef.current = jsonArticle[0]?.content || "";
-  // savedBodyRef.current = jsonArticle[2]?.content || "";
-  // Remove the sesstion Storage after the page is mounted and if exist the article is created
-  // sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
-  // sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
-  // sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
-  //}
-  // console.log("savedTitleRef at Dashboard:", savedTitleRef.current);
-  // console.log("savedBodyRef at Dashboard:", savedBodyRef.current);
-  // debugger;
-  //
-  //
-  //
   //--------------------------------------------------------
   // Context creation
   ///--------------------------------------------------------
@@ -163,7 +120,9 @@ const Dashboard: React.FC = () => {
     lastAutoSave,
     setLastAutoSave,
     setLanguage,
-    language, // This will be set later
+    language,
+    text,
+    setText,
   };
   //
   ///======================================================
@@ -197,7 +156,7 @@ const Dashboard: React.FC = () => {
           </aside>
           {/* MENU MOBILE */}
           {/* {isFontStyleOpen && <FontStyleUI />} */}
-          <nav className="md:hidden w-full h-[10dvh] bg-gray-800">
+          <nav className="md:hidden w-full h-[12dvh] bg-gray-800">
             <div className="w-full flex flex-row justify-between mt-2 px-2">
               {/* HomeButton at the start (left) */}
               <div className="flex-shrink-0">
