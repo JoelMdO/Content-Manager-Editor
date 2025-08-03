@@ -38,7 +38,7 @@ const DraftArticle = () => {
 
       newSavedTitleRef.current =
         jsonArticle.find((item: any) => item.type === "title")?.content || "";
-      //  console.log("savedTitleRef at draftarticle:", newSavedTitleRef.current);
+      // console.log("savedTitleRef at draftarticle:", newSavedTitleRef.current);
       //  console.log("savedBodyRef at draftarticle:", newSavedBodyRef.current);
       //
       setText(newSavedTitleRef.current);
