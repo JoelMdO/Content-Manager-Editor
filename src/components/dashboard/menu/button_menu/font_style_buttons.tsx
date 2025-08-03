@@ -10,9 +10,9 @@ import { menuButtonStyle } from "./style/style_menu_button";
 
 const FontStyleUI: React.FC<{
   setIsFontStyleOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsClicked?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMenuClicked?: React.Dispatch<React.SetStateAction<boolean>>;
   type: string;
-}> = ({ setIsFontStyleOpen, setIsClicked, type }) => {
+}> = ({ setIsFontStyleOpen, setIsMenuClicked, type }) => {
   ///========================================================
   // To give to the font style as Bold or Italic
   ///========================================================
@@ -47,7 +47,9 @@ const FontStyleUI: React.FC<{
                   setIsPressed(true);
                 setTimeout(() => {
                   setIsPressed(false);
-                  if (type !== "desktop") setIsClicked!(false);
+                  if (type !== "desktop") {
+                    setIsMenuClicked!(false);
+                  }
                 }, 1000);
               }}
             >

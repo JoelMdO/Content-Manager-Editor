@@ -1,13 +1,13 @@
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import readLog from "@/services/authentication/read_log";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
-import replaceSrcWithImagePlaceholders from "@/utils/dashboard/images_edit/replace_src_on_img";
+import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_placeholder_with_img";
 import { forEach } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
-import https from "https";
-import { getToken, JWT } from "next-auth/jwt";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/nextauth/auth";
+import https from "https"; // TODO remove on pprod
+import { JWT } from "next-auth/jwt";
+// import { getServerSession } from "next-auth";
+// import { authOptions } from "@/lib/nextauth/auth";
 
 export async function POST(request: NextRequest) {
   //
@@ -154,86 +154,102 @@ export async function POST(request: NextRequest) {
       // //
       // // Example Ollama prompt for translation
       // VER PREV const aiPrompt = `Translate the following text to Spanish: Title{ ${title} } Body{ ${body} } Section{ ${section} }`;
-      const url = process.env.SERVER_URL;
+      //const url = process.env.SERVER_URL;
+      //console.log("url:", url);
 
       ///--------------------------------------------------------
       // Get the Google access token from next-auth
       ///--------------------------------------------------------
 
       const authHeader = request.headers.get("authorization");
+      console.log("authHeader:", authHeader);
+
       const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+      console.log("tokenG:", tokenG);
 
       if (!tokenG) {
+        console.log("no tokenG");
+
         return NextResponse.json({ status: 401, error: "Unauthorized" });
       }
       console.log("token:", tokenG);
 
-      const newUrl = `${url}${request.url?.replace("/ai", "") || ""}`;
+      // const newUrl = `${url?.replace("/ai", "") || ""}`;
+      // console.log("newUrl:", newUrl);
+
       // TESTING newUrl: https://localhost:443/ai/ask/askhttp://localhost:8000/api/translate
-      // TESTING const newUrl = `https://localhost:443/ask/ask`;
-      // TESTING  console.log("newUrl:", newUrl);
-      // TESTING const agent = new https.Agent({
-      // TESTING rejectUnauthorized: false, // Accept self-signed certificates //TODO delete this line in production
-      // TESTING });
+      const newUrl = `https://localhost:443/ask/ask`; //TODO delete this line in production
+      console.log("newUrl:", newUrl); //TODO delete this line in production
+      const agent = new https.Agent({
+        rejectUnauthorized: false, // Accept self-signed certificates //TODO delete this line in production
+      });
       //
       //console.log("aiPrompt:", aiPrompt);
-      // TESTING process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+      process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 
-      // TESTING const fetch = (await import("node-fetch")).default;
-      const response = await fetch(`${newUrl}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${tokenG}`,
-          "Content-Type": "application/json",
-          "X-Request-Type": "translation",
-          "X-Service": "cms-translate",
-          "X-Source-DB": dbName,
-        },
-        body: JSON.stringify({
-          // model: process.env.AI_MODEL,
-          // prompt: aiPrompt,
-          // stream: false,
-          // source_service: "cms",
-          // request_type: "translation",
-          title: `${title}`,
-          body: `${body}`,
-          section: `${section}`,
-          target_language: `Spanish`,
-        }),
-        // TESTING agent: agent,
-      });
-      // //
-      console.log("response:", response);
+      // const fetch = (await import("node-fetch")).default;
+      try {
+        const response = await fetch(`${newUrl}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tokenG}`,
+            "Content-Type": "application/json",
+            "X-Request-Type": "translation",
+            "X-Service": "cms-translate",
+            "X-Source-DB": dbName,
+          },
+          body: JSON.stringify({
+            // model: process.env.AI_MODEL,
+            // prompt: aiPrompt,
+            // stream: false,
+            // source_service: "cms",
+            // request_type: "translation",
+            title: `${title}`,
+            body: `${body}`,
+            section: `${section}`,
+            target_language: `Spanish`,
+          }),
+          // agent: agent,
+        });
+        // //
+        console.log("response:", response);
 
-      console.log("Response status:", response.status);
+        console.log("Response status:", response.status);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API Error:", errorText);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("API Error:", errorText);
+
+          return NextResponse.json({
+            status: 200,
+            error: `API returned ${response.status}: ${errorText}`,
+          });
+        }
+
+        const data = await response.json();
+        console.log("Response from AI:", data);
+        // const data = {
+        //   translated_text: {
+        //     title: "Artículo de Prueba",
+        //     body: '<div>Hola a todos! Hoy vamos a explorar un concepto fascinante: la entanglement cuántica.<span font-style="bold">La entanglement.</span><div>Es un fenómeno en el que dos o más partículas se unen de manera que compartan su mismo destino, independientemente de la distancia a la que estén separadas.</div></div><br /><div>Esta idea podría parecer un poco compleja al principio, pero vamos a desglosarla paso a paso. Nuestro objetivo es entender cómo funciona esta increíble conexión y sus posibles implicaciones para las tecnologías del futuro, desde ordenadores super-rápidos hasta nuevas formas de comunicación segura.</div><br /><div>Esta idea podría parecer un poco compleja al principio, pero vamos a desglosarla paso a paso. Nuestro objetivo es entender cómo funciona esta increíble conexión y sus posibles implicaciones para las tecnologías del futuro, desde ordenadores super-rápidos hasta nuevas formas de comunicación segura.</div>',
+        //     section: "Reglas importantes:",
+        //   },
+        //   success: true,
+        //   model_used: "llama3.2",
+        // };
 
         return NextResponse.json({
           status: 200,
-          error: `API returned ${response.status}: ${errorText}`,
+          message: "Data translated successfully",
+          body: data,
+        });
+      } catch (error) {
+        console.error("Error:", error);
+        return NextResponse.json({
+          status: 500,
+          error: "Failed to translate article",
         });
       }
-
-      const data = await response.json();
-      console.log("Response from AI:", data);
-      // const data = {
-      //   translated_text: {
-      //     title: "Artículo de Prueba",
-      //     body: '<div>Hola a todos! Hoy vamos a explorar un concepto fascinante: la entanglement cuántica.<span font-style="bold">La entanglement.</span><div>Es un fenómeno en el que dos o más partículas se unen de manera que compartan su mismo destino, independientemente de la distancia a la que estén separadas.</div></div><br /><div>Esta idea podría parecer un poco compleja al principio, pero vamos a desglosarla paso a paso. Nuestro objetivo es entender cómo funciona esta increíble conexión y sus posibles implicaciones para las tecnologías del futuro, desde ordenadores super-rápidos hasta nuevas formas de comunicación segura.</div><br /><div>Esta idea podría parecer un poco compleja al principio, pero vamos a desglosarla paso a paso. Nuestro objetivo es entender cómo funciona esta increíble conexión y sus posibles implicaciones para las tecnologías del futuro, desde ordenadores super-rápidos hasta nuevas formas de comunicación segura.</div>',
-      //     section: "Reglas importantes:",
-      //   },
-      //   success: true,
-      //   model_used: "llama3.2",
-      // };
-
-      return NextResponse.json({
-        status: 200,
-        message: "Data translated successfully",
-        body: data,
-      });
     } catch (error) {
       console.error("Error:", error);
       return NextResponse.json({

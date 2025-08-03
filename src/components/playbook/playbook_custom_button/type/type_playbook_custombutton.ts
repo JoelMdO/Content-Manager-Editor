@@ -1,5 +1,5 @@
 // import { ChangeEvent } from "react";
-import { PlaybookMeta } from "../../../../types/plabookMeta";
+import { PlaybookMeta } from "../../types/plabookMeta";
 
 export interface CustomDashButtonProps {
   type: string;

@@ -11,11 +11,11 @@ const MenuDesktop = () => {
   //
   return (
     <div className="flex flex-col items-center justify-center gap-y-2 mt-3">
-      <MenuButton type={"image"} index={1} />
-      <MenuButton type={"link"} index={1} />
-      <MenuButton type={"sections"} />
-      <MenuButton type={"clear"} />
-      <MenuButton type={"save"} />
+      <MenuButton type={"image"} index={1} tag={"desktop"} />
+      <MenuButton type={"link"} index={1} tag={"desktop"} />
+      <MenuButton type={"sections"} tag={"desktop"} />
+      <MenuButton type={"clear"} tag={"desktop"} />
+      <MenuButton type={"save"} tag={"desktop"} />
       {/* <MenuButton type={"styles"} /> */}
       <div className="relative flex flex-col items-center">
         {isStylesOpen && (
@@ -26,10 +26,14 @@ const MenuDesktop = () => {
             />
           </div>
         )}
-        <MenuButton type={"styles"} setIsFontStyleOpen={setIsFontStyleOpen} />
+        <MenuButton
+          type={"styles"}
+          setIsFontStyleOpen={setIsFontStyleOpen}
+          tag={"desktop"}
+        />
       </div>
-      <MenuButton type={"translate"} />
-      <MenuButton type="post" />
+      <MenuButton type={"translate"} tag={"desktop"} />
+      <MenuButton type="post" tag={"desktop"} />
     </div>
   );
 };

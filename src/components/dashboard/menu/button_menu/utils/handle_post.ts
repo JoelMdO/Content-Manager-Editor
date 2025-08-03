@@ -1,6 +1,6 @@
 import { DebouncedFunc } from "lodash";
 
-export const handleSave = (debouncedUpdateStore: DebouncedFunc<() => void>) => {
+export const handlePost = (debouncedUpdateStore: DebouncedFunc<() => void>) => {
   ///========================================================
   // After the data has been sent to the database, flush the debounced store
   ///========================================================
