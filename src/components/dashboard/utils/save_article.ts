@@ -2,7 +2,7 @@ import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import removeBase64FromImgTags from "../menu/button_menu/utils/remove_img_base64";
 
 interface SaveArticleProps {
-  dbName: string | null;
+  dbName: string | null | undefined;
   currentTitle: string;
   currentBody: string;
   language: string | undefined;
@@ -180,6 +180,9 @@ const saveArticle = ({
   const id = JSON.parse(
     sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
   ).filter((item: any) => item.type === "id");
+  const section = JSON.parse(
+    sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+  ).filter((item: any) => item.type === "section");
   //console.log("images at auto-save:", images);
   //console.log("id at auto-save:", id);
 
@@ -189,9 +192,9 @@ const saveArticle = ({
 
   if (language === "en") {
     //
-    const section = JSON.parse(
-      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-    ).filter((item: any) => item.type === "section");
+    // const section = JSON.parse(
+    //   sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+    // ).filter((item: any) => item.type === "section");
     //
     articleData = [
       { type: "title", content: currentTitle },
@@ -207,9 +210,9 @@ const saveArticle = ({
     localStorage.setItem(DRAFT_KEY!, articleJson);
   } else {
     //
-    const section = JSON.parse(
-      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-    ).filter((item: any) => item.type === "es-section");
+    // const section = JSON.parse(
+    //   sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+    // ).filter((item: any) => item.type === "es-section");
     //
     articleData = [
       { type: "es-title", content: currentTitle },
