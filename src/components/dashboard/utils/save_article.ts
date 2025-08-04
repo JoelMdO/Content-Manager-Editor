@@ -19,9 +19,8 @@ const saveArticle = ({
   //
   // Purpose: Check if the currentTitle contains a placeholder "Title" or a gray placeholder span.
   //---------------------------------------------------------------------------------------------
-  // Get current content from the editor divs
-  //   let currentTitle = editorRefs?.current[0]?.innerHTML || "";
-  //   let currentBody = editorRefs?.current[1]?.innerHTML || "";
+  console.log("dbName at saveArticle:", dbName);
+
   // Check for placeholders in the title
   const hasTitlePlaceholder =
     /<span class="text-gray-400">.*?<\/span>/g.test(currentTitle) &&
@@ -126,7 +125,9 @@ const saveArticle = ({
     //   /<img[^>]*?>/gi,
     //   '<img src="{image_url_placeholder}">'
     // );
+    //------------------------------------------
     // Check on images
+    //------------------------------------------
     const sessionStoredImages = JSON.parse(
       sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
     ).filter((item: any) => item.type === "image");
@@ -181,30 +182,41 @@ const saveArticle = ({
   ).filter((item: any) => item.type === "id");
   //console.log("images at auto-save:", images);
   //console.log("id at auto-save:", id);
+
   // console.log("images at auto-save:", images);
   const htmlCleanedBody = removeBase64FromImgTags(currentBody);
   //console.log("htmlCleanedBody at auto-save:", htmlCleanedBody);
 
   if (language === "en") {
     //
+    const section = JSON.parse(
+      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+    ).filter((item: any) => item.type === "section");
+    //
     articleData = [
       { type: "title", content: currentTitle },
       { type: "body", content: htmlCleanedBody },
       ...images,
       ...id,
+      ...section,
     ];
     //  console.log("Auto-saving content to localStorage: EN", articleData);
 
     const articleJson = JSON.stringify(articleData);
     //  console.log("Article JSON at auto-save:", articleJson);
-
     localStorage.setItem(DRAFT_KEY!, articleJson);
   } else {
+    //
+    const section = JSON.parse(
+      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+    ).filter((item: any) => item.type === "es-section");
+    //
     articleData = [
       { type: "es-title", content: currentTitle },
       { type: "es-body", content: htmlCleanedBody },
       ...images,
       ...id,
+      ...section,
     ];
 
     const articleJson = JSON.stringify(articleData);
