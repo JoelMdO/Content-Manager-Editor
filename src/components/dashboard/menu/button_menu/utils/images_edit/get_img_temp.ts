@@ -6,7 +6,7 @@ const getImageTemporally = async (fileName: string) => {
       ///========================================================
       // Open the IndexedDB with the name "imageStore" and version 1
       // const request = window.indexedDB.open("imageStore", 1);
-      const request = window.indexedDB.open("imageStore");
+      const request = window.indexedDB.open("imageStore", 1);
       console.log("Opening IndexedDB with request:", request);
 
       //
