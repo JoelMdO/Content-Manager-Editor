@@ -42,7 +42,8 @@ const callHub = async (
     //## POST
     case "post":
     case "translate":
-      console.log('"doing translate at callhub", data);');
+      console.log('"doing post at callhub", data);');
+      console.log("data at callhub for post:", data);
 
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
