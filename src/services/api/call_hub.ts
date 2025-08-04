@@ -12,6 +12,7 @@ const callHub = async (
   message: string | unknown;
   sessionId?: string;
   body?: PlaybookMeta[] | TranslateType | undefined;
+  sessionStorageBody?: PlaybookMeta[] | TranslateType | undefined;
 }> => {
   ///=============================================================
   /// Function to orchestrate the api endpoints as hub.
@@ -59,12 +60,6 @@ const callHub = async (
       body = formData;
       credentials = "include";
       break;
-    // case "translate":
-    //   console.log("doing translate at callhub", data);
-    //   body = JSON.stringify(data);
-    //   headers["Content-Type"] = "application/json";
-    //   credentials = "include";
-    //   break;
     default:
       body = JSON.stringify({ data: data, type: type });
       headers["Content-Type"] = "application/json";
@@ -83,11 +78,16 @@ const callHub = async (
     });
     const jsonResponse = await response.json();
     console.log("jsonResponse at callhub:", jsonResponse);
+    console.log(
+      "sessionStorageBody at callhub:",
+      jsonResponse.sessionStorageBody
+    );
 
     return {
       status: jsonResponse.status,
       message: jsonResponse.message,
       body: jsonResponse.body,
+      sessionStorageBody: jsonResponse.sessionStorageBody,
     };
     //}
   } catch (error) {

@@ -33,16 +33,10 @@ export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
       if (response.status === 200) {
         successAlert("saved");
         //TODO check if needed to be saved again
-        if (response.body) {
-          const dbName = sessionStorage.getItem("db");
-          const articleContent = JSON.parse(
-            sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-          );
-          articleContent.push({ type: "body", content: response.body });
-        }
         //Delete indexDB and localStorage
         //indexedDB.deleteDatabase("imageStore");
         //localStorage.clear();
+        //console.log('"Post response body:", response.body);');
       } else if (
         response.status === 401 ||
         response.message === "User not authenticated"
@@ -178,18 +172,21 @@ export const translateToSpanish = ({
             (item: any) =>
               item.type !== "es-title" &&
               item.type !== "es-body" &&
-              item.type !== "es-section"
+              item.type !== "es-section" &&
+              item.type !== "body"
           );
           //
           const translated = (response.body as any).translated_text;
           const title = translated.title || "";
-          const body = translated.body || "";
+          const es_body = translated.body || "";
           const section = translated.section || "";
+          const body = response.sessionStorageBody || "";
 
           // Add new translation
           filteredContent.push({ type: "es-title", content: title });
-          filteredContent.push({ type: "es-body", content: body });
+          filteredContent.push({ type: "es-body", content: es_body });
           filteredContent.push({ type: "es-section", content: section });
+          filteredContent.push({ type: "body", content: body });
 
           // Store updated content in sessionStorage
           sessionStorage.setItem(
@@ -205,8 +202,9 @@ export const translateToSpanish = ({
           //
 
           articleContent.push({ type: "es-title", content: title });
-          articleContent.push({ type: "es-body", content: body });
+          articleContent.push({ type: "es-body", content: es_body });
           articleContent.push({ type: "es-section", content: section });
+          articleContent.push({ type: "body", content: body });
         }
         setTranslationReady!(true);
       } else if (

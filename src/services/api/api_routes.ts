@@ -71,17 +71,29 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     // Wait for the JSON response
     const jsonResponse = await response.json();
     ///-----------------------------------------------
-    /// From api/post and api/translate return the body.
+    /// From api/post return the body.
     ///-----------------------------------------------
-    if (
-      jsonResponse.message === "Data saved successfully" ||
-      jsonResponse.message === "Data translated successfully"
-    ) {
+    if (jsonResponse.message === "Data saved successfully") {
       const body = jsonResponse.body;
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,
         body: body,
+      });
+    }
+    ///-----------------------------------------------
+    /// From api/translate return the body.
+    ///-----------------------------------------------
+    if (jsonResponse.message === "Data translated successfully") {
+      const body = jsonResponse.body;
+      const sessionStorageBody = jsonResponse.sessionStorageBody;
+      console.log("sessionStorageBody at apiRoutes:", sessionStorageBody);
+
+      return NextResponse.json({
+        status: jsonResponse.status,
+        message: jsonResponse.message,
+        body: body,
+        sessionStorageBody: sessionStorageBody,
       });
       ///-----------------------------------------------
       /// From api/search return the meta.
