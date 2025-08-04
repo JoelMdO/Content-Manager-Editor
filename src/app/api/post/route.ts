@@ -91,6 +91,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     if (imageFiles.length > 0) {
       //Filter valid file objects
+      console.log("imageFiles found:", imageFiles);
 
       pre_images = imageFiles.filter(
         (value): value is File => value instanceof File
@@ -119,6 +120,8 @@ export async function POST(req: NextRequest): Promise<Response> {
               (uploadError, result) => {
                 if (uploadError) {
                   // Handle upload error
+                  console.log("Error uploading image:", uploadError);
+
                   return NextResponse.json({
                     status: 500,
                     message: "Error uploading image. No URL.",
@@ -138,6 +141,8 @@ export async function POST(req: NextRequest): Promise<Response> {
             ); //     // Update image URL in article content
             // If any images were uploaded, update the article's images array
             if (imageUrls.length > 0) {
+              console.log("images length >0");
+
               article.images = imageUrls; // Append image URLs to article.images
             }
           });
@@ -192,6 +197,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     //     }
     //   });
     // Replace src of the each image with the corresponded url:
+    console.log("article.images:", article.images);
+
     const articlesBodies = [article.body, article.esBody];
     articlesBodies.forEach((article) => {
       replaceSrcWithImagePlaceholders(article!, images);

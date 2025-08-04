@@ -6,6 +6,7 @@ const replaceSrcWithImagePlaceholders = (
     /<img src="{image_url_placeholder}">[\s\S]*?<p[^>]*>(.*?)<\/p>/g,
     (match, filename) => {
       // Trim filename and replace spaces with underscores
+      console.log("Processing filename:", filename);
 
       const cleanedFilename = filename
         .trim()
@@ -13,10 +14,17 @@ const replaceSrcWithImagePlaceholders = (
         .replace(/^\d{2}-\d{2}-\d{2}-/, ""); // Remove date prefix
 
       // Find the matching image URL
+      console.log("Cleaned filename:", cleanedFilename);
+
       const matchingImage = images.find((image) => {
         const urlFilename = image.url.split("/").pop();
+        console.log("Matching image URL:", urlFilename);
+
         return urlFilename?.includes(cleanedFilename.replace(".png", ""));
       });
+      console.log("Matching image:", matchingImage);
+
+      // console.log("matchingImage url:", matchingImage!.url);
 
       if (matchingImage) {
         return `<img src="${matchingImage.url}">`;
