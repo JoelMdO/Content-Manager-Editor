@@ -108,11 +108,11 @@ export const handleClick = async ({
       console.log('"images" from IndexedDB:', images);
 
       if (images.length > 0) {
-        //console.log("images more than 1 at indexDb");
-        //console.log(
-        //  '"preSavedBodyRef" before replacing images:',
-        //   preSavedBodyRef
-        // );
+        console.log("images more than 1 at indexDb");
+        console.log(
+          '"preSavedBodyRef" before replacing images:',
+          preSavedBodyRef
+        );
 
         for (const image of images) {
           // const regex = '<img src="{image_url_placeholder}">';
