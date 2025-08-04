@@ -1,4 +1,6 @@
-import deleteImageFromIndexDB from "./images_edit/delete_img_from_indexdb";
+// import deleteImageFromIndexDB from "./images_edit/delete_img_from_indexdb";
+
+import { removeStoredImage } from "./images_edit/delete_img_from_localstorage";
 
 export const handleClear = (
   // setTheTitle: (value: string) => void,
@@ -27,5 +29,5 @@ export const handleClear = (
   });
 
   // Delete images from IndexedDB
-  deleteImageFromIndexDB(undefined, "clear-all");
+  // deleteImageFromIndexDB(undefined, "clear-all");
 };
