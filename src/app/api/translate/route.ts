@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     let fileName: string = "";
 
     for (const key of formData.keys()) {
-      console.log("images with key", key);
+      //console.log("images with key", key);
 
       if (key.startsWith("image")) {
         const fileData = formData.get(key);
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     const titleObj = JSON.parse(titleData);
     const idData = formData.get("id") as string;
     const idObj = JSON.parse(idData);
-    const articleData = formData.get("article") as string;
+    const articleData = formData.get("body") as string;
     const bodyObj = JSON.parse(articleData);
     const sectionData = formData.get("section") as string;
     const sectionObj = JSON.parse(sectionData);
