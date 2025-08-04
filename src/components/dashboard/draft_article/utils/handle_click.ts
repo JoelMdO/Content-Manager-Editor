@@ -141,7 +141,8 @@ export const handleClick = async ({
     // Replace tags with line breaks
     //-------------------------------------------------------------------------------------
     preSavedBodyRef = preSavedBodyRef
-      .replace(/<\/div>/g, "___LINE_BREAK___")
+      .replace(/<div>/g, "")
+      .replace(/<\/div>/g, "")
       .replace(/<br\s*\/?>/g, "___LINE_BREAK___")
       // .replace(/<(?!img|span|a\\b)[^>]*>/g, "")
       .replace(/___LINE_BREAK___/g, "<br>");
