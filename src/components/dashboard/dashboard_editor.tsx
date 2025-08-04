@@ -57,10 +57,7 @@ const DashboardEditor = () => {
     console.log("Setting up auto-save every 1 minutes for db:", dbNameToSearch);
 
     const interval = setInterval(() => {
-      const dbName =
-        typeof dbNameToSearch === "string"
-          ? dbNameToSearch
-          : dbNameToSearch?.current || "";
+      const dbName = sessionStorage.getItem("db");
       console.log("dbName at useEffect update by timer:", dbName);
 
       let currentTitle = editorRefs?.current[0]?.innerHTML || "";

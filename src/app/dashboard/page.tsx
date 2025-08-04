@@ -78,15 +78,20 @@ const Dashboard: React.FC = () => {
   // Check if screen is desktop and database selector
   ///======================================================
   useEffect(() => {
-    dbSelector();
-    //
+    const initializeDbName = async () => {
+      await dbSelector(); // Wait for dbSelector to complete
+      dbNameToSearch.current = sessionStorage.getItem("db") as string;
+      console.log(
+        "dbNameToSearch.current after dbSelector:",
+        dbNameToSearch.current
+      );
+      setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
+    };
+
+    initializeDbName();
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
-    //   //console.log("dbNameToSearch.current:", dbNameToSearch.current);
-    dbNameToSearch.current = sessionStorage.getItem("db") as string;
-    console.log("dbNameToSearch.current first render:", dbNameToSearch.current);
-    setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
   }, []);
   //
   //TODO second phase add a section selector on change of dbNameToSearch
