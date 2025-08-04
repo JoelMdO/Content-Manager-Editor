@@ -2,7 +2,7 @@ import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import removeBase64FromImgTags from "../menu/button_menu/utils/remove_img_base64";
 
 interface SaveArticleProps {
-  dbName: string | undefined;
+  dbName: string | null;
   currentTitle: string;
   currentBody: string;
   language: string | undefined;
