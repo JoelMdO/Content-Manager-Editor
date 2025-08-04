@@ -4,7 +4,7 @@ import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_placeholder_with_img";
 import { forEach } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
-import https from "https"; // TODO remove on pprod
+// import https from "https";
 import { JWT } from "next-auth/jwt";
 // import { getServerSession } from "next-auth";
 // import { authOptions } from "@/lib/nextauth/auth";
@@ -150,13 +150,8 @@ export async function POST(request: NextRequest) {
       // Replace src of the each image with the corresponded url:
       body = replaceSrcWithImagePlaceholders(body, images, "translate");
       console.log("body after replaceSrcWithImagePlaceholders:", body);
-
-      // //
-      // // Example Ollama prompt for translation
-      // VER PREV const aiPrompt = `Translate the following text to Spanish: Title{ ${title} } Body{ ${body} } Section{ ${section} }`;
-      //const url = process.env.SERVER_URL;
-      //console.log("url:", url);
-
+      // Update the sessionStorage with the correct tags.
+      const sessionStorageBody = body;
       ///--------------------------------------------------------
       // Get the Google access token from next-auth
       ///--------------------------------------------------------
@@ -173,21 +168,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ status: 401, error: "Unauthorized" });
       }
       console.log("token:", tokenG);
-
-      // const newUrl = `${url?.replace("/ai", "") || ""}`;
-      // console.log("newUrl:", newUrl);
-
-      // TESTING newUrl: https://localhost:443/ai/ask/askhttp://localhost:8000/api/translate
-      const newUrl = `https://localhost:443/ask/ask`; //TODO delete this line in production
-      console.log("newUrl:", newUrl); //TODO delete this line in production
-      const agent = new https.Agent({
-        rejectUnauthorized: false, // Accept self-signed certificates //TODO delete this line in production
-      });
+      const newUrl = process.env.SERVER_URL;
+      console.log("newUrl:", newUrl);
       //
-      //console.log("aiPrompt:", aiPrompt);
-      process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+      process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; //TODO delete this line in production
 
-      // const fetch = (await import("node-fetch")).default;
       try {
         const response = await fetch(`${newUrl}`, {
           method: "POST",
@@ -199,17 +184,11 @@ export async function POST(request: NextRequest) {
             "X-Source-DB": dbName,
           },
           body: JSON.stringify({
-            // model: process.env.AI_MODEL,
-            // prompt: aiPrompt,
-            // stream: false,
-            // source_service: "cms",
-            // request_type: "translation",
             title: `${title}`,
             body: `${body}`,
             section: `${section}`,
             target_language: `Spanish`,
           }),
-          // agent: agent,
         });
         // //
         console.log("response:", response);
@@ -228,20 +207,14 @@ export async function POST(request: NextRequest) {
 
         const data = await response.json();
         console.log("Response from AI:", data);
-        // const data = {
-        //   translated_text: {
-        //     title: "Artículo de Prueba",
-        //     body: '<div>Hola a todos! Hoy vamos a explorar un concepto fascinante: la entanglement cuántica.<span font-style="bold">La entanglement.</span><div>Es un fenómeno en el que dos o más partículas se unen de manera que compartan su mismo destino, independientemente de la distancia a la que estén separadas.</div></div><br /><div>Esta idea podría parecer un poco compleja al principio, pero vamos a desglosarla paso a paso. Nuestro objetivo es entender cómo funciona esta increíble conexión y sus posibles implicaciones para las tecnologías del futuro, desde ordenadores super-rápidos hasta nuevas formas de comunicación segura.</div><br /><div>Esta idea podría parecer un poco compleja al principio, pero vamos a desglosarla paso a paso. Nuestro objetivo es entender cómo funciona esta increíble conexión y sus posibles implicaciones para las tecnologías del futuro, desde ordenadores super-rápidos hasta nuevas formas de comunicación segura.</div>',
-        //     section: "Reglas importantes:",
-        //   },
-        //   success: true,
-        //   model_used: "llama3.2",
-        // };
+        //
+        console.log("sessionStorageBody:", sessionStorageBody);
 
         return NextResponse.json({
           status: 200,
           message: "Data translated successfully",
           body: data,
+          sessionStorageBody: sessionStorageBody,
         });
       } catch (error) {
         console.error("Error:", error);

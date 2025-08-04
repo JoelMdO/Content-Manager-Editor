@@ -177,7 +177,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     // SAVE in db.
     console.log("body at save article:", article.body);
     console.log("title at save article:", article.title);
-    // let images = article.images;
+    let images = article.images;
     // let section = article.section;
     //
 
@@ -193,8 +193,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     //   });
     // Replace src of the each image with the corresponded url:
     const articlesBodies = [article.body, article.esBody];
-    articlesBodies.forEach((body) => {
-      body = replaceSrcWithImagePlaceholders(body!, article.images!);
+    articlesBodies.forEach((article) => {
+      replaceSrcWithImagePlaceholders(article!, images);
     });
     //
     console.log("articlesBodies english:", articlesBodies[0]);
