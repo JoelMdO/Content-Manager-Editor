@@ -60,6 +60,7 @@ const Dashboard: React.FC = () => {
   const [isTranslating, setTranslating] = useState(false);
   const [text, setText] = useState<string>("Without Draft Articles");
   const [language, setLanguage] = useState<"en" | "es">("en");
+  const [dbIsReady, setDbIsReady] = useState<boolean>(false);
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
@@ -80,19 +81,23 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const initializeDbName = async () => {
       await dbSelector(); // Wait for dbSelector to complete
-      dbNameToSearch.current = sessionStorage.getItem("db") as string;
-      console.log(
-        "dbNameToSearch.current after dbSelector:",
-        dbNameToSearch.current
-      );
-      setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
+      setDbIsReady(true);
     };
-
+    //
     initializeDbName();
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
   }, []);
+  //
+  useEffect(() => {
+    dbNameToSearch.current = sessionStorage.getItem("db") as string;
+    console.log(
+      "dbNameToSearch.current after dbSelector:",
+      dbNameToSearch.current
+    );
+    setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
+  }, [dbIsReady]);
   //
   //TODO second phase add a section selector on change of dbNameToSearch
   //--------------------------------------------------------
