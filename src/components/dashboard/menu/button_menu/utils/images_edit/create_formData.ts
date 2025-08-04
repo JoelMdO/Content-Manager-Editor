@@ -1,7 +1,7 @@
 import { any } from "cypress/types/bluebird";
 import errorAlert from "../../../../../alerts/error";
 import { FormDataItem } from "../../type/formData";
-import getImageTemporally from "./get_img_temp";
+// import getImageTemporally from "./get_img_temp";
 //
 
 //
@@ -67,13 +67,20 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
       )
       .map(async (item) => {
         try {
-          const response = await getImageTemporally(item.fileName as string);
-          if ((response as { file: File }).file instanceof File) {
-            formData.append(`image`, (response as { file: File }).file);
-            console.log("Image added to formData:", item.fileName);
-          } else {
-            console.log("Image not found in temporary storage:", item.fileName);
-          }
+          // const response = await getImageTemporally(item.fileName as string);
+          // const base64 = JSON.parse(
+          //   localStorage.getItem(dbName) || "[]"
+          // ).filter((item: any) => item.type === "image");
+          // if (!base64) return;
+          // item.forEach(async (img: any) => {
+          console.log("item.blobUrl:", item.blobUrl);
+
+          const blob = await (await fetch(item.blobUrl)).blob(); // Convert Base64 back to Blob
+          const file = new File([blob], item.fileName, { type: blob.type });
+          formData.append(`image`, file);
+          console.log("Image added to formData:", item.fileName);
+          //}
+          //);
         } catch (error) {
           console.log("Error retrieving image:", item.fileName, error);
 
