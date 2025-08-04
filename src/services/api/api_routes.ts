@@ -23,8 +23,8 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       //## POST
       case "post":
       case "translate":
-        console.log('"doing translate at api routes', JWT!);
-
+        // console.log('"doing translate at api routes', JWT!);
+        console.log('"doing post at api routes', token!);
         endPoint = type;
         body = data as FormData;
         body.append("token", token || "");

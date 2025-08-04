@@ -43,9 +43,9 @@ const DraftArticle = () => {
       //
       setText(newSavedTitleRef.current);
       //
-      sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
-      sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
-      sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
+      //sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
+      //sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
+      //sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
     } else {
       setText("Without Draft Articles");
     }

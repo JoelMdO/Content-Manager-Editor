@@ -26,35 +26,44 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
   const id = JSON.stringify(getContentByType("id"));
   const article = JSON.stringify(getContentByType("body"));
   const section = JSON.stringify(getContentByType("section"));
-  // const bold = JSON.stringify(getContentByType("bold"));
   const dbName = JSON.stringify(getContentByType("dbName"));
-  // const title = JSON.stringify(data.title);
-  // const id = JSON.stringify(data.id);
-  // const article = JSON.stringify(data.body);
-  // const italic = JSON.stringify(data.italic);
-  // const bold = JSON.stringify(data.bold);
-  // const dbName = JSON.stringify(data.dbName);
+  const es_title = JSON.stringify(getContentByType("es-title"));
+  const es_article = JSON.stringify(getContentByType("es-body"));
+  const es_section = JSON.stringify(getContentByType("es-section"));
+  //
   console.log('title after getContentByType("title"):', title);
   console.log('id after getContentByType("id"):', id);
   console.log('article after getContentByType("body"):', article);
   console.log('section after getContentByType("section"):', section);
   console.log('dbName after getContentByType("dbName"):', dbName);
-
+  console.log('es_title after getContentByType("es-title"):', es_title);
+  console.log('es_article after getContentByType("es-body"):', es_article);
+  console.log('es_section after getContentByType("es-section"):', es_section);
+  //
   formData.append("title", title);
   formData.append("id", id);
-  formData.append("article", article);
+  formData.append("body", article);
   formData.append("type", type);
   formData.append("section", section);
-  // formData.append("bold", bold);
   formData.append("dbName", dbName);
+  formData.append("es-title", es_title);
+  formData.append("es-body", es_article);
+  formData.append("es-section", es_section);
   //
   //Filter if any image on the data
-  console.log("doing next images");
+
   if (type !== "translate") {
+    console.log("doing next images");
     const imagePromises = data
       .filter(
-        (item): item is { type: "image"; imageId: string; fileName: string } =>
-          item.type === "image"
+        (
+          item
+        ): item is {
+          type: "image";
+          imageId: string;
+          fileName: string;
+          blobUrl: string;
+        } => item.type === "image"
       )
       .map(async (item) => {
         try {
@@ -66,9 +75,13 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
             console.log("Image not found in temporary storage:", item.fileName);
           }
         } catch (error) {
+          console.log("Error retrieving image:", item.fileName, error);
+
           errorAlert("", "", error);
         }
       });
+    console.log("ImagePromises:", imagePromises);
+
     await Promise.all(imagePromises);
     console.log("ImagePromise", await Promise.all(imagePromises));
   } else {

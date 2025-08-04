@@ -5,12 +5,16 @@ const getImageTemporally = async (fileName: string) => {
       // Function to get an image from the IndexedDB
       ///========================================================
       // Open the IndexedDB with the name "imageStore" and version 1
-      const request = window.indexedDB.open("imageStore", 1);
+      // const request = window.indexedDB.open("imageStore", 1);
+      const request = window.indexedDB.open("imageStore");
+      console.log("Opening IndexedDB with request:", request);
+
       //
       try {
         request.onsuccess = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
           if (!window.indexedDB) {
+            console.log('"IndexedDB not supported in this browser."');
           }
           //
           // Check if "images" store exists before querying
@@ -37,6 +41,7 @@ const getImageTemporally = async (fileName: string) => {
                 message: `Image read from the IndexedDB`,
                 file: file,
               });
+              console.log("on success", file);
             } else {
               file = null;
               reject({
@@ -44,6 +49,7 @@ const getImageTemporally = async (fileName: string) => {
                 message: "Failed to open IndexedDB",
                 file: null,
               });
+              console.log("on error at else", file);
             }
           };
           getRequest.onerror = () => {
@@ -52,9 +58,12 @@ const getImageTemporally = async (fileName: string) => {
               message: "Error retrieving image",
               file: null,
             });
+            console.log("on error", file);
           };
         };
       } catch (error) {
+        console.log("#catch error", error);
+
         reject({ status: 500, message: String(error), file: null });
       }
     }

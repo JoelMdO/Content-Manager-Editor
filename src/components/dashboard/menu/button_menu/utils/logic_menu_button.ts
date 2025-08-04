@@ -20,47 +20,44 @@ import saveArticle from "@/components/dashboard/utils/save_article";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
-export const post =
-  // ({ setIsClicked, italic, bold, router }: Partial<ButtonProps>) =>
+export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
+  //
+  console.log("post button clicked");
 
-
-    ({ setIsClicked, router }: Partial<ButtonProps>) =>
-    () => {
-      //
-      handlePost(debouncedUpdateStore);
-      setIsClicked!(true);
-      // postButtonClicked(italic!, bold!)
-      postButtonClicked()
-        .then((response) => {
-          setIsClicked!(false);
-          if (response.status === 200) {
-            successAlert("saved");
-            //TODO check if needed to be saved again
-            if (response.body) {
-              const dbName = sessionStorage.getItem("db");
-              const articleContent = JSON.parse(
-                sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-              );
-              articleContent.push({ type: "body", content: response.body });
-            }
-            //Delete indexDB and localStorage
-            indexedDB.deleteDatabase("imageStore");
-            localStorage.clear();
-          } else if (
-            response.status === 401 ||
-            response.message === "User not authenticated"
-          ) {
-            errorAlert("saved", "nonauth", response.message);
-            router!.push("/");
-          } else {
-            errorAlert("saved", "non200", response.message);
-          }
-        })
-        .catch((error) => {
-          setIsClicked!(false);
-          errorAlert("saved", "error", error);
-        });
-    };
+  handlePost(debouncedUpdateStore);
+  setIsClicked!(true);
+  // postButtonClicked(italic!, bold!)
+  postButtonClicked()
+    .then((response) => {
+      setIsClicked!(false);
+      if (response.status === 200) {
+        successAlert("saved");
+        //TODO check if needed to be saved again
+        if (response.body) {
+          const dbName = sessionStorage.getItem("db");
+          const articleContent = JSON.parse(
+            sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+          );
+          articleContent.push({ type: "body", content: response.body });
+        }
+        //Delete indexDB and localStorage
+        //indexedDB.deleteDatabase("imageStore");
+        //localStorage.clear();
+      } else if (
+        response.status === 401 ||
+        response.message === "User not authenticated"
+      ) {
+        errorAlert("saved", "nonauth", response.message);
+        router!.push("/");
+      } else {
+        errorAlert("saved", "non200", response.message);
+      }
+    })
+    .catch((error) => {
+      setIsClicked!(false);
+      errorAlert("saved", "error", error);
+    });
+};
 ///--------------------------------------------------------
 // Save to sessionStorage on every change
 ///--------------------------------------------------------
@@ -277,6 +274,7 @@ export const buttonMenuLogic = ({
       break;
     case "post":
       // post({ setIsClicked, italic, bold, router });
+      console.log('"post button clicked at logic_menu_button.ts"');
       post({ setIsClicked, router });
       break;
     case "save":

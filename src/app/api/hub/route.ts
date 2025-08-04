@@ -63,6 +63,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (session && type !== "sign-in-by-email") {
       token = createLog(session?.user.id);
+      console.log('"token" at API Hub:', token);
     }
 
     if ((session && type === "post") || (session && type === "translate")) {
@@ -121,6 +122,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
         break;
       case "post":
+        console.log("session at post on api hub:", sessionId);
+
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
