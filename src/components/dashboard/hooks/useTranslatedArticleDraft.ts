@@ -22,14 +22,12 @@ export function useTranslatedArticleDraft() {
   // For rerendering on translation, you can expose a reload function:
   ///======================================================
   useEffect(() => {
+    console.log("translationReady in useEffect:", translationReady);
     if (translationReady) {
       console.log("useTranslatedArticleDraft triggered");
-      //
-      const dbName =
-        typeof dbNameToSearch === "string"
-          ? dbNameToSearch
-          : dbNameToSearch.current || "";
 
+      const dbName = sessionStorage.getItem("db") as string;
+      console.log('"translationReady" is true', dbName);
       let articleStored: string | null = sessionStorage.getItem(
         `articleContent-${dbName}`
       );

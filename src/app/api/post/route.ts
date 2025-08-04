@@ -1,15 +1,15 @@
 import "server-only";
 import { database } from "../../../../firebaseMain";
 import { databaseDecav } from "../../../../firebaseDecav";
-import { Database, ref, set, update } from "firebase/database";
+import { Database } from "firebase/database";
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
-import { forEach } from "lodash";
 import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import readLog from "../../../services/authentication/read_log";
 import { convertHtmlToMarkdown } from "@/services/api/html_to_markdown";
 import { sectionsCode } from "../../../constants/sections";
+import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
   ///
   /// Variables.
-  const imageUrls: { url: string }[] = [];
+  const imageUrls: { url: string; fileId: string }[] = [];
   const formData = await req.formData();
   const dbName = formData.get("dbName") as string;
   console.log("doing POST");
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     esTitle?: string;
     body: string;
     esBody?: string;
-    images?: { url: string }[];
+    images?: { url: string; fileId: string }[];
     category?: string;
     version?: string;
     section?: string;
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest): Promise<Response> {
                   let urlCloudinary: string | undefined = "";
                   urlCloudinary = result?.secure_url;
 
-                  imageUrls.push({ url: urlCloudinary! });
+                  imageUrls.push({ url: urlCloudinary!, fileId: fileName });
                 }
                 resolve();
               }
@@ -183,112 +183,148 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log("body at save article:", article.body);
     console.log("title at save article:", article.title);
     let images = article.images;
-    // let section = article.section;
+    let section = article.section;
     //
-
-    // try {
-    //   // const arrayData = [images, bold, italic];
-    //   const arrayData = [images];
-    //   forEach(arrayData, (value) => {
-    //     if (Array.isArray(value) && value.length === 0) {
-    //       if (value === images) {
-    //         images = [{ url: "nil" }];
-    //       }
-    //     }
-    //   });
-    // Replace src of the each image with the corresponded url:
     console.log("article.images:", article.images);
 
+    //------------------------------------------
+    // Purpose: Replace image src attributes in article bodies with placeholders and assign the updated strings back.
+    //------------------------------------------
     const articlesBodies = [article.body, article.esBody];
-    articlesBodies.forEach((article) => {
-      replaceSrcWithImagePlaceholders(article!, images);
-    });
-    //
-    console.log("articlesBodies english:", articlesBodies[0]);
-    console.log("articlesBodies spanish:", articlesBodies[1]);
+    const updatedArticlesBodies = articlesBodies.map((body) =>
+      replaceSrcWithImagePlaceholders(body!, images)
+    );
+    article.body = updatedArticlesBodies[0];
+    article.esBody = updatedArticlesBodies[1];
+
+    console.log("articlesBodies english:", updatedArticlesBodies[0]);
+    console.log("articlesBodies spanish:", updatedArticlesBodies[1]);
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
     ///--------------------------------------------------------
-    // const category = sectionsCode[dbNameObj].find(
-    //   (item) => item.label === section
-    // );
-    // ///--------------------------------------------------------
-    // // Convert HTML to Markdown
-    // ///--------------------------------------------------------
-    // const markdownContent = convertHtmlToMarkdown(body, {
-    //   preserveWhitespace: false, // Clean up extra whitespace
-    //   includeImageAlt: true, // Include alt text for images
-    //   preserveImageDimensions: true, // Keep image dimensions as comments
-    //   convertTables: true, // Convert HTML tables to markdown
-    //   preserveLineBreaks: true, // Keep line breaks as they are
-    // });
-    // //
-    // console.log("markdownContent:", markdownContent);
-    // ///--------------------------------------------------------
-    // // Select the correct database to save the article
-    // ///--------------------------------------------------------
-    // //
-    // let db: Database;
-    // let author: string;
-    // //
-    // if (dbNameObj === "DeCav") {
-    //   db = databaseDecav;
-    //   author = process.env.AUTHOR_DECAV || "Default Author";
-    // } else {
-    //   db = database;
-    //   author = process.env.AUTHOR || "Default Author";
-    // }
-    // ///--------------------------------------------------------
-    // // Create Metadata Object
-    // ///--------------------------------------------------------
-    // const metadata = {
-    //   author: author,
-    //   category: category,
-    //   date: new Date().toISOString(),
-    //   description: markdownContent.slice(0, 150), // Get first 150 chars as description
-    //   published: true,
-    //   tags: [],
-    //   title: title,
-    // };
-    // //
-    // const articleData = {
-    //   id: id,
-    //   en: articlesBodies[0],
-    //   es: articlesBodies[1],
-    //   metadata: metadata,
-    // };
-    // //
-    // ///--------------------------------------------------------
-    // // Obtain section code
-    // ///--------------------------------------------------------
-    // let sectionCode: string = "";
-    // if (section && sectionsCode.hasOwnProperty(dbNameObj)) {
-    //   sectionCode =
-    //     sectionsCode[dbNameObj].find(
-    //       (sectionCode) => sectionCode.label === section
-    //     )?.code || "";
-    // }
+    console.log("section before retrieve the code :", section);
+    console.log("dbNameObj:", dbNameObj);
+
+    const sectionCode = sectionsCode[dbNameObj].find(
+      (item) => item.label === section
+    );
+    console.log("Section found:", sectionCode);
+
+    ///--------------------------------------------------------
+    // Find the correct section for spanish
+    ///--------------------------------------------------------
+    const esSection = getTranslatedSection({
+      db: dbNameObj,
+      langFrom: "en",
+      langTo: "es",
+      value: section,
+    });
+
+    console.log("Translated value:", esSection);
+    ///--------------------------------------------------------
+    // Convert HTML to Markdown
+    ///--------------------------------------------------------
+    const newArticles = [updatedArticlesBodies[0], updatedArticlesBodies[1]];
+    //------------------------------------------
+    // Purpose: Convert HTML bodies to Markdown, including the title at the top of each body.
+    //------------------------------------------
+    const titles = [article.title, article.esTitle];
+    // Combine title and body for each language, then convert to Markdown
+    const markdownContent = newArticles.map((body, idx) =>
+      convertHtmlToMarkdown(`<h1>${titles[idx]}</h1>\n${body}`, {
+        preserveWhitespace: false, // Clean up extra whitespace
+        includeImageAlt: true, // Include alt text for images
+        preserveImageDimensions: true, // Keep image dimensions as comments
+        convertTables: true, // Convert HTML tables to markdown
+        preserveLineBreaks: true, // Keep line breaks as they are
+      })
+    );
+    //
+    console.log("markdownContentEN:", markdownContent[0]);
+    console.log("markdownContentES:", markdownContent[1]);
+    ///--------------------------------------------------------
+    // Select the correct database to save the article
+    ///--------------------------------------------------------
+    //
+    let db: Database;
+    let author: string;
+    let tags: string[] = [];
+    let tags_es: string[] = [];
+    let api_call_url: string;
+    //
+    if (dbNameObj === "DeCav") {
+      db = databaseDecav;
+      author = process.env.AUTHOR_DECAV || "Default Author";
+      tags = ["Aviation", "DecodingAviation", "DeCav"];
+      tags_es = ["Aviación", "DecodingAviation", "DeCav"];
+      api_call_url = process.env.URL_API_DECAV || "";
+    } else {
+      db = database;
+      author = process.env.AUTHOR || "Default Author";
+      tags = ["Software Engineering", "Joel Montes de Oca Lopez", "AI"];
+      tags_es = [
+        "Desarrollo de Software",
+        "Joel Montes de Oca Lopez",
+        "Inteligencia Artificial",
+      ];
+      api_call_url = process.env.URL_API_JOE || "";
+    }
+    ///--------------------------------------------------------
+    // Create Metadata Object
+    ///--------------------------------------------------------
+    const metadata = {
+      title: article.title,
+      description: markdownContent[0].slice(0, 150), // Get first 150 chars as description
+      author: author,
+      date: new Date().toISOString(),
+      tags: tags,
+      category: sectionCode,
+      published: true,
+      version: "1.0",
+    };
+    const esMetadata = {
+      title: article.esTitle,
+      description: markdownContent[1].slice(0, 150), // Get first 150 chars as description
+      author: author,
+      date: new Date().toISOString(),
+      tags: tags_es,
+      category: sectionCode,
+      published: true,
+      version: "1.0",
+    };
+    //
+
+    //
+    const articleDataForDb = {
+      id: article.id,
+      en: markdownContent[0],
+      es: markdownContent[1],
+      metadata: metadata,
+      esMetadata: esMetadata,
+    };
+    console.log("articleData:", articleDataForDb);
     // //
     // const articlesMenu = {
-    //   id: id,
+    //   id: article.id,
     //   en: {
     //     published: true,
     //     resume: markdownContent.slice(0, 150),
-    //     title: title,
-    //   }, //TODO to english
+    //     title: article.title,
+    //   },
     //   es: {
     //     published: true,
     //     resume: markdownContent.slice(0, 150),
-    //     title: title,
-    //   }, //TODO to spanish
+    //     title: article.esTitle,
+    //   },
     //   section: section,
+    //   esSection: esSection,
     //   section_code: sectionCode,
-    //   slug: id,
+    //   slug: article.id,
     // };
     // //
     // const likes = {
-    //   id: id,
+    //   id: article.id,
     //   likes: 0,
     // };
     //
@@ -302,6 +338,24 @@ export async function POST(req: NextRequest): Promise<Response> {
     //   const dbLikes = ref(db, `likes/${id}`);
     //   await update(dbLikes, likes);
     //   //
+    // await fetch(api_call_url, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "x-cms-secret": process.env.CMS_SECRET_KEY!,
+    //   },
+    //   body: JSON.stringify({
+    //     title: article.title,
+    //     description: metadata.description,
+    //     slug: article.id,
+    //     section_code: sectionCode,
+    //     section: article.section,
+    //     content_en: markdownContent[0],
+    //     content_es: markdownContent[1],
+    //     tags: tags.join(", "),
+    //   }),
+    // });
+
     return NextResponse.json({
       status: 200,
       message: "Data saved successfully",

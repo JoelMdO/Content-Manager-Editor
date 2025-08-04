@@ -76,13 +76,14 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
           console.log("item.blobUrl:", item.blobUrl);
 
           const blob = await (await fetch(item.blobUrl)).blob(); // Convert Base64 back to Blob
-          const file = new File([blob], item.fileName, { type: blob.type });
+          const file = new File([blob], item.imageId, { type: blob.type });
+
           formData.append(`image`, file);
-          console.log("Image added to formData:", item.fileName);
+          console.log("Image added to formData:", item.imageId);
           //}
           //);
         } catch (error) {
-          console.log("Error retrieving image:", item.fileName, error);
+          console.log("Error retrieving image:", item.imageId, error);
 
           errorAlert("", "", error);
         }

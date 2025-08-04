@@ -205,8 +205,10 @@ export const translateToSpanish = ({
           articleContent.push({ type: "es-body", content: es_body });
           articleContent.push({ type: "es-section", content: section });
           articleContent.push({ type: "body", content: body });
+          //
+          console.log("Setting translationReady to true");
+          setTranslationReady!(true);
         }
-        setTranslationReady!(true);
       } else if (
         response.status === 401 ||
         response.message === "User not authenticated"
