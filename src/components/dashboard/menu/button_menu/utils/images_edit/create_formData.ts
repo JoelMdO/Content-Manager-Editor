@@ -1,4 +1,3 @@
-import { any } from "cypress/types/bluebird";
 import errorAlert from "../../../../../alerts/error";
 import { FormDataItem } from "../../type/formData";
 // import getImageTemporally from "./get_img_temp";
