@@ -10,6 +10,8 @@ import readLog from "../../../services/authentication/read_log";
 import { convertHtmlToMarkdown } from "@/services/api/html_to_markdown";
 import { sectionsCode } from "../../../constants/sections";
 import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
+import { JWT } from "next-auth/jwt";
+import { title } from "process";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -347,25 +349,40 @@ export async function POST(req: NextRequest): Promise<Response> {
       //
       const dbLikes = ref(db, `likes/${article.id}`);
       await set(dbLikes, likes);
+
       //
-      await fetch(api_call_url, {
+      const authHeader = req.headers.get("authorization");
+      console.log("authHeader:", authHeader);
+
+      const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+      console.log("tokenG:", tokenG);
+      //
+      const response = await fetch(api_call_url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-cms-secret": process.env.CMS_SECRET_KEY!,
+          Authorization: `Bearer ${tokenG}`,
         },
         body: JSON.stringify({
           title: article.title,
-          description: metadata.description,
           slug: article.id,
-          section_code: sectionCode,
-          section: article.section,
-          content_en: markdownContent[0],
-          content_es: markdownContent[1],
-          tags: tags.join(", "),
         }),
       });
+      //
+      console.log("response status:", response.status);
+      console.log("response", response);
 
+      //
+      if (response.status !== 200) {
+        const errorText = await response.text();
+        console.error("Error response from API:", errorText);
+        return NextResponse.json({
+          status: response.status,
+          message: "Error saving data",
+          error: errorText,
+        });
+      }
       return NextResponse.json({
         status: 200,
         message: "Data saved successfully",
