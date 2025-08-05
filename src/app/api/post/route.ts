@@ -1,7 +1,7 @@
 import "server-only";
 import { database } from "../../../../firebaseMain";
 import { databaseDecav } from "../../../../firebaseDecav";
-import { Database } from "firebase/database";
+import { Database, set, ref, update } from "firebase/database";
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
 import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img";
@@ -296,84 +296,89 @@ export async function POST(req: NextRequest): Promise<Response> {
     //
 
     //
+    let id = article.id;
     const articleDataForDb = {
-      id: article.id,
+      // [id]: {
       en: markdownContent[0],
       es: markdownContent[1],
       metadata: metadata,
       esMetadata: esMetadata,
+      //},
     };
     console.log("articleData:", articleDataForDb);
     // //
-    // const articlesMenu = {
-    //   id: article.id,
-    //   en: {
-    //     published: true,
-    //     resume: markdownContent.slice(0, 150),
-    //     title: article.title,
-    //   },
-    //   es: {
-    //     published: true,
-    //     resume: markdownContent.slice(0, 150),
-    //     title: article.esTitle,
-    //   },
-    //   section: section,
-    //   esSection: esSection,
-    //   section_code: sectionCode,
-    //   slug: article.id,
-    // };
-    // //
-    // const likes = {
-    //   id: article.id,
-    //   likes: 0,
-    // };
-    //
-    // try {
-    //   const dbRef = ref(db, `articles/${id}`);
-    //   await set(dbRef, articleData);
-    //   //
-    //   const dbRefMenu = ref(db, `articles_menu/${id}`);
-    //   await set(dbRefMenu, articlesMenu);
-    //   //
-    //   const dbLikes = ref(db, `likes/${id}`);
-    //   await update(dbLikes, likes);
-    //   //
-    // await fetch(api_call_url, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "x-cms-secret": process.env.CMS_SECRET_KEY!,
-    //   },
-    //   body: JSON.stringify({
-    //     title: article.title,
-    //     description: metadata.description,
-    //     slug: article.id,
-    //     section_code: sectionCode,
-    //     section: article.section,
-    //     content_en: markdownContent[0],
-    //     content_es: markdownContent[1],
-    //     tags: tags.join(", "),
-    //   }),
-    // });
 
-    return NextResponse.json({
-      status: 200,
-      message: "Data saved successfully",
-      // body: body,
-    });
-    // } catch (error) {
-    //   return NextResponse.json({
-    //     status: 500,
-    //     message: "Error saving data ",
-    //     error,
-    //   });
-    // }
-    // } catch (error) {
-    //   return NextResponse.json({
-    //     status: 500,
-    //     message: `Error processing request. ${error}`,
-    //   });
-    // }
+    const articlesMenu = {
+      // [id]: {
+      en: {
+        published: true,
+        resume: markdownContent.slice(0, 150),
+        title: article.title,
+      },
+      es: {
+        published: true,
+        resume: markdownContent.slice(0, 150),
+        title: article.esTitle,
+      },
+      section: section,
+      esSection: esSection,
+      section_code: sectionCode,
+      slug: article.id,
+      //},
+    };
+    //
+    console.log("articlesMenu:", articlesMenu);
+
+    const likes = {
+      // [id]: {
+      likes: 0,
+      //},
+    };
+    //
+    console.log("likes:", likes);
+
+    //
+    try {
+      const dbRef = ref(db, `articles/${article.id}`);
+      await set(dbRef, articleDataForDb);
+      //
+      const dbRefMenu = ref(db, `articles_menu/${article.id}`);
+      await set(dbRefMenu, articlesMenu);
+      //
+      const dbLikes = ref(db, `likes/${article.id}`);
+      await set(dbLikes, likes);
+      //
+      await fetch(api_call_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-cms-secret": process.env.CMS_SECRET_KEY!,
+        },
+        body: JSON.stringify({
+          title: article.title,
+          description: metadata.description,
+          slug: article.id,
+          section_code: sectionCode,
+          section: article.section,
+          content_en: markdownContent[0],
+          content_es: markdownContent[1],
+          tags: tags.join(", "),
+        }),
+      });
+
+      return NextResponse.json({
+        status: 200,
+        message: "Data saved successfully",
+        // body: body,
+      });
+    } catch (error) {
+      const parse = JSON.stringify(error);
+      return NextResponse.json({
+        status: 500,
+        message: "Error saving data ",
+        error: parse,
+      });
+    }
   } else {
     return NextResponse.json({
       status: 422,

@@ -7,9 +7,8 @@ const SectionSelector = () => {
   //
   //CONTEXT
   //===================================================
-  const { selectedSection, setSelectedSection, sectionsDialogRef } = useContext(
-    MenuContext
-  ) as ButtonProps;
+  const { selectedSection, setSelectedSection, sectionsDialogRef, dbIsReady } =
+    useContext(MenuContext) as ButtonProps;
   let { dbNameToSearch } = useContext(MenuContext) as ButtonProps;
 
   console.log(
@@ -26,16 +25,9 @@ const SectionSelector = () => {
   // Purpose: Safely get db value from dbNameToSearch, handling both string and RefObject<string>.
   //------------------------------------------
   // let db = (dbNameToSearch.current) || "DeCav";
-
-  let dbName =
-    typeof dbNameToSearch === "string"
-      ? dbNameToSearch
-      : dbNameToSearch.current || "";
+  // let dbName = (dbNameToSearch as string) || "DeCav";
+  let dbName = sessionStorage.getItem("db") || "DeCav";
   const typedSections = sections as SectionsType;
-  console.log("dbName", typeof dbName);
-
-  console.log("db", dbName);
-
   if (Object.prototype.hasOwnProperty.call(typedSections, dbName!)) {
     dbName = dbName;
   }
@@ -84,7 +76,7 @@ const SectionSelector = () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("touchstart", handleClickOrTapOutside);
     };
-  }, [sectionsDialogRef, setSelectedSection]);
+  }, []);
   //
   //
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

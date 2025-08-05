@@ -190,45 +190,47 @@ const saveArticle = ({
   const htmlCleanedBody = removeBase64FromImgTags(currentBody);
   //console.log("htmlCleanedBody at auto-save:", htmlCleanedBody);
 
-  if (language === "en") {
-    //
-    // const section = JSON.parse(
-    //   sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-    // ).filter((item: any) => item.type === "section");
-    //
-    articleData = [
-      { type: "title", content: currentTitle },
-      { type: "body", content: htmlCleanedBody },
-      ...images,
-      ...id,
-      ...section,
-    ];
-    //  console.log("Auto-saving content to localStorage: EN", articleData);
+  //if (language === "en") {
+  //
+  // const section = JSON.parse(
+  //   sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+  // ).filter((item: any) => item.type === "section");
+  //
+  articleData = [
+    { type: "title", content: currentTitle },
+    { type: "body", content: htmlCleanedBody },
+    { type: "es-title", content: currentTitle },
+    { type: "es-body", content: htmlCleanedBody },
+    ...images,
+    ...id,
+    ...section,
+  ];
+  //  console.log("Auto-saving content to localStorage: EN", articleData);
 
-    const articleJson = JSON.stringify(articleData);
-    //  console.log("Article JSON at auto-save:", articleJson);
-    localStorage.setItem(DRAFT_KEY!, articleJson);
-  } else {
-    //
-    // const section = JSON.parse(
-    //   sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-    // ).filter((item: any) => item.type === "es-section");
-    //
-    articleData = [
-      { type: "es-title", content: currentTitle },
-      { type: "es-body", content: htmlCleanedBody },
-      ...images,
-      ...id,
-      ...section,
-    ];
+  // const articleJson = JSON.stringify(articleData);
+  //  console.log("Article JSON at auto-save:", articleJson);
+  // localStorage.setItem(DRAFT_KEY!, articleJson);
+  //} else {
+  //
+  // const section = JSON.parse(
+  //   sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+  // ).filter((item: any) => item.type === "es-section");
+  //
+  // articleData = [
+  //   { type: "es-title", content: currentTitle },
+  //   { type: "es-body", content: htmlCleanedBody },
+  //   ...images,
+  //   ...id,
+  //   ...section,
+  // ];
 
-    const articleJson = JSON.stringify(articleData);
-    localStorage.setItem(DRAFT_KEY!, articleJson);
-    // console.log("✅ Auto-saved content to localStorage:", {
-    //   title: cleanTitle ? "Has content" : "Empty",
-    //   body: cleanBody ? "Has content" : "Empty",
-    //   timestamp: new Date().toISOString(),
-    // });
-  }
+  const articleJson = JSON.stringify(articleData);
+  localStorage.setItem(DRAFT_KEY!, articleJson);
+  // console.log("✅ Auto-saved content to localStorage:", {
+  //   title: cleanTitle ? "Has content" : "Empty",
+  //   body: cleanBody ? "Has content" : "Empty",
+  //   timestamp: new Date().toISOString(),
+  // });
+  //}
 };
 export default saveArticle;
