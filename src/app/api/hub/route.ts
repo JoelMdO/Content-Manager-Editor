@@ -127,6 +127,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
+        const nextToken = await getToken({
+          req: req,
+          secret: process.env.NEXTAUTH_SECRET,
+        });
+        nextAuthToken = nextToken?.accessToken;
         break;
       case "translate":
         console.log("translate at api hub", dataApiHub);
