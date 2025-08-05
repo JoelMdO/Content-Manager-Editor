@@ -79,14 +79,17 @@ const Dashboard: React.FC = () => {
   // Check if screen is desktop and database selector
   ///======================================================
   useEffect(() => {
-    const initializeDbName = async () => {
-      await dbSelector(); // Wait for dbSelector to complete
-      setDbIsReady(true);
-    };
+    dbSelector();
     //
-    initializeDbName();
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
+    }
+    console.log("dbNameToSearch.current:", dbNameToSearch.current);
+
+    setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
+    console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
+    if (sessionStorage.getItem("db") !== null) {
+      setDbIsReady(true);
     }
   }, []);
   //
@@ -134,6 +137,7 @@ const Dashboard: React.FC = () => {
     language,
     text,
     setText,
+    dbIsReady,
   };
   //
   ///======================================================

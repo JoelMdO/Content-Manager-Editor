@@ -45,6 +45,7 @@ export interface ButtonProps {
   tag: string;
   text: string;
   setText: React.Dispatch<React.SetStateAction<string>>;
+  dbIsReady: boolean;
 }
 
 export const menuButtonTypes = [
