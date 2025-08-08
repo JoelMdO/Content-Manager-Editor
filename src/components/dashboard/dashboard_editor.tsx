@@ -30,6 +30,9 @@ const DashboardEditor = () => {
     isTranslating,
     setLastAutoSave,
     language,
+    setOpenDialogNoSection,
+    openDialogNoSection,
+    sectionsDialogRef,
   } = useContext(MenuContext) as ButtonProps;
   //
   //
@@ -40,7 +43,7 @@ const DashboardEditor = () => {
   // Get the translated article draft
   ///--------------------------------------------------------
   useTranslatedArticleDraft();
-  console.log("body at dashboard_editor:", savedBodyRef.current);
+  //console.log("body at dashboard_editor:", savedBodyRef.current);
 
   //--------------------------------------------------------
   // Read the sessionStorage on page initial load, based on the corresponded db.
@@ -52,15 +55,15 @@ const DashboardEditor = () => {
   // or when the text has been translated.
   ///--------------------------------------------------------
   useEffect(() => {
-    console.log(
-      "reloading dashboard_editor, isDraftArticleButtonClicked:",
-      isDraftArticleButtonClicked
-    );
-    console.log("savedBodyRef.current:", savedBodyRef?.current);
+    // console.log(
+    //   "reloading dashboard_editor, isDraftArticleButtonClicked:",
+    //   isDraftArticleButtonClicked
+    // );
+    // console.log("savedBodyRef.current:", savedBodyRef?.current);
 
     const editableDiv = editorRefs?.current[1];
     if (editableDiv && savedBodyRef?.current) {
-      console.log("Setting editor body to:", savedBodyRef.current);
+      // console.log("Setting editor body to:", savedBodyRef.current);
       editableDiv.innerHTML = savedBodyRef.current; // Force HTML rendering
     }
   }, [isDraftArticleButtonClicked, savedBodyRef?.current]);
@@ -76,7 +79,15 @@ const DashboardEditor = () => {
 
       let currentTitle = editorRefs?.current[0]?.innerHTML || "";
       let currentBody = editorRefs?.current[1]?.innerHTML || "";
-      saveArticle({ dbName, currentTitle, currentBody, language, DRAFT_KEY });
+      saveArticle({
+        dbName,
+        currentTitle,
+        currentBody,
+        language,
+        DRAFT_KEY,
+        setOpenDialogNoSection,
+      });
+
       setLastAutoSave(new Date());
       //}
     }, 60000); // 1 minute //TODO change to 10 minutes.
@@ -92,6 +103,17 @@ const DashboardEditor = () => {
     };
   }, []);
   //
+  ///--------------------------------------------------------
+  // Open the sections dialog when the section is not selected
+  // and the autoSave has triggered.
+  ///--------------------------------------------------------
+  useEffect(() => {
+    if (openDialogNoSection) {
+      console.log("openDialogNoSection:", openDialogNoSection);
+      sectionsDialogRef?.current?.showModal();
+    }
+    setOpenDialogNoSection(false);
+  }, [openDialogNoSection]);
   ///--------------------------------------------------------
   // UI
   ///--------------------------------------------------------

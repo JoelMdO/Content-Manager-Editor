@@ -11,7 +11,7 @@ import { convertHtmlToMarkdown } from "@/services/api/html_to_markdown";
 import { sectionsCode } from "../../../constants/sections";
 import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 import { JWT } from "next-auth/jwt";
-import { title } from "process";
+import crypto from "crypto";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     if (imageFiles.length > 0) {
       //Filter valid file objects
-      console.log("imageFiles found:", imageFiles);
+      // console.log("imageFiles found:", imageFiles);
 
       pre_images = imageFiles.filter(
         (value): value is File => value instanceof File
@@ -182,16 +182,19 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.esSection = esSectionObj;
 
     // SAVE in db.
-    console.log("body at save article:", article.body);
-    console.log("title at save article:", article.title);
+    //console.log("body at save article:", article.body);
+    //console.log("title at save article:", article.title);
     let images = article.images;
     let section = article.section;
     //
-    console.log("article.images:", article.images);
+    //console.log("article.images:", article.images);
 
     //------------------------------------------
     // Purpose: Replace image src attributes in article bodies with placeholders and assign the updated strings back.
     //------------------------------------------
+    //console.log("english article", article.body);
+    //console.log("spanish article", article.esBody);
+
     const articlesBodies = [article.body, article.esBody];
     const updatedArticlesBodies = articlesBodies.map((body) =>
       replaceSrcWithImagePlaceholders(body!, images)
@@ -199,16 +202,16 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.body = updatedArticlesBodies[0];
     article.esBody = updatedArticlesBodies[1];
 
-    console.log("articlesBodies english:", updatedArticlesBodies[0]);
-    console.log("articlesBodies spanish:", updatedArticlesBodies[1]);
+    //console.log("articlesBodies english:", updatedArticlesBodies[0]);
+    //console.log("articlesBodies spanish:", updatedArticlesBodies[1]);
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
     ///--------------------------------------------------------
-    console.log("section before retrieve the code :", section);
-    console.log("dbNameObj:", dbNameObj);
+    //console.log("section before retrieve the code :", section);
+    //console.log("dbNameObj:", dbNameObj);
 
-    const sectionCode = sectionsCode[dbNameObj].find(
+    let sectionCode = sectionsCode[dbNameObj].find(
       (item) => item.label === section
     );
     console.log("Section found:", sectionCode);
@@ -223,7 +226,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       value: section,
     });
 
-    console.log("Translated value:", esSection);
+    //console.log("Translated value:", esSection);
     ///--------------------------------------------------------
     // Convert HTML to Markdown
     ///--------------------------------------------------------
@@ -243,8 +246,8 @@ export async function POST(req: NextRequest): Promise<Response> {
       })
     );
     //
-    console.log("markdownContentEN:", markdownContent[0]);
-    console.log("markdownContentES:", markdownContent[1]);
+    //console.log("markdownContentEN:", markdownContent[0]);
+    //console.log("markdownContentES:", markdownContent[1]);
     ///--------------------------------------------------------
     // Select the correct database to save the article
     ///--------------------------------------------------------
@@ -272,6 +275,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       ];
       api_call_url = process.env.URL_API_JOE || "";
     }
+
+    console.log("Selected database:", dbNameObj);
+    console.log("Database instance:", db ? "Connected" : "Not connected");
     ///--------------------------------------------------------
     // Create Metadata Object
     ///--------------------------------------------------------
@@ -299,6 +305,16 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     //
     let id = article.id;
+
+    // Validate required fields
+    if (!id || !article.title || !article.esTitle) {
+      return NextResponse.json({
+        status: 400,
+        message: "Missing required fields: id, title, or esTitle",
+        data: { id, title: article.title, esTitle: article.esTitle },
+      });
+    }
+
     const articleDataForDb = {
       // [id]: {
       en: markdownContent[0],
@@ -307,19 +323,26 @@ export async function POST(req: NextRequest): Promise<Response> {
       esMetadata: esMetadata,
       //},
     };
-    console.log("articleData:", articleDataForDb);
+    console.log("articleData structure validated:", {
+      hasEn: !!articleDataForDb.en,
+      hasEs: !!articleDataForDb.es,
+      hasMetadata: !!articleDataForDb.metadata,
+      hasEsMetadata: !!articleDataForDb.esMetadata,
+      enLength: articleDataForDb.en?.length || 0,
+      esLength: articleDataForDb.es?.length || 0,
+    });
     // //
 
     const articlesMenu = {
       // [id]: {
       en: {
         published: true,
-        resume: markdownContent.slice(0, 150),
+        resume: markdownContent[0].slice(0, 150), // Fix: use markdownContent[0] for English
         title: article.title,
       },
       es: {
         published: true,
-        resume: markdownContent.slice(0, 150),
+        resume: markdownContent[1].slice(0, 150), // Fix: use markdownContent[1] for Spanish
         title: article.esTitle,
       },
       section: section,
@@ -329,7 +352,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       //},
     };
     //
-    console.log("articlesMenu:", articlesMenu);
+    //console.log("articlesMenu:", articlesMenu);
 
     const likes = {
       // [id]: {
@@ -337,52 +360,93 @@ export async function POST(req: NextRequest): Promise<Response> {
       //},
     };
     //
-    console.log("likes:", likes);
+    //console.log("likes:", likes);
 
     //
     try {
+      console.log("Attempting to save article with ID:", article.id);
+      console.log("Database reference path:", `articles/${article.id}`);
+      console.log(
+        "Data structure to save:",
+        JSON.stringify(articleDataForDb, null, 2)
+      );
+
       const dbRef = ref(db, `articles/${article.id}`);
-      await set(dbRef, articleDataForDb);
-      //
-      const dbRefMenu = ref(db, `articles_menu/${article.id}`);
-      await set(dbRefMenu, articlesMenu);
-      //
-      const dbLikes = ref(db, `likes/${article.id}`);
-      await set(dbLikes, likes);
+      try {
+        const response = await set(dbRef, articleDataForDb);
+        console.log("Article saved successfully, response:", response);
+      } catch (e) {
+        console.log("Error saving article data:");
+        console.log(
+          "Error message:",
+          e instanceof Error ? e.message : "Unknown error"
+        );
+        console.log(
+          "Error stack:",
+          e instanceof Error ? e.stack : "No stack trace"
+        );
+        console.log("Error code:", (e as any)?.code || "No error code");
+        console.log("Full error object:", e);
 
-      //
-      const authHeader = req.headers.get("authorization");
-      console.log("authHeader:", authHeader);
-
-      const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
-      console.log("tokenG:", tokenG);
-      //
-      const response = await fetch(api_call_url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-cms-secret": process.env.CMS_SECRET_KEY!,
-          Authorization: `Bearer ${tokenG}`,
-        },
-        body: JSON.stringify({
-          title: article.title,
-          slug: article.id,
-        }),
-      });
-      //
-      console.log("response status:", response.status);
-      console.log("response", response);
-
-      //
-      if (response.status !== 200) {
-        const errorText = await response.text();
-        console.error("Error response from API:", errorText);
         return NextResponse.json({
-          status: response.status,
-          message: "Error saving data",
-          error: errorText,
+          status: 500,
+          message: "Error saving article to database",
+          error: e instanceof Error ? e.message : "Unknown database error",
         });
       }
+      //
+      // const dbRefMenu = ref(db, `articles_menu/${article.id}`);
+      // const response4 =  await set(dbRefMenu, articlesMenu);
+      //
+      // const dbLikes = ref(db, `likes/${article.id}`);
+      // const response3 =  await set(dbLikes, likes);
+
+      //
+      //const authHeader = req.headers.get("authorization");
+      //console.log("authHeader:", authHeader);
+
+      //const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+      //console.log("tokenG:", tokenG);
+      //
+      ///--------------------------------------------------------
+      // HMAC API Call to save the article
+      ///--------------------------------------------------------
+      // const body = JSON.stringify({
+      //   title: article.title,
+      //   slug: article.id,
+      // });
+      // console.log("body before preboarding call:", body);
+
+      // const secret = process.env.CMS_SECRET;
+      // const signature = crypto
+      //   .createHmac("sha256", secret!)
+      //   .update(body)
+      //   .digest("hex");
+      //
+      // const response = await fetch(api_call_url, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "x-cms-secret": process.env.CMS_SECRET_KEY!,
+      //     "x-leg": signature,
+      //     Authorization: `Bearer ${tokenG}`,
+      //   },
+      //   body: body,
+      // });
+      //
+      // console.log("response status:", response.status);
+      // console.log("response", response);
+
+      //
+      // if (response.status !== 200) {
+      //   const errorText = await response.text();
+      //   console.error("Error response from API:", errorText);
+      //   return NextResponse.json({
+      //     status: response.status,
+      //     message: "Error saving data",
+      //     error: errorText,
+      //   });
+      // }
       return NextResponse.json({
         status: 200,
         message: "Data saved successfully",
@@ -390,6 +454,8 @@ export async function POST(req: NextRequest): Promise<Response> {
       });
     } catch (error) {
       const parse = JSON.stringify(error);
+      console.log("Error saving data:", parse);
+
       return NextResponse.json({
         status: 500,
         message: "Error saving data ",

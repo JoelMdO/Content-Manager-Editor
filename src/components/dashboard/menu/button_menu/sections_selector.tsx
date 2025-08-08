@@ -9,16 +9,16 @@ const SectionSelector = () => {
   //===================================================
   const { selectedSection, setSelectedSection, sectionsDialogRef, dbIsReady } =
     useContext(MenuContext) as ButtonProps;
-  let { dbNameToSearch } = useContext(MenuContext) as ButtonProps;
+  // let { dbNameToSearch } = useContext(MenuContext) as ButtonProps;
 
-  console.log(
-    "db at sections selector:",
-    dbNameToSearch,
-    "sections:",
-    selectedSection,
-    "sectionsDialogRef:",
-    sectionsDialogRef
-  );
+  // console.log(
+  //   "db at sections selector:",
+  //   dbNameToSearch,
+  //   "sections:",
+  //   selectedSection,
+  //   "sectionsDialogRef:",
+  //   sectionsDialogRef
+  // );
 
   //
   //------------------------------------------
