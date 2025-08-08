@@ -130,17 +130,23 @@ const MenuButton = ({
         } hover:border-orange-300 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
           handleClick();
-          if (type !== "post" && type !== "styles") {
+          if (type !== "post" && type !== "styles" && type !== "translate") {
             setTimeout(() => {
-              console.log('"MenuButton" setIsClicked to false');
+              //console.log('"MenuButton" setIsClicked to false');
               setIsClicked(false);
-              console.log("tag:", tag);
-
+              //console.log("tag:", tag);
               if (tag !== "desktop") {
                 setIsMenuClicked!(false);
               }
-              console.log("isClicked after setTimeout:", isClicked);
+              //console.log("isClicked after setTimeout:", isClicked);
             }, 2000);
+          } else if (type === "translate") {
+            // setTimeout(() => {
+            setIsClicked(false);
+            if (tag !== "desktop") {
+              setIsMenuClicked!(false);
+            }
+            // }, 300);
           }
         }}
       >

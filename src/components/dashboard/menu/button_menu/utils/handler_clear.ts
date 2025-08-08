@@ -22,11 +22,13 @@ export const handleClear = (
   sessionStorage.removeItem(`articleContent-${dbName}`);
 
   // Clear contentEditable divs
-  editorRefs.current.forEach((ref) => {
-    if (ref) {
-      ref.innerText = "";
-    }
-  });
+  editorRefs.current![0]!.innerText = "";
+  editorRefs.current![1]!.innerText = "";
+  // editorRefs.current.forEach((ref) => {
+  //   if (ref) {
+  //     ref.innerText = "";
+  //   }
+  // });
 
   // Delete images from IndexedDB
   // deleteImageFromIndexDB(undefined, "clear-all");

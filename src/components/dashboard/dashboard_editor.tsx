@@ -40,16 +40,30 @@ const DashboardEditor = () => {
   // Get the translated article draft
   ///--------------------------------------------------------
   useTranslatedArticleDraft();
+  console.log("body at dashboard_editor:", savedBodyRef.current);
+
   //--------------------------------------------------------
   // Read the sessionStorage on page initial load, based on the corresponded db.
   // And retrieve if any article is already created.
   //--------------------------------------------------------
   // useGetInitialArticleDraft();
+  ///--------------------------------------------------------
+  // Update of editorRefs on every change through draftArticle button
+  // or when the text has been translated.
+  ///--------------------------------------------------------
   useEffect(() => {
-    //console.log("reloading dashboard_editor");
-    console.log("savedTitleRef at dashboard_editor:", savedTitleRef);
-    console.log("savedBodyRef at dashboard_editor:", savedBodyRef);
-  }, [isDraftArticleButtonClicked]);
+    console.log(
+      "reloading dashboard_editor, isDraftArticleButtonClicked:",
+      isDraftArticleButtonClicked
+    );
+    console.log("savedBodyRef.current:", savedBodyRef?.current);
+
+    const editableDiv = editorRefs?.current[1];
+    if (editableDiv && savedBodyRef?.current) {
+      console.log("Setting editor body to:", savedBodyRef.current);
+      editableDiv.innerHTML = savedBodyRef.current; // Force HTML rendering
+    }
+  }, [isDraftArticleButtonClicked, savedBodyRef?.current]);
   ///--------------------------------------------------------
   // Save to localStorage every 10 minutes (only if content exists)
   ///--------------------------------------------------------
@@ -77,17 +91,6 @@ const DashboardEditor = () => {
       debouncedUpdateStore.cancel();
     };
   }, []);
-  //
-  ///--------------------------------------------------------
-  // Update of editorRefs on every change through draftArticle button
-  // or when the text has been translated.
-  ///--------------------------------------------------------
-  useEffect(() => {
-    const editableDiv = editorRefs?.current[1];
-    if (editableDiv && savedBodyRef?.current) {
-      editableDiv.innerHTML = savedBodyRef.current; // Force HTML rendering
-    }
-  }, [savedBodyRef?.current]);
   //
   ///--------------------------------------------------------
   // UI

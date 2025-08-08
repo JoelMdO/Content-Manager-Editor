@@ -40,7 +40,11 @@ export function useTranslatedArticleDraft() {
         const newSavedTitleRef = jsonArticle.find(
           (item: any) => item.type === "es-title"
         );
+        const newSavedBodyRef = jsonArticle.find(
+          (item: any) => item.type === "es-body"
+        );
         console.log('"newSavedTitleRef" at translated:', newSavedTitleRef);
+        console.log('"newSavedBodyRef" at translated:', newSavedBodyRef);
 
         handleClick({
           newTitleRef: newSavedTitleRef.content,
@@ -53,6 +57,11 @@ export function useTranslatedArticleDraft() {
             setDraftArticleButtonClicked((prev) => !prev);
           },
         });
+
+        // Directly update savedBodyRef with the translated content
+        savedBodyRef.current = newSavedBodyRef.content;
+        console.log("Updated savedBodyRef.current to:", savedBodyRef.current);
+
         setText(newSavedTitleRef.content);
         setLanguage("es"); // Set the language to Spanish
         //);
@@ -69,7 +78,7 @@ export function useTranslatedArticleDraft() {
         // //
         // savedTitleRef.current = esTitleObj?.content || "";
         // savedBodyRef.current = cleanBody;
-        setLanguage("es"); // Set the language to Spanish
+        //setLanguage("es"); // Set the language to Spanish
       }
     }
   }, [translationReady]);
