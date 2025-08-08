@@ -60,6 +60,9 @@ export const saveDraft = ({
   DRAFT_KEY,
   setIsClicked,
   language,
+  openDialogNoSection,
+  setOpenDialogNoSection,
+  sectionsDialogRef,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
   // console.log("saving draft");
@@ -80,7 +83,14 @@ export const saveDraft = ({
     currentBody: "",
     language,
     DRAFT_KEY,
+    openDialogNoSection,
+    setOpenDialogNoSection,
+    sectionsDialogRef,
   });
+  //
+  console.log("Draft saved successfully");
+  setIsClicked!(false);
+  //
 };
 ///--------------------------------------------------------
 // Clear the UI
@@ -249,6 +259,8 @@ export const buttonMenuLogic = ({
   setTranslationReady,
   setTranslating,
   language,
+  openDialogNoSection,
+  setOpenDialogNoSection,
 }: Partial<ButtonProps>) => {
   // onClick?.();
   // console.log(
@@ -278,7 +290,15 @@ export const buttonMenuLogic = ({
       post({ setIsClicked, router });
       break;
     case "save":
-      saveDraft({ dbNameToSearch, DRAFT_KEY, language, setIsClicked });
+      saveDraft({
+        dbNameToSearch,
+        DRAFT_KEY,
+        language,
+        setIsClicked,
+        openDialogNoSection,
+        setOpenDialogNoSection,
+        sectionsDialogRef,
+      });
       break;
     case "translate":
       translateToSpanish({

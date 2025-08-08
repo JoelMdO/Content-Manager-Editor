@@ -46,6 +46,11 @@ export interface ButtonProps {
   text: string;
   setText: React.Dispatch<React.SetStateAction<string>>;
   dbIsReady: boolean;
+  setOpenDialogNoSection: React.Dispatch<React.SetStateAction<boolean>>;
+  openDialogNoSection: boolean;
+  dbName: string | null | undefined;
+  currentTitle: string;
+  currentBody: string;
 }
 
 export const menuButtonTypes = [

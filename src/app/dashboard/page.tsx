@@ -61,6 +61,9 @@ const Dashboard: React.FC = () => {
   const [text, setText] = useState<string>("Without Draft Articles");
   const [language, setLanguage] = useState<"en" | "es">("en");
   const [dbIsReady, setDbIsReady] = useState<boolean>(false);
+  const [openDialogNoSection, setOpenDialogNoSection] =
+    useState<boolean>(false);
+
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
@@ -138,6 +141,8 @@ const Dashboard: React.FC = () => {
     text,
     setText,
     dbIsReady,
+    openDialogNoSection,
+    setOpenDialogNoSection,
   };
   //
   ///======================================================
