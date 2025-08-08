@@ -7,7 +7,7 @@ export const debouncedUpdateStore = debounce(
   ///========================================================
   (newTitle: string, newBody: string) => {
     //
-    const title = newTitle.split(" ").slice(0, 2).join("-");
+    const title = newTitle;
     const date = new Date().getDay();
     const month = new Date().getMonth() + 1;
     const year = new Date().getFullYear();
