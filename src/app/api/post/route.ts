@@ -1,7 +1,7 @@
 import "server-only";
 import { database } from "../../../../firebaseMain";
 import { databaseDecav } from "../../../../firebaseDecav";
-import { Database, set, ref, update } from "firebase/database";
+// import { set, ref, update } from "firebase/database";
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
 import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img";
@@ -12,6 +12,9 @@ import { sectionsCode } from "../../../constants/sections";
 import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 import { JWT } from "next-auth/jwt";
 import crypto from "crypto";
+import { Database } from "firebase-admin/lib/database/database";
+import { initializeFirebaseAdmin } from "../../../../firebase_admin_DeCav";
+import { adminDB } from "../../../../firebase-admin";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -252,20 +255,24 @@ export async function POST(req: NextRequest): Promise<Response> {
     // Select the correct database to save the article
     ///--------------------------------------------------------
     //
-    let db: Database;
+    let db: Database | Database;
+    const { auth, database } = initializeFirebaseAdmin();
+    console.log("auth", auth);
+    console.log("database", database);
     let author: string;
     let tags: string[] = [];
     let tags_es: string[] = [];
     let api_call_url: string;
     //
     if (dbNameObj === "DeCav") {
-      db = databaseDecav;
+      // db = databaseDecav;
+      db = database;
       author = process.env.AUTHOR_DECAV || "Default Author";
       tags = ["Aviation", "DecodingAviation", "DeCav"];
       tags_es = ["Aviación", "DecodingAviation", "DeCav"];
       api_call_url = process.env.URL_API_DECAV || "";
     } else {
-      db = database;
+      db = adminDB as unknown as Database;
       author = process.env.AUTHOR || "Default Author";
       tags = ["Software Engineering", "Joel Montes de Oca Lopez", "AI"];
       tags_es = [
@@ -363,105 +370,134 @@ export async function POST(req: NextRequest): Promise<Response> {
     //console.log("likes:", likes);
 
     //
+    //try {
+    // console.log("Attempting to save article with ID:", article.id);
+    // console.log("Database reference path:", `articles/${article.id}`);
+    // console.log(
+    //   "Data structure to save:",
+    //   JSON.stringify(articleDataForDb, null, 2)
+    // );
+    let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
+
     try {
-      console.log("Attempting to save article with ID:", article.id);
-      console.log("Database reference path:", `articles/${article.id}`);
+      const dbRef = db.ref(`articles/${newId}`);
+      const response = await dbRef.set(articleDataForDb);
+
+      console.log("Article saved successfully, response:", response);
+    } catch (e) {
+      console.log("Error saving articles:");
       console.log(
-        "Data structure to save:",
-        JSON.stringify(articleDataForDb, null, 2)
+        "Error message:",
+        e instanceof Error ? e.message : "Unknown error"
       );
+      console.log(
+        "Error stack:",
+        e instanceof Error ? e.stack : "No stack trace"
+      );
+      console.log("Error code:", (e as any)?.code || "No error code");
+      console.log("Full error object:", e);
 
-      const dbRef = ref(db, `articles/${article.id}`);
-      try {
-        const response = await set(dbRef, articleDataForDb);
-        console.log("Article saved successfully, response:", response);
-      } catch (e) {
-        console.log("Error saving article data:");
-        console.log(
-          "Error message:",
-          e instanceof Error ? e.message : "Unknown error"
-        );
-        console.log(
-          "Error stack:",
-          e instanceof Error ? e.stack : "No stack trace"
-        );
-        console.log("Error code:", (e as any)?.code || "No error code");
-        console.log("Full error object:", e);
-
-        return NextResponse.json({
-          status: 500,
-          message: "Error saving article to database",
-          error: e instanceof Error ? e.message : "Unknown database error",
-        });
-      }
-      //
-      // const dbRefMenu = ref(db, `articles_menu/${article.id}`);
-      // const response4 =  await set(dbRefMenu, articlesMenu);
-      //
-      // const dbLikes = ref(db, `likes/${article.id}`);
-      // const response3 =  await set(dbLikes, likes);
-
-      //
-      //const authHeader = req.headers.get("authorization");
-      //console.log("authHeader:", authHeader);
-
-      //const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
-      //console.log("tokenG:", tokenG);
-      //
-      ///--------------------------------------------------------
-      // HMAC API Call to save the article
-      ///--------------------------------------------------------
-      // const body = JSON.stringify({
-      //   title: article.title,
-      //   slug: article.id,
+      // return NextResponse.json({
+      //   status: 500,
+      //   message: "Error saving article to database",
+      //   error: e instanceof Error ? e.message : "Unknown database error",
       // });
-      // console.log("body before preboarding call:", body);
+    }
+    //
+    try {
+      const dbRefMenu = db.ref(`articles_menu/${newId}`);
+      await dbRefMenu.set(articlesMenu);
+    } catch (e) {
+      console.log("Error saving articles menu:");
+      console.log(
+        "Error message:",
+        e instanceof Error ? e.message : "Unknown error"
+      );
+      console.log(
+        "Error stack:",
+        e instanceof Error ? e.stack : "No stack trace"
+      );
+      console.log("Error code:", (e as any)?.code || "No error code");
+      console.log("Full error object:", e);
+    }
+    //
+    try {
+      const dbLikes = db.ref(`likes/${newId}`);
+      await dbLikes.set(likes);
+    } catch (e) {
+      console.log("Error saving likes:");
+      console.log(
+        "Error message:",
+        e instanceof Error ? e.message : "Unknown error"
+      );
+      console.log(
+        "Error stack:",
+        e instanceof Error ? e.stack : "No stack trace"
+      );
+      console.log("Error code:", (e as any)?.code || "No error code");
+      console.log("Full error object:", e);
+    }
+    //
+    const authHeader = req.headers.get("authorization");
+    //console.log("authHeader:", authHeader);
 
-      // const secret = process.env.CMS_SECRET;
-      // const signature = crypto
-      //   .createHmac("sha256", secret!)
-      //   .update(body)
-      //   .digest("hex");
-      //
-      // const response = await fetch(api_call_url, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "x-cms-secret": process.env.CMS_SECRET_KEY!,
-      //     "x-leg": signature,
-      //     Authorization: `Bearer ${tokenG}`,
-      //   },
-      //   body: body,
-      // });
-      //
-      // console.log("response status:", response.status);
-      // console.log("response", response);
+    const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+    //console.log("tokenG:", tokenG);
+    //
+    ///--------------------------------------------------------
+    // HMAC API Call to save the article
+    ///--------------------------------------------------------
+    const body = JSON.stringify({
+      title: article.title,
+      slug: newId,
+    });
+    console.log("body before preboarding call:", body);
 
-      //
-      // if (response.status !== 200) {
-      //   const errorText = await response.text();
-      //   console.error("Error response from API:", errorText);
-      //   return NextResponse.json({
-      //     status: response.status,
-      //     message: "Error saving data",
-      //     error: errorText,
-      //   });
-      // }
+    const secret = process.env.CMS_SECRET_KEY!;
+    const signature = crypto
+      .createHmac("sha256", secret!)
+      .update(body)
+      .digest("hex");
+
+    const response = await fetch(api_call_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-cms-secret": process.env.CMS_SECRET_KEY!,
+        "x-leg": signature,
+        Authorization: `Bearer ${tokenG}`,
+      },
+      body: body,
+    });
+
+    console.log("response status:", response.status);
+    console.log("response", response);
+
+    //
+    if (response.status !== 200) {
+      const errorText = await response.text();
+      console.error("Error response from API:", errorText);
       return NextResponse.json({
-        status: 200,
-        message: "Data saved successfully",
-        // body: body,
-      });
-    } catch (error) {
-      const parse = JSON.stringify(error);
-      console.log("Error saving data:", parse);
-
-      return NextResponse.json({
-        status: 500,
-        message: "Error saving data ",
-        error: parse,
+        status: response.status,
+        message: "Error saving data",
+        error: errorText,
       });
     }
+    return NextResponse.json({
+      status: 200,
+      message: "Data saved successfully",
+      // body: body,
+    });
+    // } catch (error) {
+    //   const parse = JSON.stringify(error);
+    //   console.log("Error saving data:", parse);
+
+    //   return NextResponse.json({
+    //     status: 500,
+    //     message: "Error saving data ",
+    //     error: parse,
+    //   });
+    // }
   } else {
     return NextResponse.json({
       status: 422,
