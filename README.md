@@ -27,6 +27,7 @@ Whether you're drafting blog articles or building a personal playbook of code sn
 ## 📂 Use Cases
 
 - **Blogging:** Publish blog posts directly to your blog.
+- **IA Translator:** Interface with an own Python API to translate the articles, using Mistral LLM, through Ollama.
 - **Knowledge Management:** Keep all your recurring coding solutions and patterns in one place.
 - **Learning:** Use the playbook as a digital notebook while studying new technologies.
 
