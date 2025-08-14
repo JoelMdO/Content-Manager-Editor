@@ -26,19 +26,25 @@ export const handleClick = async ({
 }: HandleClickProps) => {
   //
   let dbFieldName: string = "body";
+  const articleStored = localStorage.getItem(DRAFT_KEY);
+  const jsonArticle = JSON.parse(articleStored!);
+  //
   if (tag === "translated") {
     savedTitleRef.current = newTitleRef!;
     console.log('"tag" is translated');
     dbFieldName = "es-body";
-  } else {
+  } else if (tag === "draft-en") {
     savedTitleRef.current = newSavedTitleRef!.current;
+    dbFieldName = "body";
+  } else if (tag === "draft-es") {
+    savedTitleRef.current =
+      jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
+    dbFieldName = "es-body";
   }
   console.log("DRAFT_KEY at handleClick:", DRAFT_KEY);
-
-  const articleStored = localStorage.getItem(DRAFT_KEY);
   //
-  if (articleStored) {
-    const jsonArticle = JSON.parse(articleStored);
+  //
+  if (jsonArticle) {
     //console.log("article at draft article:", jsonArticle);
     //
     let preSavedBodyRef =
@@ -51,88 +57,89 @@ export const handleClick = async ({
     //-------------------------------------------------------------------------------------
     try {
       let images: any[] = [];
-      try {
-        const db: IDBDatabase = await new Promise((resolve, reject) => {
-          const request = window.indexedDB.open("imageStore", 2); // bump to force upgrade
-          request.onupgradeneeded = (event) => {
-            const db = (event.target as IDBOpenDBRequest).result;
-            if (!db.objectStoreNames.contains("images")) {
-              db.createObjectStore("images", { keyPath: "id" });
-              //console.log("✅ Created 'images' store");
-            } else {
-              //console.log("ℹ️ 'images' store already exists in upgrade.");
-            }
-          };
-          request.onsuccess = (event) =>
-            resolve((event.target as IDBOpenDBRequest).result);
+      //try {
+      //   const db: IDBDatabase = await new Promise((resolve, reject) => {
+      //     const request = window.indexedDB.open("imageStore", 2); // bump to force upgrade
+      //     request.onupgradeneeded = (event) => {
+      //       const db = (event.target as IDBOpenDBRequest).result;
+      //       if (!db.objectStoreNames.contains("images")) {
+      //         db.createObjectStore("images", { keyPath: "id" });
+      //         //console.log("✅ Created 'images' store");
+      //       } else {
+      //         //console.log("ℹ️ 'images' store already exists in upgrade.");
+      //       }
+      //     };
+      //     request.onsuccess = (event) =>
+      //       resolve((event.target as IDBOpenDBRequest).result);
 
-          request.onerror = () => {
-            reject("Failed to open IndexedDB");
-            db.close();
-          };
-        });
+      //     request.onerror = () => {
+      //       reject("Failed to open IndexedDB");
+      //       db.close();
+      //     };
+      //   });
 
-        const transaction = db.transaction("images", "readonly");
-        const store = transaction.objectStore("images");
-        //console.log("Object stores:", db.objectStoreNames);
-        images = await new Promise<any[]>((resolve, reject) => {
-          const allImages: any[] = [];
-          const request = store.getAll();
-          request.onsuccess = () => {
-            //console.log("🧾 store.getAll result:", request.result);
-          };
-          const cursorRequest = store.openCursor();
-          cursorRequest.onsuccess = (event) => {
-            const cursor = (event.target as IDBRequest<IDBCursorWithValue>)
-              .result;
-            //console.log('"cursor" at draft article:', cursor);
+      //   const transaction = db.transaction("images", "readonly");
+      //   const store = transaction.objectStore("images");
+      //   //console.log("Object stores:", db.objectStoreNames);
+      //   images = await new Promise<any[]>((resolve, reject) => {
+      //     const allImages: any[] = [];
+      //     const request = store.getAll();
+      //     request.onsuccess = () => {
+      //       //console.log("🧾 store.getAll result:", request.result);
+      //     };
+      //     const cursorRequest = store.openCursor();
+      //     cursorRequest.onsuccess = (event) => {
+      //       const cursor = (event.target as IDBRequest<IDBCursorWithValue>)
+      //         .result;
+      //       //console.log('"cursor" at draft article:', cursor);
 
-            if (cursor) {
-              //console.log("Found cursor value:", cursor.value);
-              allImages.push(cursor.value);
-              cursor.continue();
-            } else {
-              //console.log("Finished reading from cursor.");
-              resolve(allImages);
-            }
-            db.close();
-          };
-          request.onerror = () =>
-            reject("Failed to retrieve images from IndexedDB");
-          db.close();
-        });
-        //console.log('"images" from IndexedDB:', images);
-      } catch (dbErr) {
-        console.error("Error opening IndexedDB or retrieving images:", dbErr);
-      }
-      console.log('"images" from IndexedDB:', images);
+      //       if (cursor) {
+      //         //console.log("Found cursor value:", cursor.value);
+      //         allImages.push(cursor.value);
+      //         cursor.continue();
+      //       } else {
+      //         //console.log("Finished reading from cursor.");
+      //         resolve(allImages);
+      //       }
+      //       db.close();
+      //     };
+      //     request.onerror = () =>
+      //       reject("Failed to retrieve images from IndexedDB");
+      //     db.close();
+      //   });
+      //   //console.log('"images" from IndexedDB:', images);
+      // } catch (dbErr) {
+      //   console.error("Error opening IndexedDB or retrieving images:", dbErr);
+      // }
+      // console.log('"images" from IndexedDB:', images);
 
-      if (images.length > 0) {
-        console.log("images more than 1 at indexDb");
-        console.log(
-          '"preSavedBodyRef" before replacing images:',
-          preSavedBodyRef
+      // if (images.length > 0) {
+      //   console.log("images more than 1 at indexDb");
+      //   console.log(
+      //     '"preSavedBodyRef" before replacing images:',
+      //     preSavedBodyRef
+      //   );
+      images = jsonArticle.filter((item: any) => item.type === "image");
+
+      for (const image of images) {
+        // const regex = '<img src="{image_url_placeholder}">';
+        // Create a regex to match the <img> tag and its associated <p> tag with the image.fileName
+        const regex = new RegExp(
+          `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${image.id}</p>`,
+          "g"
         );
+        //console.log("regex at images article:", regex);
 
-        for (const image of images) {
-          // const regex = '<img src="{image_url_placeholder}">';
-          // Create a regex to match the <img> tag and its associated <p> tag with the image.fileName
-          const regex = new RegExp(
-            `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${image.id}</p>`,
-            "g"
-          );
-          //console.log("regex at images article:", regex);
+        // Only generate blobUrl for valid images
+        // const blobUrl = URL.createObjectURL(image.data);
+        // console.log("blobUrl at draft article:", blobUrl);
 
-          // Only generate blobUrl for valid images
-          const blobUrl = URL.createObjectURL(image.data);
-          console.log("blobUrl at draft article:", blobUrl);
-
-          preSavedBodyRef = preSavedBodyRef.replace(
-            regex,
-            `<img src="${blobUrl}" alt="${image.id}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${image.id}</p>`
-          );
-        }
+        preSavedBodyRef = preSavedBodyRef.replace(
+          regex,
+          `<img src="${image.blobUrl}" alt="${image.id}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${image.id}</p>`
+        );
       }
+      //}
       //console.log("preSavedBodyRef after replacing images:", preSavedBodyRef);
     } catch (err) {
       console.error("Error loading images from IndexedDB:", err);

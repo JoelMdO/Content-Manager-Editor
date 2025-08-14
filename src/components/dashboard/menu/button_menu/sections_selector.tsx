@@ -26,7 +26,10 @@ const SectionSelector = () => {
   //------------------------------------------
   // let db = (dbNameToSearch.current) || "DeCav";
   // let dbName = (dbNameToSearch as string) || "DeCav";
-  let dbName = sessionStorage.getItem("db") || "DeCav";
+  let dbName = "DeCav";
+  if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
+    dbName = sessionStorage.getItem("db") || "DeCav";
+  }
   const typedSections = sections as SectionsType;
   if (Object.prototype.hasOwnProperty.call(typedSections, dbName!)) {
     dbName = dbName;
