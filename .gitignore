@@ -53,3 +53,8 @@ docs
 
 #remove logs
 remove-console-logs.sh
+
+#
+.hintrc
+.npmrc
+Translation Process.md
