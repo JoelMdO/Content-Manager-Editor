@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
   const imageUrls: { url: string }[] = [];
   const formData = await request.formData();
   const dbName = formData.get("dbName") as string;
-  console.log("at api translate");
 
   interface Article {
     id: string;
@@ -45,7 +44,6 @@ export async function POST(request: NextRequest) {
     ///================================================================
     /// SAVE IMAGE :
     ///================================================================
-    console.log("auth approved");
 
     // let pre_images: Array<File> = [];
     const article: Article = {
@@ -58,7 +56,6 @@ export async function POST(request: NextRequest) {
     // let fileName: string = "";
 
     // for (const key of formData.keys()) {
-    //   //console.log("images with key", key);
 
     //   if (key.startsWith("image")) {
     //     const fileData = formData.get(key);
@@ -67,7 +64,6 @@ export async function POST(request: NextRequest) {
 
     //       // Convert to File
     //       const file = new File([fileData], fileName, { type: fileData.type });
-    //       console.log("File created:", file);
 
     //       imageFiles.push(file);
     //     } else {
@@ -79,7 +75,6 @@ export async function POST(request: NextRequest) {
 
     // if (imageFiles.length > 0) {
     //   //Filter valid file objects
-    //   console.log("Valid image files found:", imageFiles);
     //   pre_images = imageFiles.filter(
     //     (value): value is File => value instanceof File
     //   );
@@ -94,7 +89,6 @@ export async function POST(request: NextRequest) {
     //         // Get create a place holder for the image URL
     //         let urlCloudinary: string | undefined = "";
     //         urlCloudinary = fileUri ? fileUri : "";
-    //         console.log("URL image:", urlCloudinary);
 
     //         imageUrls.push({ url: urlCloudinary! });
     //         resolve();
@@ -133,10 +127,6 @@ export async function POST(request: NextRequest) {
     // let images = article.images;
     let section = article.section;
 
-    console.log("title:", title);
-    console.log("body:", body);
-    console.log("section:", section);
-    // console.log("images:", images);
 
     // try {
     //   const arrayData = [images];
@@ -149,7 +139,6 @@ export async function POST(request: NextRequest) {
     //   });
     //   // Replace src of the each image with the corresponded url:
     //   body = replaceSrcWithImagePlaceholders(body, images, "translate");
-    //   console.log("body after replaceSrcWithImagePlaceholders:", body);
     // Update the sessionStorage with the correct tags.
     // const sessionStorageBody = body;
     ///--------------------------------------------------------
@@ -157,19 +146,14 @@ export async function POST(request: NextRequest) {
     ///--------------------------------------------------------
 
     const authHeader = request.headers.get("authorization");
-    console.log("authHeader:", authHeader);
 
     const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
-    console.log("tokenG:", tokenG);
 
     if (!tokenG) {
-      console.log("no tokenG");
 
       return NextResponse.json({ status: 401, error: "Unauthorized" });
     }
-    console.log("token:", tokenG);
     const newUrl = process.env.SERVER_URL;
-    console.log("newUrl:", newUrl);
     //
     process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; //TODO delete this line in production
 
@@ -191,9 +175,7 @@ export async function POST(request: NextRequest) {
         }),
       });
       // //
-      //console.log("response:", response);
 
-      //console.log("Response status:", response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -206,9 +188,7 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      console.log("Response from AI:", data);
       //
-      // console.log("sessionStorageBody:", sessionStorageBody);
 
       return NextResponse.json({
         status: 200,

@@ -33,19 +33,15 @@ const DraftArticle = () => {
   useEffect(() => {
     //
     const articleStored = localStorage.getItem(DRAFT_KEY);
-    // console.log(
     //   "articleStored from localStorage at draft article:",
     //   articleStored
     // );
     //}
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
-      // console.log("jsonArticle at draft article:", jsonArticle);
 
       newSavedTitleRef.current =
         jsonArticle.find((item: any) => item.type === "title")?.content || "";
-      // console.log("savedTitleRef at draftarticle:", newSavedTitleRef.current);
-      //  console.log("savedBodyRef at draftarticle:", newSavedBodyRef.current);
       //
       setText(newSavedTitleRef.current);
       //

@@ -24,7 +24,6 @@ const FontStyleUI: React.FC<{
     { type: "U", value: "underline" },
   ];
 
-  console.log("Rendering FontStyleUI with fontTypes:", fontTypes);
 
   return (
     <>
@@ -41,7 +40,6 @@ const FontStyleUI: React.FC<{
                   : defaultProperties
               } mt-2 text-lg text-white border-2 border-green w-8 h-9 `}
               onClick={() => {
-                console.log(`Button clicked: ${font.value}`);
                 handleFontChange(font.value),
                   setIsFontStyleOpen(false),
                   setIsPressed(true);

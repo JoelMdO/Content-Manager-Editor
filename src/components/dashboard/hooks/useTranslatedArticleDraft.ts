@@ -22,21 +22,16 @@ export function useTranslatedArticleDraft() {
   // For rerendering on translation, you can expose a reload function:
   ///======================================================
   useEffect(() => {
-    console.log("translationReady in useEffect:", translationReady);
     if (translationReady) {
-      console.log("useTranslatedArticleDraft triggered");
 
       const dbName = sessionStorage.getItem("db") as string;
-      console.log('"translationReady" is true', dbName);
 
       let articleStored: string | null = sessionStorage.getItem(
         `articleContent-${dbName}`
       );
-      console.log("articleStored from session at translated:", articleStored);
 
       if (articleStored) {
         //
-        console.log("Retrieved translated data");
         const jsonArticle = JSON.parse(articleStored);
         const newSavedTitleRef = jsonArticle.find(
           (item: any) => item.type === "es-title"
@@ -44,8 +39,6 @@ export function useTranslatedArticleDraft() {
         // const newSavedBodyRef = jsonArticle.find(
         //   (item: any) => item.type === "es-body"
         // );
-        // console.log('"newSavedTitleRef" at translated:', newSavedTitleRef);
-        // console.log('"newSavedBodyRef" at translated:', newSavedBodyRef);
 
         handleClick({
           newTitleRef: newSavedTitleRef.content,
@@ -54,14 +47,12 @@ export function useTranslatedArticleDraft() {
           savedBodyRef: savedBodyRef,
           tag: "translated",
           setDraftArticleButtonClicked: (clicked) => {
-            console.log("Toggling isDraftArticleButtonClicked");
             setDraftArticleButtonClicked((prev) => !prev);
           },
         });
 
         // Directly update savedBodyRef with the translated content
         // savedBodyRef.current = newSavedBodyRef.content;
-        // console.log("Updated savedBodyRef.current to:", savedBodyRef.current);
 
         setText(newSavedTitleRef.content);
         setLanguage("es"); // Set the language to Spanish
@@ -73,8 +64,6 @@ export function useTranslatedArticleDraft() {
         // );
         // //
         // const cleanBody = cleanHtml(esBodyObj?.content || "");
-        // console.log("esTitleObj at translated:", esTitleObj);
-        // console.log("esBodyObj at translated:", cleanBody);
         // //todo working on check the same code as in useDraftArticle.tsx
         // //
         // savedTitleRef.current = esTitleObj?.content || "";

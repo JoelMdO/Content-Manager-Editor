@@ -112,14 +112,11 @@ async function middleware(req) {
     let rateLimitResponse;
     let response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next();
     const database_url = process.env.NEXT_PUBLIC_databaseURL;
-    console.log('pathname', path);
     if (path.startsWith('/dashboard') || path.startsWith('/playbook') || path.startsWith('/read-playbook')) {
         //Get the previous path
-        console.log('doing /path', path);
         const referrer = req.headers.get("referer") || "";
         const referrerUrl = referrer ? new URL(referrer) : null;
         const referrerPAth = referrerUrl?.pathname || "";
-        console.log(`access to ${path} from referrer ${referrerPAth}`);
         if (referrerPAth === '/') {
             rateLimitResponse = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2f$rate_limit$2e$ts__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["default"])(req);
             if (rateLimitResponse.status === 200) {
@@ -136,7 +133,6 @@ async function middleware(req) {
     const isSubRequest = header.get('x-middleware-subrequest');
     if (isSubRequest) {
         const origin = header.get('origin') || header.get('referer');
-        console.log('origin at middlewre', origin);
         const url = process.env.NEXT_PUBLIC_api_url;
         if (!origin || origin != url) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].json({

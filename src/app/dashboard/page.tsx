@@ -87,10 +87,8 @@ const Dashboard: React.FC = () => {
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
-    // console.log("dbNameToSearch.current:", dbNameToSearch.current);
 
     // setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
-    // console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
     if (sessionStorage.getItem("db") !== null) {
       setDbIsReady(true);
     }
@@ -98,7 +96,6 @@ const Dashboard: React.FC = () => {
   //
   useEffect(() => {
     dbNameToSearch.current = sessionStorage.getItem("db") as string;
-    console.log(
       "dbNameToSearch.current after dbSelector:",
       dbNameToSearch.current
     );

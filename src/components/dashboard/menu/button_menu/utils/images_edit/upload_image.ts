@@ -28,7 +28,6 @@ const uploadImage = async (
     // Store reference before API call
     const editorRefBefore = editorRef;
     if (!file || !editorRef) {
-      // console.log("no file or not editorRef", file, editorRef);
       return { status: 400, message: "No file or editor reference provided" };
     }
 
@@ -55,7 +54,6 @@ const uploadImage = async (
           .toString()
           .slice(-2)}`;
         const imageId = `${formattedDate}-${fileName}`;
-        //console.log("Image ID:", imageId);
 
         img.setAttribute("id", imageId); // Set image Id to allow selection
         // Add a reference to the image in the editor

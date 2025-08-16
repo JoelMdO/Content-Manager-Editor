@@ -30,14 +30,6 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
   const es_article = JSON.stringify(getContentByType("es-body"));
   const es_section = JSON.stringify(getContentByType("es-section"));
   //
-  console.log('title after getContentByType("title"):', title);
-  console.log('id after getContentByType("id"):', id);
-  console.log('article after getContentByType("body"):', article);
-  console.log('section after getContentByType("section"):', section);
-  console.log('dbName after getContentByType("dbName"):', dbName);
-  console.log('es_title after getContentByType("es-title"):', es_title);
-  console.log('es_article after getContentByType("es-body"):', es_article);
-  console.log('es_section after getContentByType("es-section"):', es_section);
   //
   formData.append("title", title);
   formData.append("id", id);
@@ -52,7 +44,6 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
   //Filter if any image on the data
 
   if (type !== "translate") {
-    console.log("doing next images");
     const imagePromises = data
       .filter(
         (
@@ -72,25 +63,20 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
           // ).filter((item: any) => item.type === "image");
           // if (!base64) return;
           // item.forEach(async (img: any) => {
-          console.log("item.blobUrl:", item.blobUrl);
 
           const blob = await (await fetch(item.blobUrl)).blob(); // Convert Base64 back to Blob
           const file = new File([blob], item.imageId, { type: blob.type });
 
           formData.append(`image`, file);
-          console.log("Image added to formData:", item.imageId);
           //}
           //);
         } catch (error) {
-          console.log("Error retrieving image:", item.imageId, error);
 
           errorAlert("", "", error);
         }
       });
-    console.log("ImagePromises:", imagePromises);
 
     await Promise.all(imagePromises);
-    console.log("ImagePromise", await Promise.all(imagePromises));
   } else {
     //------------------------------------------
     // Purpose: For "translate" type, filter all image items and append their content as strings to formData.
@@ -103,10 +89,8 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
         // Get the image content as string (e.g., base64 or identifier)
         const imageContent = JSON.stringify(getContentByType("image"));
         formData.append("image", imageContent);
-        console.log("Image added to formData as string:", imageContent);
       });
   }
-  console.log("formData after adding images:", formData);
 
   return formData;
 };

@@ -13,19 +13,16 @@ Partial<ButtonProps>) => {
   //
   // Purpose: Check if the currentTitle contains a placeholder "Title" or a gray placeholder span.
   //---------------------------------------------------------------------------------------------
-  console.log("dbName at saveArticle:", dbName);
   if (currentTitle !== undefined && currentBody !== undefined) {
     // Check for placeholders in the title
     const hasTitlePlaceholder =
       /<span class="text-gray-400">.*?<\/span>/g.test(currentTitle) &&
       currentTitle.includes("Title");
-    //console.log("hasTitlePlaceholdertitle:", hasTitlePlaceholder);
     if (hasTitlePlaceholder) return;
     // Check for placeholders in the body
     const hasBodyPlaceholder =
       /<span class="text-gray-400">.*?<\/span>/g.test(currentBody) &&
       currentBody.includes("Article");
-    //console.log("hasBodyPlaceholderBody:", hasBodyPlaceholder);
     if (hasBodyPlaceholder) return;
     //------------------------------------------
     // Load if any draft on localStorage
@@ -34,7 +31,6 @@ Partial<ButtonProps>) => {
       `draft-articleContent-${dbName}`
     );
     let localStoreTextArray = JSON.parse(localStoreText || "[]");
-    //console.log("article at draft article:", localStoreTextArray);
     //------------------------------------------
     // Load if any draft on sessionStorage
     //------------------------------------------
@@ -112,7 +108,6 @@ Partial<ButtonProps>) => {
         `draft-articleContent-${dbName}`,
         JSON.stringify(localStoreTextArray)
       );
-      console.log("Updated fields in localStorage:", differences);
     }
     // if (
     //   !localItem ||
@@ -126,11 +121,9 @@ Partial<ButtonProps>) => {
     //   );
     //   // Add new translation
     //   filteredContent.push({ differences });
-    //   console.log("new push image");
 
     // Update or add the image object
     // if (localItem) {
-    //   console.log('Updating image in localStorage:', localItem);
     //   localItem.imageId = sessionItem.imageId;
     //   localItem.fileName = sessionItem.fileName;
     //   localItem.blobUrl = sessionItem.blobUrl;
@@ -154,7 +147,6 @@ Partial<ButtonProps>) => {
     //     );
     //     // Add new translation
     //     filteredContent.push({ differences });
-    //     console.log("new push content");
     // if (localItem) {
     //   localItem.content = sessionItem.content;
     //   differences.push({type: sessionItem.type, content: sessionItem.content});
@@ -170,7 +162,6 @@ Partial<ButtonProps>) => {
     // }
     //}
     //
-    console.log("Updated fields in localStorage:", differences);
     //}
     //}
     // getArticleDraftDifferences(sessionJsonArticle, localStoreTextArray);
@@ -183,8 +174,6 @@ Partial<ButtonProps>) => {
     // let localStorageSection = localStoreTextArray.find(
     //   (item: any) => item.type === "section"
     // );
-    // // console.log("storedTitle at auto-save:", storedTitle);
-    // // console.log("storedBody at auto-save:", storedBody);
     // //TODO do for save english and spanish
     // if (language === "es") {
     //   localStoredTitle =
@@ -210,7 +199,6 @@ Partial<ButtonProps>) => {
     // // Purpose: Compare textTitle with local Storage storedTitleRef and storedBodyRef
     // //------------------------------------------
     // const titles = [sessionStoredTitle, localStoredTitle];
-    // //console.log("titles at auto-save befpre map:", titles);
 
     // const cleanTitleText = titles.map((title) => {
     //   // If title is a RefObject, use its current value; otherwise, use as is
@@ -220,12 +208,9 @@ Partial<ButtonProps>) => {
     //     .replace(/<[^>]*>/g, "")
     //     .trim();
     // });
-    // //console.log("Title 1:", cleanTitleText[0]);
-    // //console.log("Title 2:", cleanTitleText[1]);
     // //
     // //
     // if (cleanTitleText[0] !== cleanTitleText[1]) {
-    //   //  console.log("different title:", cleanTitleText[0]);
     //   currentTitle = sessionStoredTitle;
     // }
     // //
@@ -234,7 +219,6 @@ Partial<ButtonProps>) => {
     // //------------------------------------------
     // const content = [sessionStoredBody, localStoredBody];
     // let images: object[] = [];
-    // // console.log("content at auto-save before map:", content);
 
     // const cleanBodyText = content.map((body) => {
     //   const strBody = typeof body === "string" ? body : body?.current || "";
@@ -246,7 +230,6 @@ Partial<ButtonProps>) => {
     // });
     // //
     // if (cleanBodyText[0] !== cleanBodyText[1]) {
-    //   console.log("different cleanBody:");
     //   //
     //   currentBody = sessionStoredBody;
     //   //------------------------------------------
@@ -255,10 +238,7 @@ Partial<ButtonProps>) => {
     //   const areArraysEqual =
     //     JSON.stringify(sessionStoredImages.sort()) ===
     //     JSON.stringify(localStoredImages.sort());
-    //   // console.log("sessionStoredImages:", sessionStoredImages);
-    //   // console.log("localStoredImages:", localStoredImages);
 
-    //   // console.log("Are arrays equal (ignoring order)?", areArraysEqual);
     //   if (!areArraysEqual) {
     //     //------------------------------------------
     //     // Purpose: Find images that are present in either sessionStoredImages or localStoredImages but not both, based on unique imageId and fileName.
@@ -267,15 +247,11 @@ Partial<ButtonProps>) => {
     //   }
     //   //
     // }
-    // console.log("cleanTitle:", cleanTitle);
-    // console.log("cleanBody:", cleanBody);
     // let articleData = [];
     // //Load current images if any
     // //------------------------------------------
     // // Purpose: Safely get the db name from either a string or a ref object for sessionStorage key.
     // //------------------------------------------
-    // //console.log("Body 1 ready to save:", currentBody);
-    // //console.log("Title 2 ready to save:", currentTitle);
     // const id = JSON.parse(
     //   sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
     // ).filter((item: any) => item.type === "id");
@@ -283,11 +259,8 @@ Partial<ButtonProps>) => {
     // //------------------------------------------
     // // Compare sections and update localStorage if needed
     // //------------------------------------------
-    // //console.log("images at auto-save:", images);
-    // //console.log("id at auto-save:", id);
     // if (!sessionStoreSection || sessionStoreSection.length === 0) {
     //   setOpenDialogNoSection!(true);
-    //   console.log("No section found in sessionStorage");
     // }
 
     // if (
@@ -295,7 +268,6 @@ Partial<ButtonProps>) => {
     //   (!localStorageSection ||
     //     localStorageSection.content !== sessionStoreSection.content)
     // ) {
-    //   console.log(
     //     "Section differs between session and local storage, updating localStorage"
     //   );
 
@@ -312,13 +284,9 @@ Partial<ButtonProps>) => {
 
     //   // Update localStorage immediately
     //   // localStorage.setItem(`draft-articleContent-${dbName}`, JSON.stringify(localStoreTextArray));
-    //   // console.log("Updated section in localStorage:", sessionStoreSection.content);
     // }
-    // console.log("continue to htmlCleanedBody on SAVE");
 
-    // // console.log("images at auto-save:", images);
     // const htmlCleanedBody = removeBase64FromImgTags(currentBody!);
-    // //console.log("htmlCleanedBody at auto-save:", htmlCleanedBody);
 
     // //if (language === "en") {
     // //
@@ -335,10 +303,8 @@ Partial<ButtonProps>) => {
     //   ...id,
     //   ...localStoreTextArray,
     // ];
-    // //  console.log("Auto-saving content to localStorage: EN", articleData);
 
     // // const articleJson = JSON.stringify(articleData);
-    // //  console.log("Article JSON at auto-save:", articleJson);
     // // localStorage.setItem(DRAFT_KEY!, articleJson);
     // //} else {
     // //
@@ -356,7 +322,6 @@ Partial<ButtonProps>) => {
 
     // const articleJson = JSON.stringify(articleData);
     // localStorage.setItem(DRAFT_KEY!, articleJson);
-    // console.log("✅ Auto-saved content to localStorage:", {
     //   title: cleanTitle ? "Has content" : "Empty",
     //   body: cleanBody ? "Has content" : "Empty",
     //   timestamp: new Date().toISOString(),

@@ -11,14 +11,12 @@ const postButtonClicked = async () => {
   articleContent = JSON.parse(
     localStorage.getItem(`draft-articleContent-${dbName}`) || "[]"
   );
-  console.log("articleContent before push postButtonClicked:", articleContent);
 
   articleContent.push(
     // { type: "italic", content: italic },
     // { type: "bold", content: bold },
     { type: "dbName", content: dbName }
   );
-  console.log("postButtonClicked articleContent:", articleContent);
 
   const response = await callHub("post", articleContent);
   //sessionStorage.clear();

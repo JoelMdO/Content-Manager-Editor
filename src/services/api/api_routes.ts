@@ -23,8 +23,6 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       //## POST
       case "post":
       case "translate":
-        // console.log('"doing translate at api routes', JWT!);
-        console.log('"doing post at api routes', token!);
         endPoint = type;
         body = data as FormData;
         body.append("token", token || "");
@@ -87,7 +85,6 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     if (jsonResponse.message === "Data translated successfully") {
       const body = jsonResponse.body;
       // const sessionStorageBody = jsonResponse.sessionStorageBody;
-      console.log("Body at apiRoutes:", body);
 
       return NextResponse.json({
         status: jsonResponse.status,
@@ -106,7 +103,6 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         body: body,
       });
     } else {
-      console.log("response at apiRoutes:", jsonResponse);
 
       return NextResponse.json({
         status: jsonResponse.status,

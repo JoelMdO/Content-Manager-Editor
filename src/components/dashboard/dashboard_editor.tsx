@@ -36,14 +36,11 @@ const DashboardEditor = () => {
   } = useContext(MenuContext) as ButtonProps;
   //
   //
-  //console.log("savedTitleRef at dashboard_editor:", savedTitleRef);
-  //console.log("savedBodyRef at dashboard_editor:", savedBodyRef);
   //debugger;
   ///--------------------------------------------------------
   // Get the translated article draft
   ///--------------------------------------------------------
   useTranslatedArticleDraft();
-  //console.log("body at dashboard_editor:", savedBodyRef.current);
 
   //--------------------------------------------------------
   // Read the sessionStorage on page initial load, based on the corresponded db.
@@ -55,15 +52,12 @@ const DashboardEditor = () => {
   // or when the text has been translated.
   ///--------------------------------------------------------
   useEffect(() => {
-    // console.log(
     //   "reloading dashboard_editor, isDraftArticleButtonClicked:",
     //   isDraftArticleButtonClicked
     // );
-    // console.log("savedBodyRef.current:", savedBodyRef?.current);
 
     const editableDiv = editorRefs?.current[1];
     if (editableDiv && savedBodyRef?.current) {
-      // console.log("Setting editor body to:", savedBodyRef.current);
       editableDiv.innerHTML = savedBodyRef.current; // Force HTML rendering
     }
   }, [isDraftArticleButtonClicked, savedBodyRef?.current]);
@@ -71,11 +65,9 @@ const DashboardEditor = () => {
   // Save to localStorage every 10 minutes (only if content exists)
   ///--------------------------------------------------------
   useEffect(() => {
-    console.log("Setting up auto-save every 1 minutes for db:", dbNameToSearch);
 
     const interval = setInterval(() => {
       const dbName = sessionStorage.getItem("db");
-      console.log("dbName at useEffect update by timer:", dbName);
 
       let currentTitle = editorRefs?.current[0]?.innerHTML || "";
       let currentBody = editorRefs?.current[1]?.innerHTML || "";
@@ -109,7 +101,6 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   useEffect(() => {
     if (openDialogNoSection) {
-      console.log("openDialogNoSection:", openDialogNoSection);
       sectionsDialogRef?.current?.showModal();
     }
     setOpenDialogNoSection(false);

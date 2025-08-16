@@ -72,7 +72,6 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   // Function to handle the cases of the playbookCustomButton
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
-    console.log("Playbook Button Clicked");
 
     playbookButtonLogic({
       type,

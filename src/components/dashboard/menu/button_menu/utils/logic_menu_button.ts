@@ -22,7 +22,6 @@ import saveArticle from "@/components/dashboard/utils/save_article";
 ///--------------------------------------------------------
 export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
   //
-  console.log("post button clicked");
 
   handlePost(debouncedUpdateStore);
   setIsClicked!(true);
@@ -36,7 +35,6 @@ export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
         //Delete indexDB and localStorage
         //indexedDB.deleteDatabase("imageStore");
         //localStorage.clear();
-        //console.log('"Post response body:", response.body);');
       } else if (
         response.status === 401 ||
         response.message === "User not authenticated"
@@ -65,9 +63,6 @@ export const saveDraft = ({
   sectionsDialogRef,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  // console.log("saving draft");
-  // console.log("dbNameToSearch:", dbNameToSearch);
-  // console.log("DRAFT_KEY:", DRAFT_KEY);
 
   const dbName =
     typeof dbNameToSearch === "string"
@@ -76,7 +71,6 @@ export const saveDraft = ({
   ///--------------------------------------------------------
   // Load if any draft on sessionStorage
   ///--------------------------------------------------------
-  //console.log("dbName at saveDraft:", dbName);
   saveArticle({
     dbName,
     currentTitle: "",
@@ -88,7 +82,6 @@ export const saveDraft = ({
     sectionsDialogRef,
   });
   //
-  console.log("Draft saved successfully");
   setIsClicked!(false);
   //
 };
@@ -103,7 +96,6 @@ export const clearUI = ({
   setIsClicked,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  // console.log("Clearing UI with:", editorRefs, savedTitleRef, savedBodyRef);
 
   handleClear(editorRefs!);
   savedTitleRef!.current = "";
@@ -122,7 +114,6 @@ const loadImage = ({ fileInputRef, setIsClicked }: Partial<ButtonProps>) => {
 ///--------------------------------------------------------
 const openLinkDialog = ({ dialogRef, setIsClicked }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  // console.log("Opening dialog...", dialogRef?.current);
   dialogRef!.current?.showModal();
 };
 ///--------------------------------------------------------
@@ -133,7 +124,6 @@ const openStylesDialog = ({
   setIsFontStyleOpen,
 }: Partial<ButtonProps>) => {
   setIsFontStyleOpen!((setIsFontStyleOpen) => !setIsFontStyleOpen);
-  //console.log("Opening dialog...", stylesDialogRef?.current);
   // stylesDialogRef!.current?.showModal();
 };
 ///--------------------------------------------------------
@@ -145,7 +135,6 @@ const openSelectorDialog = ({
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
   if (sectionsDialogRef?.current) {
-    //  console.log("Opening dialog...", sectionsDialogRef?.current);
     sectionsDialogRef!.current?.showModal();
   }
 };
@@ -158,7 +147,6 @@ export const translateToSpanish = ({
   setTranslating,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  console.log('"Translating article to Spanish at logic ...');
   setTranslating!(true);
   translateButtonClicked()
     .then((response) => {
@@ -168,13 +156,11 @@ export const translateToSpanish = ({
         successAlert("translate");
         if (response.body) {
           const dbName = sessionStorage.getItem("db");
-          console.log("Translating article for database:", dbName);
 
           // Get existing content
           const articleContent = JSON.parse(
             sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
           );
-          console.log("Current article content:", articleContent);
 
           // Check if translation already exists
           // Remove all previous es-title, es-body, es-section items
@@ -216,7 +202,6 @@ export const translateToSpanish = ({
           // articleContent.push({ type: "es-section", content: section });
           // articleContent.push({ type: "body", content: body });
           //
-          console.log("Setting translationReady to true");
           setTranslationReady!(true);
         }
       } else if (
@@ -263,7 +248,6 @@ export const buttonMenuLogic = ({
   setOpenDialogNoSection,
 }: Partial<ButtonProps>) => {
   // onClick?.();
-  // console.log(
   //   "type at button logic:",
   //   type,
   //   "sectionsDialogRef:",
@@ -275,18 +259,15 @@ export const buttonMenuLogic = ({
       loadImage({ fileInputRef, setIsClicked });
       break;
     case "link":
-      // console.log('"Opening link dialog...");', dialogRef);
 
       openLinkDialog({ dialogRef, setIsClicked });
       break;
     case "sections":
-      // console.log('"Opening sections dialog...");', sectionsDialogRef);
 
       openSelectorDialog({ sectionsDialogRef, setIsClicked });
       break;
     case "post":
       // post({ setIsClicked, italic, bold, router });
-      console.log('"post button clicked at logic_menu_button.ts"');
       post({ setIsClicked, router });
       break;
     case "save":

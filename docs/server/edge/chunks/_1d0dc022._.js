@@ -3150,7 +3150,6 @@ var { g: global, __dirname, m: module, e: exports } = __turbopack_context__;
                             if (console) {
                                 let r = console[e];
                                 if (typeof r !== "function") {
-                                    r = console.log;
                                 }
                                 if (typeof r === "function") {
                                     return r.apply(console, t);

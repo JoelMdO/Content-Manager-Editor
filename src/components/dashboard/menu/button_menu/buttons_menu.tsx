@@ -40,7 +40,6 @@ const MenuButton = ({
 }: Partial<ButtonProps>) => {
   // CONTEXT
   //=========================================================
-  //console.log("type at menubutton:", type);
   const {
     editorRefs,
     id,
@@ -76,13 +75,11 @@ const MenuButton = ({
 
   // const sectionsDialogRef = useRef<HTMLDialogElement | null>(null);
   // const sectionsType = useRef<string>("");
-  // console.log("dialogRef at buttons:", sectionsDialogRef);
 
   //
   // const italic = useSelector((state: RootState) => state.data_state?.fontStyle);
   // const bold = useSelector((state: RootState) => state.data_state?.fontWeight);
 
-  //console.log("isCreating:", isClicked);
   // sectionsType.current = type as string;
   const { text, icon } = useMemo(
     () => menuButtonStyle(type!, isClicked),
@@ -132,13 +129,10 @@ const MenuButton = ({
           handleClick();
           if (type !== "post" && type !== "styles" && type !== "translate") {
             setTimeout(() => {
-              //console.log('"MenuButton" setIsClicked to false');
               setIsClicked(false);
-              //console.log("tag:", tag);
               if (tag !== "desktop") {
                 setIsMenuClicked!(false);
               }
-              //console.log("isClicked after setTimeout:", isClicked);
             }, 2000);
           } else if (type === "translate") {
             // setTimeout(() => {

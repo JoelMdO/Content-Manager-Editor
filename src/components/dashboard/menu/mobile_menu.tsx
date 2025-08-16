@@ -12,7 +12,6 @@ import MenuContext from "./button_menu/context/menu_context";
 //--------------------------------------------------------
 const MenuMobile = () => {
   //
-  //console.log("selectedSection at menumobile:", selectedSection);
   const [isMenuClicked, setIsMenuClicked] = useState<boolean>(false);
   const [isStylesOpen, setIsFontStyleOpen] = useState<boolean>(false);
   const { isClicked } = useContext(MenuContext) as ButtonProps;
@@ -23,8 +22,6 @@ const MenuMobile = () => {
   //     menu.classList.toggle("hidden");
   //   }
   // }
-  // console.log("ismediumScreen:", isMediumScreen);
-  // console.log("selectedSection:", selectedSection);
   //
   return (
     <>

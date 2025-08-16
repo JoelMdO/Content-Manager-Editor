@@ -15,20 +15,17 @@ const replacePlaceholderWithImage = (
       /<img src="{image_url_placeholder}">[\s\S]*?<p[^>]*>(.*?)<\/p>/g,
       (match, filename) => {
         // Trim filename and replace spaces with underscores
-        console.log("new filename:", filename);
 
         const cleanedFilename = filename
           .trim()
           .replace(/\s+/g, "_")
           .replace(/^\d{2}-\d{2}-\d{2}-/, ""); // Remove date prefix
-        console.log("cleanedFilename:", cleanedFilename);
 
         // Find the matching image URL
         const matchingImage = images.find((image) => {
           const urlFilename = image.url.split("/").pop();
           return urlFilename?.includes(cleanedFilename.replace(".png", ""));
         });
-        console.log("matchingImage:", matchingImage);
         if (matchingImage) {
           return `<img src="${matchingImage.url}">`;
         }
@@ -37,7 +34,6 @@ const replacePlaceholderWithImage = (
       }
     );
   }
-  console.log("newHtmlContent:", newHtmlContent);
 
   // if (!newHtmlContent.trim().startsWith("<div>")) {
   //   return `<div>${newHtmlContent}</div>`;
@@ -49,7 +45,6 @@ const replacePlaceholderWithImage = (
     .split(/<div>/g) // Split by closing divs
     .map((section) => {
       const trimmedSection = section.trim();
-      console.log('"trimmedSection":', trimmedSection);
 
       if (!trimmedSection) return ""; // Skip empty sections
 
@@ -59,7 +54,6 @@ const replacePlaceholderWithImage = (
       } else if (!trimmedSection.endsWith("</div>")) {
         return `${trimmedSection}</div>`;
       }
-      console.log('"trimmedSection after wrapping":', trimmedSection);
 
       return trimmedSection;
     })
@@ -67,14 +61,12 @@ const replacePlaceholderWithImage = (
     .replace(/<\/div><div>/g, "</div><br><div>") // Add line breaks between divs
     .replace(/<div><br><\/div>/g, "<br>") // Replace empty divs with <br>
     .replace(/<div><\/div>/g, ""); // Remove empty divs
-  console.log('"newHtmlContent after formatting":', newHtmlContent);
 
   // Ensure the entire content is wrapped in a single <div> if needed
   if (!newHtmlContent.trim().startsWith("<div>")) {
     newHtmlContent = `<div>${newHtmlContent}</div>`;
   }
 
-  console.log("Formatted newHtmlContent:", newHtmlContent);
 
   return newHtmlContent;
 };

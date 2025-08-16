@@ -103,8 +103,6 @@ export function playbookButtonLogic({
       updatePlaybook(setUpdateNote);
       break;
     case "view-note":
-      console.log("View Note Button Clicked");
-      console.log("toggle noteView", noteViewMode);
 
       viewNote({
         noteViewMode,

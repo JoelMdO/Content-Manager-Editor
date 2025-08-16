@@ -43,19 +43,14 @@ const callHub = async (
     //## POST
     case "post":
     case "translate":
-      console.log('"doing post at callhub", data);');
-      console.log("data at callhub for post:", data);
 
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
         : data !== undefined
         ? [data as FormDataItem]
         : [];
-      console.log("data at callhub:", data);
-      console.log("formDataItems at callhub:", formDataItems);
 
       const formData = await createFormData(type, formDataItems);
-      console.log("formData at callhub:", formData);
 
       body = formData;
       credentials = "include";
@@ -68,7 +63,6 @@ const callHub = async (
   }
   //
   try {
-    console.log("calling API hub with URL:", url);
 
     const response = await fetch(url, {
       method: "POST",
@@ -77,7 +71,6 @@ const callHub = async (
       credentials: credentials,
     });
     const jsonResponse = await response.json();
-    console.log("jsonResponse at callhub:", jsonResponse);
 
     return {
       status: jsonResponse.status,

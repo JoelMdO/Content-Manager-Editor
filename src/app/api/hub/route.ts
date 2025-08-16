@@ -16,7 +16,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let nextAuthToken: string | undefined = "";
   let sessionId: string | undefined = "";
   let formData: FormData = new FormData();
-  console.log('"Request received at API Hub"');
 
   ///___________________________________________________
   /// Check the content type to see if the request
@@ -27,10 +26,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (contentType.includes("application/json")) {
       const getDataAtApiHub = await req.json();
-      console.log("getDataAtApiHub:", getDataAtApiHub);
 
       dataApiHub = getDataAtApiHub.data;
-      console.log("dataApiHub:", dataApiHub);
 
       type = getDataAtApiHub.type;
       dataApiHub = dataApiHub;
@@ -63,7 +60,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (session && type !== "sign-in-by-email") {
       token = createLog(session?.user.id);
-      console.log('"token" at API Hub:', token);
     }
 
     if ((session && type === "post") || (session && type === "translate")) {
@@ -81,7 +77,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ status: 403, message: "Unauthorized data" });
     }
     //
-    console.log("Type of request received at API Hub:", type);
     switch (type) {
       ///--------------------------------------------------------
       // For Clean Image and Clean Link, the response should be back to the client
@@ -122,8 +117,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
         break;
       case "post":
-        console.log("session at post on api hub:", sessionId);
-
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
@@ -134,7 +127,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         nextAuthToken = nextToken?.accessToken;
         break;
       case "translate":
-        console.log("translate at api hub", dataApiHub);
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
@@ -143,14 +135,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           secret: process.env.NEXTAUTH_SECRET,
         });
         nextAuthToken = next?.accessToken;
-        console.log("🔍 Full token object:", JSON.stringify(next, null, 2));
-        console.log("🔍 Access token exists:", !!next?.accessToken);
-        console.log("🔍 Access token value:", next?.accessToken);
 
         if (!nextAuthToken) {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
-        console.log("token at callhub:", nextAuthToken);
         break;
       default:
         dataApiHub = dataApiHub;
@@ -185,7 +173,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (jsonResponse.message === "Data translated successfully") {
       const body = jsonResponse.body;
       // const sessionStorageBody = jsonResponse.sessionStorageBody;
-      console.log("Body at apiRoutes:", body);
 
       return NextResponse.json({
         status: jsonResponse.status,

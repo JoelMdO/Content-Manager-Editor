@@ -25,7 +25,6 @@ export async function POST(req: NextRequest): Promise<Response> {
   const imageUrls: { url: string; fileId: string }[] = [];
   const formData = await req.formData();
   const dbName = formData.get("dbName") as string;
-  console.log("doing POST");
 
   interface Article {
     id: string;
@@ -96,7 +95,6 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     if (imageFiles.length > 0) {
       //Filter valid file objects
-      // console.log("imageFiles found:", imageFiles);
 
       pre_images = imageFiles.filter(
         (value): value is File => value instanceof File
@@ -125,7 +123,6 @@ export async function POST(req: NextRequest): Promise<Response> {
               (uploadError, result) => {
                 if (uploadError) {
                   // Handle upload error
-                  console.log("Error uploading image:", uploadError);
 
                   return NextResponse.json({
                     status: 500,
@@ -146,7 +143,6 @@ export async function POST(req: NextRequest): Promise<Response> {
             ); //     // Update image URL in article content
             // If any images were uploaded, update the article's images array
             if (imageUrls.length > 0) {
-              console.log("images length >0");
 
               article.images = imageUrls; // Append image URLs to article.images
             }
@@ -185,18 +181,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.esSection = esSectionObj;
 
     // SAVE in db.
-    //console.log("body at save article:", article.body);
-    //console.log("title at save article:", article.title);
     let images = article.images;
     let section = article.section;
     //
-    //console.log("article.images:", article.images);
 
     //------------------------------------------
     // Purpose: Replace image src attributes in article bodies with placeholders and assign the updated strings back.
     //------------------------------------------
-    //console.log("english article", article.body);
-    //console.log("spanish article", article.esBody);
 
     const articlesBodies = [article.body, article.esBody];
     const updatedArticlesBodies = articlesBodies.map((body) =>
@@ -205,19 +196,14 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.body = updatedArticlesBodies[0];
     article.esBody = updatedArticlesBodies[1];
 
-    //console.log("articlesBodies english:", updatedArticlesBodies[0]);
-    //console.log("articlesBodies spanish:", updatedArticlesBodies[1]);
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
     ///--------------------------------------------------------
-    //console.log("section before retrieve the code :", section);
-    //console.log("dbNameObj:", dbNameObj);
 
     let sectionCode = sectionsCode[dbNameObj].find(
       (item) => item.label === section
     );
-    console.log("Section found:", sectionCode);
 
     ///--------------------------------------------------------
     // Find the correct section for spanish
@@ -229,7 +215,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       value: section,
     });
 
-    //console.log("Translated value:", esSection);
     ///--------------------------------------------------------
     // Convert HTML to Markdown
     ///--------------------------------------------------------
@@ -249,16 +234,12 @@ export async function POST(req: NextRequest): Promise<Response> {
       })
     );
     //
-    //console.log("markdownContentEN:", markdownContent[0]);
-    //console.log("markdownContentES:", markdownContent[1]);
     ///--------------------------------------------------------
     // Select the correct database to save the article
     ///--------------------------------------------------------
     //
     let db: Database | Database;
     const { auth, database } = initializeFirebaseAdmin();
-    console.log("auth", auth);
-    console.log("database", database);
     let author: string;
     let tags: string[] = [];
     let tags_es: string[] = [];
@@ -283,8 +264,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       api_call_url = process.env.URL_API_JOE || "";
     }
 
-    console.log("Selected database:", dbNameObj);
-    console.log("Database instance:", db ? "Connected" : "Not connected");
     ///--------------------------------------------------------
     // Create Metadata Object
     ///--------------------------------------------------------
@@ -330,7 +309,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       esMetadata: esMetadata,
       //},
     };
-    console.log("articleData structure validated:", {
       hasEn: !!articleDataForDb.en,
       hasEs: !!articleDataForDb.es,
       hasMetadata: !!articleDataForDb.metadata,
@@ -359,7 +337,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       //},
     };
     //
-    //console.log("articlesMenu:", articlesMenu);
 
     const likes = {
       // [id]: {
@@ -367,13 +344,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       //},
     };
     //
-    //console.log("likes:", likes);
 
     //
     //try {
-    // console.log("Attempting to save article with ID:", article.id);
-    // console.log("Database reference path:", `articles/${article.id}`);
-    // console.log(
     //   "Data structure to save:",
     //   JSON.stringify(articleDataForDb, null, 2)
     // );
@@ -383,19 +356,13 @@ export async function POST(req: NextRequest): Promise<Response> {
       const dbRef = db.ref(`articles/${newId}`);
       const response = await dbRef.set(articleDataForDb);
 
-      console.log("Article saved successfully, response:", response);
     } catch (e) {
-      console.log("Error saving articles:");
-      console.log(
         "Error message:",
         e instanceof Error ? e.message : "Unknown error"
       );
-      console.log(
         "Error stack:",
         e instanceof Error ? e.stack : "No stack trace"
       );
-      console.log("Error code:", (e as any)?.code || "No error code");
-      console.log("Full error object:", e);
 
       // return NextResponse.json({
       //   status: 500,
@@ -408,41 +375,29 @@ export async function POST(req: NextRequest): Promise<Response> {
       const dbRefMenu = db.ref(`articles_menu/${newId}`);
       await dbRefMenu.set(articlesMenu);
     } catch (e) {
-      console.log("Error saving articles menu:");
-      console.log(
         "Error message:",
         e instanceof Error ? e.message : "Unknown error"
       );
-      console.log(
         "Error stack:",
         e instanceof Error ? e.stack : "No stack trace"
       );
-      console.log("Error code:", (e as any)?.code || "No error code");
-      console.log("Full error object:", e);
     }
     //
     try {
       const dbLikes = db.ref(`likes/${newId}`);
       await dbLikes.set(likes);
     } catch (e) {
-      console.log("Error saving likes:");
-      console.log(
         "Error message:",
         e instanceof Error ? e.message : "Unknown error"
       );
-      console.log(
         "Error stack:",
         e instanceof Error ? e.stack : "No stack trace"
       );
-      console.log("Error code:", (e as any)?.code || "No error code");
-      console.log("Full error object:", e);
     }
     //
     const authHeader = req.headers.get("authorization");
-    //console.log("authHeader:", authHeader);
 
     const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
-    //console.log("tokenG:", tokenG);
     //
     ///--------------------------------------------------------
     // HMAC API Call to save the article
@@ -451,7 +406,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       title: article.title,
       slug: newId,
     });
-    console.log("body before preboarding call:", body);
 
     const secret = process.env.CMS_SECRET_KEY!;
     const signature = crypto
@@ -470,8 +424,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       body: body,
     });
 
-    console.log("response status:", response.status);
-    console.log("response", response);
 
     //
     if (response.status !== 200) {
@@ -490,7 +442,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
     // } catch (error) {
     //   const parse = JSON.stringify(error);
-    //   console.log("Error saving data:", parse);
 
     //   return NextResponse.json({
     //     status: 500,
