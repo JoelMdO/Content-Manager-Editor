@@ -15,8 +15,9 @@ import handleSelectChange from "../../components/playbook/utils/readPlaybook/han
 import text from "../../constants/readPlaybook_data_text.json";
 import withSessionProvider from "../../utils/withSessionProvider";
 import { PlaybookMeta } from "../../components/playbook/types/plabookMeta";
-import "../../styles/readPlaybook.css";
+import "../../components/playbook/styles/playbook.css";
 import PlaybookCustomButton from "../../components/playbook/playbook_custom_button/button_dashboard";
+import index from "swr";
 
 //
 const PlaybookForm = dynamic(
@@ -92,7 +93,7 @@ const ReadPlaybookPage: React.FC = () => {
 
   //
   let isMetaToUpdate: PlaybookMeta | undefined;
-  if (isUpdateNote.isUpdateNote) {
+  useEffect(() => {
     const entry = entries!.find((e) => e.id === isUpdateNote.noteId);
 
     if (entry) {
@@ -109,7 +110,7 @@ const ReadPlaybookPage: React.FC = () => {
         references: entry.references || [{ title: "", link: "" }],
       };
     }
-  }
+  }, [isUpdateNote.isUpdateNote]);
 
   //
   return (
@@ -308,6 +309,26 @@ const ReadPlaybookPage: React.FC = () => {
                             >
                               {ref.title}
                             </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {isViewDetails && entry.codeSnippets != undefined && (
+                    <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <h4 className="font-medium text-sm mb-2">
+                        {text.readPlaybook.divCodeSnippets}
+                      </h4>
+                      <ul className="list-none pl-0 text-sm">
+                        {entry.codeSnippets!.map((ref, i) => (
+                          <li key={i} className="mb-1 flex items-center">
+                            <Link size={14} className="mr-1 text-blue-500" />
+                            <textarea
+                              className="text-blue-500 hover:underline"
+                              value={ref.code}
+                              readOnly
+                            />
                           </li>
                         ))}
                       </ul>

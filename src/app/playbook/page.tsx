@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import withSessionProvider from "../../utils/withSessionProvider";
-import "../../styles/playbook.css";
+import "../../components/playbook/styles/playbook.css";
 //
 const LogOutButton = dynamic(
   () => import("../../components/buttons/logout_buttons"),
