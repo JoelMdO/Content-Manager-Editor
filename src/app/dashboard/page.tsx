@@ -87,10 +87,10 @@ const Dashboard: React.FC = () => {
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
-    console.log("dbNameToSearch.current:", dbNameToSearch.current);
+    // console.log("dbNameToSearch.current:", dbNameToSearch.current);
 
-    setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
-    console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
+    // setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
+    // console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
     if (sessionStorage.getItem("db") !== null) {
       setDbIsReady(true);
     }
@@ -161,21 +161,11 @@ const Dashboard: React.FC = () => {
           <aside className="hidden md:flex w-[25vw] h-full gap-y-2 bg-gray-800 text-white items-center flex-col">
             <DraftArticle />
             {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
-            <MenuDesktop
-            // editorRefs={editorRefs}
-            // theTitle={theTitle}
-            // theBody={theBody}
-            // setIsFontStyleOpen={setIsFontStyleOpen}
-            // setSelectedSection={setSelectedSection}
-            // selectedSection={selectedSection}
-            // isMediumScreen={isMediumScreen}
-            // dbNameToSearch={dbNameToSearch.current}
-            />
+            <MenuDesktop />
             <HomeButton />
             <LogOutButton />
           </aside>
           {/* MENU MOBILE */}
-          {/* {isFontStyleOpen && <FontStyleUI />} */}
           <nav className="md:hidden w-full h-[12dvh] bg-gray-800">
             <div className="w-full flex flex-row justify-between mt-2 px-2">
               {/* HomeButton at the start (left) */}
@@ -191,16 +181,7 @@ const Dashboard: React.FC = () => {
                 <LogOutButton />
               </div>
             </div>
-            <MenuMobile
-            // editorRefs={editorRefs}
-            // theTitle={theTitle}
-            // theBody={theBody}
-            // setIsFontStyleOpen={setIsFontStyleOpen}
-            // setSelectedSection={setSelectedSection}
-            // isMediumScreen={isMediumScreen}
-            // selectedSection={selectedSection}
-            // dbNameToSearch={dbNameToSearch.current}
-            />
+            <MenuMobile />
           </nav>
           {/* Main Content */}
           <main className="flex-1 p-4 pt-2 h-[80dvh] md:h-full md:w-[75vw] overflow-y-auto">

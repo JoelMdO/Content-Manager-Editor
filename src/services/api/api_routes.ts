@@ -86,14 +86,14 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     ///-----------------------------------------------
     if (jsonResponse.message === "Data translated successfully") {
       const body = jsonResponse.body;
-      const sessionStorageBody = jsonResponse.sessionStorageBody;
-      console.log("sessionStorageBody at apiRoutes:", sessionStorageBody);
+      // const sessionStorageBody = jsonResponse.sessionStorageBody;
+      console.log("Body at apiRoutes:", body);
 
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,
         body: body,
-        sessionStorageBody: sessionStorageBody,
+        // sessionStorageBody: sessionStorageBody,
       });
       ///-----------------------------------------------
       /// From api/search return the meta.

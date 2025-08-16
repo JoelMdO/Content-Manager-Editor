@@ -78,16 +78,12 @@ const callHub = async (
     });
     const jsonResponse = await response.json();
     console.log("jsonResponse at callhub:", jsonResponse);
-    console.log(
-      "sessionStorageBody at callhub:",
-      jsonResponse.sessionStorageBody
-    );
 
     return {
       status: jsonResponse.status,
       message: jsonResponse.message,
       body: jsonResponse.body,
-      sessionStorageBody: jsonResponse.sessionStorageBody,
+      // sessionStorageBody: jsonResponse.sessionStorageBody,
     };
     //}
   } catch (error) {
