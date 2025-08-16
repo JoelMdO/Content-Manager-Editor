@@ -14,7 +14,8 @@ type styleplaybookCustomButton = {
 
 export function playbookButtonStyle(
   type: string,
-  isCreating: boolean | undefined
+  isCreating: boolean | undefined,
+  noteViewMode: "view" | "edit"
   // isClicked: boolean
 ): styleplaybookCustomButton {
   //
@@ -35,7 +36,7 @@ export function playbookButtonStyle(
 
   const stylesByType: Record<string, Partial<styleplaybookCustomButton>> = {
     "view-note": {
-      text: "View Details",
+      text: noteViewMode === "view" ? "View Details" : "Edit Details",
       isNew: true,
       color: "bg-gray-100",
       hover_color: "bg-gray-200",

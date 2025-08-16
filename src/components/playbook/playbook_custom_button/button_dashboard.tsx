@@ -64,14 +64,16 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
     height,
     width,
   } = useMemo(
-    () => playbookButtonStyle(type!, isCreating),
-    [type, isCreating, isClicked]
+    () => playbookButtonStyle(type!, isCreating, noteViewMode),
+    [type, isCreating, isClicked, noteViewMode]
   );
 
   ///--------------------------------------------------------
   // Function to handle the cases of the playbookCustomButton
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
+    console.log("Playbook Button Clicked");
+
     playbookButtonLogic({
       type,
       router,
@@ -102,26 +104,37 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   // UI of the button
   ///--------------------------------------------------------
   return (
-    <button
-      type="button"
-      data-cy={dataCity}
-      className={`${height} ${width} ${textColor} ${otherFeatures} ${shadow} ${position} ${textSmallSize} md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1 ${
-        isClicked ? "bg-cream text-black" : color
-      } hover:${hover_color}`}
-      onClick={handleClick}
-    >
-      {!isNew && (
-        <Image
-          src={icon}
-          style={{ display: isClicked ? "none" : "block" }}
-          className={`md:w-6 md:h-6 w-3 h-3 cursor-pointer ${textColor}`}
-          width={12}
-          height={12}
-          alt={`${text}-icon`}
-        />
+    <>
+      <button
+        type="button"
+        data-cy={dataCity}
+        className={`${height} ${width} ${textColor} ${otherFeatures} ${shadow} ${position} ${textSmallSize} md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1 ${
+          isClicked ? "bg-cream text-black" : color
+        } hover:${hover_color}`}
+        onClick={handleClick}
+      >
+        {!isNew && (
+          <Image
+            src={icon}
+            style={{ display: isClicked ? "none" : "block" }}
+            className={`md:w-6 md:h-6 w-3 h-3 cursor-pointer ${textColor}`}
+            width={12}
+            height={12}
+            alt={`${text}-icon`}
+          />
+        )}
+        {isClicked ? "Posting" : text}
+      </button>
+      {noteViewMode === "view" && (
+        <button
+          className="flex mt-2 justify-end cursor-pointer"
+          type="button"
+          onClick={() => setViewDetails!(false)}
+        >
+          <p className="text-sm text-gray-500">Close</p>
+        </button>
       )}
-      {isClicked ? "Posting" : text}
-    </button>
+    </>
   );
 };
 
