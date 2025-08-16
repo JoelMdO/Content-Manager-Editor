@@ -1,13 +1,7 @@
-// import jwt from "jsonwebtoken";
 import readLog from "@/services/authentication/read_log";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
-import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_placeholder_with_img";
-import { forEach } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
-// import https from "https";
 import { JWT } from "next-auth/jwt";
-// import { getServerSession } from "next-auth";
-// import { authOptions } from "@/lib/nextauth/auth";
 
 export async function POST(request: NextRequest) {
   //
@@ -44,103 +38,33 @@ export async function POST(request: NextRequest) {
     ///================================================================
     /// SAVE IMAGE :
     ///================================================================
-
-    // let pre_images: Array<File> = [];
     const article: Article = {
       id: "",
       title: "",
       article: "",
       images: [],
     };
-    // const imageFiles: File[] = [];
-    // let fileName: string = "";
 
-    // for (const key of formData.keys()) {
-
-    //   if (key.startsWith("image")) {
-    //     const fileData = formData.get(key);
-    //     if (fileData instanceof Blob) {
-    //       fileName = fileData.name || key;
-
-    //       // Convert to File
-    //       const file = new File([fileData], fileName, { type: fileData.type });
-
-    //       imageFiles.push(file);
-    //     } else {
-    //       const fileData = formData.get(key);
-    //       imageFiles.push(fileData as File);
-    //     }
-    //   }
-    // }
-
-    // if (imageFiles.length > 0) {
-    //   //Filter valid file objects
-    //   pre_images = imageFiles.filter(
-    //     (value): value is File => value instanceof File
-    //   );
-
-    //   await Promise.all(
-    //     pre_images.map(async (item: File) => {
-    //       return new Promise<void>(async (resolve) => {
-    //         ///CLOUDINARY UPLOAD
-    //         //Convert to a buffer stream
-    //         const mimeType = item.type;
-    //         const fileUri = "data:" + mimeType;
-    //         // Get create a place holder for the image URL
-    //         let urlCloudinary: string | undefined = "";
-    //         urlCloudinary = fileUri ? fileUri : "";
-
-    //         imageUrls.push({ url: urlCloudinary! });
-    //         resolve();
-    //       });
-    //     })
-    //   ); //     // Update image URL in article content
-    //   // If any images were uploaded, update the article's images array
-    //   if (imageUrls.length > 0) {
-    //     article.images = imageUrls; // Append image URLs to article.images
-    //   }
-    // }
     ///================================================================
     /// SAVE　THE FULL ARTICLE to database:
     ///================================================================
     // Parse individual fields
     const titleData = formData.get("title") as string;
     const titleObj = JSON.parse(titleData);
-    // const idData = formData.get("id") as string;
-    // const idObj = JSON.parse(idData);
     const articleData = formData.get("body") as string;
     const bodyObj = JSON.parse(articleData);
     const sectionData = formData.get("section") as string;
     const sectionObj = JSON.parse(sectionData);
     //
-    // article.id = idObj;
     article.title = titleObj;
     article.article = bodyObj;
     article.images = imageUrls;
     article.section = sectionObj;
     //
-
-    // // SAVE in db.
-    // const id = article.id;
     const title = article.title;
     let body = article.article;
-    // let images = article.images;
     let section = article.section;
 
-
-    // try {
-    //   const arrayData = [images];
-    //   forEach(arrayData, (value) => {
-    //     if (Array.isArray(value) && value.length === 0) {
-    //       if (value === images) {
-    //         images = [{ url: "nil" }];
-    //       }
-    //     }
-    //   });
-    //   // Replace src of the each image with the corresponded url:
-    //   body = replaceSrcWithImagePlaceholders(body, images, "translate");
-    // Update the sessionStorage with the correct tags.
-    // const sessionStorageBody = body;
     ///--------------------------------------------------------
     // Get the Google access token from next-auth
     ///--------------------------------------------------------
@@ -150,7 +74,6 @@ export async function POST(request: NextRequest) {
     const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
 
     if (!tokenG) {
-
       return NextResponse.json({ status: 401, error: "Unauthorized" });
     }
     const newUrl = process.env.SERVER_URL;
@@ -176,10 +99,8 @@ export async function POST(request: NextRequest) {
       });
       // //
 
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("API Error:", errorText);
 
         return NextResponse.json({
           status: 200,
@@ -194,15 +115,7 @@ export async function POST(request: NextRequest) {
         status: 200,
         message: "Data translated successfully",
         body: data,
-        // sessionStorageBody: sessionStorageBody,
       });
-      // } catch (error) {
-      //   console.error("Error:", error);
-      //   return NextResponse.json({
-      //     status: 500,
-      //     error: "Failed to translate article",
-      //   });
-      // }
     } catch (error) {
       console.error("Error:", error);
       return NextResponse.json({

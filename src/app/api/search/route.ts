@@ -13,7 +13,7 @@ import {
 import allowedOriginsCheck from "../../../utils/allowed_origins_check";
 import readLog from "../../../services/authentication/read_log";
 import { DocumentData, QuerySnapshot } from "firebase/firestore";
-import { PlaybookMeta } from "@/types/plabookMeta";
+import { PlaybookMeta } from "../../../components/playbook/types/plabookMeta";
 export async function POST(req: NextRequest): Promise<NextResponse> {
   //
 
@@ -49,11 +49,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         snaps = await getDocs(
           query(db, where("searchIndex", "array-contains", data.data))
         );
-      } else if (data.type === "playbook-search-category") {
         ///--------------------------------------------------------
         // Search by category
         ///--------------------------------------------------------
-
+      } else if (data.type === "playbook-search-category") {
         snaps = await getDocs(query(db, where("category", "==", data.data)));
       } else {
         ///--------------------------------------------------------

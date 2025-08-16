@@ -1,22 +1,13 @@
 import errorAlert from "@/components/alerts/error";
 import postButtonClicked from "./post_button_clicked";
 import successAlert from "@/components/alerts/sucess";
-// import handleNoteClick from "../../../../utils/playbook/handle_note_click";
-// import emailMe from "../../../../utils/buttons/email_me";
-// import { useContext } from "react";
-// import { customDashLogicProps } from "../../../../types/customDash_type";
 import { debouncedUpdateStore } from "../../../utils/debounceUpdateStore";
-// import { autoBatchEnhancer } from "@reduxjs/toolkit";
-// import FontStyleUI from "../../../buttons/font_style_buttons";
 import { handlePost } from "./handle_post";
 import { ButtonProps } from "../type/type_menu_button";
 import { handleClear } from "./handler_clear";
-// import MenuContext from "../../../../utils/context/menu_context";
 import translateButtonClicked from "./translate_button_clicked";
 import router from "next/router";
 import saveArticle from "@/components/dashboard/utils/save_article";
-// import { set } from "cypress/types/lodash";
-// import { useMenuContext } from "@/utils/context/menu_context";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
@@ -25,16 +16,11 @@ export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
 
   handlePost(debouncedUpdateStore);
   setIsClicked!(true);
-  // postButtonClicked(italic!, bold!)
   postButtonClicked()
     .then((response) => {
       setIsClicked!(false);
       if (response.status === 200) {
         successAlert("saved");
-        //TODO check if needed to be saved again
-        //Delete indexDB and localStorage
-        //indexedDB.deleteDatabase("imageStore");
-        //localStorage.clear();
       } else if (
         response.status === 401 ||
         response.message === "User not authenticated"
@@ -96,7 +82,6 @@ export const clearUI = ({
   setIsClicked,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-
   handleClear(editorRefs!);
   savedTitleRef!.current = "";
   savedBodyRef!.current = "";
@@ -119,12 +104,8 @@ const openLinkDialog = ({ dialogRef, setIsClicked }: Partial<ButtonProps>) => {
 ///--------------------------------------------------------
 // Styles
 ///--------------------------------------------------------
-const openStylesDialog = ({
-  // stylesDialogRef,
-  setIsFontStyleOpen,
-}: Partial<ButtonProps>) => {
+const openStylesDialog = ({ setIsFontStyleOpen }: Partial<ButtonProps>) => {
   setIsFontStyleOpen!((setIsFontStyleOpen) => !setIsFontStyleOpen);
-  // stylesDialogRef!.current?.showModal();
 };
 ///--------------------------------------------------------
 // Section Selector
@@ -169,20 +150,17 @@ export const translateToSpanish = ({
               item.type !== "es-title" &&
               item.type !== "es-body" &&
               item.type !== "es-section"
-            // item.type !== "body"
           );
           //
           const translated = (response.body as any).translated_text;
           const title = translated.title || "";
           const es_body = translated.body || "";
           const section = translated.section || "";
-          // const body = response.sessionStorageBody || "";
 
           // Add new translation
           filteredContent.push({ type: "es-title", content: title });
           filteredContent.push({ type: "es-body", content: es_body });
           filteredContent.push({ type: "es-section", content: section });
-          // filteredContent.push({ type: "body", content: body });
 
           // Store updated content in sessionStorage
           sessionStorage.setItem(
@@ -196,11 +174,6 @@ export const translateToSpanish = ({
             JSON.stringify(filteredContent)
           );
           //
-
-          // articleContent.push({ type: "es-title", content: title });
-          // articleContent.push({ type: "es-body", content: es_body });
-          // articleContent.push({ type: "es-section", content: section });
-          // articleContent.push({ type: "body", content: body });
           //
           setTranslationReady!(true);
         }
@@ -218,7 +191,6 @@ export const translateToSpanish = ({
       setIsClicked!(false);
       errorAlert("translate", "error", error);
     });
-  //debugger;
 };
 ///--------------------------------------------------------
 // Main Function to handle the cases of the Menu Buttons
@@ -229,8 +201,6 @@ export const buttonMenuLogic = ({
   dialogRef,
   sectionsDialogRef,
   setIsClicked,
-  // italic,
-  // bold,
   router,
   dbNameToSearch,
   DRAFT_KEY,
@@ -247,27 +217,17 @@ export const buttonMenuLogic = ({
   openDialogNoSection,
   setOpenDialogNoSection,
 }: Partial<ButtonProps>) => {
-  // onClick?.();
-  //   "type at button logic:",
-  //   type,
-  //   "sectionsDialogRef:",
-  //   sectionsDialogRef
-  // );
-
   switch (type) {
     case "image":
       loadImage({ fileInputRef, setIsClicked });
       break;
     case "link":
-
       openLinkDialog({ dialogRef, setIsClicked });
       break;
     case "sections":
-
       openSelectorDialog({ sectionsDialogRef, setIsClicked });
       break;
     case "post":
-      // post({ setIsClicked, italic, bold, router });
       post({ setIsClicked, router });
       break;
     case "save":

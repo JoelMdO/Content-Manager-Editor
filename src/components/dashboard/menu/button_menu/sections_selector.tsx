@@ -9,22 +9,10 @@ const SectionSelector = () => {
   //===================================================
   const { selectedSection, setSelectedSection, sectionsDialogRef, dbIsReady } =
     useContext(MenuContext) as ButtonProps;
-  // let { dbNameToSearch } = useContext(MenuContext) as ButtonProps;
-
-  //   "db at sections selector:",
-  //   dbNameToSearch,
-  //   "sections:",
-  //   selectedSection,
-  //   "sectionsDialogRef:",
-  //   sectionsDialogRef
-  // );
-
   //
   //------------------------------------------
   // Purpose: Safely get db value from dbNameToSearch, handling both string and RefObject<string>.
   //------------------------------------------
-  // let db = (dbNameToSearch.current) || "DeCav";
-  // let dbName = (dbNameToSearch as string) || "DeCav";
   let dbName = "DeCav";
   if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
     dbName = sessionStorage.getItem("db") || "DeCav";

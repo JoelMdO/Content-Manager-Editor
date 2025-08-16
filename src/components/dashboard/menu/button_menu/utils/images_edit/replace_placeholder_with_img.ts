@@ -35,11 +35,6 @@ const replacePlaceholderWithImage = (
     );
   }
 
-  // if (!newHtmlContent.trim().startsWith("<div>")) {
-  //   return `<div>${newHtmlContent}</div>`;
-  // } else {
-  //   return newHtmlContent;
-  // }
   // Ensure proper formatting with <div> and <br>
   newHtmlContent = newHtmlContent
     .split(/<div>/g) // Split by closing divs
@@ -66,7 +61,6 @@ const replacePlaceholderWithImage = (
   if (!newHtmlContent.trim().startsWith("<div>")) {
     newHtmlContent = `<div>${newHtmlContent}</div>`;
   }
-
 
   return newHtmlContent;
 };

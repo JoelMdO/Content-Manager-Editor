@@ -1,20 +1,11 @@
 "use client";
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  // createContext,
-  // useContext,
-} from "react";
-import MenuContext from "../../components/dashboard/menu/button_menu/context/menu_context";
-// Remove ButtonProps import, not needed for context
-
+import React, { useRef, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import dbSelector from "../../components/alerts/db_selector";
-import { ButtonProps } from "@/components/dashboard/menu/button_menu/type/type_menu_button";
-import DraftArticle from "@/components/dashboard/draft_article/draft_article";
-import AutoSaveScreen from "@/components/loaders/auto_save";
-// import { useGetDraftArticleHook } from "@/hooks/useDraftArticle";
+import { ButtonProps } from "../../components/dashboard/menu/button_menu/type/type_menu_button";
+import MenuContext from "../../components/dashboard/menu/button_menu/context/menu_context";
+import DraftArticle from "../../components/dashboard/draft_article/draft_article";
+import AutoSaveScreen from "../../components/loaders/auto_save";
 const ImageInput = dynamic(
   () => import("../../components/dashboard/menu/button_menu/image_input")
 );
@@ -41,17 +32,12 @@ const DashboardEditor = dynamic(
   () => import("../../components/dashboard/dashboard_editor")
 );
 //
-// const MenuContext = createContext<Partial<ButtonProps> | null>(null);
-
-// Do not export useMenuContext from this file
-//
 const Dashboard: React.FC = () => {
   //
   const [isPlaceHolderTitle, setPlaceHolderTitle] = useState<boolean>(true);
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const [selectedSection, setSelectedSection] =
     useState<string>("Select category"); // TODO check if its necesary
-  // const [isFontStyleOpen, setIsFontStyleOpen] = useState<boolean>(false);
   const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
   const [translationReady, setTranslationReady] = useState(false);
   const [isDraftArticleButtonClicked, setDraftArticleButtonClicked] =
@@ -88,7 +74,6 @@ const Dashboard: React.FC = () => {
       setIsMediumScreen(true);
     }
 
-    // setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
     if (sessionStorage.getItem("db") !== null) {
       setDbIsReady(true);
     }
@@ -96,9 +81,6 @@ const Dashboard: React.FC = () => {
   //
   useEffect(() => {
     dbNameToSearch.current = sessionStorage.getItem("db") as string;
-      "dbNameToSearch.current after dbSelector:",
-      dbNameToSearch.current
-    );
     setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
   }, [dbIsReady]);
   //
@@ -107,7 +89,6 @@ const Dashboard: React.FC = () => {
   // Context creation
   ///--------------------------------------------------------
   const menuContextValue: Partial<ButtonProps> = {
-    // setIsFontStyleOpen,
     setSelectedSection,
     selectedSection,
     isMediumScreen,

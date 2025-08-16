@@ -4,7 +4,6 @@ import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import { handleClick } from "./utils/handle_click";
 import draftArticleText from "../../../constants/draft_article_text.json";
 import { iconsMenu } from "../../../constants/icons";
-// import replacePlaceholderWithImage from "./menu/button_menu/utils/images_edit/replace_placeholder_with_img";
 
 const DraftArticle = () => {
   //
@@ -33,10 +32,6 @@ const DraftArticle = () => {
   useEffect(() => {
     //
     const articleStored = localStorage.getItem(DRAFT_KEY);
-    //   "articleStored from localStorage at draft article:",
-    //   articleStored
-    // );
-    //}
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
 
@@ -45,9 +40,6 @@ const DraftArticle = () => {
       //
       setText(newSavedTitleRef.current);
       //
-      //sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
-      //sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
-      //sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
     } else {
       setText("Without Draft Articles");
     }
@@ -91,25 +83,6 @@ const DraftArticle = () => {
             </button>
           </div>
         ))}
-        {/* <div className="flex h-[2.5dvh] md:h-[4.5dvh] bg-gray-500 w-[0.7] ml-1 mr-1"></div>
-        <button
-          type="button"
-          className="flex w-15 h-15"
-          onClick={() => {
-            handleClick({
-              newSavedTitleRef: newSavedTitleRef,
-              DRAFT_KEY: DRAFT_KEY,
-              savedTitleRef: savedTitleRef,
-              savedBodyRef: savedBodyRef,
-              setDraftArticleButtonClicked: setDraftArticleButtonClicked,
-              tag: "draft-es",
-            });
-          }}
-        >
-          <span className="text-2xl flex items-center justify-center">
-            {iconsMenu.spanish}
-          </span>
-        </button> */}
       </div>
     </div>
   );

@@ -1,5 +1,3 @@
-// import deleteImageFromIndexDB from "../menu/button_menu/utils/images_edit/delete_img_from_indexdb";
-
 import { removeStoredImage } from "../menu/button_menu/utils/images_edit/delete_img_from_localstorage";
 
 export const handleKeyBoardActions = (
@@ -45,7 +43,6 @@ export const handleKeyBoardActions = (
           //Remove the image from IndexDB
           const refId = selectedNode.dataset.refId;
           if (refId) {
-            // deleteImageFromIndexDB(selectedText);
             removeStoredImage(selectedText, "", false);
           }
           // Remove the image reference text ImgRef

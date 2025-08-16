@@ -1,34 +1,9 @@
-import React, { useMemo, useState, useCallback } from "react";
-// import { useSelector } from "react-redux";
+import { useMemo, useState, useCallback } from "react";
 import Image from "next/image";
-// import successAlert from "../alerts/sucess";
-// import errorAlert from "../alerts/error";
 import { useRouter } from "next/navigation";
-// import postButtonClicked from "../../utils/buttons/save_button_clicked";
-// import emailMe from "@/utils/buttons/email_me";
-// import handleNoteClick from "../../utils/playbook/handle_note_click";
-// import { PlaybookMeta } from "../../../types/plabookMeta";
-// import { RootState } from "@/store/store";
 import { playbookButtonStyle } from "./styles/style_playbook_custombutton";
 import { playbookButtonLogic } from "./utils/logic_playbook_custombutton";
 import { CustomDashButtonProps } from "./type/type_playbook_custombutton";
-
-// interface ButtonProps {
-//   type: string;
-//   onClick?: () => void;
-//   isCreating?: boolean;
-//   id?: string;
-//   setViewDetails?: React.Dispatch<React.SetStateAction<boolean>>;
-//   setEntries?: React.Dispatch<React.SetStateAction<PlaybookMeta[] | undefined>>;
-//   setUpdateNote?: React.Dispatch<
-//     React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>
-//   >;
-//   setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
-//   "data-cy"?: string;
-//   resetForm?: () => void;
-//   DRAFT_KEY?: (db: string) => string;
-//   dbNameToSearch?: string; // Optional prop for dbNameToSearch
-// }
 
 const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   type,
@@ -47,9 +22,6 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
 
   const [isClicked, setIsClicked] = useState(false);
   const [noteViewMode, setNoteViewMode] = useState<"view" | "edit">("view");
-
-  // const italic = useSelector((state: RootState) => state.data_state?.fontStyle);
-  // const bold = useSelector((state: RootState) => state.data_state?.fontWeight);
 
   const {
     text,
@@ -72,7 +44,6 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   // Function to handle the cases of the playbookCustomButton
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
-
     playbookButtonLogic({
       type,
       router,
@@ -124,7 +95,7 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
         )}
         {isClicked ? "Posting" : text}
       </button>
-      {noteViewMode === "view" && (
+      {noteViewMode === "edit" && (
         <button
           className="flex mt-2 justify-end cursor-pointer"
           type="button"

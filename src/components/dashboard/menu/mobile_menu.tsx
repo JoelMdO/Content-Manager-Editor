@@ -1,27 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import MenuButton from "./button_menu/buttons_menu";
-import {
-  // ButtonProps,
-  iconsMenu,
-} from "../../../constants/icons";
+import { iconsMenu } from "../../../constants/icons";
 import FontStyleUI from "./button_menu/font_style_buttons";
 import { ButtonProps } from "./button_menu/type/type_menu_button";
 import MenuContext from "./button_menu/context/menu_context";
-// import MenuContext from "../../utils/context/menu_context";
 
 //--------------------------------------------------------
 const MenuMobile = () => {
   //
   const [isMenuClicked, setIsMenuClicked] = useState<boolean>(false);
   const [isStylesOpen, setIsFontStyleOpen] = useState<boolean>(false);
-  const { isClicked } = useContext(MenuContext) as ButtonProps;
-  // const { isClicked, setIsClicked } = useContext(MenuContext) as ButtonProps;
-  // function toggleMenu() {
-  //   const menu = document.getElementById("menuItems");
-  //   if (menu) {
-  //     menu.classList.toggle("hidden");
-  //   }
-  // }
   //
   return (
     <>
@@ -34,7 +22,6 @@ const MenuMobile = () => {
               : "from-cyan-400 to-white"
           } rounded-full flex items-center justify-center mb-6`}
           onClick={() => {
-            // toggleMenu();
             setIsMenuClicked(!isMenuClicked);
           }}
         >

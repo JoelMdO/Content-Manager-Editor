@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/nextauth/auth";
 import createLog from "../../../services/authentication/create_log";
 import { dataType } from "@/types/dataType";
-import { getToken, JWT } from "next-auth/jwt";
+import { getToken } from "next-auth/jwt";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   //

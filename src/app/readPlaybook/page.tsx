@@ -5,7 +5,6 @@ import BackPageButton from "../../components/buttons/back_page_button";
 import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "../../components/buttons/logo_button";
 import categories from "../../constants/categories";
-// import playbookCustomButton from "../../components/buttons/playbook_custom_button/button_dashboard";
 import callHub from "../../services/api/call_hub";
 import dynamic from "next/dynamic";
 import errorAlert from "../../components/alerts/error";
@@ -17,7 +16,6 @@ import withSessionProvider from "../../utils/withSessionProvider";
 import { PlaybookMeta } from "../../components/playbook/types/plabookMeta";
 import "../../components/playbook/styles/playbook.css";
 import PlaybookCustomButton from "../../components/playbook/playbook_custom_button/button_dashboard";
-import index from "swr";
 
 //
 const PlaybookForm = dynamic(

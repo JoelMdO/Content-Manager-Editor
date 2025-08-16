@@ -5,31 +5,20 @@ import uploadImage from "./utils/images_edit/upload_image";
 import successAlert from "@/components/alerts/sucess";
 import errorAlert from "@/components/alerts/error";
 
-const ImageInput = ({
-  index,
-}: // setIsClicked,
-{
-  index: number;
-  // setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const ImageInput = ({ index }: { index: number }) => {
   //CONTEXT
   //===========================================================
-  const { editorRefs, fileInputRef, setIsClicked } = useContext(
-    MenuContext
-  ) as ButtonProps;
+  const { editorRefs, fileInputRef } = useContext(MenuContext) as ButtonProps;
   //
 
   ///--------------------------------------------------------
   // Function to handle the cases of the MenuButtons
   ///--------------------------------------------------------
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-
     const editorRef = editorRefs?.current ? editorRefs.current[index] : null;
 
     if (editorRef) {
-
       const dbName = sessionStorage.getItem("db");
-      //debugger;
       uploadImage(e, editorRef, dbName!)
         .then((response) => {
           if (response.status === 200) {

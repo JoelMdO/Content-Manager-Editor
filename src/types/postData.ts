@@ -1,4 +1,3 @@
-import { JWT } from "next-auth/jwt";
 import { dataType } from "./dataType";
 
 export type postDataType = {

@@ -29,13 +29,6 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         headers["Authorization"] = `Bearer ${JWT!}`;
         credentials = "include";
         break;
-      // //## AUTH THROUGH EMAIL AND FIREBASE
-      // case "sign-in-by-email":
-      //   endPoint = "signin";
-      //   body = JSON.stringify(data);
-      //   headers["Content-Type"] = "application/json";
-      //   credentials = "include";
-      //   break;
       //## PLAYBOOK SAVE
       case "playbook-save":
         endPoint = "save";
@@ -84,13 +77,11 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     ///-----------------------------------------------
     if (jsonResponse.message === "Data translated successfully") {
       const body = jsonResponse.body;
-      // const sessionStorageBody = jsonResponse.sessionStorageBody;
 
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,
         body: body,
-        // sessionStorageBody: sessionStorageBody,
       });
       ///-----------------------------------------------
       /// From api/search return the meta.
@@ -103,7 +94,6 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         body: body,
       });
     } else {
-
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,

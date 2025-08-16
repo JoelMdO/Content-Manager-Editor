@@ -1,17 +1,12 @@
 import { debouncedUpdateStore } from "./utils/debounceUpdateStore";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 import { handleKeyBoardActions } from "./utils/handle_keyboard_actions";
 import { handleContentChange } from "./utils/handle_content_change";
 import { ButtonProps } from "./menu/button_menu/type/type_menu_button";
-// import { use } from "chai";
 import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_context";
-// import { useGetInitialArticleDraft } from "../../hooks/useGetInitialArticleDraft";
-// import { subtle } from "crypto";
 import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
 import TranslationLoader from "../loaders/translation_loader";
-// import removeBase64FromImgTags from "./menu/button_menu/utils/remove_img_base64";
 import saveArticle from "./utils/save_article";
-// import AutoSaveScreen from "../loaders/auto_save";
 
 const DashboardEditor = () => {
   //
@@ -36,26 +31,15 @@ const DashboardEditor = () => {
   } = useContext(MenuContext) as ButtonProps;
   //
   //
-  //debugger;
   ///--------------------------------------------------------
   // Get the translated article draft
   ///--------------------------------------------------------
   useTranslatedArticleDraft();
-
-  //--------------------------------------------------------
-  // Read the sessionStorage on page initial load, based on the corresponded db.
-  // And retrieve if any article is already created.
-  //--------------------------------------------------------
-  // useGetInitialArticleDraft();
   ///--------------------------------------------------------
   // Update of editorRefs on every change through draftArticle button
   // or when the text has been translated.
   ///--------------------------------------------------------
   useEffect(() => {
-    //   "reloading dashboard_editor, isDraftArticleButtonClicked:",
-    //   isDraftArticleButtonClicked
-    // );
-
     const editableDiv = editorRefs?.current[1];
     if (editableDiv && savedBodyRef?.current) {
       editableDiv.innerHTML = savedBodyRef.current; // Force HTML rendering
@@ -65,7 +49,6 @@ const DashboardEditor = () => {
   // Save to localStorage every 10 minutes (only if content exists)
   ///--------------------------------------------------------
   useEffect(() => {
-
     const interval = setInterval(() => {
       const dbName = sessionStorage.getItem("db");
 
@@ -82,7 +65,7 @@ const DashboardEditor = () => {
 
       setLastAutoSave(new Date());
       //}
-    }, 60000); // 1 minute //TODO change to 10 minutes.
+    }, 10 * 60000); // 10 minutes.
 
     return () => clearInterval(interval);
   }, [dbNameToSearch, DRAFT_KEY]);

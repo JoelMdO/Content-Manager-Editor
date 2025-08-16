@@ -1,6 +1,6 @@
 "server-only";
 import { isValidUrl } from "./data/valid_url";
-import { PlaybookMetaWithUseRecord } from "@/types/plabookMeta_with_useRecord";
+import { PlaybookMetaWithUseRecord } from "../../components/playbook/types/plabookMeta_with_useRecord";
 import { CodeSnippet } from "@/components/playbook/types/codesnippet";
 import { Reference } from "@/types/references";
 

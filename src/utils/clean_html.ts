@@ -1,24 +1,5 @@
 export function cleanHtml(input: string): string {
-  // Replace <br> and <br/> with newlines
   let output = input.replace(/<br\s*\/?>/gi, "___LINE_BREAK___");
-
-  // Replace <span font-style="..."> with markdown-like formatting
-  // output = output.replace(
-  //   /<span[^>]*font-style=["']?bold["']?[^>]*>(.*?)<\/span>/gi,
-  //   "**$1**"
-  // );
-  // output = output.replace(
-  //   /<span[^>]*font-style=["']?italic["']?[^>]*>(.*?)<\/span>/gi,
-  //   "_$1_"
-  // );
-  // output = output.replace(
-  //   /<span[^>]*font-style=["']?underline["']?[^>]*>(.*?)<\/span>/gi,
-  //   "__$1__"
-  // );
-
-  // // Remove all other <span> tags but keep their content
-  // output = output.replace(/<span[^>]*>(.*?)<\/span>/gi, "$1");
-
   // Add space before and after <img> tags, keep the tag
   // output = output.replace(/<img[^>]*>/gi, " $& ");
   output = output.replace(/<img[^>]*>/gi, "___LINE_BREAK___");

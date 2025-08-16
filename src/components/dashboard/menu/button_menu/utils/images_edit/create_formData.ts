@@ -1,6 +1,5 @@
 import errorAlert from "../../../../../alerts/error";
 import { FormDataItem } from "../../type/formData";
-// import getImageTemporally from "./get_img_temp";
 //
 
 //
@@ -57,21 +56,11 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
       )
       .map(async (item) => {
         try {
-          // const response = await getImageTemporally(item.fileName as string);
-          // const base64 = JSON.parse(
-          //   localStorage.getItem(dbName) || "[]"
-          // ).filter((item: any) => item.type === "image");
-          // if (!base64) return;
-          // item.forEach(async (img: any) => {
-
           const blob = await (await fetch(item.blobUrl)).blob(); // Convert Base64 back to Blob
           const file = new File([blob], item.imageId, { type: blob.type });
 
           formData.append(`image`, file);
-          //}
-          //);
         } catch (error) {
-
           errorAlert("", "", error);
         }
       });

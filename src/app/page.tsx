@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-
 import successAlert from "../components/alerts/sucess";
 import errorAlert from "../components/alerts/error";
 import LogoButton from "../components/buttons/logo_button";
@@ -9,10 +8,6 @@ import Loader from "../components/buttons/loader_saving";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import text from "../constants/mainPage_data_text.json";
-import Dashboard from "./dashboard/page";
-// import Home from "./home/page";
-// import TranslationLoader from "@/components/loaders/translation_loader";
-// import AutoSaveScreen from "@/components/loaders/auto_save";
 
 const Login: React.FC = () => {
   ///===================================================
@@ -23,7 +18,6 @@ const Login: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isSubmittedGoogle, setIsSubmittedGoogle] = useState<boolean>(false);
   const router = useRouter();
-  const isDev = process.env.NEXT_PUBLIC_NODE_ENV === "development";
   ///--------------------------------------------------------
   //handleLogin with Firebase authentication
   ///--------------------------------------------------------
@@ -53,11 +47,6 @@ const Login: React.FC = () => {
   /// UI with a login form and a contact button for the
   /// user to reach the software engineer.
   ///--------------------------------------------------------
-  // //TODO dont delete on test only on production
-  // if (isDev) {
-  //   //Directly render dashboard for development
-  //   return <Dashboard />;
-  // }
   return (
     <>
       <div className="relative w-full min-h-screen flex flex-col justify-center px-4 sm:px-8 md:px-16">
@@ -117,7 +106,7 @@ const Login: React.FC = () => {
             <div className="flex flex-row">
               {isSubmittedGoogle ? null : (
                 <Image
-                  src="https://developers.google.com/identity/images/g-logo.png"
+                  src={process.env.NEXT_PUBLIC_GOOGLE_DEV_URL!}
                   alt="Google logo"
                   className="w-6 h-6 mr-2 rounded-xl"
                   width={50}

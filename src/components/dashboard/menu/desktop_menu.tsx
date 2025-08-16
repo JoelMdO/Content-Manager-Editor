@@ -1,8 +1,6 @@
-// import { useMenuContext } from "@/utils/context/menu_context";
 import { useState } from "react";
 import MenuButton from "./button_menu/buttons_menu";
 import FontStyleUI from "./button_menu/font_style_buttons";
-// import { ButtonProps } from "@/components/Menu/Menu Button/type/menu_button_type";
 
 //--------------------------------------------------------
 const MenuDesktop = () => {
@@ -16,7 +14,6 @@ const MenuDesktop = () => {
       <MenuButton type={"sections"} tag={"desktop"} />
       <MenuButton type={"clear"} tag={"desktop"} />
       <MenuButton type={"save"} tag={"desktop"} />
-      {/* <MenuButton type={"styles"} /> */}
       <div className="relative flex flex-col items-center">
         {isStylesOpen && (
           <div className="absolute md:left-[14vw] g:left-[9vw] top-1/2 -translate-y-1/2 gap-3 items-center">

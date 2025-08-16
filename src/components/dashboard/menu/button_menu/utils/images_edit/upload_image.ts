@@ -1,6 +1,5 @@
 import { ChangeEvent } from "react";
 import callHub from "../../../../../../services/api/call_hub";
-// import saveImageTemporally from "./save_img_temp";
 //
 interface TrackedImage {
   id: string;
@@ -67,14 +66,6 @@ const uploadImage = async (
         document.body.appendChild(img);
         // Create a temporary blob URL for image preview
         const objectUrl = URL.createObjectURL(file);
-        // Save updated image temporally
-        // CHANGED TO NOT USE INDEXDB const responseSaveImage = (await saveImageTemporally(
-        //   file,
-        //   imageId
-        // )) as {
-        //   status: number;
-        // };
-        // if (responseSaveImage.status === 205) return responseSaveImage;
         // Get current article content from sessionStorage
         const articleContent = JSON.parse(
           sessionStorage.getItem(`articleContent-${dbName}`) || "[]"

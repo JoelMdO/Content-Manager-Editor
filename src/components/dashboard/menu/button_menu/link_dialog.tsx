@@ -6,28 +6,20 @@ import { useContext, useRef } from "react";
 import { ButtonProps } from "./type/type_menu_button";
 import MenuContext from "./context/menu_context";
 
-const LinkDialog = ({
-  index,
-}: // setIsClicked,
-{
-  index?: number;
-  // setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const LinkDialog = ({ index }: { index?: number }) => {
   ///========================================================
   // To load links and store them in IndexedDB for later save on db.
   ///========================================================
   //
   //CONTEXT
   //=========================================================
-  const { editorRefs, dialogRef, setIsClicked } = useContext(
-    MenuContext
-  ) as ButtonProps;
+  const { editorRefs, dialogRef } = useContext(MenuContext) as ButtonProps;
   // Ensure dialogRef is defined
 
   // Ensure safe access to editorRefs
   const editorRef = editorRefs?.current ? editorRefs.current[index!] : null;
   const linkInputRef = useRef<HTMLInputElement>(null);
-  // getLink value
+
   let link_url: string;
   const getLinkValue = () => {
     if (linkInputRef.current) {
@@ -66,7 +58,6 @@ const LinkDialog = ({
                 .then((response) => {
                   linkInputRef.current!.value = "";
                   dialogRef!.current?.close();
-                  // setIsClicked(false);
                   if (response.status === 200) {
                     successAlert("link");
                   } else {
@@ -87,7 +78,6 @@ const LinkDialog = ({
             type="button"
             onClick={() => {
               dialogRef!.current?.close();
-              // setIsClicked(false);
             }}
           >
             {text.buttons.close}

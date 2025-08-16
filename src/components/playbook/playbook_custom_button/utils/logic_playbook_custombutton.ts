@@ -1,12 +1,4 @@
-// import errorAlert from "@/components/alerts/error";
-// import postButtonClicked from "../../../Menu/Menu Button/utils/save_button_clicked";
-// import successAlert from "@/components/alerts/sucess";
-// import handleNoteClick from "../playbook/handle_note_click";
 import emailMe from "../../../buttons/utils/email_me";
-// import { useCallback } from "react";
-// import { customDashLogicProps } from "@/types/customDash_type";
-// import { debouncedUpdateStore } from "../../utils/dashboard/debounceUpdateStore";
-// import { ButtonProps } from "@/components/Menu/Menu Button/type/type_menu_button";
 import { CustomDashButtonProps } from "../type/type_playbook_custombutton";
 import handleNoteClick from "../../utils/handle_note_click";
 
@@ -103,7 +95,6 @@ export function playbookButtonLogic({
       updatePlaybook(setUpdateNote);
       break;
     case "view-note":
-
       viewNote({
         noteViewMode,
         setNoteViewMode,

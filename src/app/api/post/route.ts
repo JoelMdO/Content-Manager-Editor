@@ -1,7 +1,4 @@
 import "server-only";
-import { database } from "../../../../firebaseMain";
-import { databaseDecav } from "../../../../firebaseDecav";
-// import { set, ref, update } from "firebase/database";
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
 import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img";
@@ -143,7 +140,6 @@ export async function POST(req: NextRequest): Promise<Response> {
             ); //     // Update image URL in article content
             // If any images were uploaded, update the article's images array
             if (imageUrls.length > 0) {
-
               article.images = imageUrls; // Append image URLs to article.images
             }
           });
@@ -239,14 +235,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
     //
     let db: Database | Database;
-    const { auth, database } = initializeFirebaseAdmin();
+    const { database } = initializeFirebaseAdmin();
     let author: string;
     let tags: string[] = [];
     let tags_es: string[] = [];
     let api_call_url: string;
     //
     if (dbNameObj === "DeCav") {
-      // db = databaseDecav;
       db = database;
       author = process.env.AUTHOR_DECAV || "Default Author";
       tags = ["Aviation", "DecodingAviation", "DeCav"];
@@ -302,97 +297,68 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
 
     const articleDataForDb = {
-      // [id]: {
       en: markdownContent[0],
       es: markdownContent[1],
       metadata: metadata,
       esMetadata: esMetadata,
-      //},
     };
-      hasEn: !!articleDataForDb.en,
-      hasEs: !!articleDataForDb.es,
-      hasMetadata: !!articleDataForDb.metadata,
-      hasEsMetadata: !!articleDataForDb.esMetadata,
-      enLength: articleDataForDb.en?.length || 0,
-      esLength: articleDataForDb.es?.length || 0,
-    });
     // //
 
     const articlesMenu = {
-      // [id]: {
       en: {
         published: true,
-        resume: markdownContent[0].slice(0, 150), // Fix: use markdownContent[0] for English
+        resume: markdownContent[0].slice(0, 150),
         title: article.title,
       },
       es: {
         published: true,
-        resume: markdownContent[1].slice(0, 150), // Fix: use markdownContent[1] for Spanish
+        resume: markdownContent[1].slice(0, 150),
         title: article.esTitle,
       },
       section: section,
       esSection: esSection,
       section_code: sectionCode,
       slug: article.id,
-      //},
     };
     //
 
     const likes = {
-      // [id]: {
       likes: 0,
-      //},
     };
     //
-
-    //
-    //try {
-    //   "Data structure to save:",
-    //   JSON.stringify(articleDataForDb, null, 2)
-    // );
     let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
 
     try {
       const dbRef = db.ref(`articles/${newId}`);
-      const response = await dbRef.set(articleDataForDb);
-
+      await dbRef.set(articleDataForDb);
     } catch (e) {
-        "Error message:",
-        e instanceof Error ? e.message : "Unknown error"
-      );
-        "Error stack:",
-        e instanceof Error ? e.stack : "No stack trace"
-      );
-
-      // return NextResponse.json({
-      //   status: 500,
-      //   message: "Error saving article to database",
-      //   error: e instanceof Error ? e.message : "Unknown database error",
-      // });
+      return NextResponse.json({
+        status: 500,
+        message: "Error saving article to database",
+        error: e instanceof Error ? e.message : "Unknown database error",
+      });
     }
     //
     try {
       const dbRefMenu = db.ref(`articles_menu/${newId}`);
       await dbRefMenu.set(articlesMenu);
     } catch (e) {
-        "Error message:",
-        e instanceof Error ? e.message : "Unknown error"
-      );
-        "Error stack:",
-        e instanceof Error ? e.stack : "No stack trace"
-      );
+      return NextResponse.json({
+        status: 500,
+        message: "Error saving article to database",
+        error: e instanceof Error ? e.message : "Unknown database error",
+      });
     }
     //
     try {
       const dbLikes = db.ref(`likes/${newId}`);
       await dbLikes.set(likes);
     } catch (e) {
-        "Error message:",
-        e instanceof Error ? e.message : "Unknown error"
-      );
-        "Error stack:",
-        e instanceof Error ? e.stack : "No stack trace"
-      );
+      return NextResponse.json({
+        status: 500,
+        message: "Error saving article to database",
+        error: e instanceof Error ? e.message : "Unknown database error",
+      });
     }
     //
     const authHeader = req.headers.get("authorization");
@@ -424,11 +390,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       body: body,
     });
 
-
     //
     if (response.status !== 200) {
       const errorText = await response.text();
-      console.error("Error response from API:", errorText);
       return NextResponse.json({
         status: response.status,
         message: "Error saving data",
@@ -438,17 +402,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     return NextResponse.json({
       status: 200,
       message: "Data saved successfully",
-      // body: body,
     });
-    // } catch (error) {
-    //   const parse = JSON.stringify(error);
-
-    //   return NextResponse.json({
-    //     status: 500,
-    //     message: "Error saving data ",
-    //     error: parse,
-    //   });
-    // }
+    //
   } else {
     return NextResponse.json({
       status: 422,

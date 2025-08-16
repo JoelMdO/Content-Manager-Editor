@@ -71,29 +71,6 @@ export async function sanitizeData(
     } else {
       sanitizedData = { status: 400, message: "Invalid post data" };
     }
-    // const titleBeforeSanitize = data.title
-    // const idBeforeSanitize = data.get("id");
-    // const articleBeforeSanitize = data.get("article");
-    // const italicBeforeSanitize = data.get("italic");
-    // const boldBeforeSanitize = data.get("bold");
-    // const imageBeforeSanitize = data.get(`image`);
-    // const title = JSON.stringify(titleBeforeSanitize);
-    // const id = JSON.stringify(idBeforeSanitize);
-    // const article = JSON.stringify(articleBeforeSanitize);
-    // const italic = JSON.stringify(italicBeforeSanitize);
-    // const bold = JSON.stringify(boldBeforeSanitize);
-    // const image = JSON.stringify(imageBeforeSanitize);
-
-    // const dataGroup = [title, id, image, article, italic, bold];
-    // try {
-    //   forEach(dataGroup, (value) => {
-    //     if (typeof value === "string") {
-    //       sanitizedData = sanitizeUrl(value);
-    //     }
-    //   });
-    // } catch (error) {
-    //   sanitizedData.message = `data not allowed, ${error}`;
-    // }
     //--------------------------------------------------------
   } else if (type === "playbook-save") {
     ///--------------------------------------------------------

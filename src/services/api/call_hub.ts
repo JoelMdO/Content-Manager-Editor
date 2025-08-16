@@ -43,7 +43,6 @@ const callHub = async (
     //## POST
     case "post":
     case "translate":
-
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
         : data !== undefined
@@ -63,7 +62,6 @@ const callHub = async (
   }
   //
   try {
-
     const response = await fetch(url, {
       method: "POST",
       body: body,
@@ -76,7 +74,6 @@ const callHub = async (
       status: jsonResponse.status,
       message: jsonResponse.message,
       body: jsonResponse.body,
-      // sessionStorageBody: jsonResponse.sessionStorageBody,
     };
     //}
   } catch (error) {
