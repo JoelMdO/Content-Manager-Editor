@@ -10,7 +10,7 @@ export function useTranslatedArticleDraft() {
   const {
     savedTitleRef,
     savedBodyRef,
-    dbNameToSearch,
+    // dbNameToSearch,
     translationReady,
     DRAFT_KEY,
     setLanguage,
@@ -28,6 +28,7 @@ export function useTranslatedArticleDraft() {
 
       const dbName = sessionStorage.getItem("db") as string;
       console.log('"translationReady" is true', dbName);
+
       let articleStored: string | null = sessionStorage.getItem(
         `articleContent-${dbName}`
       );
@@ -48,7 +49,7 @@ export function useTranslatedArticleDraft() {
 
         handleClick({
           newTitleRef: newSavedTitleRef.content,
-          DRAFT_KEY: DRAFT_KEY,
+          DRAFT_KEY: `draft-articleContent-${dbName}`,
           savedTitleRef: savedTitleRef,
           savedBodyRef: savedBodyRef,
           tag: "translated",
