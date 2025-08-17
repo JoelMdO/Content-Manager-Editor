@@ -303,6 +303,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       esMetadata: esMetadata,
     };
     // //
+    let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
 
     const articlesMenu = {
       en: {
@@ -318,7 +319,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       section: section,
       esSection: esSection,
       section_code: sectionCode,
-      slug: article.id,
+      slug: newId,
     };
     //
 
@@ -326,7 +327,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       likes: 0,
     };
     //
-    let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
 
     try {
       const dbRef = db.ref(`articles/${newId}`);
