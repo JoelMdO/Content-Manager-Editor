@@ -1,5 +1,12 @@
+//==========================================
+// Original Code (Preserved for Reference)
+//==========================================
+// import { ChangeEvent } from "react";
+// import callHub from "../../../../../../services/api/call_hub";
+
 import { ChangeEvent } from "react";
 import callHub from "../../../../../../services/api/call_hub";
+import { applyWatermarkToImage, base64ToFile } from "../../../../../../utils/watermark/watermark_utils";
 //
 interface TrackedImage {
   id: string;
@@ -9,25 +16,60 @@ interface TrackedImage {
 //
 type UploadImageResult = { status: number; message?: string };
 //
+interface WatermarkOptions {
+  enabled: boolean;
+  type: 'text' | 'logo';
+  text?: string;
+  fontSize?: number;
+  color?: string;
+  opacity?: number;
+  logoFile?: File;
+}
 
+//------------------------------------------
+// Purpose: Enhanced image upload function with AI watermark support
+// Integrates with existing image validation and storage workflow
+//------------------------------------------
 const uploadImage = async (
   e: ChangeEvent<HTMLInputElement>,
   editorRef: HTMLDivElement | null,
-  dbName: string
+  dbName: string,
+  watermarkOptions?: WatermarkOptions
 ): Promise<UploadImageResult> => {
   ///========================================================
-  // Function to upload an image
+  // Function to upload an image with optional AI watermark processing
   ///========================================================
   //
   try {
     //Array sintax
-    const file = e.target.files?.[0];
+    let file = e.target.files?.[0];
     const fileName = file?.name;
     //
     // Store reference before API call
     const editorRefBefore = editorRef;
     if (!file || !editorRef) {
       return { status: 400, message: "No file or editor reference provided" };
+    }
+
+    // Apply watermark if enabled
+    if (watermarkOptions?.enabled) {
+      try {
+        const watermarkResult = await applyWatermarkToImage(file, watermarkOptions);
+        
+        if (watermarkResult.success && watermarkResult.watermarkedImageData) {
+          // Convert watermarked image back to File object
+          const watermarkedFile = base64ToFile(
+            watermarkResult.watermarkedImageData,
+            `watermarked_${fileName}`,
+            file.type
+          );
+          file = watermarkedFile;
+        } else {
+          // console.warn("Watermark application failed, proceeding with original image:", watermarkResult.error);
+        }
+      } catch (watermarkError) {
+        // console.warn("Watermark processing error, proceeding with original image:", watermarkError);
+      }
     }
 
     // Check if the file is a valid image and if its save it on the server
