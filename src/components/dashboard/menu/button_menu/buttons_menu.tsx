@@ -99,6 +99,11 @@ const MenuButton = ({
             if (tag !== "desktop") {
               setIsMenuClicked!(false);
             }
+          } else if (type === "styles") {
+            setIsClicked((prev) => !prev);
+            if (tag !== "desktop") {
+              setIsMenuClicked!((prev) => !prev);
+            }
           }
         }}
       >

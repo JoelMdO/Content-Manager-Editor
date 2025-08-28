@@ -16,6 +16,8 @@ const FontStyleUI: React.FC<{
     { type: "B", value: "bold" },
     { type: "I", value: "italic" },
     { type: "U", value: "underline" },
+    { type: "A++", value: "font_h2" },
+    { type: "A+", value: "font_h3" },
   ];
 
   return (
@@ -31,7 +33,9 @@ const FontStyleUI: React.FC<{
                 isPressed
                   ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"
                   : defaultProperties
-              } mt-2 text-lg text-white border-2 border-green w-8 h-9 `}
+              } mt-2 text-lg text-white border-2 border-green ${
+                font.value === "font_h2" ? "w-9" : "w-8"
+              } h-9 `}
               onClick={() => {
                 handleFontChange(font.value),
                   setIsFontStyleOpen(false),

@@ -424,6 +424,10 @@ class HTMLToMarkdownConverter {
       style.includes("background-color")
     ) {
       content = `==${content}==`;
+    } else if (className.includes("font_h2") || style.includes("font_h2")) {
+      content = `## ${content}`;
+    } else if (className.includes("font_h3") || style.includes("font_h3")) {
+      content = `### ${content}`;
     }
     return content;
   }
