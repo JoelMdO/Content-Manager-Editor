@@ -8,8 +8,8 @@ import { isValidImage } from "./valid_image";
 export async function sanitizeFile(
   file: File
 ): Promise<{ status: number; message: string }> {
-  const allowedTypes = ["image/png", "image/jpeg", "image/gif"];
-  const maxSize = 500 * 1024; // 5kB limit
+  const allowedTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+  const maxSize = 500 * 1024; // 500kB limit
   try {
     if (!allowedTypes.includes(file.type)) {
       return { status: 205, message: "Invalid file type" };
