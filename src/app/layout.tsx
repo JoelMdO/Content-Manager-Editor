@@ -28,6 +28,10 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   other: { "apple-mobile-web-app-title": "Your CMS" },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 //
 export default function RootLayout({
