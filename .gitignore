@@ -58,3 +58,12 @@ remove-console-logs.sh
 .hintrc
 .npmrc
 Translation Process.md
+
+# Python watermark service
+python_services/watermark_generator/__pycache__/
+python_services/watermark_generator/*.pyc
+python_services/watermark_generator/.env
+python_services/watermark_generator/venv/
+python_services/watermark_generator/.pytest_cache/
+/tmp/watermarked_*.jpg
+/tmp/test_*.png
