@@ -322,7 +322,7 @@ class HTMLToMarkdownConverter {
     const items = Array.from(node.children).filter(
       (child) => child.tagName.toLowerCase() === "li"
     );
-    let result = "\n\n";
+    let result = "\n";
     items.forEach((item, index) => {
       result += this.processListItem(
         item as HTMLElement,
@@ -342,20 +342,28 @@ class HTMLToMarkdownConverter {
   ): string {
     const indent = "  ".repeat(depth);
     const content = this.processChildren(node, options).trim();
-    const nestedLists = node.querySelectorAll("ul, ol");
-    let processedContent = content;
+    // const nestedLists = node.querySelectorAll("ul, ol");
+    const nestedLists = Array.from(node.children).filter(
+      (child) =>
+        child.tagName.toLowerCase() === "ul" ||
+        child.tagName.toLowerCase() === "ol"
+    );
+    // let processedContent = content;
+    let nestedMarkdown = "";
     nestedLists.forEach((list) => {
       const listType = list.tagName.toLowerCase();
-      const nestedMarkdown =
+      // const nestedMarkdown =
+      nestedMarkdown +=
         listType === "ul"
           ? this.processUnorderedList(list as HTMLElement, depth + 1, options)
           : this.processOrderedList(list as HTMLElement, depth + 1, options);
-      processedContent = processedContent.replace(
-        list.outerHTML,
-        nestedMarkdown
-      );
+      // processedContent = processedContent.replace(
+      //   list.outerHTML,
+      //   nestedMarkdown
+      // );
     });
-    return `${indent}${marker} ${processedContent}\n`;
+    return `${indent}${marker} ${nestedMarkdown}\n`;
+    // return `${indent}${marker} ${processedContent}\n`;
   }
 
   processBlockquote(

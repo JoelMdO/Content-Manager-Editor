@@ -191,7 +191,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
     article.body = updatedArticlesBodies[0];
     article.esBody = updatedArticlesBodies[1];
-
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
@@ -258,27 +257,76 @@ export async function POST(req: NextRequest): Promise<Response> {
       ];
       api_call_url = process.env.URL_API_JOE || "";
     }
+    ///--------------------------------------------------------
+    // Create a summary of the article content for description
+    ///--------------------------------------------------------
+    ///--------------------------------------------------------
+    // Get the Google access token from next-auth
+    ///--------------------------------------------------------
 
+    const authHeader = req.headers.get("authorization");
+
+    const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+
+    if (!tokenG) {
+      return NextResponse.json({ status: 401, error: "Unauthorized" });
+    }
+    const newUrl = process.env.SERVER_URL;
+    //
+    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; //TODO delete this line in production
+    try {
+      const resumeResponse = await fetch(`${newUrl}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${tokenG}`,
+          "Content-Type": "application/json",
+          "X-Request-Type": "translation",
+          "X-Service": "cms-translate",
+          "X-Source-DB": dbName,
+        },
+        body: JSON.stringify({
+          article: article.body,
+          esArticle: article.esBody,
+        }),
+      });
+      console.log("response", resumeResponse);
+
+      if (!resumeResponse.ok) {
+        const errorText = await resumeResponse.text();
+
+        return NextResponse.json({
+          status: 500,
+          error: `API returned ${resumeResponse.status}: ${errorText}`,
+        });
+      }
+
+      const resume = await resumeResponse.json();
+      article.body = resume.article;
+      article.esBody = resume.esArticle;
+      console.log("resume", resume);
+    } catch (error) {
+      console.log("error", error);
+    }
     ///--------------------------------------------------------
     // Create Metadata Object
     ///--------------------------------------------------------
     const metadata = {
       title: article.title,
-      description: markdownContent[0].slice(0, 150), // Get first 150 chars as description
+      description: article.body,
       author: author,
       date: new Date().toISOString(),
       tags: tags,
-      category: sectionCode,
+      category: sectionCode?.code,
       published: true,
       version: "1.0",
     };
     const esMetadata = {
       title: article.esTitle,
-      description: markdownContent[1].slice(0, 150), // Get first 150 chars as description
+      description: article.esBody,
       author: author,
       date: new Date().toISOString(),
       tags: tags_es,
-      category: sectionCode,
+      category: sectionCode?.code,
       published: true,
       version: "1.0",
     };
@@ -318,7 +366,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       },
       section: section,
       esSection: esSection,
-      section_code: sectionCode,
+      section_code: sectionCode?.code,
       slug: newId,
     };
     //
@@ -338,7 +386,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         error: e instanceof Error ? e.message : "Unknown database error",
       });
     }
-    //
+
     try {
       const dbRefMenu = db.ref(`articles_menu/${newId}`);
       await dbRefMenu.set(articlesMenu);
@@ -361,13 +409,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       });
     }
     //
-    const authHeader = req.headers.get("authorization");
-
-    const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
-    //
-    ///--------------------------------------------------------
-    // HMAC API Call to save the article
-    ///--------------------------------------------------------
     const body = JSON.stringify({
       title: article.title,
       slug: newId,
