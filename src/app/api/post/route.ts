@@ -186,11 +186,15 @@ export async function POST(req: NextRequest): Promise<Response> {
     //------------------------------------------
 
     const articlesBodies = [article.body, article.esBody];
+    console.log("articlesBodie", article.body);
+
     const updatedArticlesBodies = articlesBodies.map((body) =>
       replaceSrcWithImagePlaceholders(body!, images)
     );
     article.body = updatedArticlesBodies[0];
     article.esBody = updatedArticlesBodies[1];
+    console.log("updatedArticlesBodies", updatedArticlesBodies[0]);
+
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
@@ -228,6 +232,8 @@ export async function POST(req: NextRequest): Promise<Response> {
         preserveLineBreaks: true, // Keep line breaks as they are
       })
     );
+    console.log("markdownContent", markdownContent[0]);
+
     //
     ///--------------------------------------------------------
     // Select the correct database to save the article
@@ -260,10 +266,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
     // Create a summary of the article content for description
     ///--------------------------------------------------------
-    ///--------------------------------------------------------
-    // Get the Google access token from next-auth
-    ///--------------------------------------------------------
-
     const authHeader = req.headers.get("authorization");
 
     const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
@@ -271,68 +273,53 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!tokenG) {
       return NextResponse.json({ status: 401, error: "Unauthorized" });
     }
-    const newUrl = process.env.SERVER_URL;
+    const newUrl = process.env.RESUME_URL;
+    console.log("newUrl", newUrl);
+
     //
     process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; //TODO delete this line in production
-    try {
-      const resumeResponse = await fetch(`${newUrl}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${tokenG}`,
-          "Content-Type": "application/json",
-          "X-Request-Type": "translation",
-          "X-Service": "cms-translate",
-          "X-Source-DB": dbName,
-        },
-        body: JSON.stringify({
-          article: article.body,
-          esArticle: article.esBody,
-        }),
+
+    const resumeResponse = await fetch(`${newUrl}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${tokenG}`,
+        "Content-Type": "application/json",
+        "X-Request-Type": "translation",
+        "X-Service": "cms-translate",
+        "X-Source-DB": dbName,
+      },
+      body: JSON.stringify({
+        article: article.body,
+        esArticle: article.esBody,
+      }),
+    });
+    console.log("response", resumeResponse);
+
+    if (!resumeResponse.ok) {
+      const errorText = await resumeResponse.text();
+
+      return NextResponse.json({
+        status: 500,
+        error: `API returned ${resumeResponse.status}: ${errorText}`,
       });
-      console.log("response", resumeResponse);
-
-      if (!resumeResponse.ok) {
-        const errorText = await resumeResponse.text();
-
-        return NextResponse.json({
-          status: 500,
-          error: `API returned ${resumeResponse.status}: ${errorText}`,
-        });
-      }
-
-      const resume = await resumeResponse.json();
-      article.body = resume.article;
-      article.esBody = resume.esArticle;
-      console.log("resume", resume);
-    } catch (error) {
-      console.log("error", error);
     }
-    ///--------------------------------------------------------
-    // Create Metadata Object
-    ///--------------------------------------------------------
-    const metadata = {
-      title: article.title,
-      description: article.body,
-      author: author,
-      date: new Date().toISOString(),
-      tags: tags,
-      category: sectionCode?.code,
-      published: true,
-      version: "1.0",
-    };
-    const esMetadata = {
-      title: article.esTitle,
-      description: article.esBody,
-      author: author,
-      date: new Date().toISOString(),
-      tags: tags_es,
-      category: sectionCode?.code,
-      published: true,
-      version: "1.0",
-    };
-    //
 
-    //
+    const resume = await resumeResponse.json();
+    article.body = resume.article;
+    article.esBody = resume.esArticle;
+    //   console.log("resume", resume);
+    if (article.body && article.body.length >= 180) {
+      article.body = article.body.slice(0, 180);
+    }
+    if (article.esBody && article.esBody.length >= 180) {
+      article.esBody = article.esBody.slice(0, 180);
+    }
+    // } catch (error) {
+    //   console.log("error", error);
+    //}
+    ///--------------------------------------------------------
+    // Obtain id
+    ///--------------------------------------------------------
     let id = article.id;
 
     // Validate required fields
@@ -343,6 +330,39 @@ export async function POST(req: NextRequest): Promise<Response> {
         data: { id, title: article.title, esTitle: article.esTitle },
       });
     }
+    let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
+    ///--------------------------------------------------------
+    // Create Metadata Object
+    ///--------------------------------------------------------
+    const metadata = {
+      title: article.title,
+      description: article.body,
+      author: author,
+      date: new Date().toISOString(),
+      tags: tags,
+      category: sectionCode?.code,
+      slug: newId,
+      section: section,
+      section_code: sectionCode?.code,
+      published: true,
+      version: "1.0",
+    };
+    const esMetadata = {
+      title: article.esTitle,
+      description: article.esBody,
+      author: author,
+      date: new Date().toISOString(),
+      tags: tags_es,
+      category: sectionCode?.code,
+      slug: newId,
+      section: esSection,
+      section_code: sectionCode?.code,
+      published: true,
+      version: "1.0",
+    };
+    //
+
+    //
 
     const articleDataForDb = {
       en: markdownContent[0],
@@ -350,32 +370,14 @@ export async function POST(req: NextRequest): Promise<Response> {
       metadata: metadata,
       esMetadata: esMetadata,
     };
-    // //
-    let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
-
-    const articlesMenu = {
-      en: {
-        published: true,
-        resume: markdownContent[0].slice(0, 150),
-        title: article.title,
-      },
-      es: {
-        published: true,
-        resume: markdownContent[1].slice(0, 150),
-        title: article.esTitle,
-      },
-      section: section,
-      esSection: esSection,
-      section_code: sectionCode?.code,
-      slug: newId,
-    };
     //
-
     const likes = {
       likes: 0,
     };
     //
+    console.log("articleDataForDb", articleDataForDb);
 
+    //
     try {
       const dbRef = db.ref(`articles/${newId}`);
       await dbRef.set(articleDataForDb);
@@ -388,17 +390,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
 
     try {
-      const dbRefMenu = db.ref(`articles_menu/${newId}`);
-      await dbRefMenu.set(articlesMenu);
-    } catch (e) {
-      return NextResponse.json({
-        status: 500,
-        message: "Error saving article to database",
-        error: e instanceof Error ? e.message : "Unknown database error",
-      });
-    }
-    //
-    try {
       const dbLikes = db.ref(`likes/${newId}`);
       await dbLikes.set(likes);
     } catch (e) {
@@ -408,6 +399,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         error: e instanceof Error ? e.message : "Unknown database error",
       });
     }
+    //
     //
     const body = JSON.stringify({
       title: article.title,
@@ -419,6 +411,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       .createHmac("sha256", secret!)
       .update(body)
       .digest("hex");
+    console.log("url preboarding", api_call_url);
 
     const response = await fetch(api_call_url, {
       method: "POST",
@@ -430,7 +423,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       },
       body: body,
     });
-
+    console.log("response api", response);
     //
     if (response.status !== 200) {
       const errorText = await response.text();

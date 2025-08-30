@@ -16,10 +16,14 @@ interface HTMLTypes {
 class HTMLToMarkdownConverter {
   imageCounter: number;
   linkCounter: number;
+  private dom: JSDOM;
+  private Node: typeof Node;
 
   constructor() {
     this.imageCounter = 0;
     this.linkCounter = 0;
+    this.dom = new JSDOM();
+    this.Node = this.dom.window.Node;
   }
 
   convert({ html, options = {} }: HTMLTypes): string {
@@ -54,7 +58,7 @@ class HTMLToMarkdownConverter {
   ): string {
     if (!node) return markdown;
 
-    if (node.nodeType === 3) {
+    if (node.nodeType === this.Node.TEXT_NODE) {
       const text = node.textContent || "";
       return (
         markdown +
@@ -62,7 +66,7 @@ class HTMLToMarkdownConverter {
       );
     }
 
-    if (node.nodeType === 1) {
+    if (node.nodeType === this.Node.ELEMENT_NODE) {
       const tagName = (node as HTMLElement).tagName.toLowerCase();
 
       switch (tagName) {
@@ -322,6 +326,8 @@ class HTMLToMarkdownConverter {
     const items = Array.from(node.children).filter(
       (child) => child.tagName.toLowerCase() === "li"
     );
+    console.log("items as processORderedList", items);
+
     let result = "\n";
     items.forEach((item, index) => {
       result += this.processListItem(
@@ -331,6 +337,8 @@ class HTMLToMarkdownConverter {
         `${index + 1}.`
       );
     });
+    console.log("result as processOrderedList", result);
+
     return result + "\n";
   }
 
@@ -341,13 +349,33 @@ class HTMLToMarkdownConverter {
     marker = "-"
   ): string {
     const indent = "  ".repeat(depth);
-    const content = this.processChildren(node, options).trim();
+    // Get text content excluding nested lists
+    let textContent = "";
+    for (const child of Array.from(node.childNodes)) {
+      if (child.nodeType === this.Node.TEXT_NODE) {
+        textContent += child.textContent || "";
+      } else if (child.nodeType === this.Node.ELEMENT_NODE) {
+        const childElement = child as HTMLElement;
+        const tagName = childElement.tagName.toLowerCase();
+
+        // Skip nested lists, process other elements
+        if (tagName !== "ul" && tagName !== "ol") {
+          textContent += this.processNode(child, "", depth, options);
+        }
+      }
+    }
+
+    // Clean up the text content
+    textContent = textContent.trim();
+    // const content = this.processChildren(node, options).trim();
     // const nestedLists = node.querySelectorAll("ul, ol");
     const nestedLists = Array.from(node.children).filter(
       (child) =>
         child.tagName.toLowerCase() === "ul" ||
         child.tagName.toLowerCase() === "ol"
     );
+    console.log("nestedLists", nestedLists);
+
     // let processedContent = content;
     let nestedMarkdown = "";
     nestedLists.forEach((list) => {
@@ -362,7 +390,16 @@ class HTMLToMarkdownConverter {
       //   nestedMarkdown
       // );
     });
-    return `${indent}${marker} ${nestedMarkdown}\n`;
+    console.log("nestedMarkdown processedListItem", nestedMarkdown);
+    // Combine text content with nested lists
+    let result = `${indent}${marker} ${textContent}`;
+    if (nestedMarkdown) {
+      result += nestedMarkdown;
+    }
+    result += "\n";
+
+    return result;
+    // return `${indent}${marker} ${nestedMarkdown}\n`;
     // return `${indent}${marker} ${processedContent}\n`;
   }
 
