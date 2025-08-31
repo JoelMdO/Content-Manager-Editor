@@ -35,6 +35,10 @@ const errorAlert = (
     case "nonTranslated":
       text = `Translation failed ${message}.`;
       break;
+    case "nonsection":
+      text = message as string;
+      button_text = "Close";
+      break;
     default:
       text = `Error uploading the ${type}: ${message}`;
       break;

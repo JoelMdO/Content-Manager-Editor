@@ -27,6 +27,8 @@ export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
       ) {
         errorAlert("saved", "nonauth", response.message);
         router!.push("/");
+      } else if (response.status === 206) {
+        errorAlert("saved", "nonsection", response.message);
       } else {
         errorAlert("saved", "non200", response.message);
       }
