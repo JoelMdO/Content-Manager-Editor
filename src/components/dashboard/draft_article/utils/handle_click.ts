@@ -15,7 +15,7 @@ type HandleClickProps = {
   setDraftArticleButtonClicked?: (clicked: boolean) => void;
   tag: string;
   newTitleRef?: string;
-  setLanguage: (language: "en" | "es") => void;
+  setLanguage?: (language: "en" | "es") => void;
 };
 
 // Updated function to accept a single props object
@@ -44,13 +44,13 @@ export const handleClick = ({
   } else if (tag === "draft-en") {
     savedTitleRef.current = newSavedTitleRef!.current;
     dbFieldName = "body";
-    setLanguage("en");
+    setLanguage!("en");
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   } else if (tag === "draft-es") {
     savedTitleRef.current =
       jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
     dbFieldName = "es-body";
-    setLanguage("es");
+    setLanguage!("es");
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   }
   //
