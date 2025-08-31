@@ -7,6 +7,7 @@ import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_co
 import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
 import TranslationLoader from "../loaders/translation_loader";
 import saveArticle from "./utils/save_article";
+import { set } from "lodash";
 
 const DashboardEditor = () => {
   //
@@ -28,6 +29,7 @@ const DashboardEditor = () => {
     setOpenDialogNoSection,
     openDialogNoSection,
     sectionsDialogRef,
+    setText,
   } = useContext(MenuContext) as ButtonProps;
   //
   //
@@ -118,7 +120,13 @@ const DashboardEditor = () => {
           }
           onInput={(e) => {
             const content = (e.target as HTMLDivElement).innerHTML;
-            handleContentChange(index, content, debouncedUpdateStore);
+            handleContentChange(
+              index,
+              content,
+              language,
+              setText,
+              debouncedUpdateStore
+            );
           }}
         >
           {index === 0

@@ -49,9 +49,12 @@ export const saveDraft = ({
   sectionsDialogRef,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
+  console.log("dNameToSearch", dbNameToSearch);
 
   const dbName =
-    typeof dbNameToSearch === "string"
+    dbNameToSearch === undefined
+      ? sessionStorage.getItem("db")
+      : typeof dbNameToSearch === "string"
       ? dbNameToSearch
       : dbNameToSearch?.current;
   ///--------------------------------------------------------

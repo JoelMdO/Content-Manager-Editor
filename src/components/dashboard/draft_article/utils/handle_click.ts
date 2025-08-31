@@ -2,6 +2,10 @@
 // HANDLE CLICK, purpose:
 // Update UI with the draft article content
 //=========================================================
+
+import { set } from "lodash";
+import { useCallback } from "react";
+
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
   newSavedTitleRef?: React.RefObject<string>;
@@ -11,10 +15,11 @@ type HandleClickProps = {
   setDraftArticleButtonClicked?: (clicked: boolean) => void;
   tag: string;
   newTitleRef?: string;
+  setLanguage: (language: "en" | "es") => void;
 };
 
 // Updated function to accept a single props object
-export const handleClick = async ({
+export const handleClick = ({
   newSavedTitleRef,
   DRAFT_KEY,
   savedTitleRef,
@@ -22,6 +27,7 @@ export const handleClick = async ({
   setDraftArticleButtonClicked,
   tag,
   newTitleRef,
+  setLanguage,
 }: HandleClickProps) => {
   //
   let dbFieldName: string = "body";
@@ -38,10 +44,14 @@ export const handleClick = async ({
   } else if (tag === "draft-en") {
     savedTitleRef.current = newSavedTitleRef!.current;
     dbFieldName = "body";
+    setLanguage("en");
+    sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   } else if (tag === "draft-es") {
     savedTitleRef.current =
       jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
     dbFieldName = "es-body";
+    setLanguage("es");
+    sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   }
   //
   //
