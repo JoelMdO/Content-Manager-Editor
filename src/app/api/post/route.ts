@@ -10,8 +10,8 @@ import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 import { JWT } from "next-auth/jwt";
 import crypto from "crypto";
 import { Database } from "firebase-admin/lib/database/database";
-import { initializeFirebaseAdmin } from "../../../../firebase_admin_DeCav";
-import { adminDB } from "../../../../firebase-admin";
+import { initializeFirebaseAdmin } from "../../../services/db/firebase_admin_DeCav";
+import { adminDB } from "../../../services/db/firebase-admin";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------

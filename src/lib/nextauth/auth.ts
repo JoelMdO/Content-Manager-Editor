@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { FirestoreAdapter } from "@auth/firebase-adapter";
-import { adminDB } from "../../../firebase-admin";
+import { adminDB } from "../../services/db/firebase-admin";
 import CredentialsProvider from "next-auth/providers/credentials";
 import callHub from "@/services/api/call_hub";
 

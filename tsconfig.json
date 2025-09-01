@@ -27,7 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "firebaseMain.js",
+    "src/services/db/firebaseMain.js",
     "next-env.d.ts",
     "src/app/store.ts",
     "src/services/handle_image.js",
