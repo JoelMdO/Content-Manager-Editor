@@ -1,6 +1,6 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import { dbFireStore } from "../../../../firebaseMain";
+import { dbFireStore } from "../../../services/db/firebaseMain";
 import {
   collection,
   getDocs,

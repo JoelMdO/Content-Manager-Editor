@@ -1,4 +1,4 @@
-import { dbFireStore } from "../../../../firebaseMain";
+import { dbFireStore } from "../../../services/db/firebaseMain";
 import { doc, getDoc } from "firebase/firestore";
 
 export default async function handleNoteClick(id: string) {
