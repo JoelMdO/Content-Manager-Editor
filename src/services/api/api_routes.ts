@@ -23,12 +23,24 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       //## POST
       case "post":
       case "translate":
+<<<<<<< HEAD
+=======
+        // console.log('"doing translate at api routes', JWT!);
+        console.log('"doing post at api routes', token!);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         endPoint = type;
         body = data as FormData;
         body.append("token", token || "");
         headers["Authorization"] = `Bearer ${JWT!}`;
         credentials = "include";
         break;
+      // //## AUTH THROUGH EMAIL AND FIREBASE
+      // case "sign-in-by-email":
+      //   endPoint = "signin";
+      //   body = JSON.stringify(data);
+      //   headers["Content-Type"] = "application/json";
+      //   credentials = "include";
+      //   break;
       //## PLAYBOOK SAVE
       case "playbook-save":
         endPoint = "save";
@@ -69,6 +81,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,
+<<<<<<< HEAD
         body: body,
       });
     }
@@ -81,7 +94,24 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,
+=======
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         body: body,
+      });
+    }
+    ///-----------------------------------------------
+    /// From api/translate return the body.
+    ///-----------------------------------------------
+    if (jsonResponse.message === "Data translated successfully") {
+      const body = jsonResponse.body;
+      const sessionStorageBody = jsonResponse.sessionStorageBody;
+      console.log("sessionStorageBody at apiRoutes:", sessionStorageBody);
+
+      return NextResponse.json({
+        status: jsonResponse.status,
+        message: jsonResponse.message,
+        body: body,
+        sessionStorageBody: sessionStorageBody,
       });
       ///-----------------------------------------------
       /// From api/search return the meta.
@@ -94,6 +124,8 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         body: body,
       });
     } else {
+      console.log("response at apiRoutes:", jsonResponse);
+
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,

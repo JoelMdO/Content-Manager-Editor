@@ -1,11 +1,18 @@
+<<<<<<< HEAD
+=======
+import { ButtonProps } from "../../menu/button_menu/type/type_menu_button";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 //=========================================================
 // HANDLE CLICK, purpose:
 // Update UI with the draft article content
 //=========================================================
+<<<<<<< HEAD
 
 import { set } from "lodash";
 import { useCallback } from "react";
 
+=======
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
   newSavedTitleRef?: React.RefObject<string>;
@@ -15,11 +22,18 @@ type HandleClickProps = {
   setDraftArticleButtonClicked?: (clicked: boolean) => void;
   tag: string;
   newTitleRef?: string;
+<<<<<<< HEAD
   setLanguage?: (language: "en" | "es") => void;
 };
 
 // Updated function to accept a single props object
 export const handleClick = ({
+=======
+};
+
+// Updated function to accept a single props object
+export const handleClick = async ({
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   newSavedTitleRef,
   DRAFT_KEY,
   savedTitleRef,
@@ -27,6 +41,7 @@ export const handleClick = ({
   setDraftArticleButtonClicked,
   tag,
   newTitleRef,
+<<<<<<< HEAD
   setLanguage,
 }: HandleClickProps) => {
   //
@@ -35,21 +50,34 @@ export const handleClick = ({
   if (DRAFT_KEY === null || DRAFT_KEY === undefined) {
     DRAFT_KEY = `draft-articleContent-${db}`;
   }
+=======
+}: HandleClickProps) => {
+  //
+  let dbFieldName: string = "body";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   const articleStored = localStorage.getItem(DRAFT_KEY);
   const jsonArticle = JSON.parse(articleStored!);
   //
   if (tag === "translated") {
     savedTitleRef.current = newTitleRef!;
+<<<<<<< HEAD
+=======
+    console.log('"tag" is translated');
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     dbFieldName = "es-body";
   } else if (tag === "draft-en") {
     savedTitleRef.current = newSavedTitleRef!.current;
     dbFieldName = "body";
+<<<<<<< HEAD
     setLanguage!("en");
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
+=======
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   } else if (tag === "draft-es") {
     savedTitleRef.current =
       jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
     dbFieldName = "es-body";
+<<<<<<< HEAD
     setLanguage!("es");
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   }
@@ -59,6 +87,18 @@ export const handleClick = ({
     //
     let preSavedBodyRef =
       jsonArticle.find((item: any) => item.type === dbFieldName)?.content || "";
+=======
+  }
+  console.log("DRAFT_KEY at handleClick:", DRAFT_KEY);
+  //
+  //
+  if (jsonArticle) {
+    //console.log("article at draft article:", jsonArticle);
+    //
+    let preSavedBodyRef =
+      jsonArticle.find((item: any) => item.type === dbFieldName)?.content || "";
+    console.log('"preSavedBodyRef" before replacing images:', preSavedBodyRef);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
     //-------------------------------------------------------------------------------------
     // Purpose: Load images from IndexedDB and replace <img src="{image_url_placeholder}">
@@ -66,18 +106,95 @@ export const handleClick = ({
     //-------------------------------------------------------------------------------------
     try {
       let images: any[] = [];
+<<<<<<< HEAD
 
       images = jsonArticle.filter((item: any) => item.type === "image");
 
       for (const image of images) {
+=======
+      //try {
+      //   const db: IDBDatabase = await new Promise((resolve, reject) => {
+      //     const request = window.indexedDB.open("imageStore", 2); // bump to force upgrade
+      //     request.onupgradeneeded = (event) => {
+      //       const db = (event.target as IDBOpenDBRequest).result;
+      //       if (!db.objectStoreNames.contains("images")) {
+      //         db.createObjectStore("images", { keyPath: "id" });
+      //         //console.log("✅ Created 'images' store");
+      //       } else {
+      //         //console.log("ℹ️ 'images' store already exists in upgrade.");
+      //       }
+      //     };
+      //     request.onsuccess = (event) =>
+      //       resolve((event.target as IDBOpenDBRequest).result);
+
+      //     request.onerror = () => {
+      //       reject("Failed to open IndexedDB");
+      //       db.close();
+      //     };
+      //   });
+
+      //   const transaction = db.transaction("images", "readonly");
+      //   const store = transaction.objectStore("images");
+      //   //console.log("Object stores:", db.objectStoreNames);
+      //   images = await new Promise<any[]>((resolve, reject) => {
+      //     const allImages: any[] = [];
+      //     const request = store.getAll();
+      //     request.onsuccess = () => {
+      //       //console.log("🧾 store.getAll result:", request.result);
+      //     };
+      //     const cursorRequest = store.openCursor();
+      //     cursorRequest.onsuccess = (event) => {
+      //       const cursor = (event.target as IDBRequest<IDBCursorWithValue>)
+      //         .result;
+      //       //console.log('"cursor" at draft article:', cursor);
+
+      //       if (cursor) {
+      //         //console.log("Found cursor value:", cursor.value);
+      //         allImages.push(cursor.value);
+      //         cursor.continue();
+      //       } else {
+      //         //console.log("Finished reading from cursor.");
+      //         resolve(allImages);
+      //       }
+      //       db.close();
+      //     };
+      //     request.onerror = () =>
+      //       reject("Failed to retrieve images from IndexedDB");
+      //     db.close();
+      //   });
+      //   //console.log('"images" from IndexedDB:', images);
+      // } catch (dbErr) {
+      //   console.error("Error opening IndexedDB or retrieving images:", dbErr);
+      // }
+      // console.log('"images" from IndexedDB:', images);
+
+      // if (images.length > 0) {
+      //   console.log("images more than 1 at indexDb");
+      //   console.log(
+      //     '"preSavedBodyRef" before replacing images:',
+      //     preSavedBodyRef
+      //   );
+      images = jsonArticle.filter((item: any) => item.type === "image");
+
+      for (const image of images) {
+        // const regex = '<img src="{image_url_placeholder}">';
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         // Create a regex to match the <img> tag and its associated <p> tag with the image.fileName
         const regex = new RegExp(
           `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${image.id}</p>`,
           "g"
         );
+<<<<<<< HEAD
 
         // Only generate blobUrl for valid images
         // const blobUrl = URL.createObjectURL(image.data);
+=======
+        //console.log("regex at images article:", regex);
+
+        // Only generate blobUrl for valid images
+        // const blobUrl = URL.createObjectURL(image.data);
+        // console.log("blobUrl at draft article:", blobUrl);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
         preSavedBodyRef = preSavedBodyRef.replace(
           regex,
@@ -85,6 +202,10 @@ export const handleClick = ({
         );
       }
       //}
+<<<<<<< HEAD
+=======
+      //console.log("preSavedBodyRef after replacing images:", preSavedBodyRef);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     } catch (err) {
       console.error("Error loading images from IndexedDB:", err);
     }
@@ -95,11 +216,25 @@ export const handleClick = ({
       .replace(/<div>/g, "")
       .replace(/<\/div>/g, "")
       .replace(/<br\s*\/?>/g, "___LINE_BREAK___")
+<<<<<<< HEAD
       .replace(/___LINE_BREAK___/g, "<br>");
 
     // Update the body reference
     savedBodyRef.current = preSavedBodyRef;
     //-------------------------------------------------------------------------------------
     setDraftArticleButtonClicked!(true);
+=======
+      // .replace(/<(?!img|span|a\\b)[^>]*>/g, "")
+      .replace(/___LINE_BREAK___/g, "<br>");
+    console.log("preSavedBodyRef after replacing tags:", preSavedBodyRef);
+
+    // Update the body reference
+    savedBodyRef.current = preSavedBodyRef;
+    // if (tag === "draft") {
+    console.log("savedBodyRef at handleClick:", savedBodyRef.current);
+
+    setDraftArticleButtonClicked!(true);
+    //}
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   }
 };

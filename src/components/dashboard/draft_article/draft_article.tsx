@@ -4,6 +4,10 @@ import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import { handleClick } from "./utils/handle_click";
 import draftArticleText from "../../../constants/draft_article_text.json";
 import { iconsMenu } from "../../../constants/icons";
+<<<<<<< HEAD
+=======
+// import replacePlaceholderWithImage from "./menu/button_menu/utils/images_edit/replace_placeholder_with_img";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
 const DraftArticle = () => {
   //
@@ -17,7 +21,10 @@ const DraftArticle = () => {
     setDraftArticleButtonClicked,
     setText,
     text,
+<<<<<<< HEAD
     setLanguage,
+=======
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   } = useContext(MenuContext) as ButtonProps;
   const newSavedTitleRef = useRef<string>("");
   // NOT USED const newSavedBodyRef = useRef<string>("");
@@ -33,6 +40,7 @@ const DraftArticle = () => {
   useEffect(() => {
     //
     const articleStored = localStorage.getItem(DRAFT_KEY);
+<<<<<<< HEAD
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
 
@@ -41,6 +49,27 @@ const DraftArticle = () => {
       //
       setText(newSavedTitleRef.current);
       //
+=======
+    // console.log(
+    //   "articleStored from localStorage at draft article:",
+    //   articleStored
+    // );
+    //}
+    if (articleStored) {
+      const jsonArticle = JSON.parse(articleStored);
+      // console.log("jsonArticle at draft article:", jsonArticle);
+
+      newSavedTitleRef.current =
+        jsonArticle.find((item: any) => item.type === "title")?.content || "";
+      // console.log("savedTitleRef at draftarticle:", newSavedTitleRef.current);
+      //  console.log("savedBodyRef at draftarticle:", newSavedBodyRef.current);
+      //
+      setText(newSavedTitleRef.current);
+      //
+      //sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
+      //sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
+      //sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     } else {
       setText("Without Draft Articles");
     }
@@ -75,7 +104,10 @@ const DraftArticle = () => {
                   savedBodyRef: savedBodyRef,
                   setDraftArticleButtonClicked: setDraftArticleButtonClicked,
                   tag: button.tag,
+<<<<<<< HEAD
                   setLanguage: setLanguage,
+=======
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
                 });
               }}
             >
@@ -85,6 +117,28 @@ const DraftArticle = () => {
             </button>
           </div>
         ))}
+<<<<<<< HEAD
+=======
+        {/* <div className="flex h-[2.5dvh] md:h-[4.5dvh] bg-gray-500 w-[0.7] ml-1 mr-1"></div>
+        <button
+          type="button"
+          className="flex w-15 h-15"
+          onClick={() => {
+            handleClick({
+              newSavedTitleRef: newSavedTitleRef,
+              DRAFT_KEY: DRAFT_KEY,
+              savedTitleRef: savedTitleRef,
+              savedBodyRef: savedBodyRef,
+              setDraftArticleButtonClicked: setDraftArticleButtonClicked,
+              tag: "draft-es",
+            });
+          }}
+        >
+          <span className="text-2xl flex items-center justify-center">
+            {iconsMenu.spanish}
+          </span>
+        </button> */}
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
       </div>
     </div>
   );

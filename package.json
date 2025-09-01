@@ -25,10 +25,18 @@
     "isomorphic-dompurify": "^2.25.0",
     "js-cookie": "^3.0.5",
     "jsdom": "^26.1.0",
+<<<<<<< HEAD
     "lodash": "^4.17.21",
     "lucide-react": "^0.487.0",
     "mongodb": "^6.15.0",
     "next": "^15.5.2",
+=======
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.487.0",
+    "mongodb": "^6.15.0",
+    "next": "^15.4.2",
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     "next-auth": "^4.24.11",
     "nookies": "^2.5.2",
     "react": "^18.3.1",
@@ -47,11 +55,18 @@
   "devDependencies": {
     "@cypress/react": "^9.0.1",
     "@cypress/webpack-dev-server": "^4.1.0",
+<<<<<<< HEAD
     "@eslint/plugin-kit": "^0.3.5",
     "@tailwindcss/postcss": "^4.0.5",
     "@types/js-cookie": "^3.0.6",
     "@types/jsdom": "^21.1.7",
     "@types/jsonwebtoken": "^9.0.10",
+=======
+    "@eslint/plugin-kit": "^0.3.3",
+    "@tailwindcss/postcss": "^4.0.5",
+    "@types/js-cookie": "^3.0.6",
+    "@types/jsdom": "^21.1.7",
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     "@types/react": "^19.1.6",
     "@types/sanitize-html": "^2.13.0",
     "@types/swagger-jsdoc": "^6.0.4",

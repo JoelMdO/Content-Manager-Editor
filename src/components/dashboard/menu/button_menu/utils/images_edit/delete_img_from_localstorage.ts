@@ -14,7 +14,18 @@ export function removeStoredImage(
         (item: any) => item.imageId !== imageIdToRemove
       );
       storage.setItem(key, JSON.stringify(filtered));
+<<<<<<< HEAD
     } catch (err) {}
+=======
+      console.log(
+        `Removed image ${imageIdToRemove} from ${
+          useSession ? "session" : "local"
+        }Storage.`
+      );
+    } catch (err) {
+      console.error("Error removing image:", err);
+    }
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   };
 
   if (dbName === "") {

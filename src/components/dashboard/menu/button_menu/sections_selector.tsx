@@ -9,10 +9,29 @@ const SectionSelector = () => {
   //===================================================
   const { selectedSection, setSelectedSection, sectionsDialogRef, dbIsReady } =
     useContext(MenuContext) as ButtonProps;
+<<<<<<< HEAD
+=======
+  // let { dbNameToSearch } = useContext(MenuContext) as ButtonProps;
+
+  // console.log(
+  //   "db at sections selector:",
+  //   dbNameToSearch,
+  //   "sections:",
+  //   selectedSection,
+  //   "sectionsDialogRef:",
+  //   sectionsDialogRef
+  // );
+
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   //
   //------------------------------------------
   // Purpose: Safely get db value from dbNameToSearch, handling both string and RefObject<string>.
   //------------------------------------------
+<<<<<<< HEAD
+=======
+  // let db = (dbNameToSearch.current) || "DeCav";
+  // let dbName = (dbNameToSearch as string) || "DeCav";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   let dbName = "DeCav";
   if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
     dbName = sessionStorage.getItem("db") || "DeCav";
@@ -22,6 +41,11 @@ const SectionSelector = () => {
     dbName = dbName;
   }
   const [isClicked, setIsClicked] = useState(false);
+<<<<<<< HEAD
+=======
+  //console.log("sections", sectionsDialogRef);
+  //console.log("dbName at sections searcher:", dbName);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
   //
   ///--------------------------------------------------------
@@ -33,6 +57,10 @@ const SectionSelector = () => {
       if (!dialog) return;
       if (event.target === dialog) {
         dialog.close();
+<<<<<<< HEAD
+=======
+        // console.log("Dialog closed");
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         setSelectedSection!("Select category");
       }
     }
@@ -67,12 +95,22 @@ const SectionSelector = () => {
   //
   //
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+<<<<<<< HEAD
+=======
+    // console.log("doing handleChange");
+    // console.log("dbName sections selector:", dbName);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     setSelectedSection!(e.target.value);
     let articleContent: { type: string; content: string }[] = [];
     //
     articleContent = JSON.parse(
       sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
     );
+<<<<<<< HEAD
+=======
+    // console.log("Selected section:", e.target.value);
+    // console.log("articleContent before:", articleContent);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
     //
     articleContent.push({ type: "section", content: e.target.value });
@@ -80,6 +118,10 @@ const SectionSelector = () => {
       `articleContent-${dbName}`,
       JSON.stringify(articleContent)
     );
+<<<<<<< HEAD
+=======
+    // console.log("articleContent after:", articleContent);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
     // Clear the section selector dialog
     sectionsDialogRef?.current?.close();

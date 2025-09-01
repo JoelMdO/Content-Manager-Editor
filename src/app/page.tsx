@@ -49,10 +49,11 @@ const Login: React.FC = () => {
   /// UI with a login form and a contact button for the
   /// user to reach the software engineer.
   ///--------------------------------------------------------
-  if (isDev) {
-    // Directly render dashboard for development
-    return <Dashboard />;
-  }
+  // //TODO dont delete on test only on production
+  // if (isDev) {
+  //   //Directly render dashboard for development
+  //   return <Dashboard />;
+  // }
   return (
     <>
       <div className="relative w-full min-h-screen flex flex-col justify-center px-4 sm:px-8 md:px-16">

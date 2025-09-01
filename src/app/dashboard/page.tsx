@@ -1,4 +1,5 @@
 "use client";
+<<<<<<< HEAD
 import React, { useRef, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import dbSelector from "../../components/alerts/db_selector";
@@ -6,6 +7,24 @@ import { ButtonProps } from "../../components/dashboard/menu/button_menu/type/ty
 import MenuContext from "../../components/dashboard/menu/button_menu/context/menu_context";
 import DraftArticle from "../../components/dashboard/draft_article/draft_article";
 import AutoSaveScreen from "../../components/loaders/auto_save";
+=======
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  // createContext,
+  // useContext,
+} from "react";
+import MenuContext from "../../components/dashboard/menu/button_menu/context/menu_context";
+// Remove ButtonProps import, not needed for context
+
+import dynamic from "next/dynamic";
+import dbSelector from "../../components/alerts/db_selector";
+import { ButtonProps } from "@/components/dashboard/menu/button_menu/type/type_menu_button";
+import DraftArticle from "@/components/dashboard/draft_article/draft_article";
+import AutoSaveScreen from "@/components/loaders/auto_save";
+// import { useGetDraftArticleHook } from "@/hooks/useDraftArticle";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 const ImageInput = dynamic(
   () => import("../../components/dashboard/menu/button_menu/image_input")
 );
@@ -32,12 +51,23 @@ const DashboardEditor = dynamic(
   () => import("../../components/dashboard/dashboard_editor")
 );
 //
+<<<<<<< HEAD
+=======
+// const MenuContext = createContext<Partial<ButtonProps> | null>(null);
+
+// Do not export useMenuContext from this file
+//
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 const Dashboard: React.FC = () => {
   //
   const [isPlaceHolderTitle, setPlaceHolderTitle] = useState<boolean>(true);
   const [isPlaceHolderArticle, setPlaceHolderArticle] = useState<boolean>(true);
   const [selectedSection, setSelectedSection] =
     useState<string>("Select category"); // TODO check if its necesary
+<<<<<<< HEAD
+=======
+  // const [isFontStyleOpen, setIsFontStyleOpen] = useState<boolean>(false);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
   const [translationReady, setTranslationReady] = useState(false);
   const [isDraftArticleButtonClicked, setDraftArticleButtonClicked] =
@@ -73,7 +103,14 @@ const Dashboard: React.FC = () => {
     if (window.innerWidth > 768) {
       setIsMediumScreen(true);
     }
+<<<<<<< HEAD
 
+=======
+    console.log("dbNameToSearch.current:", dbNameToSearch.current);
+
+    setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
+    console.log("DRAFT_KEY: at useeffect", DRAFT_KEY);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     if (sessionStorage.getItem("db") !== null) {
       setDbIsReady(true);
     }
@@ -81,6 +118,13 @@ const Dashboard: React.FC = () => {
   //
   useEffect(() => {
     dbNameToSearch.current = sessionStorage.getItem("db") as string;
+<<<<<<< HEAD
+=======
+    console.log(
+      "dbNameToSearch.current after dbSelector:",
+      dbNameToSearch.current
+    );
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
   }, [dbIsReady]);
   //
@@ -89,6 +133,10 @@ const Dashboard: React.FC = () => {
   // Context creation
   ///--------------------------------------------------------
   const menuContextValue: Partial<ButtonProps> = {
+<<<<<<< HEAD
+=======
+    // setIsFontStyleOpen,
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     setSelectedSection,
     selectedSection,
     isMediumScreen,
@@ -139,11 +187,28 @@ const Dashboard: React.FC = () => {
           <aside className="hidden md:flex w-[25vw] h-full gap-y-2 bg-gray-800 text-white items-center flex-col">
             <DraftArticle />
             {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
+<<<<<<< HEAD
             <MenuDesktop />
+=======
+            <MenuDesktop
+            // editorRefs={editorRefs}
+            // theTitle={theTitle}
+            // theBody={theBody}
+            // setIsFontStyleOpen={setIsFontStyleOpen}
+            // setSelectedSection={setSelectedSection}
+            // selectedSection={selectedSection}
+            // isMediumScreen={isMediumScreen}
+            // dbNameToSearch={dbNameToSearch.current}
+            />
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
             <HomeButton />
             <LogOutButton />
           </aside>
           {/* MENU MOBILE */}
+<<<<<<< HEAD
+=======
+          {/* {isFontStyleOpen && <FontStyleUI />} */}
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
           <nav className="md:hidden w-full h-[12dvh] bg-gray-800">
             <div className="w-full flex flex-row justify-between mt-2 px-2">
               {/* HomeButton at the start (left) */}
@@ -159,7 +224,20 @@ const Dashboard: React.FC = () => {
                 <LogOutButton />
               </div>
             </div>
+<<<<<<< HEAD
             <MenuMobile />
+=======
+            <MenuMobile
+            // editorRefs={editorRefs}
+            // theTitle={theTitle}
+            // theBody={theBody}
+            // setIsFontStyleOpen={setIsFontStyleOpen}
+            // setSelectedSection={setSelectedSection}
+            // isMediumScreen={isMediumScreen}
+            // selectedSection={selectedSection}
+            // dbNameToSearch={dbNameToSearch.current}
+            />
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
           </nav>
           {/* Main Content */}
           <main className="flex-1 p-4 pt-2 h-[80dvh] md:h-full md:w-[75vw] overflow-y-auto">

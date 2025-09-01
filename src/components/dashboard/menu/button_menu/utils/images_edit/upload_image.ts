@@ -1,5 +1,9 @@
 import { ChangeEvent } from "react";
 import callHub from "../../../../../../services/api/call_hub";
+<<<<<<< HEAD
+=======
+// import saveImageTemporally from "./save_img_temp";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 //
 interface TrackedImage {
   id: string;
@@ -27,6 +31,10 @@ const uploadImage = async (
     // Store reference before API call
     const editorRefBefore = editorRef;
     if (!file || !editorRef) {
+<<<<<<< HEAD
+=======
+      // console.log("no file or not editorRef", file, editorRef);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
       return { status: 400, message: "No file or editor reference provided" };
     }
 
@@ -53,6 +61,10 @@ const uploadImage = async (
           .toString()
           .slice(-2)}`;
         const imageId = `${formattedDate}-${fileName}`;
+<<<<<<< HEAD
+=======
+        //console.log("Image ID:", imageId);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
         img.setAttribute("id", imageId); // Set image Id to allow selection
         // Add a reference to the image in the editor
@@ -66,6 +78,17 @@ const uploadImage = async (
         document.body.appendChild(img);
         // Create a temporary blob URL for image preview
         const objectUrl = URL.createObjectURL(file);
+<<<<<<< HEAD
+=======
+        // Save updated image temporally
+        // CHANGED TO NOT USE INDEXDB const responseSaveImage = (await saveImageTemporally(
+        //   file,
+        //   imageId
+        // )) as {
+        //   status: number;
+        // };
+        // if (responseSaveImage.status === 205) return responseSaveImage;
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         // Get current article content from sessionStorage
         const articleContent = JSON.parse(
           sessionStorage.getItem(`articleContent-${dbName}`) || "[]"

@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+<<<<<<< HEAD
+=======
+// import ReduxProvider from "../services/redux_provider";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -42,6 +46,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={lexend.className}>
+<<<<<<< HEAD
+=======
+        {/* <ReduxProvider>{children}</ReduxProvider> */}
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         {children}
         <SpeedInsights />
         <Analytics />

@@ -5,6 +5,10 @@ import BackPageButton from "../../components/buttons/back_page_button";
 import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "../../components/buttons/logo_button";
 import categories from "../../constants/categories";
+<<<<<<< HEAD
+=======
+// import playbookCustomButton from "../../components/buttons/playbook_custom_button/button_dashboard";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 import callHub from "../../services/api/call_hub";
 import dynamic from "next/dynamic";
 import errorAlert from "../../components/alerts/error";
@@ -14,7 +18,11 @@ import handleSelectChange from "../../components/playbook/utils/readPlaybook/han
 import text from "../../constants/readPlaybook_data_text.json";
 import withSessionProvider from "../../utils/withSessionProvider";
 import { PlaybookMeta } from "../../components/playbook/types/plabookMeta";
+<<<<<<< HEAD
 import "../../components/playbook/styles/playbook.css";
+=======
+import "../../styles/readPlaybook.css";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 import PlaybookCustomButton from "../../components/playbook/playbook_custom_button/button_dashboard";
 
 //

@@ -6,7 +6,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/nextauth/auth";
 import createLog from "../../../services/authentication/create_log";
 import { dataType } from "@/types/dataType";
+<<<<<<< HEAD
 import { getToken } from "next-auth/jwt";
+=======
+import { getToken, JWT } from "next-auth/jwt";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   //
@@ -16,6 +20,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let nextAuthToken: string | undefined = "";
   let sessionId: string | undefined = "";
   let formData: FormData = new FormData();
+  console.log('"Request received at API Hub"');
 
   ///___________________________________________________
   /// Check the content type to see if the request
@@ -26,8 +31,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (contentType.includes("application/json")) {
       const getDataAtApiHub = await req.json();
+      console.log("getDataAtApiHub:", getDataAtApiHub);
 
       dataApiHub = getDataAtApiHub.data;
+      console.log("dataApiHub:", dataApiHub);
 
       type = getDataAtApiHub.type;
       dataApiHub = dataApiHub;
@@ -60,6 +67,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (session && type !== "sign-in-by-email") {
       token = createLog(session?.user.id);
+      console.log('"token" at API Hub:', token);
     }
 
     if ((session && type === "post") || (session && type === "translate")) {
@@ -77,6 +85,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ status: 403, message: "Unauthorized data" });
     }
     //
+    console.log("Type of request received at API Hub:", type);
     switch (type) {
       ///--------------------------------------------------------
       // For Clean Image and Clean Link, the response should be back to the client
@@ -117,6 +126,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
         break;
       case "post":
+        console.log("session at post on api hub:", sessionId);
+
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
@@ -127,6 +138,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         nextAuthToken = nextToken?.accessToken;
         break;
       case "translate":
+<<<<<<< HEAD
+=======
+        console.log("translate at api hub", dataApiHub);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
@@ -135,10 +150,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           secret: process.env.NEXTAUTH_SECRET,
         });
         nextAuthToken = next?.accessToken;
+<<<<<<< HEAD
+=======
+        console.log("🔍 Full token object:", JSON.stringify(next, null, 2));
+        console.log("🔍 Access token exists:", !!next?.accessToken);
+        console.log("🔍 Access token value:", next?.accessToken);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
         if (!nextAuthToken) {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+<<<<<<< HEAD
+=======
+        console.log("token at callhub:", nextAuthToken);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
         break;
       default:
         dataApiHub = dataApiHub;
@@ -172,13 +197,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///-----------------------------------------------
     if (jsonResponse.message === "Data translated successfully") {
       const body = jsonResponse.body;
+<<<<<<< HEAD
       // const sessionStorageBody = jsonResponse.sessionStorageBody;
+=======
+      const sessionStorageBody = jsonResponse.sessionStorageBody;
+      console.log("sessionStorageBody at apiRoutes:", sessionStorageBody);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
       return NextResponse.json({
         status: jsonResponse.status,
         message: jsonResponse.message,
         body: body,
+<<<<<<< HEAD
         // sessionStorageBody: sessionStorageBody,
+=======
+        sessionStorageBody: sessionStorageBody,
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
       });
       ///-----------------------------------------------
       /// From api/search return the meta.

@@ -14,8 +14,12 @@ type styleplaybookCustomButton = {
 
 export function playbookButtonStyle(
   type: string,
+<<<<<<< HEAD
   isCreating: boolean | undefined,
   noteViewMode: "view" | "edit"
+=======
+  isCreating: boolean | undefined
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   // isClicked: boolean
 ): styleplaybookCustomButton {
   //

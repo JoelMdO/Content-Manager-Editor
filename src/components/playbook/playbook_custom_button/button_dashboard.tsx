@@ -1,10 +1,44 @@
+<<<<<<< HEAD
 import { useMemo, useState, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+=======
+import React, { useMemo, useState, useCallback } from "react";
+// import { useSelector } from "react-redux";
+import Image from "next/image";
+// import successAlert from "../alerts/sucess";
+// import errorAlert from "../alerts/error";
+import { useRouter } from "next/navigation";
+// import postButtonClicked from "../../utils/buttons/save_button_clicked";
+// import emailMe from "@/utils/buttons/email_me";
+// import handleNoteClick from "../../utils/playbook/handle_note_click";
+// import { PlaybookMeta } from "../../../types/plabookMeta";
+// import { RootState } from "@/store/store";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 import { playbookButtonStyle } from "./styles/style_playbook_custombutton";
 import { playbookButtonLogic } from "./utils/logic_playbook_custombutton";
 import { CustomDashButtonProps } from "./type/type_playbook_custombutton";
 
+<<<<<<< HEAD
+=======
+// interface ButtonProps {
+//   type: string;
+//   onClick?: () => void;
+//   isCreating?: boolean;
+//   id?: string;
+//   setViewDetails?: React.Dispatch<React.SetStateAction<boolean>>;
+//   setEntries?: React.Dispatch<React.SetStateAction<PlaybookMeta[] | undefined>>;
+//   setUpdateNote?: React.Dispatch<
+//     React.SetStateAction<{ isUpdateNote: boolean; noteId: string | null }>
+//   >;
+//   setIsCreating?: React.Dispatch<React.SetStateAction<boolean>>;
+//   "data-cy"?: string;
+//   resetForm?: () => void;
+//   DRAFT_KEY?: (db: string) => string;
+//   dbNameToSearch?: string; // Optional prop for dbNameToSearch
+// }
+
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   type,
   onClick,
@@ -23,6 +57,12 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   const [isClicked, setIsClicked] = useState(false);
   const [noteViewMode, setNoteViewMode] = useState<"view" | "edit">("view");
 
+<<<<<<< HEAD
+=======
+  // const italic = useSelector((state: RootState) => state.data_state?.fontStyle);
+  // const bold = useSelector((state: RootState) => state.data_state?.fontWeight);
+
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   const {
     text,
     isNew,
@@ -36,8 +76,13 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
     height,
     width,
   } = useMemo(
+<<<<<<< HEAD
     () => playbookButtonStyle(type!, isCreating, noteViewMode),
     [type, isCreating, isClicked, noteViewMode]
+=======
+    () => playbookButtonStyle(type!, isCreating),
+    [type, isCreating, isClicked]
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   );
 
   ///--------------------------------------------------------
@@ -74,6 +119,7 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
   // UI of the button
   ///--------------------------------------------------------
   return (
+<<<<<<< HEAD
     <>
       <button
         type="button"
@@ -105,6 +151,28 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
         </button>
       )}
     </>
+=======
+    <button
+      type="button"
+      data-cy={dataCity}
+      className={`${height} ${width} ${textColor} ${otherFeatures} ${shadow} ${position} ${textSmallSize} md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1 ${
+        isClicked ? "bg-cream text-black" : color
+      } hover:${hover_color}`}
+      onClick={handleClick}
+    >
+      {!isNew && (
+        <Image
+          src={icon}
+          style={{ display: isClicked ? "none" : "block" }}
+          className={`md:w-6 md:h-6 w-3 h-3 cursor-pointer ${textColor}`}
+          width={12}
+          height={12}
+          alt={`${text}-icon`}
+        />
+      )}
+      {isClicked ? "Posting" : text}
+    </button>
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   );
 };
 

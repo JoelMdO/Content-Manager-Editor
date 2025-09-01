@@ -43,13 +43,25 @@ const callHub = async (
     //## POST
     case "post":
     case "translate":
+<<<<<<< HEAD
+=======
+      console.log('"doing post at callhub", data);');
+      console.log("data at callhub for post:", data);
+
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
         : data !== undefined
         ? [data as FormDataItem]
         : [];
+<<<<<<< HEAD
+=======
+      console.log("data at callhub:", data);
+      console.log("formDataItems at callhub:", formDataItems);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
       const formData = await createFormData(type, formDataItems);
+      console.log("formData at callhub:", formData);
 
       body = formData;
       credentials = "include";
@@ -62,6 +74,8 @@ const callHub = async (
   }
   //
   try {
+    console.log("calling API hub with URL:", url);
+
     const response = await fetch(url, {
       method: "POST",
       body: body,
@@ -69,11 +83,17 @@ const callHub = async (
       credentials: credentials,
     });
     const jsonResponse = await response.json();
+    console.log("jsonResponse at callhub:", jsonResponse);
+    console.log(
+      "sessionStorageBody at callhub:",
+      jsonResponse.sessionStorageBody
+    );
 
     return {
       status: jsonResponse.status,
       message: jsonResponse.message,
       body: jsonResponse.body,
+      sessionStorageBody: jsonResponse.sessionStorageBody,
     };
     //}
   } catch (error) {

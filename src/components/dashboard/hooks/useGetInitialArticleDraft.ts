@@ -16,6 +16,7 @@ export function useGetInitialArticleDraft() {
     let articleStored: string | null = sessionStorage.getItem(
       `articleContent-${dbNameToSearch}`
     );
+<<<<<<< HEAD
 
     if (!articleStored) {
 
@@ -23,11 +24,29 @@ export function useGetInitialArticleDraft() {
     }
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
+=======
+    // console.log("articleStored from session:", articleStored);
+
+    if (!articleStored) {
+      // console.log("DRAFT_KEY:", DRAFT_KEY);
+
+      articleStored = localStorage.getItem(DRAFT_KEY);
+      // console.log("articleStored from localStorage:", articleStored);
+    }
+    if (articleStored) {
+      const jsonArticle = JSON.parse(articleStored);
+      // console.log("jsonArticle:", jsonArticle);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
       savedTitleRef.current =
         jsonArticle.find((item: any) => item.type === "title")?.content || "";
       savedBodyRef.current =
         jsonArticle.find((item: any) => item.type === "body")?.content || "";
+<<<<<<< HEAD
+=======
+      // console.log("savedTitleRef.current:", savedTitleRef.current);
+      // console.log("savedBodyRef.current:", savedBodyRef.current);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
       sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
       sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);

@@ -1,5 +1,9 @@
 import errorAlert from "../../../../../alerts/error";
 import { FormDataItem } from "../../type/formData";
+<<<<<<< HEAD
+=======
+// import getImageTemporally from "./get_img_temp";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 //
 
 //
@@ -29,6 +33,17 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
   const es_article = JSON.stringify(getContentByType("es-body"));
   const es_section = JSON.stringify(getContentByType("es-section"));
   //
+<<<<<<< HEAD
+=======
+  console.log('title after getContentByType("title"):', title);
+  console.log('id after getContentByType("id"):', id);
+  console.log('article after getContentByType("body"):', article);
+  console.log('section after getContentByType("section"):', section);
+  console.log('dbName after getContentByType("dbName"):', dbName);
+  console.log('es_title after getContentByType("es-title"):', es_title);
+  console.log('es_article after getContentByType("es-body"):', es_article);
+  console.log('es_section after getContentByType("es-section"):', es_section);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   //
   formData.append("title", title);
   formData.append("id", id);
@@ -43,6 +58,10 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
   //Filter if any image on the data
 
   if (type !== "translate") {
+<<<<<<< HEAD
+=======
+    console.log("doing next images");
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
     const imagePromises = data
       .filter(
         (
@@ -56,16 +75,43 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
       )
       .map(async (item) => {
         try {
+<<<<<<< HEAD
+=======
+          // const response = await getImageTemporally(item.fileName as string);
+          // const base64 = JSON.parse(
+          //   localStorage.getItem(dbName) || "[]"
+          // ).filter((item: any) => item.type === "image");
+          // if (!base64) return;
+          // item.forEach(async (img: any) => {
+          console.log("item.blobUrl:", item.blobUrl);
+
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
           const blob = await (await fetch(item.blobUrl)).blob(); // Convert Base64 back to Blob
           const file = new File([blob], item.imageId, { type: blob.type });
 
           formData.append(`image`, file);
+<<<<<<< HEAD
         } catch (error) {
           errorAlert("", "", error);
         }
       });
 
     await Promise.all(imagePromises);
+=======
+          console.log("Image added to formData:", item.imageId);
+          //}
+          //);
+        } catch (error) {
+          console.log("Error retrieving image:", item.imageId, error);
+
+          errorAlert("", "", error);
+        }
+      });
+    console.log("ImagePromises:", imagePromises);
+
+    await Promise.all(imagePromises);
+    console.log("ImagePromise", await Promise.all(imagePromises));
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   } else {
     //------------------------------------------
     // Purpose: For "translate" type, filter all image items and append their content as strings to formData.
@@ -78,8 +124,15 @@ const createFormData = async (type: string, data: FormDataItem[]) => {
         // Get the image content as string (e.g., base64 or identifier)
         const imageContent = JSON.stringify(getContentByType("image"));
         formData.append("image", imageContent);
+<<<<<<< HEAD
       });
   }
+=======
+        console.log("Image added to formData as string:", imageContent);
+      });
+  }
+  console.log("formData after adding images:", formData);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
   return formData;
 };

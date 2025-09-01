@@ -1,4 +1,5 @@
 import { debouncedUpdateStore } from "./utils/debounceUpdateStore";
+<<<<<<< HEAD
 import { useContext, useEffect } from "react";
 import { handleKeyBoardActions } from "./utils/handle_keyboard_actions";
 import { handleContentChange } from "./utils/handle_content_change";
@@ -8,6 +9,21 @@ import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArtic
 import TranslationLoader from "../loaders/translation_loader";
 import saveArticle from "./utils/save_article";
 import { set } from "lodash";
+=======
+import { useContext, useEffect, useRef, useState } from "react";
+import { handleKeyBoardActions } from "./utils/handle_keyboard_actions";
+import { handleContentChange } from "./utils/handle_content_change";
+import { ButtonProps } from "./menu/button_menu/type/type_menu_button";
+// import { use } from "chai";
+import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_context";
+// import { useGetInitialArticleDraft } from "../../hooks/useGetInitialArticleDraft";
+// import { subtle } from "crypto";
+import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
+import TranslationLoader from "../loaders/translation_loader";
+// import removeBase64FromImgTags from "./menu/button_menu/utils/remove_img_base64";
+import saveArticle from "./utils/save_article";
+// import AutoSaveScreen from "../loaders/auto_save";
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
 const DashboardEditor = () => {
   //
@@ -29,21 +45,52 @@ const DashboardEditor = () => {
     setOpenDialogNoSection,
     openDialogNoSection,
     sectionsDialogRef,
+<<<<<<< HEAD
     setText,
   } = useContext(MenuContext) as ButtonProps;
   //
   //
+=======
+  } = useContext(MenuContext) as ButtonProps;
+  //
+  //
+  //console.log("savedTitleRef at dashboard_editor:", savedTitleRef);
+  //console.log("savedBodyRef at dashboard_editor:", savedBodyRef);
+  //debugger;
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   ///--------------------------------------------------------
   // Get the translated article draft
   ///--------------------------------------------------------
   useTranslatedArticleDraft();
+<<<<<<< HEAD
+=======
+  //console.log("body at dashboard_editor:", savedBodyRef.current);
+
+  //--------------------------------------------------------
+  // Read the sessionStorage on page initial load, based on the corresponded db.
+  // And retrieve if any article is already created.
+  //--------------------------------------------------------
+  // useGetInitialArticleDraft();
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   ///--------------------------------------------------------
   // Update of editorRefs on every change through draftArticle button
   // or when the text has been translated.
   ///--------------------------------------------------------
   useEffect(() => {
+<<<<<<< HEAD
     const editableDiv = editorRefs?.current[1];
     if (editableDiv && savedBodyRef?.current) {
+=======
+    // console.log(
+    //   "reloading dashboard_editor, isDraftArticleButtonClicked:",
+    //   isDraftArticleButtonClicked
+    // );
+    // console.log("savedBodyRef.current:", savedBodyRef?.current);
+
+    const editableDiv = editorRefs?.current[1];
+    if (editableDiv && savedBodyRef?.current) {
+      // console.log("Setting editor body to:", savedBodyRef.current);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
       editableDiv.innerHTML = savedBodyRef.current; // Force HTML rendering
     }
   }, [isDraftArticleButtonClicked, savedBodyRef?.current]);
@@ -51,8 +98,16 @@ const DashboardEditor = () => {
   // Save to localStorage every 10 minutes (only if content exists)
   ///--------------------------------------------------------
   useEffect(() => {
+<<<<<<< HEAD
     const interval = setInterval(() => {
       const dbName = sessionStorage.getItem("db");
+=======
+    console.log("Setting up auto-save every 1 minutes for db:", dbNameToSearch);
+
+    const interval = setInterval(() => {
+      const dbName = sessionStorage.getItem("db");
+      console.log("dbName at useEffect update by timer:", dbName);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
       let currentTitle = editorRefs?.current[0]?.innerHTML || "";
       let currentBody = editorRefs?.current[1]?.innerHTML || "";
@@ -67,7 +122,11 @@ const DashboardEditor = () => {
 
       setLastAutoSave(new Date());
       //}
+<<<<<<< HEAD
     }, 10 * 60000); // 10 minutes.
+=======
+    }, 60000); // 1 minute //TODO change to 10 minutes.
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
     return () => clearInterval(interval);
   }, [dbNameToSearch, DRAFT_KEY]);
@@ -86,6 +145,10 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   useEffect(() => {
     if (openDialogNoSection) {
+<<<<<<< HEAD
+=======
+      console.log("openDialogNoSection:", openDialogNoSection);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
       sectionsDialogRef?.current?.showModal();
     }
     setOpenDialogNoSection(false);
@@ -120,6 +183,7 @@ const DashboardEditor = () => {
           }
           onInput={(e) => {
             const content = (e.target as HTMLDivElement).innerHTML;
+<<<<<<< HEAD
             handleContentChange(
               index,
               content,
@@ -127,6 +191,9 @@ const DashboardEditor = () => {
               setText,
               debouncedUpdateStore
             );
+=======
+            handleContentChange(index, content, debouncedUpdateStore);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
           }}
         >
           {index === 0

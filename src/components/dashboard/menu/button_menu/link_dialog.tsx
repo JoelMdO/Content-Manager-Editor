@@ -6,20 +6,42 @@ import { useContext, useRef } from "react";
 import { ButtonProps } from "./type/type_menu_button";
 import MenuContext from "./context/menu_context";
 
+<<<<<<< HEAD
 const LinkDialog = ({ index }: { index?: number }) => {
+=======
+const LinkDialog = ({
+  index,
+}: // setIsClicked,
+{
+  index?: number;
+  // setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   ///========================================================
   // To load links and store them in IndexedDB for later save on db.
   ///========================================================
   //
   //CONTEXT
   //=========================================================
+<<<<<<< HEAD
   const { editorRefs, dialogRef } = useContext(MenuContext) as ButtonProps;
   // Ensure dialogRef is defined
+=======
+  const { editorRefs, dialogRef, setIsClicked } = useContext(
+    MenuContext
+  ) as ButtonProps;
+  // Ensure dialogRef is defined
+  //console.log("link dialog", index, "dialogref ", dialogRef);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 
   // Ensure safe access to editorRefs
   const editorRef = editorRefs?.current ? editorRefs.current[index!] : null;
   const linkInputRef = useRef<HTMLInputElement>(null);
+<<<<<<< HEAD
 
+=======
+  // getLink value
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
   let link_url: string;
   const getLinkValue = () => {
     if (linkInputRef.current) {
@@ -58,6 +80,10 @@ const LinkDialog = ({ index }: { index?: number }) => {
                 .then((response) => {
                   linkInputRef.current!.value = "";
                   dialogRef!.current?.close();
+<<<<<<< HEAD
+=======
+                  // setIsClicked(false);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
                   if (response.status === 200) {
                     successAlert("link");
                   } else {
@@ -78,6 +104,10 @@ const LinkDialog = ({ index }: { index?: number }) => {
             type="button"
             onClick={() => {
               dialogRef!.current?.close();
+<<<<<<< HEAD
+=======
+              // setIsClicked(false);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
             }}
           >
             {text.buttons.close}

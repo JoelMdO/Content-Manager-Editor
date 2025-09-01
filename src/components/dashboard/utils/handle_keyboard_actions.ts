@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+// import deleteImageFromIndexDB from "../menu/button_menu/utils/images_edit/delete_img_from_indexdb";
+
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
 import { removeStoredImage } from "../menu/button_menu/utils/images_edit/delete_img_from_localstorage";
 
 export const handleKeyBoardActions = (
@@ -43,6 +48,10 @@ export const handleKeyBoardActions = (
           //Remove the image from IndexDB
           const refId = selectedNode.dataset.refId;
           if (refId) {
+<<<<<<< HEAD
+=======
+            // deleteImageFromIndexDB(selectedText);
+>>>>>>> 1295580d32457ddac461590b78b05994a943dd08
             removeStoredImage(selectedText, "", false);
           }
           // Remove the image reference text ImgRef
