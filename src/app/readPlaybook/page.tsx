@@ -322,11 +322,14 @@ const ReadPlaybookPage: React.FC = () => {
                         {entry.codeSnippets!.map((ref, i) => (
                           <li key={i} className="mb-1 flex items-center">
                             <Link size={14} className="mr-1 text-blue-500" />
-                            <textarea
-                              className="text-blue-500 hover:underline"
-                              value={ref.code}
-                              readOnly
-                            />
+                            <label>
+                              ""
+                              <textarea
+                                className="text-blue-500 hover:underline"
+                                value={ref.code}
+                                readOnly
+                              />
+                            </label>
                           </li>
                         ))}
                       </ul>

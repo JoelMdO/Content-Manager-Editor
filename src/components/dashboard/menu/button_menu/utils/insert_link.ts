@@ -6,7 +6,8 @@ type insertLinkPResult = { status: number; message: string };
 const insertLink = async (
   type: string,
   link_url: string,
-  editorRef?: HTMLDivElement | null
+  editorRef?: HTMLDivElement | null,
+  editableTitle?: string
 ): Promise<insertLinkPResult> => {
   ///========================================================
   // Function to insert a link at the cursor position
@@ -36,7 +37,7 @@ const insertLink = async (
       //
       if (response.status === 200) {
         //Create a component for the link
-        const link = linkWrapperHtml("link", link_url);
+        const link = linkWrapperHtml("link", link_url, editableTitle!);
         // Click to open link
         link.onclick = (e) => {
           e.preventDefault();

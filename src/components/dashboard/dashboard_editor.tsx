@@ -109,7 +109,7 @@ const DashboardEditor = () => {
             placeholder === "Title"
               ? "h-[10dvh] font-bold"
               : "h-[70dvh] md:h-[85dvh] font-normal overflow-auto"
-          } p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-white`}
+          } p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-blue-light`}
           contentEditable={true}
           onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs!)}
           suppressContentEditableWarning={true}

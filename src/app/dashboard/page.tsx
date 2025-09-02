@@ -133,7 +133,7 @@ const Dashboard: React.FC = () => {
       <MenuContext.Provider value={menuContextValue}>
         <section
           ref={pageRef}
-          className="flex flex-col md:flex-row h-screen bg-black"
+          className="flex flex-col md:flex-row h-screen bg-white"
         >
           {/* TABLET / DESKTOP */}
           <aside className="hidden md:flex w-[25vw] h-full gap-y-2 bg-gray-800 text-white items-center flex-col">
