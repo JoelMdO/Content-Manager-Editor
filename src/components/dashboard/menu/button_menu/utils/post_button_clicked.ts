@@ -24,7 +24,18 @@ const postButtonClicked = async () => {
     sectionItem === undefined ||
     sectionItem === null
   ) {
-    return { status: 206, message: "Section is empty or missing" };
+    //Check if session is available at sessionStorage when localStorage is empty
+    const checkSessionStorage = JSON.parse(
+      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+    ).find((item: any) => item.type === "section");
+    if (checkSessionStorage) {
+      articleContent.push({
+        type: "section",
+        content: checkSessionStorage.content,
+      });
+    } else {
+      return { status: 206, message: "Section is empty or missing" };
+    }
   }
   articleContent.push({ type: "dbName", content: dbName });
 
