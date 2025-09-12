@@ -55,6 +55,8 @@ const callHub = async (
       credentials = "include";
       break;
     default:
+      console.log("doing default at callHub, type:", type);
+
       body = JSON.stringify({ data: data, type: type });
       headers["Content-Type"] = "application/json";
       credentials = "include";

@@ -107,8 +107,10 @@ export async function POST(request: NextRequest) {
           error: `API returned ${response.status}: ${errorText}`,
         });
       }
+      console.log("response", response);
 
       const data = await response.json();
+      console.log("data translated:", data);
       //
 
       return NextResponse.json({

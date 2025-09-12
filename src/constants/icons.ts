@@ -12,4 +12,5 @@ export const iconsMenu = {
   translate: "🌐",
   english: "🇺🇸",
   spanish: "🇲🇽",
+  summary: "📝",
 };

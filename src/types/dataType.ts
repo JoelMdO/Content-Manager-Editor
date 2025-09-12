@@ -6,4 +6,5 @@ export type dataType =
   | FormData
   | { email: string; password: string }
   | PlaybookMetaWithUseRecord
+  | { title: string; body: string; language?: string }
   | { status: number; message: string | PlaybookMetaWithUseRecord | object };

@@ -6,11 +6,15 @@ import { ButtonProps } from "../../components/dashboard/menu/button_menu/type/ty
 import MenuContext from "../../components/dashboard/menu/button_menu/context/menu_context";
 import DraftArticle from "../../components/dashboard/draft_article/draft_article";
 import AutoSaveScreen from "../../components/loaders/auto_save";
+
 const ImageInput = dynamic(
   () => import("../../components/dashboard/menu/button_menu/image_input")
 );
 const LinkDialog = dynamic(
   () => import("../../components/dashboard/menu/button_menu/link_dialog")
+);
+const SummaryDialog = dynamic(
+  () => import("../../components/dashboard/menu/button_menu/summary_dialog")
 );
 const SectionSelector = dynamic(
   () => import("../../components/dashboard/menu/button_menu/sections_selector")
@@ -49,7 +53,8 @@ const Dashboard: React.FC = () => {
   const [dbIsReady, setDbIsReady] = useState<boolean>(false);
   const [openDialogNoSection, setOpenDialogNoSection] =
     useState<boolean>(false);
-
+  const [isSummary, setIsSummary] = useState<boolean>(false);
+  const [summaryContent, setSummaryContent] = useState<string>("");
   //
   const savedTitleRef = useRef<string>("");
   const savedBodyRef = useRef<string>("");
@@ -58,6 +63,7 @@ const Dashboard: React.FC = () => {
   const pageRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const summaryDialogRef = useRef<HTMLDialogElement | null>(null);
   const sectionsDialogRef = useRef<HTMLDialogElement | null>(null);
   const stylesDialogRef = useRef<HTMLDialogElement | null>(null);
 
@@ -119,8 +125,13 @@ const Dashboard: React.FC = () => {
     text,
     setText,
     dbIsReady,
+    summaryDialogRef,
     openDialogNoSection,
     setOpenDialogNoSection,
+    setIsSummary,
+    isSummary,
+    summaryContent,
+    setSummaryContent,
   };
   //
   ///======================================================
@@ -133,15 +144,17 @@ const Dashboard: React.FC = () => {
       <MenuContext.Provider value={menuContextValue}>
         <section
           ref={pageRef}
-          className="flex flex-col md:flex-row h-screen bg-white"
+          className="flex flex-col md:flex-row h-screen bg-gray-100"
         >
           {/* TABLET / DESKTOP */}
           <aside className="hidden md:flex w-[25vw] h-full gap-y-2 bg-gray-800 text-white items-center flex-col">
             <DraftArticle />
             {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
             <MenuDesktop />
-            <HomeButton />
-            <LogOutButton />
+            <div className="flex flex-row w-full justify-center items-center mt-2">
+              <HomeButton />
+              <LogOutButton />
+            </div>
           </aside>
           {/* MENU MOBILE */}
           <nav className="md:hidden w-full h-[12dvh] bg-gray-800">
@@ -166,8 +179,8 @@ const Dashboard: React.FC = () => {
             <DashboardEditor />
             <SectionSelector />
             <ImageInput index={1} />
-
             <LinkDialog index={1} />
+            <SummaryDialog />
           </main>
         </section>
       </MenuContext.Provider>

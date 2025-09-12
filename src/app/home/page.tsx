@@ -5,7 +5,6 @@ import LogoButton from "@/components/buttons/logo_button";
 import InopButton from "@/components/buttons/inop_button";
 import RouteButton from "@/components/buttons/routes_button";
 import text from "../../constants/homePage_data_text.json";
-
 import withSessionProvider from "../../utils/withSessionProvider";
 
 const Home: React.FC = () => {
@@ -22,6 +21,7 @@ const Home: React.FC = () => {
     }
   }, []);
   //
+
   return (
     <>
       <div className="flex flex-col md:flex-row h-screen bg-black">

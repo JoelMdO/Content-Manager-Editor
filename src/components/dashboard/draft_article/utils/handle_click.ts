@@ -2,20 +2,17 @@
 // HANDLE CLICK, purpose:
 // Update UI with the draft article content
 //=========================================================
-
-import { set } from "lodash";
-import { useCallback } from "react";
-
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
   newSavedTitleRef?: React.RefObject<string>;
-  DRAFT_KEY: string;
-  savedTitleRef: React.RefObject<string | null>;
-  savedBodyRef: React.RefObject<string | null>;
+  DRAFT_KEY?: string;
+  savedTitleRef?: React.RefObject<string | null>;
+  savedBodyRef?: React.RefObject<string | null>;
   setDraftArticleButtonClicked?: (clicked: boolean) => void;
   tag: string;
   newTitleRef?: string;
   setLanguage?: (language: "en" | "es") => void;
+  setSummaryContent?: (summaryContent: string) => void;
 };
 
 // Updated function to accept a single props object
@@ -28,6 +25,7 @@ export const handleClick = ({
   tag,
   newTitleRef,
   setLanguage,
+  setSummaryContent,
 }: HandleClickProps) => {
   //
   let dbFieldName: string = "body";
@@ -37,21 +35,59 @@ export const handleClick = ({
   }
   const articleStored = localStorage.getItem(DRAFT_KEY);
   const jsonArticle = JSON.parse(articleStored!);
+  const sessionStorageArticle = sessionStorage.getItem(`articleContent-${db}`);
+  const jsonSessionStorageArticle = JSON.parse(sessionStorageArticle!);
   //
   if (tag === "translated") {
-    savedTitleRef.current = newTitleRef!;
+    savedTitleRef!.current = newTitleRef!;
     dbFieldName = "es-body";
   } else if (tag === "draft-en") {
-    savedTitleRef.current = newSavedTitleRef!.current;
+    savedTitleRef!.current = newSavedTitleRef!.current;
     dbFieldName = "body";
     setLanguage!("en");
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   } else if (tag === "draft-es") {
-    savedTitleRef.current =
+    savedTitleRef!.current =
       jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
     dbFieldName = "es-body";
     setLanguage!("es");
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
+  } else if (tag === "summary-en") {
+    ///--------------------------------------------------------
+    // load from sessionStorage.
+    ///--------------------------------------------------------
+    setLanguage!("en");
+    let summary =
+      jsonArticle.find((item: any) => item.type === "summary")?.content || "";
+    console.log("summary from handleClick:", summary);
+
+    //---------------------------------------------------------------------
+    // Fallback to sessionStorage if not found in sessionStorage
+    //---------------------------------------------------------------------
+    if (summary === undefined || summary === null || summary === "") {
+      summary =
+        jsonSessionStorageArticle.find((item: any) => item.type === "summary")
+          ?.content || "";
+    }
+    setSummaryContent!(summary);
+    return;
+  } else if (tag === "summary-es") {
+    // load from sessionStorage.
+    setLanguage!("es");
+    let summary =
+      jsonArticle.find((item: any) => item.type === "es-summary")?.content ||
+      "";
+    //---------------------------------------------------------------------
+    // Fallback to sessionStorage if not found in sessionStorage
+    //---------------------------------------------------------------------
+    if (summary === undefined || summary === null || summary === "") {
+      summary =
+        jsonSessionStorageArticle.find(
+          (item: any) => item.type === "es-summary"
+        )?.content || "";
+    }
+    setSummaryContent!(summary);
+    return;
   }
   //
   //
@@ -98,7 +134,7 @@ export const handleClick = ({
       .replace(/___LINE_BREAK___/g, "<br>");
 
     // Update the body reference
-    savedBodyRef.current = preSavedBodyRef;
+    savedBodyRef!.current = preSavedBodyRef;
     //-------------------------------------------------------------------------------------
     setDraftArticleButtonClicked!(true);
   }

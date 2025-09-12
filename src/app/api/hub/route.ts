@@ -31,6 +31,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
       type = getDataAtApiHub.type;
       dataApiHub = dataApiHub;
+      console.log("type at api/hub with json:", type);
+      console.log('"dataApiHub at api/hub with json":', dataApiHub);
     } else {
       /// For request including files.
       formData = await req.formData();
@@ -50,6 +52,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Check if the request is authenticated
     ///--------------------------------------------------------
     const session = await getServerSession(authOptions);
+    console.log('"session at api/hub":', session);
 
     if (!session && type !== "sign-in-by-email") {
       return NextResponse.json({
@@ -62,8 +65,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       token = createLog(session?.user.id);
     }
 
-    if ((session && type === "post") || (session && type === "translate")) {
+    if (
+      (session && type === "post") ||
+      (session && type === "translate") ||
+      (session && type === "summary")
+    ) {
+      console.log("type at api/hub with session:", type);
       sessionId = session.user?.id;
+      console.log("sessionId at api/hub with session:", sessionId);
     }
 
     ///-----------------------------------------------
@@ -71,6 +80,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///-----------------------------------------------
 
     const statusSanitize = await sanitizeData(dataApiHub, type);
+    console.log('"statusSanitize at api/hub":', statusSanitize);
 
     //
     if (statusSanitize.status != 200) {
@@ -140,6 +150,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         break;
+      case "summary":
+        console.log("doing summary at api/hub");
+        console.log("dataApiHub", dataApiHub);
+
+        dataApiHub = dataApiHub;
+        type = type;
+        const nextSummary = await getToken({
+          req: req,
+          secret: process.env.NEXTAUTH_SECRET,
+        });
+        nextAuthToken = nextSummary?.accessToken;
+
+        if (!nextAuthToken) {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        break;
       default:
         dataApiHub = dataApiHub;
         break;
@@ -170,7 +196,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///-----------------------------------------------
     /// From api/translate return the body.
     ///-----------------------------------------------
-    if (jsonResponse.message === "Data translated successfully") {
+    if (
+      jsonResponse.message === "Data translated successfully" ||
+      jsonResponse.message === "Data summarized successfully"
+    ) {
       const body = jsonResponse.body;
       // const sessionStorageBody = jsonResponse.sessionStorageBody;
 

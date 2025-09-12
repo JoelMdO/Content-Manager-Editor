@@ -9,6 +9,7 @@ import { sanitizePassword } from "./sanitize_pwd";
 import { sanitizePost } from "./sanitize_post";
 import { dataType } from "../../../types/dataType";
 import { PlaybookMetaWithUseRecord } from "../../../components/playbook/types/plabookMeta_with_useRecord";
+import { sanitizeSummary } from "./sanitize_summary";
 
 export async function sanitizeData(
   data: dataType,
@@ -109,6 +110,9 @@ export async function sanitizeData(
     } else {
       sanitizedData = { status: 400, message: "Invalid sign-in data" };
     }
+  } else if (type === "summary") {
+    const sanitizedText = sanitizeSummary(data);
+    sanitizedData = { status: 200, message: sanitizedText };
   } else {
     ///--------------------------------------------------------
     // Clean Text

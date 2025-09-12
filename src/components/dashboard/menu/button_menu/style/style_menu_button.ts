@@ -56,6 +56,11 @@ export function menuButtonStyle(
       defaultProperties: defaultProperties,
       icon: iconsMenu.translate,
     },
+    summary: {
+      text: "Summary",
+      defaultProperties: defaultProperties,
+      icon: iconsMenu.summary,
+    },
   };
 
   const styles = { ...defaultStyle, ...(stylesByType[type] || {}) };

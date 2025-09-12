@@ -8,6 +8,8 @@ import { handleClear } from "./handler_clear";
 import translateButtonClicked from "./translate_button_clicked";
 import router from "next/router";
 import saveArticle from "@/components/dashboard/utils/save_article";
+import summaryButtonClicked from "./summary_button_clicked";
+import { current } from "@reduxjs/toolkit";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
@@ -104,7 +106,7 @@ const loadImage = ({ fileInputRef, setIsClicked }: Partial<ButtonProps>) => {
 ///--------------------------------------------------------
 const openLinkDialog = ({ dialogRef, setIsClicked }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  dialogRef!.current?.showModal();
+  dialogRef?.current!.showModal();
 };
 ///--------------------------------------------------------
 // Styles
@@ -198,6 +200,39 @@ export const translateToSpanish = ({
     });
 };
 ///--------------------------------------------------------
+// Summary
+///--------------------------------------------------------
+export const getSummary = ({
+  setIsClicked,
+  summaryDialogRef,
+  setIsSummary,
+  setSummaryContent,
+  setLanguage,
+}: Partial<ButtonProps>) => {
+  setIsClicked!(true);
+  setIsSummary!(true);
+  console.log("setIsSummary at getSummary:", setIsSummary);
+  console.log(
+    "summaryDialogRef.current before summaryButtonClicked",
+    summaryDialogRef?.current
+  );
+  summaryButtonClicked({ setSummaryContent }).then((response) => {
+    console.log("response from summaryButtonClicked", response);
+    // console.log("Response type:", typeof response);
+    // console.log("Response full object:", JSON.stringify(response, null, 2));
+    // console.log("Response status:", response.status);
+    // console.log("Is status 200?", response.status === 200);
+    if (response.status === 200) {
+      console.log("summaryDialogRef", summaryDialogRef);
+      console.log("summaryDialogRef.current", summaryDialogRef?.current);
+      setIsClicked!(false);
+      setIsSummary!(false);
+      setLanguage!("en");
+      summaryDialogRef!.current?.showModal();
+    }
+  });
+};
+///--------------------------------------------------------
 // Main Function to handle the cases of the Menu Buttons
 ///--------------------------------------------------------
 
@@ -219,8 +254,12 @@ export const buttonMenuLogic = ({
   setTranslationReady,
   setTranslating,
   language,
+  setLanguage,
   openDialogNoSection,
   setOpenDialogNoSection,
+  summaryDialogRef,
+  setIsSummary,
+  setSummaryContent,
 }: Partial<ButtonProps>) => {
   switch (type) {
     case "image":
@@ -260,6 +299,17 @@ export const buttonMenuLogic = ({
         savedTitleRef,
         savedBodyRef,
         setIsClicked,
+      });
+      break;
+    case "summary":
+      console.log("calling summary");
+      console.log("setIsSummary before getSummary:", setIsSummary);
+      getSummary({
+        setIsClicked,
+        summaryDialogRef,
+        setIsSummary,
+        setSummaryContent,
+        setLanguage,
       });
       break;
     default:

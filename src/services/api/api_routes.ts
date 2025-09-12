@@ -29,6 +29,23 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         headers["Authorization"] = `Bearer ${JWT!}`;
         credentials = "include";
         break;
+      case "summary":
+        endPoint = type;
+        const mergedData = { data, token: token || "" };
+        console.log("doing summary at api/routes, mergedData:", mergedData);
+        body = JSON.stringify(mergedData); // Fix: stringify the data for JSON body
+        headers["Content-Type"] = "application/json";
+        headers["Authorization"] = `Bearer ${JWT!}`;
+        credentials = "include";
+        break;
+      //## PLAYBOOK
+      case "playbook":
+        endPoint = "playbook";
+        body = JSON.stringify(data);
+        headers["Content-Type"] = "application/json";
+        headers["Authorization"] = `Bearer ${token}`;
+        credentials = "include";
+        break;
       //## PLAYBOOK SAVE
       case "playbook-save":
         endPoint = "save";
@@ -75,7 +92,10 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     ///-----------------------------------------------
     /// From api/translate return the body.
     ///-----------------------------------------------
-    if (jsonResponse.message === "Data translated successfully") {
+    if (
+      jsonResponse.message === "Data translated successfully" ||
+      jsonResponse.message === "Data summarized successfully"
+    ) {
       const body = jsonResponse.body;
 
       return NextResponse.json({

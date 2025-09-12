@@ -28,6 +28,10 @@ const MenuButton = ({
     stylesDialogRef,
     setTranslating,
     setTranslationReady,
+    summaryDialogRef,
+    setSummaryContent,
+    setIsSummary,
+    setLanguage,
   } = useContext(MenuContext) as ButtonProps;
   // CONSTANTS
   //=========================================================
@@ -52,6 +56,7 @@ const MenuButton = ({
   // Function to handle the cases of the MenuButtons
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
+    console.log("setIsSummary before buttonMenuLogic:", setIsSummary);
     buttonMenuLogic({
       fileInputRef,
       setIsClicked,
@@ -69,6 +74,10 @@ const MenuButton = ({
       setIsFontStyleOpen,
       setTranslating,
       setTranslationReady,
+      summaryDialogRef,
+      setSummaryContent,
+      setIsSummary,
+      setLanguage,
     });
   }, [type, setIsClicked, id, editorRefs]);
   //
@@ -87,7 +96,12 @@ const MenuButton = ({
         } hover:border-orange-300 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
           handleClick();
-          if (type !== "post" && type !== "styles" && type !== "translate") {
+          if (
+            type !== "post" &&
+            type !== "styles" &&
+            type !== "translate" &&
+            type !== "summary"
+          ) {
             setTimeout(() => {
               setIsClicked(false);
               if (tag !== "desktop") {
@@ -104,6 +118,13 @@ const MenuButton = ({
             if (tag !== "desktop") {
               setIsMenuClicked!((prev) => !prev);
             }
+          } else if (type === "summary") {
+            setTimeout(() => {
+              setIsClicked(false);
+              if (tag !== "desktop") {
+                setIsMenuClicked!(false);
+              }
+            }, 2000);
           }
         }}
       >

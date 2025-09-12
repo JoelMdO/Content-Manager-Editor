@@ -28,6 +28,9 @@ const successAlert = (
     case "translate":
       text = `Article translated`;
       break;
+    case "summary":
+      text = `Summary saved`;
+      break;
     default:
       text = "Image uploaded";
       break;

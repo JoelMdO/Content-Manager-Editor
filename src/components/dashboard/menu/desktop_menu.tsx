@@ -29,6 +29,7 @@ const MenuDesktop = () => {
           tag={"desktop"}
         />
       </div>
+      <MenuButton type={"summary"} tag={"desktop"} />
       <MenuButton type={"translate"} tag={"desktop"} />
       <MenuButton type="post" tag={"desktop"} />
     </div>

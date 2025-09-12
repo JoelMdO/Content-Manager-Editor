@@ -51,6 +51,11 @@ export interface ButtonProps {
   dbName: string | null | undefined;
   currentTitle: string;
   currentBody: string;
+  summaryDialogRef: React.RefObject<HTMLDialogElement | null>;
+  setIsSummary: React.Dispatch<React.SetStateAction<boolean>>;
+  isSummary: boolean;
+  setSummaryContent: React.Dispatch<React.SetStateAction<string>>;
+  summaryContent: string;
 }
 
 export const menuButtonTypes = [
@@ -64,4 +69,5 @@ export const menuButtonTypes = [
   "styles",
   "clear",
   "translate",
+  "summary",
 ];
