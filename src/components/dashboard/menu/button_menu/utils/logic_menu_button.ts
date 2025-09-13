@@ -78,8 +78,9 @@ export const saveDraft = ({
     setOpenDialogNoSection,
     sectionsDialogRef,
   });
-  //
-  setIsClicked!(false);
+  setTimeout(() => {
+    setIsClicked!(false);
+  }, 1000);
   //
 };
 ///--------------------------------------------------------

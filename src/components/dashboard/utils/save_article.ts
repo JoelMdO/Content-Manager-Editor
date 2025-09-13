@@ -4,6 +4,7 @@ const saveArticle = ({
   dbName,
   currentTitle,
   currentBody,
+  setIsClicked,
 }: Partial<ButtonProps>) => {
   //
   // Purpose: Check if the currentTitle contains a placeholder "Title" or a gray placeholder span.
@@ -25,72 +26,62 @@ const saveArticle = ({
     const localStoreText = localStorage.getItem(
       `draft-articleContent-${dbName}`
     );
-    let localStoreTextArray = JSON.parse(localStoreText || "[]");
+    const localStoreArticle = JSON.parse(localStoreText || "[]");
     //------------------------------------------
     // Load if any draft on sessionStorage
     //------------------------------------------
     const sessionStoreText = sessionStorage.getItem(`articleContent-${dbName}`);
-    const sessionJsonArticle = JSON.parse(sessionStoreText || "[]");
-    //
-    //------------------------------------------
-    function getArticleDraftDifferences(
-      sessionStore: any[],
-      localStore: any[]
-    ) {
-      //
-      const localMap = new Map(localStore.map((item) => [item.type, item]));
-      const differences: string[] = [];
-      //
-      for (const sessionItem of sessionStore) {
-        const localItem = localMap.get(sessionItem.type);
-
-        if (sessionItem.type === "image") {
-          // Compare all relevant image fields
-          if (
-            !localItem ||
-            sessionItem.imageId !== localItem.imageId ||
-            sessionItem.fileName !== localItem.fileName ||
-            sessionItem.blobUrl !== localItem.blobUrl
-          ) {
-            differences.push(sessionItem.type);
-            // Update or add the image object
-            if (localItem) {
-              localItem.imageId = sessionItem.imageId;
-              localItem.fileName = sessionItem.fileName;
-              localItem.blobUrl = sessionItem.blobUrl;
-            } else {
-              localStore.push({ ...sessionItem });
-            }
-          }
-        } else {
-          // Compare content for other types
-          if (!localItem || localItem.content !== sessionItem.content) {
-            differences.push(sessionItem.type);
-            if (localItem) {
-              localItem.content = sessionItem.content;
-            } else {
-              localStore.push({
-                type: sessionItem.type,
-                content: sessionItem.content,
-              });
-            }
-          }
-        }
-      }
-      return differences;
+    const sessionStorageAticle = JSON.parse(sessionStoreText || "[]");
+    ///--------------------------------------------------------
+    // If session storage is empty and local storage has data, load local to session
+    ///--------------------------------------------------------
+    if (sessionStorageAticle.length === 0 && localStoreArticle.length > 0) {
+      sessionStorage.setItem(
+        `articleContent-${dbName}`,
+        JSON.stringify(localStoreArticle)
+      );
+      return;
     }
-    //}
-    // Purpose: Call the function and update localStorage if there are differences
-    //------------------------------------------
-    const differences = getArticleDraftDifferences(
-      sessionJsonArticle,
-      localStoreTextArray
+    ///--------------------------------------------------------
+    // Function to compare and update localStorage from sessionStorage
+    ///--------------------------------------------------------
+    // Create maps for easier lookup
+    type ArticleItem = {
+      type: string;
+      content?: string;
+      imageId?: string;
+      fileName?: string;
+      blobUrl?: string;
+      // add other fields as needed
+    };
+
+    const localMap = new Map<string, ArticleItem>(
+      (localStoreArticle as ArticleItem[]).map((item) => [item.type, item])
     );
-    if (differences.length > 0) {
+    const sessionMap = new Map<string, ArticleItem>(
+      (sessionStorageAticle as ArticleItem[]).map((item) => [item.type, item])
+    );
+    const hasChanges = new Set<string>();
+
+    // Compare session items with local
+    for (const [type, sessionItem] of sessionMap) {
+      const localItem = localMap.get(type);
+
+      // If type doesn't exist in local or content is different
+      if (!localItem || localItem.content !== sessionItem.content) {
+        localMap.set(type, { ...sessionItem });
+        hasChanges.add(type);
+      }
+    }
+
+    // If we found differences, update localStorage
+    if (hasChanges.size > 0) {
+      const updatedArticles = Array.from(localMap.values());
       localStorage.setItem(
         `draft-articleContent-${dbName}`,
-        JSON.stringify(localStoreTextArray)
+        JSON.stringify(updatedArticles)
       );
+      console.log("Updated types:", Array.from(hasChanges));
     }
   }
 };
