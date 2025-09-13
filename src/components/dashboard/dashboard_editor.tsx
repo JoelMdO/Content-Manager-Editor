@@ -5,7 +5,7 @@ import { handleContentChange } from "./utils/handle_content_change";
 import { ButtonProps } from "./menu/button_menu/type/type_menu_button";
 import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_context";
 import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
-import DialogsLoader from "../loaders/dialogs_loader";
+import DialogsLoader from "../../components/loaders/dialogs_loader";
 import saveArticle from "./utils/save_article";
 
 const DashboardEditor = () => {

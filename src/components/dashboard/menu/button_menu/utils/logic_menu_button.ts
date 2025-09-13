@@ -10,6 +10,7 @@ import router from "next/router";
 import saveArticle from "@/components/dashboard/utils/save_article";
 import summaryButtonClicked from "./summary_button_clicked";
 import { current } from "@reduxjs/toolkit";
+import { set } from "lodash";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
@@ -20,7 +21,6 @@ export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
   setIsClicked!(true);
   postButtonClicked()
     .then((response) => {
-      setIsClicked!(false);
       if (response.status === 200) {
         successAlert("saved");
       } else if (
@@ -36,8 +36,12 @@ export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
       }
     })
     .catch((error) => {
-      setIsClicked!(false);
       errorAlert("saved", "error", error);
+    })
+    .finally(() => {
+      setTimeout(() => {
+        setIsClicked!(false);
+      }, 500);
     });
 };
 ///--------------------------------------------------------
@@ -138,7 +142,6 @@ export const translateToSpanish = ({
   setTranslating!(true);
   translateButtonClicked()
     .then((response) => {
-      setIsClicked!(false);
       setTranslating!(false);
       if (response.status === 200) {
         successAlert("translate");
@@ -197,6 +200,11 @@ export const translateToSpanish = ({
     .catch((error) => {
       setIsClicked!(false);
       errorAlert("translate", "error", error);
+    })
+    .finally(() => {
+      setTimeout(() => {
+        setIsClicked!(false);
+      }, 500);
     });
 };
 ///--------------------------------------------------------
@@ -209,28 +217,37 @@ export const getSummary = ({
   setSummaryContent,
   setLanguage,
 }: Partial<ButtonProps>) => {
+  if (!summaryDialogRef?.current) return;
+
   setIsClicked!(true);
-  setIsSummary!(true);
-  console.log("setIsSummary at getSummary:", setIsSummary);
-  console.log(
-    "summaryDialogRef.current before summaryButtonClicked",
-    summaryDialogRef?.current
-  );
-  summaryButtonClicked({ setSummaryContent }).then((response) => {
-    console.log("response from summaryButtonClicked", response);
-    // console.log("Response type:", typeof response);
-    // console.log("Response full object:", JSON.stringify(response, null, 2));
-    // console.log("Response status:", response.status);
-    // console.log("Is status 200?", response.status === 200);
-    if (response.status === 200) {
-      console.log("summaryDialogRef", summaryDialogRef);
-      console.log("summaryDialogRef.current", summaryDialogRef?.current);
-      setIsClicked!(false);
-      setIsSummary!(false);
-      setLanguage!("en");
-      summaryDialogRef!.current?.showModal();
-    }
-  });
+  setIsSummary!(true); // Needed for DialogsLoader
+
+  // Call summary creation
+  summaryButtonClicked({ setSummaryContent })
+    .then((response) => {
+      if (response?.status === 200) {
+        setLanguage!("en");
+        // Only show modal if ref exists and we got successful response
+        if (summaryDialogRef?.current) {
+          summaryDialogRef.current.showModal();
+        }
+      } else {
+        errorAlert(
+          "summary",
+          "nonSummary",
+          response?.summary || "Failed to create summary"
+        );
+      }
+    })
+    .catch((error) => {
+      errorAlert("summary", "error", error);
+    })
+    .finally(() => {
+      setTimeout(() => {
+        setIsClicked!(false);
+        setIsSummary!(false); // Reset loader state
+      }, 500);
+    });
 };
 ///--------------------------------------------------------
 // Main Function to handle the cases of the Menu Buttons
@@ -303,7 +320,6 @@ export const buttonMenuLogic = ({
       break;
     case "summary":
       console.log("calling summary");
-      console.log("setIsSummary before getSummary:", setIsSummary);
       getSummary({
         setIsClicked,
         summaryDialogRef,

@@ -56,7 +56,6 @@ const MenuButton = ({
   // Function to handle the cases of the MenuButtons
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
-    console.log("setIsSummary before buttonMenuLogic:", setIsSummary);
     buttonMenuLogic({
       fileInputRef,
       setIsClicked,
@@ -95,36 +94,36 @@ const MenuButton = ({
             : "bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-black"
         } hover:border-orange-300 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
+          setIsClicked(true);
+
+          // Call handleClick which triggers buttonMenuLogic
           handleClick();
-          if (
-            type !== "post" &&
-            type !== "styles" &&
-            type !== "translate" &&
-            type !== "summary"
-          ) {
-            setTimeout(() => {
-              setIsClicked(false);
+
+          // Handle different button types
+          switch (type) {
+            case "styles":
+              // Toggle style menu
+              setIsClicked((prev) => !prev);
               if (tag !== "desktop") {
-                setIsMenuClicked!(false);
+                setIsMenuClicked!((prev) => !prev);
               }
-            }, 2000);
-          } else if (type === "translate") {
-            setIsClicked(false);
-            if (tag !== "desktop") {
-              setIsMenuClicked!(false);
-            }
-          } else if (type === "styles") {
-            setIsClicked((prev) => !prev);
-            if (tag !== "desktop") {
-              setIsMenuClicked!((prev) => !prev);
-            }
-          } else if (type === "summary") {
-            setTimeout(() => {
-              setIsClicked(false);
-              if (tag !== "desktop") {
-                setIsMenuClicked!(false);
-              }
-            }, 2000);
+              break;
+
+            case "translate":
+            case "post":
+            case "summary":
+              // These are handled by their respective functions in buttonMenuLogic
+              // They will set isClicked to false after their async operations
+              break;
+
+            default:
+              // For link, image, sections, etc.
+              setTimeout(() => {
+                setIsClicked(false);
+                if (tag !== "desktop") {
+                  setIsMenuClicked!(false);
+                }
+              }, 2000);
           }
         }}
       >

@@ -35,6 +35,9 @@ const errorAlert = (
     case "nonTranslated":
       text = `Translation failed ${message}.`;
       break;
+    case "nonSummary":
+      text = `Summary generation failed ${message}.`;
+      break;
     case "nonsection":
       text = message as string;
       button_text = "Close";

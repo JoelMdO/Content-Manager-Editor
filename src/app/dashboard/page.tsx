@@ -14,7 +14,8 @@ const LinkDialog = dynamic(
   () => import("../../components/dashboard/menu/button_menu/link_dialog")
 );
 const SummaryDialog = dynamic(
-  () => import("../../components/dashboard/menu/button_menu/summary_dialog")
+  () => import("../../components/dashboard/menu/summary_dialog/summary_dialog"),
+  { ssr: false }
 );
 const SectionSelector = dynamic(
   () => import("../../components/dashboard/menu/button_menu/sections_selector")
