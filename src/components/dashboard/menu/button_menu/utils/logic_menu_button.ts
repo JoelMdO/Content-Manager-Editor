@@ -116,8 +116,21 @@ const openLinkDialog = ({ dialogRef, setIsClicked }: Partial<ButtonProps>) => {
 ///--------------------------------------------------------
 // Styles
 ///--------------------------------------------------------
-const openStylesDialog = ({ setIsFontStyleOpen }: Partial<ButtonProps>) => {
-  setIsFontStyleOpen!((setIsFontStyleOpen) => !setIsFontStyleOpen);
+const openStylesDialog = ({
+  setIsFontStyleOpen,
+  setIsClicked,
+  isClicked,
+}: Partial<ButtonProps>) => {
+  setIsFontStyleOpen!((prev) => !prev);
+  console.log("isClicked", isClicked);
+  if (isClicked) {
+    setIsClicked!(false);
+  } else {
+    setIsClicked!(true);
+    setTimeout(() => {
+      setIsClicked!(false);
+    }, 1000);
+  }
 };
 ///--------------------------------------------------------
 // Section Selector
@@ -278,6 +291,7 @@ export const buttonMenuLogic = ({
   summaryDialogRef,
   setIsSummary,
   setSummaryContent,
+  isClicked,
 }: Partial<ButtonProps>) => {
   switch (type) {
     case "image":
@@ -330,7 +344,12 @@ export const buttonMenuLogic = ({
       });
       break;
     default:
-      openStylesDialog({ stylesDialogRef, setIsFontStyleOpen });
+      openStylesDialog({
+        stylesDialogRef,
+        setIsFontStyleOpen,
+        setIsClicked,
+        isClicked,
+      });
       break;
   }
 };

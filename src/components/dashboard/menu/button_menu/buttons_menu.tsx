@@ -77,6 +77,7 @@ const MenuButton = ({
       setSummaryContent,
       setIsSummary,
       setLanguage,
+      isClicked,
     });
   }, [type, setIsClicked, id, editorRefs]);
   //
@@ -94,21 +95,18 @@ const MenuButton = ({
             : "bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-black"
         } hover:border-orange-300 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
-          setIsClicked(true);
-
           // Call handleClick which triggers buttonMenuLogic
           handleClick();
 
           // Handle different button types
           switch (type) {
             case "styles":
-              // Toggle style menu
-              setIsClicked((prev) => !prev);
-              if (tag !== "desktop") {
-                setIsMenuClicked!((prev) => !prev);
-              }
+              setTimeout(() => {
+                if (tag !== "desktop") {
+                  setIsMenuClicked!((prev) => !prev);
+                }
+              }, 2000);
               break;
-
             case "translate":
             case "post":
             case "summary":
