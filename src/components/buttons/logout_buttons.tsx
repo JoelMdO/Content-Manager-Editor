@@ -15,6 +15,8 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
   let heightSet = 80;
   let mt = "md:mt-auto";
   let mb = "md:mb-14";
+  let icon = "/exit.svg";
+  let icon_mobile = "/window_exit.png";
   //
   switch (type) {
     case "playbook":
@@ -22,6 +24,14 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
       heightSet = 60;
       mt = "md:mt-0";
       mb = "md:mb-0";
+      break;
+    case "dashboard":
+      widthSet = 50;
+      heightSet = 50;
+      mt = "md:mt-0";
+      mb = "md:mb-0";
+      icon = "/window_exit.png";
+      icon_mobile = "/window_exit.png";
       break;
     default:
       widthSet = widthSet;
@@ -32,8 +42,6 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
   }
   // States
   const [isClicked, setIsClicked] = useState(false);
-  const icon = "/exit.svg";
-  const icon_mobile = "/window_exit.png";
 
   ///--------------------------------------------------------
   // UI logout button

@@ -154,7 +154,7 @@ const Dashboard: React.FC = () => {
             <MenuDesktop />
             <div className="flex flex-row w-full justify-center items-center mt-2">
               <HomeButton />
-              <LogOutButton />
+              <LogOutButton type={"dashboard"} />
             </div>
           </aside>
           {/* MENU MOBILE */}
