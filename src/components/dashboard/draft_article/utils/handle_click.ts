@@ -117,7 +117,7 @@ export const handleClick = ({
 
         preSavedBodyRef = preSavedBodyRef.replace(
           regex,
-          `<img src="${image.blobUrl}" alt="${image.id}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${image.id}</p>`
+          `<img src="${image.base64}" alt="${image.id}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${image.id}</p>`
         );
       }
       //}

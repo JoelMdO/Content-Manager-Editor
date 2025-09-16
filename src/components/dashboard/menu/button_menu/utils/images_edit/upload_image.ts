@@ -71,12 +71,17 @@ const uploadImage = async (
           sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
         );
         // Add image data (file and blobUrl) to articleContent
+        // Add image file as base64 to sessionStorage for preview after translation
+        // so on render the image still available for preview
+        reader.readAsDataURL(file);
         articleContent.push({
           type: "image",
           imageId: imageId,
           fileName: file.name,
           blobUrl: objectUrl, // Temporary preview URL
+          base64: reader.result,
         });
+        //
         sessionStorage.setItem(
           `articleContent-${dbName}`,
           JSON.stringify(articleContent)
