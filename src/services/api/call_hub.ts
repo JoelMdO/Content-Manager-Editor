@@ -71,6 +71,7 @@ const callHub = async (
       credentials: credentials,
     });
     const jsonResponse = await response.json();
+    console.log("jsonResponse at callHub", jsonResponse);
 
     return {
       status: jsonResponse.status,

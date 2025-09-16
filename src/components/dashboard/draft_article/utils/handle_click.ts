@@ -2,6 +2,9 @@
 // HANDLE CLICK, purpose:
 // Update UI with the draft article content
 //=========================================================
+
+import loadArticle from "../../preview/utils/load_article";
+
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
   newSavedTitleRef?: React.RefObject<string>;
@@ -12,11 +15,13 @@ type HandleClickProps = {
   tag: string;
   newTitleRef?: string;
   setLanguage?: (language: "en" | "es") => void;
+  language?: string;
   setSummaryContent?: (summaryContent: string) => void;
+  setArticle?: (article: any) => void;
 };
 
 // Updated function to accept a single props object
-export const handleClick = ({
+export const handleClick = async ({
   newSavedTitleRef,
   DRAFT_KEY,
   savedTitleRef,
@@ -25,7 +30,9 @@ export const handleClick = ({
   tag,
   newTitleRef,
   setLanguage,
+  language,
   setSummaryContent,
+  setArticle,
 }: HandleClickProps) => {
   //
   let dbFieldName: string = "body";
@@ -88,6 +95,18 @@ export const handleClick = ({
     }
     setSummaryContent!(summary);
     return;
+  } else if (tag === "preview-en") {
+    setLanguage!("en");
+    const loadedArticle = await loadArticle({ language: language ?? "en" });
+    if (loadedArticle) {
+      setArticle!(loadedArticle);
+    }
+  } else if (tag === "preview-es") {
+    setLanguage!("es");
+    const loadedArticle = await loadArticle({ language: language ?? "es" });
+    if (loadedArticle) {
+      setArticle!(loadedArticle);
+    }
   }
   //
   //

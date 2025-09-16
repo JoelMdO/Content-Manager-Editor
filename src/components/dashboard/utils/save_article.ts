@@ -52,6 +52,7 @@ const saveArticle = ({
       imageId?: string;
       fileName?: string;
       blobUrl?: string;
+      base64?: string;
       // add other fields as needed
     };
 

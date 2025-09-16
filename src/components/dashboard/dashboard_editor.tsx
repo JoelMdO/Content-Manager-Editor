@@ -30,6 +30,7 @@ const DashboardEditor = () => {
     sectionsDialogRef,
     setText,
     isSummary,
+    isLoadingPreview,
   } = useContext(MenuContext) as ButtonProps;
   //
   //
@@ -97,6 +98,7 @@ const DashboardEditor = () => {
     <div className="border border-gray-600 border-1px">
       {isTranslating && <DialogsLoader type={"translation"} />}
       {isSummary && <DialogsLoader type={"summary"} />}
+      {isLoadingPreview && <DialogsLoader type={"preview"} />}
       {["Title", "Article"].map((placeholder, index) => (
         <div
           key={index}

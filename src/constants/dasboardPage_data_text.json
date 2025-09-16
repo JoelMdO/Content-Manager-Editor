@@ -3,7 +3,9 @@
     "translation": "Translating ...",
     "translation_text": "AI Translating for you, please wait...",
     "summary": "Creating a desciption of the article ...",
-    "summary_text": "AI Summarizing for you, please wait..."
+    "summary_text": "AI Summarizing for you, please wait...",
+    "preview": "Generating preview ...",
+    "preview_text": "Generating a preview for you, please wait..."
   },
   "autosave": {
     "last_auto_save": "Article auto-saved: "

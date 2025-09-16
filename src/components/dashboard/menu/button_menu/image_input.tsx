@@ -34,7 +34,7 @@ const ImageInput = ({ index }: { index: number }) => {
   };
   //
   return (
-    <label htmlFor={"file-input"}>
+    <label htmlFor={"file-input"} hidden>
       ""
       <input
         type="file"

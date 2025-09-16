@@ -1,6 +1,7 @@
 import { useState } from "react";
 import MenuButton from "./button_menu/buttons_menu";
 import FontStyleUI from "./button_menu/font_style_buttons";
+import PreviewToggle from "./preview_toggle/preview_toggle";
 
 //--------------------------------------------------------
 const MenuDesktop = () => {
@@ -9,6 +10,7 @@ const MenuDesktop = () => {
   //
   return (
     <div className="flex flex-col items-center justify-center gap-y-2 mt-3">
+      <PreviewToggle />
       <MenuButton type={"image"} index={1} tag={"desktop"} />
       <MenuButton type={"link"} index={1} tag={"desktop"} />
       <MenuButton type={"sections"} tag={"desktop"} />

@@ -13,4 +13,7 @@ export const iconsMenu = {
   english: "🇺🇸",
   spanish: "🇲🇽",
   summary: "📝",
+  view: "📄",
+  edit: "✏️",
+  preview: "🗺️",
 };

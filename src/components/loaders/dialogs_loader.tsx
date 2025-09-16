@@ -1,16 +1,22 @@
 import { iconsMenu } from "../../constants/icons";
 import text from "../../constants/dasboardPage_data_text.json";
 import animation from "./style/loader.module.css";
-import { subtle } from "crypto";
 
 const DialogsLoader = ({ type }: { type: string }) => {
   // Destructure text object
-  const { translation, translation_text, summary, summary_text } =
-    text.dashboard;
+  const {
+    translation,
+    translation_text,
+    summary,
+    summary_text,
+    preview,
+    preview_text,
+  } = text.dashboard;
   //
   let title: string = "";
   let content: string = "";
   let icon: string = "";
+  //
   ///--------------------------------------------------------
   // Determine content based on type
   ///--------------------------------------------------------
@@ -19,6 +25,11 @@ const DialogsLoader = ({ type }: { type: string }) => {
       title = translation;
       content = translation_text;
       icon = iconsMenu.translate;
+      break;
+    case "preview":
+      title = preview;
+      content = preview_text;
+      icon = iconsMenu.preview;
       break;
     default:
       title = summary;

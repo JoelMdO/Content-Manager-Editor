@@ -6,6 +6,8 @@ import { ButtonProps } from "../../components/dashboard/menu/button_menu/type/ty
 import MenuContext from "../../components/dashboard/menu/button_menu/context/menu_context";
 import DraftArticle from "../../components/dashboard/draft_article/draft_article";
 import AutoSaveScreen from "../../components/loaders/auto_save";
+import { ProcessedArticle } from "@/components/dashboard/preview/types/previewed_article";
+import PreviewArticle from "@/components/dashboard/preview/preview_article";
 
 const ImageInput = dynamic(
   () => import("../../components/dashboard/menu/button_menu/image_input")
@@ -67,8 +69,11 @@ const Dashboard: React.FC = () => {
   const summaryDialogRef = useRef<HTMLDialogElement | null>(null);
   const sectionsDialogRef = useRef<HTMLDialogElement | null>(null);
   const stylesDialogRef = useRef<HTMLDialogElement | null>(null);
-
+  const [isView, setIsView] = useState<boolean>(false);
   const [DRAFT_KEY, setDraftKey] = useState(`draft-articleContent-DeCav`);
+  const [article, setArticle] = useState<ProcessedArticle | null>(null);
+  const [previewReady, setPreviewReady] = useState<boolean>(false);
+  const [isLoadingPreview, setIsLoadingPreview] = useState<boolean>(false);
   //
   //
   ///======================================================
@@ -133,6 +138,14 @@ const Dashboard: React.FC = () => {
     isSummary,
     summaryContent,
     setSummaryContent,
+    isView,
+    setIsView,
+    setArticle,
+    article,
+    setPreviewReady,
+    previewReady,
+    isLoadingPreview,
+    setIsLoadingPreview,
   };
   //
   ///======================================================
@@ -177,7 +190,7 @@ const Dashboard: React.FC = () => {
           </nav>
           {/* Main Content */}
           <main className="flex-1 p-4 pt-2 h-[80dvh] md:h-full md:w-[75vw] overflow-y-auto">
-            <DashboardEditor />
+            {previewReady ? <PreviewArticle /> : <DashboardEditor />}
             <SectionSelector />
             <ImageInput index={1} />
             <LinkDialog index={1} />

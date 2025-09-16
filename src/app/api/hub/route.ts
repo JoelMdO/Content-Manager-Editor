@@ -198,7 +198,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///-----------------------------------------------
     if (
       jsonResponse.message === "Data translated successfully" ||
-      jsonResponse.message === "Data summarized successfully"
+      jsonResponse.message === "Data summarized successfully" ||
+      jsonResponse.message === "Markdown converted successfully"
     ) {
       const body = jsonResponse.body;
       // const sessionStorageBody = jsonResponse.sessionStorageBody;

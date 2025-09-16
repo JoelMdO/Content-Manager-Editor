@@ -38,6 +38,13 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         headers["Authorization"] = `Bearer ${JWT!}`;
         credentials = "include";
         break;
+      case "markdown":
+        endPoint = type;
+        body = JSON.stringify(data); // Fix: stringify the data for JSON body
+        headers["Content-Type"] = "application/json";
+        headers["Authorization"] = `Bearer ${JWT!}`;
+        credentials = "include";
+        break;
       //## PLAYBOOK
       case "playbook":
         endPoint = "playbook";
@@ -94,9 +101,11 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     ///-----------------------------------------------
     if (
       jsonResponse.message === "Data translated successfully" ||
-      jsonResponse.message === "Data summarized successfully"
+      jsonResponse.message === "Data summarized successfully" ||
+      jsonResponse.message === "Markdown converted successfully"
     ) {
       const body = jsonResponse.body;
+      console.log("body at apiRoutes if markdown", body);
 
       return NextResponse.json({
         status: jsonResponse.status,

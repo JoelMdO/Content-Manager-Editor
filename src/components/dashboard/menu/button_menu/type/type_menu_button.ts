@@ -1,3 +1,4 @@
+import { ProcessedArticle } from "../../../preview/types/previewed_article";
 import { ChangeEvent } from "react";
 
 export interface ButtonProps {
@@ -56,6 +57,14 @@ export interface ButtonProps {
   isSummary: boolean;
   setSummaryContent: React.Dispatch<React.SetStateAction<string>>;
   summaryContent: string;
+  setIsView: React.Dispatch<React.SetStateAction<boolean>>;
+  isView: boolean;
+  setArticle: React.Dispatch<React.SetStateAction<ProcessedArticle | null>>;
+  article: ProcessedArticle | null;
+  setPreviewReady: React.Dispatch<React.SetStateAction<boolean>>;
+  previewReady: boolean;
+  isLoadingPreview: boolean;
+  setIsLoadingPreview: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const menuButtonTypes = [

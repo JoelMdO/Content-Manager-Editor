@@ -35,8 +35,14 @@ const errorAlert = (
     case "nonTranslated":
       text = `Translation failed ${message}.`;
       break;
+    case "nonArticle":
+      text = `Article not found at sessionStorage ${message}.`;
+      break;
     case "nonSummary":
       text = `Summary generation failed ${message}.`;
+      break;
+    case "nonMarkdown":
+      text = `Markdown Loading generation failed ${message}.`;
       break;
     case "nonsection":
       text = message as string;
