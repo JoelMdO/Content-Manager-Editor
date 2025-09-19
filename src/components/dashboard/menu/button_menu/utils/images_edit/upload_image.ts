@@ -34,15 +34,20 @@ const uploadImage = async (
     const response = await callHub("clean-image", file);
 
     if (response.status === 200) {
+      console.log("Image validated by server at uploadImage");
+
       // Set up a FileReader to read the image file source
       const reader = new FileReader();
       reader.onload = async (event) => {
         if (!event.target?.result) return;
+
         // Set the image to Base64 for serialization before redux
+        const base64Data = event.target.result as string;
         const img = document.createElement("img");
-        img.src = event.target.result as string;
+        img.src = base64Data;
         img.style.justifySelf = "center";
         img.style.maxWidth = "25%";
+
         // Create a formatted date string (dd-mm-yy)
         const date = new Date();
         const formattedDate = `${String(date.getDate()).padStart(
@@ -55,11 +60,13 @@ const uploadImage = async (
         const imageId = `${formattedDate}-${fileName}`;
 
         img.setAttribute("id", imageId); // Set image Id to allow selection
+
         // Add a reference to the image in the editor
         const imgRef = document.createElement("p");
         imgRef.textContent = imageId;
         imgRef.style.justifySelf = "center";
         imgRef.className = "text-xs text-gray-500";
+
         // Store `imgRef` on `img` so it can be accessed later
         img.dataset.refId = imageId;
         document.body.appendChild(imgRef);
@@ -70,16 +77,14 @@ const uploadImage = async (
         const articleContent = JSON.parse(
           sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
         );
-        // Add image data (file and blobUrl) to articleContent
-        // Add image file as base64 to sessionStorage for preview after translation
-        // so on render the image still available for preview
-        reader.readAsDataURL(file);
+
+        // Add image data to articleContent with the base64 data we already have
         articleContent.push({
           type: "image",
           imageId: imageId,
           fileName: file.name,
-          blobUrl: objectUrl, // Temporary preview URL
-          base64: reader.result,
+          blobUrl: objectUrl,
+          base64: base64Data,
         });
         //
         sessionStorage.setItem(
@@ -146,8 +151,12 @@ const uploadImage = async (
         // Clear file input
         e.target.value = "";
       };
+
+      // Start reading the file (only once)
       reader.readAsDataURL(file);
-      return { status: 200, message: "Image uploaded successfully" };
+
+      // Return success after the reader has been initialized
+      return { status: 200, message: "Image upload initiated" };
     } else {
       return { status: 205, message: "Image not valid" };
     }

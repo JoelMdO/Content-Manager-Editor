@@ -97,7 +97,6 @@ const MenuButton = ({
         onClick={() => {
           // Call handleClick which triggers buttonMenuLogic
           handleClick();
-
           // Handle different button types
           switch (type) {
             case "styles":
@@ -113,7 +112,6 @@ const MenuButton = ({
               // These are handled by their respective functions in buttonMenuLogic
               // They will set isClicked to false after their async operations
               break;
-
             default:
               // For link, image, sections, etc.
               setTimeout(() => {
