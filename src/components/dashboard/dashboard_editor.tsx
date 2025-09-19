@@ -111,26 +111,27 @@ const DashboardEditor = () => {
           className={`${
             placeholder === "Title"
               ? "h-[10dvh] font-bold"
-              : "h-[70dvh] md:h-[85dvh] font-normal overflow-auto"
+              : "h-[70dvh] md:h-[85dvh] overflow-auto"
           } p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-blue-light`}
           contentEditable={true}
           onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs!)}
+          onInput={(e) => {
+            const element = e.currentTarget as HTMLElement;
+            console.log("content with styles:", element);
+            handleContentChange(
+              index,
+              element,
+              language,
+              setText,
+              debouncedUpdateStore
+            );
+          }}
           suppressContentEditableWarning={true}
           onFocus={() =>
             index === 0
               ? setPlaceHolderTitle!(false)
               : setPlaceHolderArticle!(false)
           }
-          onInput={(e) => {
-            const content = (e.target as HTMLDivElement).innerHTML;
-            handleContentChange(
-              index,
-              content,
-              language,
-              setText,
-              debouncedUpdateStore
-            );
-          }}
         >
           {index === 0
             ? savedTitleRef?.current

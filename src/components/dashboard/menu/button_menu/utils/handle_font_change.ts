@@ -37,7 +37,7 @@ export const handleFontChange = (
       }
 
       const fontStyle = value === "italic" ? "italic" : "normal";
-      const fontWeight = value === "bold" ? "bold" : "normal";
+      const fontWeight = value === "bold" ? "700" : "400"; // Using numeric values consistently
       const textDecoration = value === "underline" ? "underline" : "none";
       const fontSizeH2 = value === "font_h2" ? "1.5em" : "1em";
       const fontSizeH3 = value === "font_h3" ? "1.17em" : "1em";
@@ -50,8 +50,8 @@ export const handleFontChange = (
           spanNode.style.fontStyle = isItalic ? "normal" : "italic";
           setMarkdownAttr(spanNode, "italic", !isItalic);
         } else if (value === "bold") {
-          const isBold = spanNode.style.fontWeight === "bold";
-          spanNode.style.fontWeight = isBold ? "normal" : "bold";
+          const isBold = ["700", "bold"].includes(spanNode.style.fontWeight);
+          spanNode.style.fontWeight = isBold ? "400" : "700"; // Use numeric values consistently
           setMarkdownAttr(spanNode, "bold", !isBold);
         } else if (value === "underline") {
           const isUnderlined = spanNode.style.textDecoration === "underline";

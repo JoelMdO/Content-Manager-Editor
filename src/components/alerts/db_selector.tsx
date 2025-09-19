@@ -22,8 +22,9 @@ const dbSelector = () => {
       confirmButtonText: "DeCav",
       cancelButtonText: "Joel",
       customClass: {
-        confirmButton: "bg-decav-toast-color py-2 px-2 text-black font-bold",
-        cancelButton: "bg-joel-toast-color text-black py-2 px-2 ml-2 font-bold",
+        confirmButton: "bg-decav-toast-color py-2 px-2 text-black font-normal",
+        cancelButton:
+          "bg-joel-toast-color text-black py-2 px-2 ml-2 font-normal",
       },
       buttonsStyling: false,
       showClass: {

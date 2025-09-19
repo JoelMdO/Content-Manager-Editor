@@ -6,7 +6,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Lexend } from "next/font/google";
 
 const lexend = Lexend({
-  weight: "400",
+  weight: ["400", "700"],
+  style: ["normal"],
   subsets: ["latin"],
 });
 

@@ -2,7 +2,7 @@ import removeBase64FromImgTags from "../menu/button_menu/utils/remove_img_base64
 
 export const handleContentChange = (
   index: number,
-  content: string,
+  element: HTMLElement,
   language: string,
   setText: (text: string) => void,
   debouncedUpdateStore: (
@@ -12,6 +12,8 @@ export const handleContentChange = (
     setText: (text: string) => void
   ) => void
 ) => {
+  // Get the innerHTML which will preserve all styling
+  const content = element.innerHTML;
   ///========================================================
   // Function to handler the content change on the editor, when
   // the user types or modifies the content.

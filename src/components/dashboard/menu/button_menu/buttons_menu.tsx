@@ -93,7 +93,7 @@ const MenuButton = ({
           isClicked
             ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"
             : "bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-black"
-        } hover:border-orange-300 font-bold mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
+        } hover:border-orange-300 font-normal mt-4 shadow-md shadow-black h-[30px] md:h-[40px] w-[9em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
           // Call handleClick which triggers buttonMenuLogic
           handleClick();
