@@ -112,6 +112,11 @@ export const handleClick = async ({
   //
   if (jsonArticle) {
     //
+    console.log("Loading article from storage:", {
+      hasImages: jsonArticle.some((item: any) => item.type === "image"),
+      imageData: jsonArticle.filter((item: any) => item.type === "image"),
+    });
+
     let preSavedBodyRef =
       jsonArticle.find((item: any) => item.type === dbFieldName)?.content || "";
 
@@ -123,21 +128,46 @@ export const handleClick = async ({
       let images: any[] = [];
 
       images = jsonArticle.filter((item: any) => item.type === "image");
+      console.log("Processing images for rendering:", {
+        count: images.length,
+        imageDetails: images.map((img) => ({
+          id: img.id || img.imageId,
+          hasBase64: !!img.base64,
+          base64Length: img.base64 ? img.base64.length : 0,
+          hasBlobUrl: !!img.blobUrl,
+        })),
+      });
 
       for (const image of images) {
-        // Create a regex to match the <img> tag and its associated <p> tag with the image.fileName
+        // Create a regex to match the <img> tag and its associated <p> tag with the image ID
+        const imageIdentifier = image.imageId || image.id; // Handle both possible ID fields
+        console.log("Trying to match image with ID:", imageIdentifier);
+
         const regex = new RegExp(
-          `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${image.id}</p>`,
+          `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
           "g"
         );
 
         // Only generate blobUrl for valid images
         // const blobUrl = URL.createObjectURL(image.data);
 
-        preSavedBodyRef = preSavedBodyRef.replace(
-          regex,
-          `<img src="${image.base64}" alt="${image.id}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${image.id}</p>`
-        );
+        // Try to use base64 first, if not available use blobUrl
+        const imageSource = image.base64 || image.blobUrl;
+        console.log("Image data available:", {
+          id: image.id,
+          hasBase64: !!image.base64,
+          hasBlobUrl: !!image.blobUrl,
+          selectedSource: imageSource,
+        });
+
+        if (imageSource) {
+          preSavedBodyRef = preSavedBodyRef.replace(
+            regex,
+            `<img src="${imageSource}" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+          );
+        } else {
+          console.warn(`No valid image source found for image ${image.id}`);
+        }
       }
       //}
     } catch (err) {

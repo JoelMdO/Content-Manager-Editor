@@ -45,7 +45,53 @@ const DashboardEditor = () => {
   useEffect(() => {
     const editableDiv = editorRefs?.current[1];
     if (editableDiv && savedBodyRef?.current) {
-      editableDiv.innerHTML = savedBodyRef.current; // Force HTML rendering
+      // Check for any remaining image placeholders and log them
+      const hasPlaceholders = savedBodyRef.current.includes(
+        "{image_url_placeholder}"
+      );
+      if (hasPlaceholders) {
+        console.warn("Found unprocessed image placeholders in content:", {
+          content: savedBodyRef.current,
+        });
+      }
+
+      // Ensure no unprocessed placeholders remain
+      let processedContent = savedBodyRef.current;
+      if (processedContent.includes("{image_url_placeholder}")) {
+        // Try to get images from session storage
+        const dbName = sessionStorage.getItem("db");
+        const articleContent = JSON.parse(
+          sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+        );
+        const images = articleContent.filter(
+          (item: any) => item.type === "image"
+        );
+
+        console.log("Available images for placeholder replacement:", images);
+
+        // Replace any remaining placeholders with actual image data
+        images.forEach((image: any) => {
+          const imgSource = image.base64 || image.blobUrl;
+          if (imgSource) {
+            const imageIdentifier = image.imageId || image.id;
+            console.log("Dashboard editor trying to replace image:", {
+              imageIdentifier,
+              contentHasId: processedContent.includes(imageIdentifier),
+            });
+
+            const placeholder = new RegExp(
+              `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
+              "g"
+            );
+            processedContent = processedContent.replace(
+              placeholder,
+              `<img src="${imgSource}" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+            );
+          }
+        });
+      }
+
+      editableDiv.innerHTML = processedContent; // Force HTML rendering
     }
   }, [isDraftArticleButtonClicked, savedBodyRef?.current]);
   ///--------------------------------------------------------
