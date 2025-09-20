@@ -3,6 +3,7 @@ import replaceSrcWithImagePlaceholders from "../../menu/button_menu/utils/images
 import matter from "gray-matter";
 import errorAlert from "@/components/alerts/error";
 import { ProcessedArticle } from "../types/previewed_article";
+import replaceImgWithSrc from "../../menu/button_menu/utils/images_edit/replace_img_with_tag";
 
 const loadArticle = async ({
   language,
@@ -71,25 +72,32 @@ const loadArticle = async ({
     //
     console.log("articleTitle", articleTitle);
     console.log("articleBody", articleBody);
-
+    console.log('images"', images);
     //
     ///--------------------------------------------------------
-    // Add images if any to the body
+    // Add images src and alt to the body tag
     ///--------------------------------------------------------
-    const updatedArticleBody = replaceSrcWithImagePlaceholders(
+    const updatedTagArticleBody = replaceImgWithSrc(
       articleBody.content! as string,
       images
     );
-    console.log("updatedArticleBody", updatedArticleBody);
-
+    console.log("updatedTagArticleBody", updatedTagArticleBody);
     ///--------------------------------------------------------
     // Convert to Markdown
     ///--------------------------------------------------------
+    const articleToMarkDown = `<h1>${articleTitle.content}</h1>\n${updatedTagArticleBody}`;
     const articleBodyMarkdown = await convertHtmlToMarkdownAPI(
-      `<h1>${articleTitle.content}</h1>\n${updatedArticleBody}`
+      articleToMarkDown
     );
     console.log("articleBodyMarkdown", articleBodyMarkdown);
-
+    // ///--------------------------------------------------------
+    // // Add images if any to the body
+    // ///--------------------------------------------------------
+    // const updatedArticleBody = replaceMarkdownWithImage(
+    //   articleBody.content! as string,
+    //   images
+    // );
+    // console.log("updatedArticleBody", articleBodyMarkdown);
     //
     ///--------------------------------------------------------
     // Parses the article, separates the body text into content
@@ -103,10 +111,10 @@ const loadArticle = async ({
       //--------------------------------------------------------
       // Validate Cloudinary image URL
       //--------------------------------------------------------
-      function isValidCdnImageUrl(url: string): boolean {
-        return /^https:\/\/cdn\.cloudinary\.com\//.test(url);
-      }
-      const image = isValidCdnImageUrl(data.image) ? data.image : "";
+      // function isValidCdnImageUrl(url: string): boolean {
+      //   return /^https:\/\/cdn\.cloudinary\.com\//.test(url);
+      // }
+      // const image = isValidCdnImageUrl(data.image) ? data.image : "";
       //
       ///--------------------------------------------------------
       // Store the markdown in sessionStorage
@@ -120,7 +128,7 @@ const loadArticle = async ({
         type: `markdown-${idiom}readTime`,
         content: data.readTime || 0,
       });
-      parsedData.push({ type: "markdown-image", content: image });
+      // parsedData.push({ type: "markdown-image", content: image });
       sessionStorage.setItem(
         `articleContent-${dbName}`,
         JSON.stringify(parsedData)
@@ -130,7 +138,7 @@ const loadArticle = async ({
         title: articleTitle.content || "Untitled",
         readTime: data.readTime || Math.ceil(content.split(" ").length / 200),
         content: content,
-        image: image,
+        // image: image,
       };
     } else {
       errorAlert("markdown");

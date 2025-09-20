@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
@@ -9,6 +9,8 @@ import previewArticleStyles from "./style/preview_article_styles";
 import MenuContext from "../menu/button_menu/context/menu_context";
 import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import LanguageSwitcher from "../language_switcher/language_switcher";
+import replaceSrcWithImagePlaceholders from "../menu/button_menu/utils/images_edit/replace_src_on_img";
+import img from "../../../../cypress/fixtures/test-image";
 //
 const PreviewArticle = () => {
   //
@@ -17,10 +19,23 @@ const PreviewArticle = () => {
     language === "en" ? "Time to Read: " : "Tiempo de lectura: ";
   const minutesToReadText = language === "en" ? " minutes" : " minutos";
   const toReadInText = language === "en" ? "Read in " : "Leer en ";
+  const [updatedContent, setUpdatedContent] = React.useState<string>("");
   //
   console.log("article at Preview Article", article);
+  //
+  useEffect(() => {
+    console.log("doing useEffect in PreviewArticle");
 
+    if (article?.content) {
+      const updatedContent = replaceSrcWithImagePlaceholders(
+        article?.content as string
+      );
+      console.log("updatedContent at useEffect", updatedContent);
+      setUpdatedContent(updatedContent);
+    }
+  }, [article?.content]);
   // Custom remark plugin to unwrap images from paragraphs
+  //
   function remarkUnwrapImages() {
     return (tree: any) => {
       visit(tree, "paragraph", (node, index, parent) => {
@@ -70,6 +85,10 @@ const PreviewArticle = () => {
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkUnwrapImages]}
+            urlTransform={(uri, key, node) => {
+              if (uri?.startsWith("data:")) return uri; // allow base64
+              return uri;
+            }}
             components={{
               h1: ({ children, ...props }) => (
                 <h1 className={`${previewArticleStyles.h}`} {...props}>
@@ -96,6 +115,7 @@ const PreviewArticle = () => {
                 const hasOnlyImages = React.Children.toArray(children).every(
                   (child) => React.isValidElement(child) && child.type === "img"
                 );
+                console.log("hasOnlyImages", hasOnlyImages);
 
                 if (hasOnlyImages) {
                   return <div className="image-container my-1">{children}</div>;
@@ -107,29 +127,33 @@ const PreviewArticle = () => {
                   </p>
                 );
               },
-              img: ({ src = "", alt = "" }) => (
-                <figure className="flex flex-col justify-center items-center transition-all duration-500 transform hover:scale-[1.02]">
-                  <div
+              img: ({ node, ...props }) => {
+                return (
+                  <figure className="flex flex-col justify-center items-center transition-all duration-500 transform hover:scale-[1.02]">
+                    {/* <div
                     className={`flex relative justify-center items-center overflow-hidden ${previewArticleStyles.image_container}`}
-                  >
+                  > */}
                     <Image
                       width={500}
                       height={500}
-                      src={src as string}
-                      alt={alt}
+                      src={props.src as string}
+                      alt={props.alt as string}
+                      unoptimized={true}
                       className="self-center object-contain"
                       loading="lazy"
                     />
-                  </div>
-                  {alt && (
-                    <p
-                      className={`${previewArticleStyles.paragraph} text-center text-gray-500 dark:text-gray-400 mt-0 italic font-medium`}
-                    >
-                      {alt}
-                    </p>
-                  )}
-                </figure>
-              ),
+                    {/* </div> */}
+
+                    {props.alt && (
+                      <figcaption
+                        className={`${previewArticleStyles.paragraph} text-center text-gray-500 dark:text-gray-400 mt-0 italic font-medium`}
+                      >
+                        {props.alt}
+                      </figcaption>
+                    )}
+                  </figure>
+                );
+              },
               ol: ({ children, ...props }) => (
                 <ol
                   className={`${previewArticleStyles.list} list-decimal list-inside text-gray-600 dark:text-gray-300 space-y-1`}
@@ -392,7 +416,7 @@ const PreviewArticle = () => {
               ),
             }}
           >
-            {article!.content}
+            {updatedContent}
           </ReactMarkdown>
         </section>
       </article>

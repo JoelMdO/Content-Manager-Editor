@@ -56,6 +56,7 @@ const callHub = async (
       break;
     default:
       console.log("doing default at callHub, type:", type);
+      console.log('"data at callHub":', data);
 
       body = JSON.stringify({ data: data, type: type });
       headers["Content-Type"] = "application/json";

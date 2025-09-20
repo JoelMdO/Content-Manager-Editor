@@ -285,12 +285,9 @@ class HTMLToMarkdownConverter {
     const alt = options.includeImageAlt
       ? node.getAttribute("alt") || `Image ${++this.imageCounter}`
       : "";
-    const title = node.getAttribute("title");
-    let imageMarkdown = `![${alt}](${src}`;
-    if (title) {
-      imageMarkdown += ` "${title}"`;
-    }
-    imageMarkdown += ")";
+    // Instead of including the full base64, just use a placeholder
+    let imageMarkdown = `![${alt}]({src_${alt}})`;
+
     if (options.preserveImageDimensions) {
       const width = node.getAttribute("width");
       const height = node.getAttribute("height");

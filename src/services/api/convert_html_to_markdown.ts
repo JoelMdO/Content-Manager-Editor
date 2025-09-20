@@ -9,6 +9,8 @@ export async function convertHtmlToMarkdownAPI(html: string) {
     //   },
     //   body: JSON.stringify({ html, options }),
     // });
+    console.log('"html to convertHtmlToMarkdownAPI":', html);
+
     const response = await callHub("markdown", html);
 
     if (!response.status || response.status !== 200) {

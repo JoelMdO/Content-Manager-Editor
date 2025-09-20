@@ -117,9 +117,17 @@ export async function sanitizeData(
     ///--------------------------------------------------------
     // Clean Text
     ///--------------------------------------------------------
+    // console.log('"type at sanitizeData:", type);' + type);
+    // console.log("type of data at sanitizeData:", typeof data);
 
     if (typeof data === "string") {
-      const sanitizedText = sanitizeUrl(data);
+      //console.log('"type of data is string at sanitizeData"');
+
+      const sanitizedText = sanitizeUrl(data, type);
+      // console.log(
+      //   '"sanitizedText at sanitizeData:", sanitizedText);' + sanitizedText
+      // );
+
       if (sanitizedText.status === 200) {
         sanitizedData = { status: 200, message: "Valid text input" };
       } else {
@@ -128,6 +136,8 @@ export async function sanitizeData(
       return sanitizedData;
     } else {
       //is not a string return error.
+      //console.log("doing else at sanitizeData, type: " + type);
+
       sanitizedData = { status: 205, message: "text not allowed" };
     }
   }

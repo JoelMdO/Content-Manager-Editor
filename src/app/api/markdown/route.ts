@@ -6,15 +6,20 @@ import HTMLToMarkdownConverter, {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    //
+    console.log("body at api/markdown", body);
+    console.log('"type of body at api/markdown"', typeof body);
 
+    //
     if (!body || typeof body !== "string") {
       return NextResponse.json(
         { error: "Invalid input: HTML is required" },
         { status: 400 }
       );
     }
+    //
     console.log("body at api/markdown", body);
-
+    //
     const options = {
       preserveWhitespace: false, // Clean up extra whitespace
       includeImageAlt: true, // Include alt text for images
