@@ -25,6 +25,7 @@ const createSummary = async ({ language }: { language: string }) => {
     default:
       title = articleJson.find((item: any) => item.type === "title").content;
       body = articleJson.find((item: any) => item.type === "body").content;
+      break;
   }
   //
   const response = await callHub("summary", {
