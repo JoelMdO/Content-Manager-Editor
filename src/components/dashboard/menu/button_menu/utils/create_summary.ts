@@ -36,7 +36,7 @@ const createSummary = async ({ language }: { language: string }) => {
   //
   if (response.status === 200) {
     const summaryLan = language === "es" ? "es-" : "";
-    const summary = (response.body as any).summary || "";
+    const summary = (response.body as any) || "";
     //Store summary in sessionStorage and localStorage
     articleJson.push({ type: `${summaryLan}summary`, content: summary });
     sessionStorage.setItem(`articleContent-${db}`, JSON.stringify(articleJson));
