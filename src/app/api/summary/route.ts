@@ -30,10 +30,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     const title = data.data.title;
     const article = data.data.body;
     const language = data.data.language;
-    console.log("data at resume", data);
-    console.log("title", title);
-    console.log("article", article);
-    console.log("language", language);
+    // console.log("data at resume", data);
+    // console.log("title", title);
+    // console.log("article", article);
+    // console.log("language", language);
 
     ///--------------------------------------------------------
     // Create a summary of the article content for description

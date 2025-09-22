@@ -38,7 +38,8 @@ const postButtonClicked = async () => {
     }
   }
   articleContent.push({ type: "dbName", content: dbName });
-
+  console.log('"articleContent at postButtonClicked"', articleContent);
+  // debugger;
   const response = await callHub("post", articleContent);
   return response;
 };

@@ -80,7 +80,7 @@ const uploadImage = async (
 
         // Add image data to articleContent with the base64 data we already have
         articleContent.push({
-          type: "image",
+          type: `image-${imageId}`,
           imageId: imageId,
           fileName: file.name,
           blobUrl: objectUrl,

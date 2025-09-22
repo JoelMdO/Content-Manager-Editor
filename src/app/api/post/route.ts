@@ -12,6 +12,10 @@ import { Database } from "firebase-admin/lib/database/database";
 import { initializeFirebaseAdmin } from "../../../services/db/firebase_admin_DeCav";
 import { adminDB } from "../../../services/db/firebase-admin";
 import { FieldPath } from "firebase-admin/firestore";
+import replaceSrcWithImagePlaceholdersAtPost from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img_at_post";
+import { convertHtmlToMarkdown } from "@/services/api/html_to_markdown";
+import { FormDataImageItem } from "@/components/dashboard/menu/button_menu/type/formData";
+import { articleDataMocksForDb } from "../../../../test/mock_post";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -22,6 +26,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   const imageUrls: { url: string; fileId: string }[] = [];
   const formData = await req.formData();
   const dbName = formData.get("dbName") as string;
+  console.log('doing POST at /api/post, dbName:"', dbName, '"');
 
   interface Article {
     id: string;
@@ -79,26 +84,48 @@ export async function POST(req: NextRequest): Promise<Response> {
     /// SAVE IMAGE :
     ///================================================================
 
-    const imageFiles: (File | string)[] = [];
+    let imageFiles: FormDataImageItem[] = [];
     let fileName: string = "";
+    console.log("auth ok");
 
-    for (const key of formData.keys()) {
-      if (key.startsWith("image")) {
-        const fileData = formData.get(key);
-        if (typeof fileData === "string") {
-          imageFiles.push(fileData);
-        } else if (fileData instanceof Blob) {
-          fileName = fileData.name || key;
+    // for (const key of formData.keys()) {
+    //   if (key.startsWith("image")) {
+    //     const fileData = formData.get(key);
+    //     console.log('"fileData with image prefix"');
 
-          // Convert to File
-          const file = new File([fileData], fileName, { type: fileData.type });
-          imageFiles.push(file);
-        } else {
-          const fileData = formData.get(key);
-          imageFiles.push(fileData as File);
-        }
-      }
-    }
+    //     if (typeof fileData === "string") {
+    //       imageFiles.push(fileData);
+    //     } else if (fileData instanceof Blob) {
+    //       fileName = fileData.name || key;
+
+    //       // Convert to File
+    //       const file = new File([fileData], fileName, { type: fileData.type });
+    //       imageFiles.push(file);
+    //     } else {
+    //       const fileData = formData.get(key);
+    //       imageFiles.push(fileData as File);
+    //     }
+    //   }
+    // }
+    // for (const key of formData.keys()) {
+    //   if (key.startsWith("images")) {
+    const files = formData.get("images");
+    console.log('files type of "images"', typeof files);
+    const filesObj = JSON.parse(files as string);
+    //console.log('"filesObj at uploadImage"', filesObj);
+
+    // if (Array.isArray(files)) {
+    //   console.log("images are arrays at uploadImage");
+    imageFiles = filesObj as FormDataImageItem[];
+    //   console.log("imageFiles at uploadImage", imageFiles);
+    //   imageFiles = files as FormDataImageItem[];
+    // } else {
+    //   console.log("images are NOT arrays at uploadImage");
+    //   imageFiles = [];
+    // }
+
+    //}
+    //}
 
     if (imageFiles.length > 0) {
       //Filter valid file objects
@@ -106,10 +133,10 @@ export async function POST(req: NextRequest): Promise<Response> {
       // pre_images = imageFiles.filter(
       //   (value): value is File => value instanceof File
       // );
-      pre_images = imageFiles;
-
+      // pre_images = imageFiles;
+      console.log("pre_images > 0");
       await Promise.all(
-        pre_images.map(async (item: File | string) => {
+        imageFiles.map(async (item: FormDataImageItem) => {
           return new Promise<void>(async (resolve) => {
             //   ///CLOUDINARY UPLOAD
             //   //Convert to a buffer stream
@@ -120,19 +147,25 @@ export async function POST(req: NextRequest): Promise<Response> {
             //   const fileUri =
             //     "data:" + mimeType + ";" + encoding + "," + base64Data;
             let fileUri: string = "";
-            let uploadFileName: string;
+            let uploadFileName: string = "";
             if (typeof item === "string") {
+              console.log('"image is string at uploadImage"');
+
               // If item is a string, use it directly as the URL
               fileUri = item;
               uploadFileName = item;
             } else {
-              const fileBuffer = await item.arrayBuffer();
-              const mimeType = item.type;
-              const encoding = "base64";
-              const base64Data = Buffer.from(fileBuffer).toString("base64");
-              const fileUri =
-                "data:" + mimeType + ";" + encoding + "," + base64Data;
-              uploadFileName = item.name || fileName;
+              console.log('"image is file at uploadImage"');
+
+              //   const fileBuffer = await item.arrayBuffer();
+              //   const mimeType = item.type;
+              //   const encoding = "base64";
+              //   const base64Data = Buffer.from(fileBuffer).toString("base64");
+              // const fileUri =
+              //   "data:" + mimeType + ";" + encoding + "," + base64Data;
+              // uploadFileName = item.name || fileName;
+              fileUri = item.base64;
+              uploadFileName = item.imageId;
             }
             cloudinary.uploader.upload(
               fileUri,
@@ -159,7 +192,6 @@ export async function POST(req: NextRequest): Promise<Response> {
                   let urlCloudinary: string | undefined = "";
                   urlCloudinary = result?.secure_url;
                   console.log("Cloudinary URL:", urlCloudinary);
-
                   imageUrls.push({
                     url: urlCloudinary!,
                     fileId: uploadFileName,
@@ -170,6 +202,8 @@ export async function POST(req: NextRequest): Promise<Response> {
             ); //     // Update image URL in article content
             // If any images were uploaded, update the article's images array
             if (imageUrls.length > 0) {
+              console.log('"imageUrls.length > 0 at uploadImage"');
+              console.log('"imageUrls"', imageUrls);
               article.images = imageUrls; // Append image URLs to article.images
             }
           });
@@ -200,10 +234,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     const esSummaryObj = JSON.parse(esSummaryData);
     const summaryData = formData.get("summary") as string;
     const summaryObj = JSON.parse(summaryData);
-    const markdownArticleData = formData.get("markdown") as string;
-    const markdownArticleObj = JSON.parse(markdownArticleData);
-    const markdownEsArticleData = formData.get("es-markdown") as string;
-    const markdownEsArticleObj = JSON.parse(markdownEsArticleData);
+    // const markdownArticleData = formData.get("markdown") as string;
+    // const markdownArticleObj = JSON.parse(markdownArticleData);
+    // const markdownEsArticleData = formData.get("es-markdown") as string;
+    // const markdownEsArticleObj = JSON.parse(markdownEsArticleData);
 
     //
     article.id = idObj;
@@ -216,14 +250,16 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.esSection = esSectionObj;
     article.summary = summaryObj;
     article.esSummary = esSummaryObj;
-    article.markdownArticle = markdownArticleObj;
-    article.markdownEsArticle = markdownEsArticleObj;
+    // article.markdownArticle = markdownArticleObj;
+    // article.markdownEsArticle = markdownEsArticleObj;
 
     // SAVE in db.
     let images = article.images;
     let section = article.section;
-    //
+    console.log('article images after cloudinary upload:"', images);
 
+    //
+    // log("article before replaceSrcWithImagePlaceholdersAtPost");
     //------------------------------------------
     // Purpose: Replace image src attributes in article bodies with placeholders and assign the updated strings back.
     //------------------------------------------
@@ -232,12 +268,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log("articlesBodie", article.body);
 
     const updatedArticlesBodies = articlesBodies.map((body) =>
-      replaceSrcWithImagePlaceholders(body!, images)
+      replaceSrcWithImagePlaceholdersAtPost(body!, images)
     );
     article.body = updatedArticlesBodies[0];
     article.esBody = updatedArticlesBodies[1];
     console.log("updatedArticlesBodies", updatedArticlesBodies[0]);
-
+    // debugger;
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
@@ -264,19 +300,26 @@ export async function POST(req: NextRequest): Promise<Response> {
     //------------------------------------------
     // Purpose: Convert HTML bodies to Markdown, including the title at the top of each body.
     //------------------------------------------
-    // const titles = [article.title, article.esTitle];
-    // // Combine title and body for each language, then convert to Markdown
-    // const markdownContent = newArticles.map((body, idx) =>
-    //   convertHtmlToMarkdown(`<h1>${titles[idx]}</h1>\n${body}`, {
-    //     preserveWhitespace: false, // Clean up extra whitespace
-    //     includeImageAlt: true, // Include alt text for images
-    //     preserveImageDimensions: true, // Keep image dimensions as comments
-    //     convertTables: true, // Convert HTML tables to markdown
-    //     preserveLineBreaks: true, // Keep line breaks as they are
-    //   })
-    // );
+    const titles = [article.title, article.esTitle];
+    // Combine title and body for each language, then convert to Markdown
+    const markdownContent = newArticles.map((body, idx) =>
+      convertHtmlToMarkdown(
+        `<h1>${titles[idx]}</h1>\n${body}`,
+        {
+          preserveWhitespace: false, // Clean up extra whitespace
+          includeImageAlt: true, // Include alt text for images
+          preserveImageDimensions: true, // Keep image dimensions as comments
+          convertTables: true, // Convert HTML tables to markdown
+          preserveLineBreaks: true, // Keep line breaks as they are
+        },
+        "post"
+      )
+    );
     // console.log("markdownContent", markdownContent[0]);
-
+    // debugger;
+    article.markdownArticle = markdownContent[0];
+    article.markdownEsArticle = markdownContent[1];
+    console.log("article.markdownArticle", article.markdownArticle);
     //
     ///--------------------------------------------------------
     // Select the correct database to save the article
@@ -330,9 +373,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       });
     }
     let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
-    ///--------------------------------------------------------
+    // /--------------------------------------------------------
     // Create Metadata Object
-    ///--------------------------------------------------------
+    // /--------------------------------------------------------
     const metadata = {
       title: article.title,
       description: article.summary,
@@ -359,9 +402,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       published: true,
       version: "1.0",
     };
-    //
-
-    //
 
     const articleDataForDb = {
       en: article.markdownArticle,
@@ -369,11 +409,13 @@ export async function POST(req: NextRequest): Promise<Response> {
       metadata: metadata,
       esMetadata: esMetadata,
     };
-    //
+
     const likes = {
       likes: 0,
     };
     //
+    // const articleDataForDb = articleDataMocksForDb;
+    // const newId = articleDataMocksForDb.metadata.slug;
     console.log("articleDataForDb", articleDataForDb);
 
     //
@@ -398,8 +440,8 @@ export async function POST(req: NextRequest): Promise<Response> {
         error: e instanceof Error ? e.message : "Unknown database error",
       });
     }
-    //
-    //
+    // //
+    // //
     const body = JSON.stringify({
       title: article.title,
       slug: newId,

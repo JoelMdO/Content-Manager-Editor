@@ -7,8 +7,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     //
-    console.log("body at api/markdown", body);
-    console.log('"type of body at api/markdown"', typeof body);
+    // console.log("body at api/markdown", body);
+    // console.log('"type of body at api/markdown"', typeof body);
 
     //
     if (!body || typeof body !== "string") {
@@ -18,10 +18,10 @@ export async function POST(request: NextRequest) {
       );
     }
     //
-    console.log("body at api/markdown", body);
+    //console.log("body at api/markdown", body);
     //
     const options = {
-      preserveWhitespace: false, // Clean up extra whitespace
+      preserveWhitespace: true, // Clean up extra whitespace
       includeImageAlt: true, // Include alt text for images
       preserveImageDimensions: true, // Keep image dimensions as comments
       convertTables: true, // Convert HTML tables to markdown
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     const converter = new HTMLToMarkdownConverter();
     const markdown = converter.convert({ html: body, options });
-    console.log("markdown at api/markdown", markdown);
+    //console.log("markdown at api/markdown", markdown);
 
     return NextResponse.json({
       status: 200,

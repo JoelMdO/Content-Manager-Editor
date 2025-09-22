@@ -43,6 +43,8 @@ const callHub = async (
     //## POST
     case "post":
     case "translate":
+      console.log('doing "post" at callHub, type:', type);
+
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
         : data !== undefined
@@ -50,6 +52,7 @@ const callHub = async (
         : [];
 
       const formData = await createFormData(type, formDataItems);
+      console.log('"formData at callHub":', formData);
 
       body = formData;
       credentials = "include";

@@ -11,6 +11,7 @@ export interface HtmlToMarkdownOptions {
 interface HTMLTypes {
   html: string;
   options?: HtmlToMarkdownOptions;
+  type?: string;
 }
 
 class HTMLToMarkdownConverter {
@@ -26,7 +27,7 @@ class HTMLToMarkdownConverter {
     this.Node = this.dom.window.Node;
   }
 
-  convert({ html, options = {} }: HTMLTypes): string {
+  convert({ html, options = {}, type }: HTMLTypes): string {
     const {
       preserveWhitespace = true,
       includeImageAlt = true,
@@ -40,23 +41,31 @@ class HTMLToMarkdownConverter {
     this.imageCounter = 0;
     this.linkCounter = 0;
     const body = document.body || document.documentElement;
-
-    return this.processNode(body, "", 0, {
-      preserveWhitespace,
-      includeImageAlt,
-      preserveImageDimensions,
-      convertTables,
-      preserveLineBreaks,
-    }).trim();
+    const newType = type === "post" ? "post" : "";
+    return this.processNode(
+      body,
+      "",
+      0,
+      {
+        preserveWhitespace,
+        includeImageAlt,
+        preserveImageDimensions,
+        convertTables,
+        preserveLineBreaks,
+      },
+      newType
+    ).trim();
   }
 
   processNode(
     node: Node,
     markdown = "",
     depth = 0,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     if (!node) return markdown;
+    console.log("type", type);
 
     if (node.nodeType === this.Node.TEXT_NODE) {
       const text = node.textContent || "";
@@ -72,93 +81,128 @@ class HTMLToMarkdownConverter {
       switch (tagName) {
         case "h1":
           return (
-            markdown + this.processHeading(node as HTMLElement, 1, options)
+            markdown +
+            this.processHeading(node as HTMLElement, 1, options, type)
           );
         case "h2":
           return (
-            markdown + this.processHeading(node as HTMLElement, 2, options)
+            markdown +
+            this.processHeading(node as HTMLElement, 2, options, type)
           );
         case "h3":
           return (
-            markdown + this.processHeading(node as HTMLElement, 3, options)
+            markdown +
+            this.processHeading(node as HTMLElement, 3, options, type)
           );
         case "h4":
           return (
-            markdown + this.processHeading(node as HTMLElement, 4, options)
+            markdown +
+            this.processHeading(node as HTMLElement, 4, options, type)
           );
         case "h5":
           return (
-            markdown + this.processHeading(node as HTMLElement, 5, options)
+            markdown +
+            this.processHeading(node as HTMLElement, 5, options, type)
           );
         case "h6":
           return (
-            markdown + this.processHeading(node as HTMLElement, 6, options)
+            markdown +
+            this.processHeading(node as HTMLElement, 6, options, type)
           );
         case "p":
-          return markdown + this.processParagraph(node as HTMLElement, options);
+          return (
+            markdown + this.processParagraph(node as HTMLElement, options, type)
+          );
         case "br":
           return markdown + (options.preserveLineBreaks ? "  \n" : "\n");
         case "hr":
           return markdown + "\n\n---\n\n";
         case "strong":
         case "b":
-          return markdown + this.processStrong(node as HTMLElement, options);
+          return (
+            markdown + this.processStrong(node as HTMLElement, options, type)
+          );
         case "em":
         case "i":
-          return markdown + this.processEmphasis(node as HTMLElement, options);
+          return (
+            markdown + this.processEmphasis(node as HTMLElement, options, type)
+          );
         case "code":
           return (
-            markdown + this.processInlineCode(node as HTMLElement, options)
+            markdown +
+            this.processInlineCode(node as HTMLElement, options, type)
           );
         case "pre":
-          return markdown + this.processCodeBlock(node as HTMLElement, options);
+          return (
+            markdown + this.processCodeBlock(node as HTMLElement, options, type)
+          );
         case "a":
-          return markdown + this.processLink(node as HTMLElement, options);
+          return (
+            markdown + this.processLink(node as HTMLElement, options, type)
+          );
         case "img":
-          return markdown + this.processImage(node as HTMLElement, options);
+          return (
+            markdown + this.processImage(node as HTMLElement, options, type)
+          );
         case "ul":
           return (
             markdown +
-            this.processUnorderedList(node as HTMLElement, depth, options)
+            this.processUnorderedList(node as HTMLElement, depth, options, type)
           );
         case "ol":
           return (
             markdown +
-            this.processOrderedList(node as HTMLElement, depth, options)
+            this.processOrderedList(node as HTMLElement, depth, options, type)
           );
         case "li":
           return (
-            markdown + this.processListItem(node as HTMLElement, depth, options)
+            markdown +
+            this.processListItem(node as HTMLElement, depth, options, type)
           );
         case "blockquote":
           return (
-            markdown + this.processBlockquote(node as HTMLElement, options)
+            markdown +
+            this.processBlockquote(node as HTMLElement, options, type)
           );
         case "table":
           if (options.convertTables) {
-            return markdown + this.processTable(node as HTMLElement, options);
+            return (
+              markdown + this.processTable(node as HTMLElement, options, type)
+            );
           }
-          return markdown + this.processChildren(node as HTMLElement, options);
+          return (
+            markdown + this.processChildren(node as HTMLElement, options, type)
+          );
         case "div":
-          return markdown + this.processDiv(node as HTMLElement, options);
+          return markdown + this.processDiv(node as HTMLElement, options, type);
         case "span":
-          return markdown + this.processSpan(node as HTMLElement, options);
+          return (
+            markdown + this.processSpan(node as HTMLElement, options, type)
+          );
         case "del":
         case "s":
         case "strike":
           return (
-            markdown + this.processStrikethrough(node as HTMLElement, options)
+            markdown +
+            this.processStrikethrough(node as HTMLElement, options, type)
           );
         case "sup":
           return (
-            markdown + this.processSuperscript(node as HTMLElement, options)
+            markdown +
+            this.processSuperscript(node as HTMLElement, options, type)
           );
         case "sub":
-          return markdown + this.processSubscript(node as HTMLElement, options);
+          return (
+            markdown + this.processSubscript(node as HTMLElement, options, type)
+          );
         case "kbd":
-          return markdown + this.processKeyboard(node as HTMLElement, options);
+          return (
+            markdown + this.processKeyboard(node as HTMLElement, options, type)
+          );
         case "mark":
-          return markdown + this.processHighlight(node as HTMLElement, options);
+          return (
+            markdown + this.processHighlight(node as HTMLElement, options, type)
+          );
         case "section":
         case "article":
         case "header":
@@ -169,7 +213,7 @@ class HTMLToMarkdownConverter {
           return (
             markdown +
             "\n\n" +
-            this.processChildren(node as HTMLElement, options) +
+            this.processChildren(node as HTMLElement, options, type) +
             "\n\n"
           );
         case "time":
@@ -180,13 +224,17 @@ class HTMLToMarkdownConverter {
         case "dfn":
         case "var":
         case "samp":
-          return markdown + this.processChildren(node as HTMLElement, options);
+          return (
+            markdown + this.processChildren(node as HTMLElement, options, type)
+          );
         case "script":
         case "style":
         case "noscript":
           return markdown;
         default:
-          return markdown + this.processChildren(node as HTMLElement, options);
+          return (
+            markdown + this.processChildren(node as HTMLElement, options, type)
+          );
       }
     }
     return markdown;
@@ -194,11 +242,12 @@ class HTMLToMarkdownConverter {
 
   processChildren(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     let result = "";
     for (let child of Array.from(node.childNodes)) {
-      result = this.processNode(child, result, 0, options);
+      result = this.processNode(child, result, 0, options, type);
     }
     return result;
   }
@@ -206,41 +255,47 @@ class HTMLToMarkdownConverter {
   processHeading(
     node: HTMLElement,
     level: number,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     const hashes = "#".repeat(level);
-    return `\n\n${hashes} ${content.trim()}\n\n`;
+    return `\n${hashes} ${content.trim()}\n\n`;
   }
 
   processParagraph(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     if (!content.trim()) return "";
-    return `\n\n${content.trim()}\n\n`;
+    // return `\n\n${content.trim()}\n\n`;
+    return `${content.trim()}\n`;
   }
 
   processStrong(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     return `**${content}**`;
   }
 
   processEmphasis(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     return `*${content}*`;
   }
 
   processInlineCode(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     const content = node.textContent || "";
     return `\`${content}\``;
@@ -248,7 +303,8 @@ class HTMLToMarkdownConverter {
 
   processCodeBlock(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     const codeElement = node.querySelector("code");
     const content = codeElement
@@ -265,9 +321,10 @@ class HTMLToMarkdownConverter {
 
   processLink(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     const href = node.getAttribute("href") || "";
     const title = node.getAttribute("title");
     if (!href) return content;
@@ -279,15 +336,28 @@ class HTMLToMarkdownConverter {
 
   processImage(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
+    console.log("type in processImage", type);
+
     const src = node.getAttribute("src") || "";
     const alt = options.includeImageAlt
       ? node.getAttribute("alt") || `Image ${++this.imageCounter}`
       : "";
     // Instead of including the full base64, just use a placeholder
     let imageMarkdown = `![${alt}]({src_${alt}})`;
+    console.log("node in processImage", node);
+    console.log("alt in processImage", alt);
 
+    //
+    if (type === "post") {
+      console.log("src in processImage", src);
+      console.log("alt in processImage", alt);
+
+      return `![${alt}](${src})`;
+    }
+    //
     if (options.preserveImageDimensions) {
       const width = node.getAttribute("width");
       const height = node.getAttribute("height");
@@ -303,7 +373,8 @@ class HTMLToMarkdownConverter {
   processUnorderedList(
     node: HTMLElement,
     depth: number,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     const items = Array.from(node.children).filter(
       (child) => child.tagName.toLowerCase() === "li"
@@ -318,7 +389,8 @@ class HTMLToMarkdownConverter {
   processOrderedList(
     node: HTMLElement,
     depth: number,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     const items = Array.from(node.children).filter(
       (child) => child.tagName.toLowerCase() === "li"
@@ -343,7 +415,8 @@ class HTMLToMarkdownConverter {
     node: HTMLElement,
     depth: number,
     options: Required<HtmlToMarkdownOptions>,
-    marker = "-"
+    marker = "-",
+    type?: string
   ): string {
     const indent = "  ".repeat(depth);
     // Get text content excluding nested lists
@@ -380,8 +453,18 @@ class HTMLToMarkdownConverter {
       // const nestedMarkdown =
       nestedMarkdown +=
         listType === "ul"
-          ? this.processUnorderedList(list as HTMLElement, depth + 1, options)
-          : this.processOrderedList(list as HTMLElement, depth + 1, options);
+          ? this.processUnorderedList(
+              list as HTMLElement,
+              depth + 1,
+              options,
+              type
+            )
+          : this.processOrderedList(
+              list as HTMLElement,
+              depth + 1,
+              options,
+              type
+            );
       // processedContent = processedContent.replace(
       //   list.outerHTML,
       //   nestedMarkdown
@@ -402,9 +485,10 @@ class HTMLToMarkdownConverter {
 
   processBlockquote(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     const lines = content.split("\n");
     const quotedLines = lines.map((line) => `> ${line}`).join("\n");
     return `\n\n${quotedLines}\n\n`;
@@ -412,7 +496,8 @@ class HTMLToMarkdownConverter {
 
   processTable(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     const rows = Array.from(node.querySelectorAll("tr"));
     if (rows.length === 0) return "";
@@ -437,23 +522,26 @@ class HTMLToMarkdownConverter {
 
   processDiv(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     const className = node.getAttribute("class") || "";
     if (className.includes("code-block") || className.includes("highlight")) {
-      return this.processCodeBlock(node, options);
+      return this.processCodeBlock(node, options, type);
     }
-    const content = this.processChildren(node, options);
-    return content ? `\n\n${content.trim()}\n\n` : "";
+    const content = this.processChildren(node, options, type);
+    // return content ? `\n\n${content.trim()}\n\n` : "";
+    return content ? `${content.trim()}\n` : "";
   }
 
   processSpan(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
     const style = node.getAttribute("style") || "";
     const className = node.getAttribute("class") || "";
-    let content = this.processChildren(node, options);
+    let content = this.processChildren(node, options, type);
     if (style.includes("font-weight: bold") || className.includes("bold")) {
       content = `**${content}**`;
     } else if (
@@ -476,41 +564,46 @@ class HTMLToMarkdownConverter {
 
   processStrikethrough(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     return `~~${content}~~`;
   }
 
   processSuperscript(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     return `^${content}^`;
   }
 
   processSubscript(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     return `~${content}~`;
   }
 
   processKeyboard(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     return `\`${content}\``;
   }
 
   processHighlight(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>
+    options: Required<HtmlToMarkdownOptions>,
+    type?: string
   ): string {
-    const content = this.processChildren(node, options);
+    const content = this.processChildren(node, options, type);
     return `==${content}==`;
   }
 }
@@ -519,8 +612,9 @@ export default HTMLToMarkdownConverter;
 
 export function convertHtmlToMarkdown(
   html: string,
-  options: HtmlToMarkdownOptions = {}
+  options: HtmlToMarkdownOptions = {},
+  type: string = ""
 ): string {
   const converter = new HTMLToMarkdownConverter();
-  return converter.convert({ html, options });
+  return converter.convert({ html, options, type });
 }
