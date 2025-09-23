@@ -1,4 +1,5 @@
 import { debounce } from "lodash";
+import slugify from "./slugify";
 
 export const debouncedUpdateStore = debounce(
   ///========================================================
@@ -38,7 +39,10 @@ export const debouncedUpdateStore = debounce(
         const month = new Date().getMonth() + 1;
         const year = new Date().getFullYear();
         const fullData = `${date}-${month}-${year}`;
-        const id = `${title}-${fullData}`;
+        const preSlug = `${title}-${fullData}`;
+        const id = slugify(preSlug);
+        console.log("id:", id);
+
         articleContent.push({ type: "id", content: id });
       }
       setText(newTitle); // Update the displayed text
