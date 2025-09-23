@@ -13,11 +13,6 @@ export const debouncedUpdateStore = debounce(
   ) => {
     //
     const title = newTitle;
-    const date = new Date().getDay();
-    const month = new Date().getMonth() + 1;
-    const year = new Date().getFullYear();
-    const fullData = `${date}-${month}-${year}`;
-    const id = `${title}-${fullData}`;
     const titleKey = language === "es" ? "es-title" : "title";
     const bodyKey = language === "es" ? "es-body" : "body";
     //----------------------------------------------------
@@ -38,7 +33,14 @@ export const debouncedUpdateStore = debounce(
 
       // Add title and id to articleContent
       articleContent.push({ type: titleKey, content: newTitle });
-      articleContent.push({ type: "id", content: id });
+      if (language === "en") {
+        const date = new Date().getDay();
+        const month = new Date().getMonth() + 1;
+        const year = new Date().getFullYear();
+        const fullData = `${date}-${month}-${year}`;
+        const id = `${title}-${fullData}`;
+        articleContent.push({ type: "id", content: id });
+      }
       setText(newTitle); // Update the displayed text
     }
 
