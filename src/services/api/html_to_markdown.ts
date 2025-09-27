@@ -271,7 +271,7 @@ class HTMLToMarkdownConverter {
     const content = this.processChildren(node, options, type);
     if (!content.trim()) return "";
     // return `\n\n${content.trim()}\n\n`;
-    return `${content.trim()}\n`;
+    return `${content.trim()}\n\n`;
   }
 
   processStrong(
@@ -541,25 +541,92 @@ class HTMLToMarkdownConverter {
   ): string {
     const style = node.getAttribute("style") || "";
     const className = node.getAttribute("class") || "";
-    let content = this.processChildren(node, options, type);
-    if (style.includes("font-weight: bold") || className.includes("bold")) {
-      content = `**${content}**`;
-    } else if (
-      style.includes("font-style: italic") ||
-      className.includes("italic")
-    ) {
-      content = `*${content}*`;
-    } else if (
+    const content = this.processChildren(node, options, type);
+    let newContent: string = "";
+    // Heading detection first — return block-level heading markdown
+    // check class names or common inline font-size patterns
+    const typeH2 =
+      className.includes("font_h2") ||
+      style.includes("font_h2") ||
+      /font-size\s*:\s*1\.5em/i.test(style);
+    const typeH3 =
+      className.includes("font_h3") ||
+      style.includes("font_h3") ||
+      /font-size\s*:\s*1\.25em/i.test(style);
+    const fontWeightMatch = style.match(/font-weight\s*:\s*(\d+)/i);
+    const fontWeightValue = fontWeightMatch
+      ? parseInt(fontWeightMatch[1], 10)
+      : 0;
+    //
+    const typeBold =
+      style.includes("font-weight: bold") ||
+      className.includes("bold") ||
+      fontWeightValue >= 600; // catch 600, 700, etc.;
+    const typeItalic =
+      style.includes("font-style: italic") || className.includes("italic");
+    const typeUnderline =
+      style.includes("background-color") ||
       className.includes("highlight") ||
-      style.includes("background-color")
-    ) {
-      content = `==${content}==`;
-    } else if (className.includes("font_h2") || style.includes("font_h2")) {
-      content = `## ${content}`;
-    } else if (className.includes("font_h3") || style.includes("font_h3")) {
-      content = `### ${content}`;
+      style.includes("text-decoration: underline") ||
+      style.includes("text-decoration:underline") ||
+      style.includes("--tw-");
+    //
+    // console.log('content in processSpan"', content);
+    // console.log('typeH2 in processSpan"', typeH2);
+    // console.log('typeH3 in processSpan"', typeH3);
+    // console.log('typeBold in processSpan"', typeBold);
+    // console.log('typeItalic in processSpan"', typeItalic);
+    // console.log('typeUnderline in processSpan"', typeUnderline);
+    // Heading processing
+    if (typeH2) {
+      if (typeBold && !typeItalic && !typeUnderline)
+        return `\n ## ${content}\n\n`;
+      if (typeBold && typeItalic && !typeUnderline)
+        return `\n ## *${content}*\n\n`;
+      if (typeBold && !typeItalic && typeUnderline)
+        return `\n ## <u>${content}</u>\n\n`;
+      if (typeBold && typeItalic && typeUnderline)
+        return `\n ## <u><em>${content}</em></u>\n\n`;
+      if (!typeBold && !typeItalic && typeUnderline)
+        return `\n ## <u>${content}</u>\n\n`;
+      if (!typeBold && typeItalic && !typeUnderline)
+        return `\n ## *${content}*\n\n`;
+      if (!typeBold && typeItalic && typeUnderline)
+        return `\n ## <u><em>${content}</em></u>\n\n`;
+      return `\n ## ${content}\n\n`;
     }
-    return content;
+
+    if (typeH3) {
+      if (typeBold && !typeItalic && !typeUnderline)
+        return `\n### ${content}\n`;
+      if (typeBold && typeItalic && !typeUnderline)
+        return `\n### *${content}*\n`;
+      if (typeBold && !typeItalic && typeUnderline)
+        return `\n### <u>${content}</u>\n`;
+      if (typeBold && typeItalic && typeUnderline)
+        return `\n### <u><em>${content}</em></u>\n`;
+      if (!typeBold && !typeItalic && typeUnderline)
+        return `\n### <u>${content}</u>\n`;
+      if (!typeBold && typeItalic && !typeUnderline)
+        return `\n### *${content}*\n`;
+      if (!typeBold && typeItalic && typeUnderline)
+        return `\n### <u><em>${content}</em></u>\n`;
+      return `\n### ${content}\n`;
+    }
+
+    if (!typeH2 && !typeH3) {
+      if (typeBold && typeItalic && typeUnderline)
+        return `<u><strong><em>${content}</em></strong></u>`;
+      if (!typeBold && !typeItalic && typeUnderline) return `<u>${content}</u>`;
+      if (!typeBold && typeItalic && !typeUnderline) return `*${content}*`;
+      if (!typeBold && typeItalic && typeUnderline)
+        return `<u><em>${content}</em></u>`;
+      return `${content}`;
+    }
+    // }
+    //console.log('newContent in processSpan"', newContent);
+
+    return newContent;
   }
 
   processStrikethrough(
