@@ -6,10 +6,11 @@ const replaceSrcWithImagePlaceholders = (
   // Check if the article has images
   ///--------------------------------------------------------
   const dbName = sessionStorage.getItem("db");
-  const articleContent = JSON.parse(
-    sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+  const localArticle = localStorage.getItem(`draft-articleContent-${dbName}`);
+  const articleContent = JSON.parse(localArticle!);
+  const images = articleContent.filter((item: any) =>
+    item.type.startsWith("image")
   );
-  const images = articleContent.filter((item: any) => item.type === "image");
   console.log('"images at replaceSrcWithImagePlaceholders"', images);
   console.log('"htmlContent at replaceSrcWithImagePlaceholders"', htmlContent);
   const imagePattern =

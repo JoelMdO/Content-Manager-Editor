@@ -10,7 +10,7 @@ import MenuContext from "../menu/button_menu/context/menu_context";
 import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import LanguageSwitcher from "../language_switcher/language_switcher";
 import replaceSrcWithImagePlaceholders from "../menu/button_menu/utils/images_edit/replace_src_on_img";
-import img from "../../../../cypress/fixtures/test-image";
+import rehypeRaw from "rehype-raw";
 //
 const PreviewArticle = () => {
   //
@@ -40,9 +40,12 @@ const PreviewArticle = () => {
     return (tree: any) => {
       visit(tree, "paragraph", (node, index, parent) => {
         // Check if paragraph contains only an image
-        if (node.children.length === 1 && node.children[0].type === "image") {
-          // Replace paragraph with just the image
-          parent.children[index!] = node.children[0];
+        const onlyImages =
+          node.children.length > 0 &&
+          node.children.every((child: any) => child.type === "image");
+        if (onlyImages) {
+          // Replace paragraph with all its image children
+          parent.children.splice(index!, 1, ...node.children);
         }
       });
     };
@@ -81,10 +84,11 @@ const PreviewArticle = () => {
         {/*BODY*/}
         <section
           aria-labelledby="post-title"
-          className="flex flex-col  w-[90%] md:w-full h-[55%] overflow-auto  max-w-full text-justify font-lexend ${bodyText.no_select}"
+          className="flex flex-col w-[90%] md:w-full h-[55%] overflow-auto  max-w-full text-justify font-lexend"
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkUnwrapImages]}
+            rehypePlugins={[rehypeRaw]}
             urlTransform={(uri, key, node) => {
               if (uri?.startsWith("data:")) return uri; // allow base64
               return uri;
@@ -113,7 +117,8 @@ const PreviewArticle = () => {
               ),
               p: ({ children, ...props }) => {
                 const hasOnlyImages = React.Children.toArray(children).every(
-                  (child) => React.isValidElement(child) && child.type === "img"
+                  (child) =>
+                    React.isValidElement(child) && child.type === "image"
                 );
                 console.log("hasOnlyImages", hasOnlyImages);
 
@@ -127,36 +132,36 @@ const PreviewArticle = () => {
                   </p>
                 );
               },
-              img: ({ node, ...props }) => {
+              img: ({ src = "", alt = "" }) => {
                 return (
-                  <figure className="flex flex-col justify-center items-center transition-all duration-500 transform hover:scale-[1.02]">
+                  <figure className="flex flex-col mt-2 justify-center items-center transition-all duration-500 transform hover:scale-[1.02]">
                     {/* <div
                     className={`flex relative justify-center items-center overflow-hidden ${previewArticleStyles.image_container}`}
                   > */}
                     <Image
                       width={500}
                       height={500}
-                      src={props.src as string}
-                      alt={props.alt as string}
+                      src={src as string}
+                      alt={alt as string}
                       unoptimized={true}
                       className="self-center object-contain"
                       loading="lazy"
                     />
                     {/* </div> */}
 
-                    {props.alt && (
-                      <figcaption
-                        className={`${previewArticleStyles.paragraph} text-center text-gray-500 dark:text-gray-400 mt-0 italic font-medium`}
+                    {alt && (
+                      <p
+                        className={`text-[10px] md:text-base text-center text-gray-500 dark:text-gray-400 mt-0 italic font-medium mb-2`}
                       >
-                        {props.alt}
-                      </figcaption>
+                        {alt}
+                      </p>
                     )}
                   </figure>
                 );
               },
               ol: ({ children, ...props }) => (
                 <ol
-                  className={`${previewArticleStyles.list} list-decimal list-inside text-gray-600 dark:text-gray-300 space-y-1`}
+                  className={`${previewArticleStyles.list} list-decimal list-inside text-black space-y-1`}
                   {...props}
                 >
                   {children}
@@ -202,13 +207,13 @@ const PreviewArticle = () => {
                         aria-label="Task completed"
                         checked={isChecked as boolean}
                         disabled
-                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue focus:ring-blue dark:border-gray-600 dark:bg-gray-700"
                       />
                       <span
                         className={`${
                           isChecked
                             ? "text-gray-500 dark:text-gray-400"
-                            : "text-gray-700 dark:text-gray-300"
+                            : "text-gray-700 dark:text-gray-700"
                         }`}
                       >
                         {textContent}
@@ -220,7 +225,7 @@ const PreviewArticle = () => {
                 // Regular list item
                 return (
                   <li
-                    className={`${previewArticleStyles.list} text-gray-600 dark:text-gray-300`}
+                    className={`${previewArticleStyles.list} text-black`}
                     {...props}
                   >
                     {children}
@@ -249,7 +254,7 @@ const PreviewArticle = () => {
                 if (isTaskList) {
                   return (
                     <ul
-                      className={`text-base mt-2 mb-1 self-center list-disc list-inside space-y-2 mx-auto`}
+                      className={`text-base text-black mt-2 mb-1 self-center list-disc space-y-2 w-full`}
                       {...props}
                     >
                       {children}
@@ -260,7 +265,7 @@ const PreviewArticle = () => {
                 // Regular unordered list
                 return (
                   <ul
-                    className={`${previewArticleStyles.list} list-disc list-inside text-gray-600 dark:text-gray-300 space-y-1 `}
+                    className={`${previewArticleStyles.list} list-disc text-black space-y-2 `}
                     {...props}
                   >
                     {children}
@@ -332,7 +337,7 @@ const PreviewArticle = () => {
               a: ({ children, href, ...props }) => (
                 <a
                   href={href}
-                  className={`${previewArticleStyles.paragraph}text-gray-500 dark:text-gray-400 underline decoration-2 underline-offset-2 hover:decoration-wavy transition-all duration-300 `}
+                  className={`${previewArticleStyles.paragraph}text-black underline decoration-2 underline-offset-2 hover:decoration-wavy transition-all duration-300 `}
                   target={href?.startsWith("http") ? "_blank" : undefined}
                   rel={
                     href?.startsWith("http") ? "noopener noreferrer" : undefined
@@ -375,7 +380,7 @@ const PreviewArticle = () => {
               ),
               th: ({ children, ...props }) => (
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
+                  className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
                   {...props}
                 >
                   {children}
@@ -383,7 +388,7 @@ const PreviewArticle = () => {
               ),
               td: ({ children, ...props }) => (
                 <td
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-black border-b border-gray-200 dark:border-gray-600"
                   {...props}
                 >
                   {children}
@@ -392,14 +397,14 @@ const PreviewArticle = () => {
               // Horizontal rule
               hr: ({ ...props }) => (
                 <hr
-                  className="my-12 border-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent"
+                  className="my-12 border-0 h-1 bg-gradient-to-r from-transparent via-blue to-transparent"
                   {...props}
                 />
               ),
               // Strong and emphasis
               strong: ({ children, ...props }) => (
                 <strong
-                  className={`${previewArticleStyles.paragraph} font-bold  text-gray-500 dark:text-gray-400 `}
+                  className={`${previewArticleStyles.paragraph} font-bold  text-black`}
                   {...props}
                 >
                   {children}
@@ -407,13 +412,63 @@ const PreviewArticle = () => {
               ),
 
               em: ({ children, ...props }) => (
-                <em
-                  className="italic  text-gray-500 dark:text-gray-400"
-                  {...props}
-                >
+                <em className="italic  text-black" {...props}>
                   {children}
                 </em>
               ),
+              u: ({ children, ...props }) => {
+                const childrenArray = React.Children.toArray(children);
+                const isStrong = childrenArray.some((child) => {
+                  if (React.isValidElement(child)) {
+                    if (child.type === "strong") {
+                      return true;
+                    }
+                  }
+                  return false;
+                });
+
+                const isItalic = childrenArray.some((child) => {
+                  if (React.isValidElement(child)) {
+                    if (child.type === "em") {
+                      return true;
+                    }
+                  }
+                  return false;
+                });
+                console.log("isItalic", isItalic);
+                console.log("isStrong", isStrong);
+
+                if (isStrong && isItalic) {
+                  return (
+                    <u
+                      className="ml-6 underline decoration-2 font-bold italic underline-offset-1 text-black"
+                      {...props}
+                    >
+                      {children}
+                    </u>
+                  );
+                }
+
+                if (!isStrong && isItalic) {
+                  return (
+                    <u
+                      className="ml-6 underline italic decoration-2 underline-offset-1 text-black"
+                      {...props}
+                    >
+                      {children}
+                    </u>
+                  );
+                }
+
+                return (
+                  <u
+                    className="underline decoration-2 underline-offset-1 text-black"
+                    {...props}
+                  >
+                    {children}
+                  </u>
+                );
+              },
             }}
           >
             {updatedContent}

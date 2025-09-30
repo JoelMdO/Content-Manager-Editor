@@ -1,8 +1,10 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { iconsMenu } from "../../../../constants/icons";
 import { ButtonProps } from "../button_menu/type/type_menu_button";
 import MenuContext from "../button_menu/context/menu_context";
-import loadArticle from "../../preview/utils/load_article";
+import loadArticle from "../../preview/utils/load_markdown_article";
+import loadMarkdownArticle from "../../preview/utils/load_markdown_article";
+import loadHTMLArticle from "../../preview/utils/load_html_article";
 
 const PreviewToggle = () => {
   // Initialize theme from localStorage or system preference
@@ -13,37 +15,94 @@ const PreviewToggle = () => {
     setArticle,
     setIsLoadingPreview,
     setPreviewReady,
+    setIsMarkdownText,
   } = useContext(MenuContext) as ButtonProps;
   //
-  const loadPreview = async () => {
-    if (!isView) {
-      console.log("Switching to Edit mode, disabling preview");
+  // Add a ref to track if this is the initial render
+
+  const loadEditMode = async () => {
+    console.log("Switching to Edit mode");
+    setIsMarkdownText(true);
+    const loadedArticle = await loadHTMLArticle({ language });
+    if (loadedArticle) {
+      setArticle(loadedArticle);
       setPreviewReady(false);
-      return;
     }
-    // If switching to preview mode, load the article
-    console.log("Switching to Preview mode, loading article");
+  };
+
+  const loadPreviewMode = async () => {
+    console.log("Switching to Preview mode");
     setIsLoadingPreview(true);
     try {
-      const loadedArticle = await loadArticle({ language });
+      const loadedArticle = await loadMarkdownArticle({ language });
       if (loadedArticle) {
         console.log("Loaded Article:", loadedArticle);
-
         setArticle(loadedArticle);
         setPreviewReady(true);
-        setIsLoadingPreview(false);
       }
     } catch (error) {
       console.error("Error loading article:", error);
+    } finally {
+      setIsLoadingPreview(false);
     }
   };
-  //
-  useEffect(() => {
-    loadPreview();
-  }, [isView]);
+
+  // useEffect(() => {
+  //   // Skip the effect on initial render
+  //   if (isInitialRender.current) {
+  //     console.warn("Initial render, skipping effect");
+  //     isInitialRender.current = false;
+  //     return;
+  //   }
+
+  //   // Only run the appropriate mode when toggle changes
+  //   if (isView) {
+  //     loadPreviewMode();
+  //   } else {
+  //     loadEditMode();
+  //   }
+  // }, [isView]);
+  // const loadPreview = async () => {
+  //   if (!isView) {
+  //     setPreviewReady(false);
+  //     setIsMarkdownText(true);
+  //     console.log("Switching to Edit mode, disabling preview");
+  //     const loadedArticle = await loadHTMLArticle({ language });
+  //     if (loadedArticle) {
+  //       setArticle(loadedArticle);
+  //     }
+  //   }
+  //   // If switching to preview mode, load the article
+  //   console.log("Switching to Preview mode, loading article");
+  //   setIsLoadingPreview(true);
+  //   try {
+  //     const loadedArticle = await loadMarkdownArticle({ language });
+  //     if (loadedArticle) {
+  //       console.log("Loaded Article:", loadedArticle);
+
+  //       setArticle(loadedArticle);
+  //       setPreviewReady(true);
+  //       setIsLoadingPreview(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error loading article:", error);
+  //   }
+  // };
+  // //
+  // useEffect(() => {
+  //   loadPreview();
+  // }, [isView]);
   //
   const togglePreview = () => {
-    setIsView((prev) => !prev);
+    const newToggleValue = !isView;
+    console.warn("Toggling preview, new value:", newToggleValue);
+    setIsView(newToggleValue);
+
+    if (newToggleValue) {
+      loadPreviewMode();
+    } else {
+      loadEditMode();
+    }
   };
 
   return (

@@ -1,11 +1,10 @@
 import { convertHtmlToMarkdownAPI } from "@/services/api/convert_html_to_markdown";
-import replaceSrcWithImagePlaceholders from "../../menu/button_menu/utils/images_edit/replace_src_on_img";
 import matter from "gray-matter";
 import errorAlert from "@/components/alerts/error";
 import { ProcessedArticle } from "../types/previewed_article";
-import replaceImgWithSrc from "../../menu/button_menu/utils/images_edit/replace_img_with_tag";
+import replaceImgWithSrc from "../../menu/button_menu/utils/images_edit/replace_img_with_src";
 
-const loadArticle = async ({
+const loadMarkdownArticle = async ({
   language,
 }: {
   language: string;
@@ -15,44 +14,11 @@ const loadArticle = async ({
   //
   const dbName = sessionStorage.getItem("db");
   const idiom = language === "en" ? "" : "es-";
-  const articleLocal = localStorage.getItem(`draft-articleContent-${dbName}`);
-  const parsedDataLocal = articleLocal ? JSON.parse(articleLocal) : null;
-  console.log("articleLocal", articleLocal);
+  const article = sessionStorage.getItem(`articleContent-${dbName}`);
+  const parsedData = article ? JSON.parse(article) : null;
 
-  //
   ///--------------------------------------------------------
-  // Check if article is already in markdown format at localStorage
-  ///--------------------------------------------------------
-  if (parsedDataLocal) {
-    console.log("parsedDataLocal", parsedDataLocal);
-
-    const isMarkdown = parsedDataLocal.some(
-      (item: any) => item.type === `markdown-${idiom}title`
-    );
-    console.log("isMarkdown", isMarkdown);
-
-    if (isMarkdown !== false) {
-      console.log("isMarkdown found");
-
-      return {
-        title: parsedDataLocal.find(
-          (item: any) => item.type === `markdown-${idiom}title`
-        ).content,
-        readTime: parsedDataLocal.find(
-          (item: any) => item.type === `markdown-${idiom}readTime`
-        ).content,
-        content: parsedDataLocal.find(
-          (item: any) => item.type === `markdown-${idiom}content`
-        ).content,
-        images: parsedDataLocal.find(
-          (item: any) => item.type === "markdown-image"
-        ).content,
-      };
-    }
-    ///--------------------------------------------------------
-    ///--------------------------------------------------------
-    // If no article found, create the article structure
-    ///--------------------------------------------------------
+  if (parsedData) {
     switch (language) {
       case "es":
         title = "es-title";
@@ -64,15 +30,15 @@ const loadArticle = async ({
         break;
     }
     //
-    const article = sessionStorage.getItem(`articleContent-${dbName}`);
-    const parsedData = article ? JSON.parse(article) : null;
     const articleTitle = parsedData.find((item: any) => item.type === title);
     const articleBody = parsedData.find((item: any) => item.type === body);
-    const images = parsedData.filter((item: any) => item.type === "image");
+    const images = parsedData.filter((item: any) =>
+      item.type.startsWith("image")
+    );
     //
     console.log("articleTitle", articleTitle);
     console.log("articleBody", articleBody);
-    console.log('images"', images);
+    console.log("images", images);
     //
     ///--------------------------------------------------------
     // Add images src and alt to the body tag
@@ -90,15 +56,6 @@ const loadArticle = async ({
       articleToMarkDown
     );
     console.log("articleBodyMarkdown", articleBodyMarkdown);
-    // ///--------------------------------------------------------
-    // // Add images if any to the body
-    // ///--------------------------------------------------------
-    // const updatedArticleBody = replaceMarkdownWithImage(
-    //   articleBody.content! as string,
-    //   images
-    // );
-    // console.log("updatedArticleBody", articleBodyMarkdown);
-    //
     ///--------------------------------------------------------
     // Parses the article, separates the body text into content
     // separates the metadata into data.
@@ -107,15 +64,6 @@ const loadArticle = async ({
       const { data, content } = matter(articleBodyMarkdown.body as string);
       console.log("data from matter", data);
       console.log("content from matter", content);
-      //
-      //--------------------------------------------------------
-      // Validate Cloudinary image URL
-      //--------------------------------------------------------
-      // function isValidCdnImageUrl(url: string): boolean {
-      //   return /^https:\/\/cdn\.cloudinary\.com\//.test(url);
-      // }
-      // const image = isValidCdnImageUrl(data.image) ? data.image : "";
-      //
       ///--------------------------------------------------------
       // Store the markdown in sessionStorage
       ///--------------------------------------------------------
@@ -128,7 +76,7 @@ const loadArticle = async ({
         type: `markdown-${idiom}readTime`,
         content: data.readTime || 0,
       });
-      // parsedData.push({ type: "markdown-image", content: image });
+
       sessionStorage.setItem(
         `articleContent-${dbName}`,
         JSON.stringify(parsedData)
@@ -150,4 +98,4 @@ const loadArticle = async ({
   //
 };
 
-export default loadArticle;
+export default loadMarkdownArticle;

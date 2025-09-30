@@ -31,6 +31,11 @@ const DialogsLoader = ({ type }: { type: string }) => {
       content = preview_text;
       icon = iconsMenu.preview;
       break;
+    case "load_html":
+      title = "Loading article...";
+      content = "Please wait while we load your article.";
+      icon = iconsMenu.preview;
+      break;
     default:
       title = summary;
       content = summary_text;

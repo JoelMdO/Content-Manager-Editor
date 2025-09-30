@@ -1,7 +1,6 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
-import replaceSrcWithImagePlaceholders from "../../../components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import readLog from "../../../services/authentication/read_log";
 import { sectionsCode } from "../../../constants/sections";
@@ -11,11 +10,11 @@ import crypto from "crypto";
 import { Database } from "firebase-admin/lib/database/database";
 import { initializeFirebaseAdmin } from "../../../services/db/firebase_admin_DeCav";
 import { adminDB } from "../../../services/db/firebase-admin";
-import { FieldPath } from "firebase-admin/firestore";
-import replaceSrcWithImagePlaceholdersAtPost from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img_at_post";
+import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
 import { convertHtmlToMarkdown } from "@/services/api/html_to_markdown";
 import { FormDataImageItem } from "@/components/dashboard/menu/button_menu/type/formData";
-import { articleDataMocksForDb } from "../../../../test/mock_post";
+import { cleanNestedDivsServer } from "@/components/dashboard/utils/clean_content_server";
+import { language } from "gray-matter";
 
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -265,14 +264,27 @@ export async function POST(req: NextRequest): Promise<Response> {
     //------------------------------------------
 
     const articlesBodies = [article.body, article.esBody];
-    console.log("articlesBodie", article.body);
+    //console.log("articlesBodie", article.body);
 
-    const updatedArticlesBodies = articlesBodies.map((body) =>
-      replaceSrcWithImagePlaceholdersAtPost(body!, images)
+    const articleReplaced = replaceImgWithSrc(
+      article.body!,
+      images,
+      "post",
+      "en"
     );
-    article.body = updatedArticlesBodies[0];
-    article.esBody = updatedArticlesBodies[1];
-    console.log("updatedArticlesBodies", updatedArticlesBodies[0]);
+    const articleESReplaced = replaceImgWithSrc(
+      article.esBody!,
+      images,
+      "post",
+      "es"
+    );
+    article.body = cleanNestedDivsServer(articleReplaced);
+    article.esBody = cleanNestedDivsServer(articleESReplaced[1]);
+    // console.log(
+    //   'article after replaceSrcWithImagePlaceholdersAtPost:"',
+    //   updatedArticlesBodies[0]
+    // );
+    // console.log("updatedArticlesBodies", article.body);
     // debugger;
     //
     ///--------------------------------------------------------
@@ -296,7 +308,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
     // Convert HTML to Markdown
     ///--------------------------------------------------------
-    const newArticles = [updatedArticlesBodies[0], updatedArticlesBodies[1]];
+    // const newArticles = [updatedArticlesBodies[0], updatedArticlesBodies[1]];
+    const newArticles = [article.body, article.esBody];
     //------------------------------------------
     // Purpose: Convert HTML bodies to Markdown, including the title at the top of each body.
     //------------------------------------------
@@ -319,7 +332,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     // debugger;
     article.markdownArticle = markdownContent[0];
     article.markdownEsArticle = markdownContent[1];
-    console.log("article.markdownArticle", article.markdownArticle);
+    //console.log("article.markdownArticle", article.markdownArticle);
+    // ///--------------------------------------------------------
+    // // HTML articles
+    // ///--------------------------------------------------------
+    // article.body = updatedArticlesBodies[0];
+    // article.esBody = updatedArticlesBodies[1];
     //
     ///--------------------------------------------------------
     // Select the correct database to save the article
@@ -406,6 +424,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     const articleDataForDb = {
       en: article.markdownArticle,
       es: article.markdownEsArticle,
+      en_html: article.body,
+      es_html: article.esBody,
       metadata: metadata,
       esMetadata: esMetadata,
     };
@@ -416,7 +436,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     //
     // const articleDataForDb = articleDataMocksForDb;
     // const newId = articleDataMocksForDb.metadata.slug;
-    console.log("articleDataForDb", articleDataForDb);
+    //console.log("articleDataForDb", articleDataForDb);
 
     //
     try {

@@ -74,6 +74,7 @@ const Dashboard: React.FC = () => {
   const [article, setArticle] = useState<ProcessedArticle | null>(null);
   const [previewReady, setPreviewReady] = useState<boolean>(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState<boolean>(false);
+  const [isMarkdownText, setIsMarkdownText] = useState<boolean>(false);
   //
   //
   ///======================================================
@@ -146,6 +147,8 @@ const Dashboard: React.FC = () => {
     previewReady,
     isLoadingPreview,
     setIsLoadingPreview,
+    isMarkdownText,
+    setIsMarkdownText,
   };
   //
   ///======================================================

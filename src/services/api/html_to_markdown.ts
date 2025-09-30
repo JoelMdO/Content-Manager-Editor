@@ -65,7 +65,7 @@ class HTMLToMarkdownConverter {
     type?: string
   ): string {
     if (!node) return markdown;
-    console.log("type", type);
+    //console.log("type", type);
 
     if (node.nodeType === this.Node.TEXT_NODE) {
       const text = node.textContent || "";
@@ -331,7 +331,7 @@ class HTMLToMarkdownConverter {
     if (title) {
       return `[${content}](${href} "${title}")`;
     }
-    return `[${content}](${href})`;
+    return `\n\n[${content}](${href})\n\n`;
   }
 
   processImage(
@@ -339,7 +339,7 @@ class HTMLToMarkdownConverter {
     options: Required<HtmlToMarkdownOptions>,
     type?: string
   ): string {
-    console.log("type in processImage", type);
+    //console.log("type in processImage", type);
 
     const src = node.getAttribute("src") || "";
     const alt = options.includeImageAlt
@@ -347,26 +347,26 @@ class HTMLToMarkdownConverter {
       : "";
     // Instead of including the full base64, just use a placeholder
     let imageMarkdown = `![${alt}]({src_${alt}})`;
-    console.log("node in processImage", node);
-    console.log("alt in processImage", alt);
+    //console.log("node in processImage", node);
+    //console.log("alt in processImage", alt);
 
     //
     if (type === "post") {
-      console.log("src in processImage", src);
-      console.log("alt in processImage", alt);
+      //console.log("src in processImage", src);
+      //console.log("alt in processImage", alt);
 
       return `![${alt}](${src})`;
     }
     //
-    if (options.preserveImageDimensions) {
-      const width = node.getAttribute("width");
-      const height = node.getAttribute("height");
-      if (width || height) {
-        imageMarkdown += ` <!-- width="${width || "auto"}" height="${
-          height || "auto"
-        }" -->`;
-      }
-    }
+    // if (options.preserveImageDimensions) {
+    //   const width = node.getAttribute("width");
+    //   const height = node.getAttribute("height");
+    //   if (width || height) {
+    //     imageMarkdown += ` <!-- width="${width || "auto"}" height="${
+    //       height || "auto"
+    //     }" -->`;
+    //   }
+    // }
     return imageMarkdown;
   }
 
@@ -531,7 +531,7 @@ class HTMLToMarkdownConverter {
     }
     const content = this.processChildren(node, options, type);
     // return content ? `\n\n${content.trim()}\n\n` : "";
-    return content ? `${content.trim()}\n` : "";
+    return content ? `${content.trim()}\n\n` : "";
   }
 
   processSpan(

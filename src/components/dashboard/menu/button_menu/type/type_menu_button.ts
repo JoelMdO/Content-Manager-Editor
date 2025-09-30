@@ -65,6 +65,8 @@ export interface ButtonProps {
   previewReady: boolean;
   isLoadingPreview: boolean;
   setIsLoadingPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  isMarkdownText: boolean;
+  setIsMarkdownText: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const menuButtonTypes = [

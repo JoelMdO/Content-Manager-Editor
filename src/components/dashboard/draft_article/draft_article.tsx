@@ -18,6 +18,7 @@ const DraftArticle = () => {
     setText,
     text,
     setLanguage,
+    setArticle,
   } = useContext(MenuContext) as ButtonProps;
   const newSavedTitleRef = useRef<string>("");
   // NOT USED const newSavedBodyRef = useRef<string>("");
@@ -76,6 +77,7 @@ const DraftArticle = () => {
                   setDraftArticleButtonClicked: setDraftArticleButtonClicked,
                   tag: button.tag,
                   setLanguage: setLanguage,
+                  setArticle: setArticle,
                 });
               }}
             >

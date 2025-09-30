@@ -19,7 +19,7 @@ const sectionQuoteListWrapperHtml = (
       wrapper.style.height = "10px";
       wrapper.style.width = "100%";
       wrapper.style.display = "block";
-      wrapper.style.border = "dashed 1px white";
+      wrapper.style.border = "dashed 1px blue";
       break;
     case "list":
       //------------------------------------------

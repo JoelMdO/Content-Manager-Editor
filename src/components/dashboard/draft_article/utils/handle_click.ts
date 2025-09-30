@@ -3,7 +3,7 @@
 // Update UI with the draft article content
 //=========================================================
 
-import loadArticle from "../../preview/utils/load_article";
+import loadArticle from "../../preview/utils/load_markdown_article";
 
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
@@ -52,12 +52,14 @@ export const handleClick = async ({
     savedTitleRef!.current = newSavedTitleRef!.current;
     dbFieldName = "body";
     setLanguage!("en");
+    setArticle!(null);
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   } else if (tag === "draft-es") {
     savedTitleRef!.current =
       jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
     dbFieldName = "es-body";
     setLanguage!("es");
+    setArticle!(null);
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   } else if (tag === "summary-en") {
     ///--------------------------------------------------------
@@ -113,8 +115,10 @@ export const handleClick = async ({
   if (jsonArticle) {
     //
     console.log("Loading article from storage:", {
-      hasImages: jsonArticle.some((item: any) => item.type === "image"),
-      imageData: jsonArticle.filter((item: any) => item.type === "image"),
+      hasImages: jsonArticle.some((item: any) => item.type.startsWith("image")),
+      imageData: jsonArticle.filter((item: any) =>
+        item.type.startsWith("image")
+      ),
     });
 
     let preSavedBodyRef =
@@ -127,7 +131,7 @@ export const handleClick = async ({
     try {
       let images: any[] = [];
 
-      images = jsonArticle.filter((item: any) => item.type === "image");
+      images = jsonArticle.filter((item: any) => item.type.startsWith("image"));
       console.log("Processing images for rendering:", {
         count: images.length,
         imageDetails: images.map((img) => ({
@@ -185,6 +189,7 @@ export const handleClick = async ({
     // Update the body reference
     savedBodyRef!.current = preSavedBodyRef;
     //-------------------------------------------------------------------------------------
+
     setDraftArticleButtonClicked!(true);
   }
 };

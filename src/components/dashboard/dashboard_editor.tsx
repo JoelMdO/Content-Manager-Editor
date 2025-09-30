@@ -1,5 +1,5 @@
 import { debouncedUpdateStore } from "./utils/debounceUpdateStore";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { handleKeyBoardActions } from "./utils/handle_keyboard_actions";
 import { handleContentChange } from "./utils/handle_content_change";
 import { ButtonProps } from "./menu/button_menu/type/type_menu_button";
@@ -7,6 +7,8 @@ import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_co
 import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
 import DialogsLoader from "../../components/loaders/dialogs_loader";
 import saveArticle from "./utils/save_article";
+import DOMPurify from "dompurify";
+import { cleanNestedDivs } from "./utils/clean_content";
 
 const DashboardEditor = () => {
   //
@@ -31,6 +33,9 @@ const DashboardEditor = () => {
     setText,
     isSummary,
     isLoadingPreview,
+    article,
+    isMarkdownText,
+    setIsMarkdownText,
   } = useContext(MenuContext) as ButtonProps;
   //
   //
@@ -44,7 +49,11 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   useEffect(() => {
     const editableDiv = editorRefs?.current[1];
-    if (editableDiv && savedBodyRef?.current) {
+    if (editableDiv && savedBodyRef?.current && !article?.content) {
+      // Check if content is markdown
+      let processedContent = savedBodyRef.current;
+      // Clean if any nested html tags
+      processedContent = cleanNestedDivs(processedContent);
       // Check for any remaining image placeholders and log them
       const hasPlaceholders = savedBodyRef.current.includes(
         "{image_url_placeholder}"
@@ -56,15 +65,24 @@ const DashboardEditor = () => {
       }
 
       // Ensure no unprocessed placeholders remain
-      let processedContent = savedBodyRef.current;
       if (processedContent.includes("{image_url_placeholder}")) {
         // Try to get images from session storage
-        const dbName = sessionStorage.getItem("db");
-        const articleContent = JSON.parse(
-          sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+        console.log(
+          "Process includes image placeholders, checking session storage."
         );
-        const images = articleContent.filter(
-          (item: any) => item.type === "image"
+
+        const dbName = sessionStorage.getItem("db");
+        console.log(
+          "Dashboard editor checking session storage for db:",
+          dbName
+        );
+
+        const localArticle = localStorage.getItem(
+          `draft-articleContent-${dbName}`
+        );
+        const articleContent = JSON.parse(localArticle!);
+        const images = articleContent.filter((item: any) =>
+          item.type.startsWith("image")
         );
 
         console.log("Available images for placeholder replacement:", images);
@@ -85,7 +103,7 @@ const DashboardEditor = () => {
             );
             processedContent = processedContent.replace(
               placeholder,
-              `<img src="${imgSource}" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+              `<img src="${imgSource}" alt="${imageIdentifier}" width="25%" style="justify-self: center;"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
             );
           }
         });
@@ -93,7 +111,39 @@ const DashboardEditor = () => {
 
       editableDiv.innerHTML = processedContent; // Force HTML rendering
     }
-  }, [isDraftArticleButtonClicked, savedBodyRef?.current]);
+  }, [isDraftArticleButtonClicked, savedBodyRef?.current, article?.content]);
+  ///--------------------------------------------------------
+  // Set HTML content from Preview Editor
+  ///--------------------------------------------------------
+  useEffect(() => {
+    console.log("loading article html");
+    if (!article?.content || !article?.title) {
+      console.log("No article content or title available yet");
+      return;
+    }
+
+    const editableBodyDiv = editorRefs?.current[1];
+    const editableTitleDiv = editorRefs?.current[0];
+    console.warn("article at UseEffect", article);
+    // Check if both divs exist before setting innerHTML
+    if (editableBodyDiv && editableTitleDiv && article) {
+      console.log("article at UseEffect on if", article);
+
+      try {
+        // Sanitize content before setting innerHTML
+        const sanitizedTitle = DOMPurify.sanitize(article.title);
+        const sanitizedContent = DOMPurify.sanitize(article.content);
+
+        editableTitleDiv.innerHTML = sanitizedTitle;
+        editableBodyDiv.innerHTML = sanitizedContent;
+
+        // Update markdown state
+        setIsMarkdownText(false);
+      } catch (error) {
+        console.error("Error setting article content:", error);
+      }
+    }
+  }, [article]);
   ///--------------------------------------------------------
   // Save to localStorage every 10 minutes (only if content exists)
   ///--------------------------------------------------------
@@ -145,12 +195,13 @@ const DashboardEditor = () => {
       {isTranslating && <DialogsLoader type={"translation"} />}
       {isSummary && <DialogsLoader type={"summary"} />}
       {isLoadingPreview && <DialogsLoader type={"preview"} />}
+      {isMarkdownText && <DialogsLoader type={"load_html"} />}
       {["Title", "Article"].map((placeholder, index) => (
         <div
           key={index}
           ref={(el) => {
             // if (el && !editorRefs!.current[index]) {
-            if (editorRefs && !editorRefs!.current[index]) {
+            if (editorRefs) {
               editorRefs!.current[index] = el;
             }
           }}

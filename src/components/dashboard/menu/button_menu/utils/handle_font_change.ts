@@ -43,7 +43,7 @@ export const handleFontChange = (
       const fontSizeH3 = value === "font_h3" ? "1.17em" : "1em";
 
       if (spanNode && spanNode.tagName === "SPAN") {
-        // Update existing <span> styles
+        // Update existing <span> stylesis
 
         if (value === "italic") {
           const isItalic = spanNode.style.fontStyle === "italic";
@@ -70,10 +70,15 @@ export const handleFontChange = (
         // Create a new <span> for the selected text
         const extractedContent = range.extractContents();
         const span = document.createElement("span");
-        span.style.fontStyle = fontStyle;
-        span.style.fontWeight = fontWeight;
-        span.style.textDecoration = textDecoration;
-        span.style.fontSize = fontSizeH2 !== "1em" ? fontSizeH2 : fontSizeH3;
+        // span.style.fontStyle = fontStyle;
+        // span.style.fontWeight = fontWeight;
+        // span.style.textDecoration = textDecoration;
+        // span.style.fontSize = fontSizeH2 !== "1em" ? fontSizeH2 : fontSizeH3;
+        if (value === "italic") span.style.fontStyle = "italic";
+        if (value === "bold") span.style.fontWeight = "700";
+        if (value === "underline") span.style.textDecoration = "underline";
+        if (value === "font_h2") span.style.fontSize = "1.5em";
+        if (value === "font_h3") span.style.fontSize = "1.17em";
         setMarkdownAttr(
           span,
           value as "bold" | "italic" | "underline" | "font_h2" | "font_h3",
