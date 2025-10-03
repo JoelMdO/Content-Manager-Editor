@@ -19,6 +19,7 @@ const DraftArticle = () => {
     text,
     setLanguage,
     setArticle,
+    setDraftKey,
   } = useContext(MenuContext) as ButtonProps;
   const newSavedTitleRef = useRef<string>("");
   // NOT USED const newSavedBodyRef = useRef<string>("");
@@ -34,6 +35,10 @@ const DraftArticle = () => {
   useEffect(() => {
     //
     const articleStored = localStorage.getItem(DRAFT_KEY);
+    if (!articleStored || articleStored === "[]") {
+      const dbName = sessionStorage.getItem("db") as string;
+      setDraftKey(`draft-articleContent-${dbName}`);
+    }
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
 
