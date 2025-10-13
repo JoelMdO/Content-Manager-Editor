@@ -4,6 +4,7 @@
 //=========================================================
 
 import loadArticle from "../../preview/utils/load_markdown_article";
+import { cleanNestedDivs } from "../../utils/clean_content";
 
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
@@ -187,7 +188,10 @@ export const handleClick = async ({
       .replace(/___LINE_BREAK___/g, "<br>");
 
     // Update the body reference
-    savedBodyRef!.current = preSavedBodyRef;
+    const cleanedBody = cleanNestedDivs(preSavedBodyRef);
+    console.log("Cleaned body on draft after cleanNestedDivs:", cleanedBody);
+
+    savedBodyRef!.current = cleanedBody;
     //-------------------------------------------------------------------------------------
 
     setDraftArticleButtonClicked!(true);
