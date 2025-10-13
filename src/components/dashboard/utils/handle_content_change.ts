@@ -1,5 +1,5 @@
 import removeBase64FromImgTags from "../menu/button_menu/utils/remove_img_base64";
-import TextEditor from "./text_editor";
+import { cleanNestedDivs } from "./clean_content";
 
 export const handleContentChange = (
   index: number,
@@ -13,28 +13,25 @@ export const handleContentChange = (
     setText: (text: string) => void
   ) => void
 ) => {
-  ///--------------------------------------------------------
-  // Ensure the content is wrapped in a <div> to maintain structure
-  ///--------------------------------------------------------
-  const newElement = new TextEditor(element);
-  newElement.initializeStructure();
-  const content = newElement.getContent();
-  console.log("Cleaned content:", content);
   ///========================================================
   // Function to handler the content change on the editor, when
   // the user types or modifies the content.
   ///========================================================
+  const newElement = element.innerHTML;
+  const content = cleanNestedDivs(newElement);
   const dbName = sessionStorage.getItem("db");
   const languageKey = language === "es" ? "es" : "en";
   //
   if (index === 0) {
     // Title
+    console.log("Title content changed:", content);
+
     sessionStorage.setItem(`${languageKey}-tempTitle-${dbName}`, content);
     console.log("Title changed:", content);
-    console.log(
-      "Body content:",
-      sessionStorage.getItem(`${languageKey}-tempBody-${dbName}`) || ""
-    );
+    // console.log(
+    //   "Body content:",
+    //   sessionStorage.getItem(`${languageKey}-tempBody-${dbName}`) || ""
+    // );
 
     debouncedUpdateStore(
       content,
@@ -43,14 +40,16 @@ export const handleContentChange = (
       setText
     );
   } else {
+    console.log("Body content changed:", content);
+
     // Article
     const htmlCleaned = removeBase64FromImgTags(content);
     sessionStorage.setItem(`${languageKey}-tempBody-${dbName}`, htmlCleaned);
-    console.log("Body content changed:", htmlCleaned);
-    console.log(
-      "Title:",
-      sessionStorage.getItem(`${languageKey}-tempTitle-${dbName}`) || ""
-    );
+    console.log("Body content html changed:", htmlCleaned);
+    // console.log(
+    //   "Title:",
+    //   sessionStorage.getItem(`${languageKey}-tempTitle-${dbName}`) || ""
+    // );
     debouncedUpdateStore(
       sessionStorage.getItem(`${languageKey}-tempTitle-${dbName}`) || "",
       htmlCleaned,

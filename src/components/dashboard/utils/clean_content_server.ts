@@ -168,7 +168,11 @@ export function cleanNestedDivsServer(content: string): string {
 
   // Remove wrapping <p> around <img> if it’s the only child
   cleanContent = cleanContent.replace(/<p>\s*(<img[^>]+>)\s*<\/p>/gi, "$1");
-
+  //Add DIV tag if needed
+  if (!cleanContent.trim().startsWith("<div>")) {
+    cleanContent = `<div>${cleanContent}</div>`;
+  } else {
+  }
   // Sanitize the final output
   return DOMPurify.sanitize(cleanContent, {
     ALLOWED_TAGS: [
@@ -185,6 +189,7 @@ export function cleanNestedDivsServer(content: string): string {
       "h1",
       "h2",
       "h3",
+      "div",
     ],
     ALLOWED_ATTR: ["href", "src", "alt", "class", "style"],
     // ADD_ATTR: ["style"],

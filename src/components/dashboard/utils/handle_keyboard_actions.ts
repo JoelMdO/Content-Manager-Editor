@@ -69,7 +69,7 @@ export const handleKeyBoardActions = (
             selectedNode.remove();
           }
         }
-        selectedNode.remove();
+        // selectedNode.remove();
       }
     }
   } else if (e.key === "ArrowDown") {
