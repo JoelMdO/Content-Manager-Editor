@@ -1,4 +1,5 @@
 import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
+import { cleanNestedDivs } from "./clean_content";
 
 const saveArticle = ({
   dbName,
@@ -36,6 +37,7 @@ const saveArticle = ({
     // If session storage is empty and local storage has data, load local to session
     ///--------------------------------------------------------
     if (sessionStorageAticle.length === 0 && localStoreArticle.length > 0) {
+      console.log("saveArticle - if 1");
       sessionStorage.setItem(
         `articleContent-${dbName}`,
         JSON.stringify(localStoreArticle)
@@ -55,6 +57,7 @@ const saveArticle = ({
       base64?: string;
       // add other fields as needed
     };
+    console.log('doing more checks before saving..."');
 
     const localMap = new Map<string, ArticleItem>(
       (localStoreArticle as ArticleItem[]).map((item) => [item.type, item])
@@ -63,6 +66,7 @@ const saveArticle = ({
       (sessionStorageAticle as ArticleItem[]).map((item) => [item.type, item])
     );
     const hasChanges = new Set<string>();
+    console.log("localMap", localMap);
 
     // Compare session items with local
     for (const [type, sessionItem] of sessionMap) {
@@ -74,10 +78,23 @@ const saveArticle = ({
         hasChanges.add(type);
       }
     }
+    console.log("hasChanges", hasChanges);
 
     // If we found differences, update localStorage
     if (hasChanges.size > 0) {
-      const updatedArticles = Array.from(localMap.values());
+      // const updatedArticles = Array.from(localMap.values());
+      const updatedArticles = Array.from(localMap.values()).map((item: any) => {
+        if (item.type === "body" && typeof item.content === "string") {
+          return { ...item, content: cleanNestedDivs(item.content) };
+        }
+        if (item.type === "es-body" && typeof item.content === "string") {
+          return { ...item, content: cleanNestedDivs(item.content) };
+        }
+        return item;
+      });
+
+      console.log("updatedArticles", updatedArticles);
+
       localStorage.setItem(
         `draft-articleContent-${dbName}`,
         JSON.stringify(updatedArticles)

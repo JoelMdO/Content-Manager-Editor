@@ -12,8 +12,13 @@ export const handleContentChange = (
     setText: (text: string) => void
   ) => void
 ) => {
-  // Get the innerHTML which will preserve all styling
-  const content = element.innerHTML;
+  ///--------------------------------------------------------
+  // Ensure the content is wrapped in a <div> to maintain structure
+  ///--------------------------------------------------------
+  const newElement = new TextEditor(element);
+  newElement.initializeStructure();
+  const content = newElement.getContent();
+  console.log("Cleaned content:", content);
   ///========================================================
   // Function to handler the content change on the editor, when
   // the user types or modifies the content.

@@ -307,6 +307,8 @@ export const buttonMenuLogic = ({
       post({ setIsClicked, router });
       break;
     case "save":
+      console.log("calling saveDraft");
+
       saveDraft({
         dbNameToSearch,
         DRAFT_KEY,

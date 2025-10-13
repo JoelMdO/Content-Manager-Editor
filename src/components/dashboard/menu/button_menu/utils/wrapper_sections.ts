@@ -39,11 +39,36 @@ const sectionQuoteListWrapperHtml = (
         }
         return;
       }
+      ///--------------------------------------------------------
+      // Detect if text looks like a list (`- item` or `1. item`)
+      ///--------------------------------------------------------
+      const plainText = fragment.textContent || "";
+      const listPattern = /^(?:-|\d+\.)\s+/m; // matches `- ` or `1. ` at line start
+      const lines = plainText
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      wrapper = document.createElement("ol");
+      wrapper.style.marginLeft = "20px";
+
+      if (listPattern.test(plainText)) {
+        // 📝 Parse markdown-style list text
+        lines.forEach((line) => {
+          const cleaned = line.replace(/^(?:-|\d+\.)\s+/, ""); // remove - or 1.
+          const li = document.createElement("li");
+          li.textContent = cleaned || "";
+          li.style.listStyleType = "decimal";
+          li.style.marginLeft = "20px";
+          li.style.display = "list-item";
+          li.style.color = "black";
+          wrapper.appendChild(li);
+        });
+      }
+
       //------------------------------------------
       // Purpose: This block creates an ordered list (<ol>) with <li> elements for each selected block (div, span, p) in the content editor.
       //------------------------------------------
-      wrapper = document.createElement("ol");
-      wrapper.style.marginLeft = "20px";
       if (fragment.childNodes.length > 0) {
         // Iterate over the fragment's child nodes and wrap each block in <li>
         Array.from(fragment.childNodes).forEach((node) => {
@@ -57,7 +82,7 @@ const sectionQuoteListWrapperHtml = (
             li.style.listStyleType = "decimal";
             li.style.marginLeft = "20px";
             li.style.display = "list-item";
-            li.style.color = "white";
+            li.style.color = "black";
             wrapper.appendChild(li);
           } else if (
             node.nodeType === Node.TEXT_NODE &&
@@ -68,7 +93,7 @@ const sectionQuoteListWrapperHtml = (
             li.style.listStyleType = "decimal";
             li.style.marginLeft = "20px";
             li.style.display = "list-item";
-            li.style.color = "white";
+            li.style.color = "black";
             wrapper.appendChild(li);
           }
         });
@@ -78,7 +103,7 @@ const sectionQuoteListWrapperHtml = (
         li.style.listStyleType = "decimal";
         li.style.marginLeft = "20px";
         li.style.display = "list-item";
-        li.style.color = "white";
+        li.style.color = "black";
         li.innerHTML = "<br>";
 
         wrapper.appendChild(li);

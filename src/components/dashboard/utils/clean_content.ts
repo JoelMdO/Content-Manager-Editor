@@ -84,10 +84,19 @@ export function cleanNestedDivs(content: string): string {
           .map((attr) => `${attr.name}="${attr.value}"`)
           .join(" ");
 
-        // Process children recursively
-        const innerContent = Array.from(element.childNodes)
-          .map((child) => processNode(child))
+        // Process inner content
+        let innerContent = Array.from(element.childNodes)
+          .map(processNode)
           .join("");
+
+        // Remove empty <p> as well if needed
+        if (tagName === "p" && innerContent.trim() === "") {
+          return "";
+        }
+        //
+        if (["br", "img", "hr"].includes(tagName)) {
+          return attributes ? `<${tagName} ${attributes}>` : `<${tagName}>`;
+        }
 
         // Return element with preserved formatting
         return attributes
@@ -105,10 +114,46 @@ export function cleanNestedDivs(content: string): string {
   }
 
   // Process the body content
-  const cleanedContent = processNode(doc.body);
+  let cleanContent = processNode(doc.body);
+  // Replace &nbsp; with regular spaces
+  cleanContent = cleanContent.replace(/&nbsp;/gi, " ");
 
+  // Final string-level cleanup
+  cleanContent = cleanContent
+    // Normalize all <br> variants first
+    .replace(/<br\s*\/?>/gi, "<br>")
+    // Collapse 3+ consecutive <br> to exactly 2 (do this BEFORE stripping whitespace)
+    .replace(/(<br>){3,}/gi, "<br><br>")
+    // Now strip excessive whitespace around BRs (but keep text readable)
+    .replace(/\s*(<br>)\s*/gi, "$1")
+    // Remove <br> from inside empty headings
+    .replace(/<(h[1-3])>(<br>)+<\/\1>/gi, "")
+    // Clean <br> around <hr>
+    .replace(/(<br>)+(<hr\s*\/?>)/gi, "$2")
+    .replace(/(<hr\s*\/?>)(<br>)+/gi, "$1");
+
+  // Second pass to catch any new consecutive BRs created
+  cleanContent = cleanContent.replace(/(<br>){3,}/gi, "<br><br>");
+  // Remove nested identical block elements like <p><p>Text</p></p>
+  cleanContent = cleanContent.replace(
+    /<p>\s*(<p>[\s\S]*?<\/p>)\s*<\/p>/gi,
+    "$1"
+  );
+
+  // Flatten <div><p>Text</p></div> to just <p>Text</p>
+  cleanContent = cleanContent.replace(/<div>\s*([\s\S]*?)\s*<\/div>/gi, "$1");
+
+  // Collapse <p><br></p> repeated blocks
+  cleanContent = cleanContent.replace(/(<p><br><\/p>){2,}/gi, "<p><br></p>");
+
+  // Remove empty spans left over
+  cleanContent = cleanContent.replace(/<span[^>]*>\s*<\/span>/gi, "");
+
+  // Remove wrapping <p> around <img> if it’s the only child
+  cleanContent = cleanContent.replace(/<p>\s*(<img[^>]+>)\s*<\/p>/gi, "$1");
+  //
   // Sanitize the final output
-  return DOMPurify.sanitize(cleanedContent, {
+  return DOMPurify.sanitize(cleanContent, {
     ALLOWED_TAGS: [
       "strong",
       "b",

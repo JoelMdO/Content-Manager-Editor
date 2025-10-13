@@ -81,9 +81,9 @@ const replaceImgWithSrc = (
 
             newHtmlContent = newHtmlContent.replaceAll(
               placeholder,
-              `<img src="${imgSource}" alt="${imageIdentifier}" style="max-width: 100%; height: auto;"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+              `<img src="${imgSource}" alt="${imageIdentifier}"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
             );
-            console.log('"newHtmlContent after replace"', newHtmlContent);
+            ///    console.log('"newHtmlContent after replace"', newHtmlContent);
 
             break;
           default:
@@ -105,7 +105,7 @@ const replaceImgWithSrc = (
     } else {
       console.log("doing else branch of newHtmlContent");
 
-      console.log('"newHtmlContent"', newHtmlContent);
+      //console.log('"newHtmlContent"', newHtmlContent);
       return newHtmlContent;
     }
   } else {

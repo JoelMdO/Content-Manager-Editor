@@ -40,12 +40,15 @@ const PreviewArticle = () => {
     return (tree: any) => {
       visit(tree, "paragraph", (node, index, parent) => {
         // Check if paragraph contains only an image
+        if (!parent || index === null) return;
+
         const onlyImages =
           node.children.length > 0 &&
           node.children.every((child: any) => child.type === "image");
         if (onlyImages) {
           // Replace paragraph with all its image children
           parent.children.splice(index!, 1, ...node.children);
+          return index;
         }
       });
     };
@@ -116,13 +119,26 @@ const PreviewArticle = () => {
                 </h4>
               ),
               p: ({ children, ...props }) => {
-                const hasOnlyImages = React.Children.toArray(children).every(
-                  (child) =>
-                    React.isValidElement(child) && child.type === "image"
-                );
-                console.log("hasOnlyImages", hasOnlyImages);
+                const childrenArray = React.Children.toArray(children);
+                const hasBlockElements = childrenArray.some((child) => {
+                  if (!React.isValidElement(child)) return false;
 
-                if (hasOnlyImages) {
+                  // Check for block-level element types
+                  const blockTypes = [
+                    "div",
+                    "figure",
+                    "img",
+                    "table",
+                    "ul",
+                    "ol",
+                    "blockquote",
+                    "pre",
+                  ];
+                  return blockTypes.includes(child.type as string);
+                });
+                console.log("hasBlockElements", hasBlockElements);
+
+                if (hasBlockElements) {
                   return <div className="image-container my-1">{children}</div>;
                 }
 
@@ -150,11 +166,11 @@ const PreviewArticle = () => {
                     {/* </div> */}
 
                     {alt && (
-                      <p
+                      <figcaption
                         className={`text-[10px] md:text-base text-center text-gray-500 dark:text-gray-400 mt-0 italic font-medium mb-2`}
                       >
                         {alt}
-                      </p>
+                      </figcaption>
                     )}
                   </figure>
                 );

@@ -97,6 +97,8 @@ const MenuButton = ({
         onClick={() => {
           // Call handleClick which triggers buttonMenuLogic
           handleClick();
+          console.log("Button clicked:", type);
+
           // Handle different button types
           switch (type) {
             case "styles":

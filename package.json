@@ -19,7 +19,6 @@
     "@vercel/speed-insights": "^1.2.0",
     "animate.css": "^4.1.1",
     "cloudinary": "^2.6.0",
-    "crypto": "^1.0.1",
     "dompurify": "^3.2.7",
     "firebase": "^11.3.0",
     "firebase-admin": "^12.7.0",

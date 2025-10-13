@@ -40,6 +40,60 @@ const DashboardEditor = () => {
   //
   //
   ///--------------------------------------------------------
+  // Add evenlisteners to editorRefs on mount
+  ///--------------------------------------------------------
+  useEffect(() => {
+    const editableBodyDiv = editorRefs?.current[1];
+    if (!editableBodyDiv) return;
+
+    // Handle paste
+    const handlePaste = (e: ClipboardEvent) => {
+      e.preventDefault();
+      const text = e.clipboardData?.getData("text/plain") || "";
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = text
+        .split("\n")
+        .map((line) => `<p>${line}</p>`)
+        .join("");
+
+      const frag = document.createDocumentFragment();
+      Array.from(tempDiv.childNodes).forEach((node) => frag.appendChild(node));
+
+      range.insertNode(frag);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    };
+
+    // Handle cut
+    const handleCut = () => {
+      // Use a small delay to check DOM after cut
+      requestAnimationFrame(() => {
+        editableBodyDiv.querySelectorAll("p, div, span").forEach((el) => {
+          if (el.textContent?.trim() === "" && !el.querySelector("img, a")) {
+            el.remove();
+          }
+        });
+      });
+    };
+
+    // ✅ Add listeners
+    editableBodyDiv.addEventListener("paste", handlePaste);
+    editableBodyDiv.addEventListener("cut", handleCut);
+
+    // 🧹 Clean up on unmount
+    return () => {
+      editableBodyDiv.removeEventListener("paste", handlePaste);
+      editableBodyDiv.removeEventListener("cut", handleCut);
+    };
+  }, [editorRefs]);
+
+  ///--------------------------------------------------------
   // Get the translated article draft
   ///--------------------------------------------------------
   useTranslatedArticleDraft();
@@ -103,7 +157,7 @@ const DashboardEditor = () => {
             );
             processedContent = processedContent.replace(
               placeholder,
-              `<img src="${imgSource}" alt="${imageIdentifier}" width="25%" style="justify-self: center;"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+              `<img src="${imgSource}" alt="${imageIdentifier}" width="150" height="150" style="justify-self: center;"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
             );
           }
         });
