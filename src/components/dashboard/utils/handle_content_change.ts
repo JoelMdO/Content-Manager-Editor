@@ -1,4 +1,5 @@
 import removeBase64FromImgTags from "../menu/button_menu/utils/remove_img_base64";
+import TextEditor from "./text_editor";
 
 export const handleContentChange = (
   index: number,

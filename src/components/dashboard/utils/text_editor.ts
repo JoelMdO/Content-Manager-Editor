@@ -3,7 +3,7 @@
  * Handles: paste, cut, delete, backspace, and maintains clean HTML structure
  */
 
-class TextEditor {
+export default class TextEditor {
   private editor: HTMLElement;
   private isComposing: boolean = false;
 
