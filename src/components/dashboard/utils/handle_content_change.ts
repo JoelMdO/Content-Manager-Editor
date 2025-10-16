@@ -26,8 +26,11 @@ export const handleContentChange = (
     // Title
     console.log("Title content changed:", content);
 
-    sessionStorage.setItem(`${languageKey}-tempTitle-${dbName}`, content);
-    console.log("Title changed:", content);
+    sessionStorage.setItem(
+      `${languageKey}-tempTitle-${dbName}`,
+      element.innerHTML
+    );
+    console.log("Title changed:", element.innerHTML);
     // console.log(
     //   "Body content:",
     //   sessionStorage.getItem(`${languageKey}-tempBody-${dbName}`) || ""
