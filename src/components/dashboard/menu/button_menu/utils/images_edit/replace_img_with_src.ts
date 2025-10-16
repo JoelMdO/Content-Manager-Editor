@@ -1,6 +1,3 @@
-import { language } from "gray-matter";
-import { endsWith } from "lodash";
-
 const replaceImgWithSrc = (
   htmlContent: string,
   images: Array<{ url: string; fileId: string }>,

@@ -151,9 +151,6 @@ const PreviewArticle = () => {
               img: ({ src = "", alt = "" }) => {
                 return (
                   <figure className="flex flex-col mt-2 justify-center items-center transition-all duration-500 transform hover:scale-[1.02]">
-                    {/* <div
-                    className={`flex relative justify-center items-center overflow-hidden ${previewArticleStyles.image_container}`}
-                  > */}
                     <Image
                       width={500}
                       height={500}
@@ -163,8 +160,6 @@ const PreviewArticle = () => {
                       className="self-center object-contain"
                       loading="lazy"
                     />
-                    {/* </div> */}
-
                     {alt && (
                       <figcaption
                         className={`text-[10px] md:text-base text-center text-gray-500 dark:text-gray-400 mt-0 italic font-medium mb-2`}

@@ -70,10 +70,6 @@ export const handleFontChange = (
         // Create a new <span> for the selected text
         const extractedContent = range.extractContents();
         const span = document.createElement("span");
-        // span.style.fontStyle = fontStyle;
-        // span.style.fontWeight = fontWeight;
-        // span.style.textDecoration = textDecoration;
-        // span.style.fontSize = fontSizeH2 !== "1em" ? fontSizeH2 : fontSizeH3;
         if (value === "italic") span.style.fontStyle = "italic";
         if (value === "bold") span.style.fontWeight = "700";
         if (value === "underline") span.style.textDecoration = "underline";

@@ -89,27 +89,6 @@ const createFormData = async (
     }
     const images = JSON.stringify(getAllImagesFromSessionStorage());
     formData.append("images", images);
-    // const imagePromises = data
-    //   .filter(
-    //     (
-    //       item
-    //     ): item is {
-    //       type: "image";
-    //       imageId: string;
-    //       fileName: string;
-    //       blobUrl: string;
-    //     } => item.type === "image"
-    //   )
-    //   .map(async (item) => {
-    //     try {
-    //       const blob = await (await fetch(item.blobUrl)).blob(); // Convert Base64 back to Blob
-    //       const file = new File([blob], item.imageId, { type: blob.type });
-
-    //       formData.append(`image`, file);
-    // } catch (error) {
-    //   errorAlert("", "", error);
-    // }
-    //});
 
     // await Promise.all(imagePromises);
   } else {

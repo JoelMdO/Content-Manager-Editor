@@ -2,13 +2,6 @@ import callHub from "./call_hub";
 
 export async function convertHtmlToMarkdownAPI(html: string) {
   try {
-    // const response = await fetch("/api/convert-html-to-markdown", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ html, options }),
-    // });
     console.log('"html to convertHtmlToMarkdownAPI":', html);
 
     const response = await callHub("markdown", html);

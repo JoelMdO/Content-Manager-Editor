@@ -135,52 +135,15 @@ export async function POST(req: NextRequest): Promise<Response> {
     let fileName: string = "";
     console.log("auth ok");
 
-    // for (const key of formData.keys()) {
-    //   if (key.startsWith("image")) {
-    //     const fileData = formData.get(key);
-    //     console.log('"fileData with image prefix"');
-
-    //     if (typeof fileData === "string") {
-    //       imageFiles.push(fileData);
-    //     } else if (fileData instanceof Blob) {
-    //       fileName = fileData.name || key;
-
-    //       // Convert to File
-    //       const file = new File([fileData], fileName, { type: fileData.type });
-    //       imageFiles.push(file);
-    //     } else {
-    //       const fileData = formData.get(key);
-    //       imageFiles.push(fileData as File);
-    //     }
-    //   }
-    // }
-    // for (const key of formData.keys()) {
-    //   if (key.startsWith("images")) {
     const files = formData.get("images");
     //console.log('files type of "images"', typeof files);
     const filesObj = JSON.parse(files as string);
     //console.log('"filesObj at uploadImage"', filesObj);
 
-    // if (Array.isArray(files)) {
-    //   console.log("images are arrays at uploadImage");
     imageFiles = filesObj as FormDataImageItem[];
-    //   console.log("imageFiles at uploadImage", imageFiles);
-    //   imageFiles = files as FormDataImageItem[];
-    // } else {
-    //   console.log("images are NOT arrays at uploadImage");
-    //   imageFiles = [];
-    // }
-
-    //}
-    //}
 
     if (imageFiles.length > 0) {
       //Filter valid file objects
-
-      // pre_images = imageFiles.filter(
-      //   (value): value is File => value instanceof File
-      // );
-      // pre_images = imageFiles;
       console.log("pre_images > 0");
       await Promise.all(
         imageFiles.map(async (item: FormDataImageItem) => {
@@ -321,20 +284,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     const cleanedBody = articlesReplaced.map((body) =>
       body ? cleanNestedDivsServer(body) : body
     );
-    // Clean nested divs
-    // article.body = cleanNestedDivsServer(articleReplaced);
-    // article.esBody = cleanNestedDivsServer(articleESReplaced[1]);
-    // console.log(
-    //   'article after replaceSrcWithImagePlaceholdersAtPost:"',
-    //   article.body
-    // );
-
-    // console.log(
-    //   'article after replaceSrcWithImagePlaceholdersAtPost:"',
-    //   updatedArticlesBodies[0]
-    // );
-    // console.log("updatedArticlesBodies", article.body);
-    // debugger;
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
@@ -483,12 +432,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const likes = {
       likes: 0,
     };
-    // //
-    // // const articleDataForDb = articleDataMocksForDb;
-    // // const newId = articleDataMocksForDb.metadata.slug;
-    // //console.log("articleDataForDb", articleDataForDb);
 
-    // //
     try {
       const dbRef = db.ref(`articles/${newId}`);
       await dbRef.set(articleDataForDb);
@@ -510,8 +454,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         error: e instanceof Error ? e.message : "Unknown database error",
       });
     }
-    // //
-    // //
+
     const body = JSON.stringify({
       title: article.title,
       slug: newId,

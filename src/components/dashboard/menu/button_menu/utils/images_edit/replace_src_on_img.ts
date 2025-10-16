@@ -1,7 +1,4 @@
-const replaceSrcWithImagePlaceholders = (
-  htmlContent: string
-  // images: Array<{ url: string; fileId: string }>
-) => {
+const replaceSrcWithImagePlaceholders = (htmlContent: string) => {
   ///--------------------------------------------------------
   // Check if the article has images
   ///--------------------------------------------------------
@@ -44,10 +41,6 @@ const replaceSrcWithImagePlaceholders = (
       }
     });
     ///
-
-    // if (!newHtmlContent.trim().startsWith("<div>")) {
-    //   return `<div>${newHtmlContent}</div>`;
-    // } else {
     console.log(
       '"newHtmlContent at replaceSrcWithImagePlaceholders"',
       newHtmlContent
@@ -65,9 +58,6 @@ const replaceSrcWithImagePlaceholders = (
     ///--------------------------------------------------------
     console.log('"No image placeholders found"');
     return htmlContent;
-    // return !htmlContent.trim().startsWith("<div>")
-    //   ? `<div>${htmlContent}</div>`
-    //   : htmlContent;
   }
 };
 

@@ -9,8 +9,6 @@ import translateButtonClicked from "./translate_button_clicked";
 import router from "next/router";
 import saveArticle from "@/components/dashboard/utils/save_article";
 import summaryButtonClicked from "./summary_button_clicked";
-import { current } from "@reduxjs/toolkit";
-import { set } from "lodash";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
