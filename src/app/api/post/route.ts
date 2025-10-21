@@ -144,18 +144,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const filesObj = JSON.parse(files as string);
     ////console.log('"filesObj at uploadImage"', filesObj);
 
-    // if (Array.isArray(files)) {
-    //   console.log("images are arrays at uploadImage");
     imageFiles = filesObj as FormDataImageItem[];
-    //   console.log("imageFiles at uploadImage", imageFiles);
-    //   imageFiles = files as FormDataImageItem[];
-    // } else {
-    //   console.log("images are NOT arrays at uploadImage");
-    //   imageFiles = [];
-    // }
-
-    //}
-    //}
 
     if (imageFiles.length > 0) {
       //Filter valid file objects
@@ -299,20 +288,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     const cleanedBody = articlesReplaced.map((body) =>
       body ? cleanNestedDivsServer(body) : body
     );
-    // Clean nested divs
-    // article.body = cleanNestedDivsServer(articleReplaced);
-    // article.esBody = cleanNestedDivsServer(articleESReplaced[1]);
-    // console.log(
-    //   'article after replaceSrcWithImagePlaceholdersAtPost:"',
-    //   article.body
-    // );
-
-    // console.log(
-    //   'article after replaceSrcWithImagePlaceholdersAtPost:"',
-    //   updatedArticlesBodies[0]
-    // );
-    // console.log("updatedArticlesBodies", article.body);
-    // debugger;
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
@@ -461,12 +436,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const likes = {
       likes: 0,
     };
-    // //
-    // // const articleDataForDb = articleDataMocksForDb;
-    // // const newId = articleDataMocksForDb.metadata.slug;
-    // //console.log("articleDataForDb", articleDataForDb);
 
-    // //
     try {
       const dbRef = db.ref(`articles/${newId}`);
       await dbRef.set(articleDataForDb);
@@ -488,8 +458,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         error: e instanceof Error ? e.message : "Unknown database error",
       });
     }
-    // //
-    // //
+
     const body = JSON.stringify({
       title: article.title,
       slug: newId,

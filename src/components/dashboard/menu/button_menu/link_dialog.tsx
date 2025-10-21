@@ -92,11 +92,7 @@ const LinkDialog = ({ index }: { index?: number }) => {
         dialogRef!.current?.close();
       });
   };
-  // const getLinkValue = () => {
-  //   if (linkInputRef.current) {
-  //     link_url = linkInputRef.current.value;
-  //   }
-  // };
+
   return (
     <dialog
       ref={dialogRef}

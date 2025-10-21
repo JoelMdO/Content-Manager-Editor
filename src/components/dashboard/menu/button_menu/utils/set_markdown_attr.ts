@@ -9,7 +9,6 @@ export const setMarkdownAttr = (
   //
   const primary_style: string = type;
 
-  // span.style.fontSize = enabled ? primary_style : secondary_style;
   if (enabled) {
     span.classList.add(primary_style);
   } else {

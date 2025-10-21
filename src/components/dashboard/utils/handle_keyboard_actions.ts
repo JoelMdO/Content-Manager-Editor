@@ -1,5 +1,3 @@
-import { removeStoredImage } from "../menu/button_menu/utils/images_edit/delete_img_from_localstorage";
-
 export const handleKeyBoardActions = (
   e: React.KeyboardEvent<HTMLDivElement>,
   index: number,

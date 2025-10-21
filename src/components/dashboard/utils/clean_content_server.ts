@@ -192,6 +192,5 @@ export function cleanNestedDivsServer(content: string): string {
       "div",
     ],
     ALLOWED_ATTR: ["href", "src", "alt", "class", "style"],
-    // ADD_ATTR: ["style"],
   });
 }

@@ -96,8 +96,6 @@ const Dashboard: React.FC = () => {
     dbNameToSearch.current = sessionStorage.getItem("db") as string;
     setDraftKey(`draft-articleContent-${dbNameToSearch.current}`);
   }, [dbIsReady]);
-  //
-  //TODO second phase add a section selector on change of dbNameToSearch
   //--------------------------------------------------------
   // Context creation
   ///--------------------------------------------------------

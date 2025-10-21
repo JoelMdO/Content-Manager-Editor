@@ -1,4 +1,3 @@
-import { create } from "lodash";
 import { ButtonProps } from "../type/type_menu_button";
 import createSummary from "./create_summary";
 

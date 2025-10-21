@@ -60,9 +60,6 @@ const replaceSrcWithImagePlaceholders = (htmlContent: string) => {
     ///--------------------------------------------------------
     //console.log('"No image placeholders found"');
     return htmlContent;
-    // return !htmlContent.trim().startsWith("<div>")
-    //   ? `<div>${htmlContent}</div>`
-    //   : htmlContent;
   }
 };
 
