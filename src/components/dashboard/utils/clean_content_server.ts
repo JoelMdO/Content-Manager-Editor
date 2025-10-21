@@ -83,7 +83,7 @@ export function cleanNestedDivsServer(content: string): string {
           "h3",
         ].includes(tagName)
       ) {
-        let attributes = Array.from(element.attributes)
+        const attributes = Array.from(element.attributes)
           .filter((attr) => {
             // Keep specific classes
             if (attr.name === "class") {
@@ -101,7 +101,7 @@ export function cleanNestedDivsServer(content: string): string {
           .join(" ");
 
         // Process inner content
-        let innerContent = Array.from(element.childNodes)
+        const innerContent = Array.from(element.childNodes)
           .map(processNode)
           .join("");
 

@@ -3,6 +3,7 @@ import matter from "gray-matter";
 import errorAlert from "@/components/alerts/error";
 import { ProcessedArticle } from "../types/previewed_article";
 import replaceImgWithSrc from "../../menu/button_menu/utils/images_edit/replace_img_with_src";
+import { ImageItem } from "@/types/image_item";
 
 const loadMarkdownArticle = async ({
   language,
@@ -30,15 +31,19 @@ const loadMarkdownArticle = async ({
         break;
     }
     //
-    const articleTitle = parsedData.find((item: any) => item.type === title);
-    const articleBody = parsedData.find((item: any) => item.type === body);
-    const images = parsedData.filter((item: any) =>
-      item.type.startsWith("image")
+    const articleTitle = parsedData.find(
+      (item: ImageItem) => item.type === title
+    );
+    const articleBody = parsedData.find(
+      (item: ImageItem) => item.type === body
+    );
+    const images = parsedData.filter((item: ImageItem) =>
+      item.type!.startsWith("image")
     );
     //
-    console.log("articleTitle", articleTitle);
-    console.log("articleBody", articleBody);
-    console.log("images", images);
+    //console.log("articleTitle", articleTitle);
+    //console.log("articleBody", articleBody);
+    //console.log("images", images);
     //
     ///--------------------------------------------------------
     // Add images src and alt to the body tag
@@ -47,7 +52,7 @@ const loadMarkdownArticle = async ({
       articleBody.content! as string,
       images
     );
-    console.log("updatedTagArticleBody", updatedTagArticleBody);
+    //console.log("updatedTagArticleBody", updatedTagArticleBody);
     ///--------------------------------------------------------
     // Convert to Markdown
     ///--------------------------------------------------------
@@ -55,15 +60,15 @@ const loadMarkdownArticle = async ({
     const articleBodyMarkdown = await convertHtmlToMarkdownAPI(
       articleToMarkDown
     );
-    console.log("articleBodyMarkdown", articleBodyMarkdown);
+    //console.log("articleBodyMarkdown", articleBodyMarkdown);
     ///--------------------------------------------------------
     // Parses the article, separates the body text into content
     // separates the metadata into data.
     ///--------------------------------------------------------
     if (articleBodyMarkdown && articleBodyMarkdown.status === 200) {
       const { data, content } = matter(articleBodyMarkdown.body as string);
-      console.log("data from matter", data);
-      console.log("content from matter", content);
+      //console.log("data from matter", data);
+      //console.log("content from matter", content);
       ///--------------------------------------------------------
       // Store the markdown in sessionStorage
       ///--------------------------------------------------------

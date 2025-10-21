@@ -31,8 +31,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
       type = getDataAtApiHub.type;
       dataApiHub = dataApiHub;
-      console.log("type at api/hub with json:", type);
-      console.log('"dataApiHub at api/hub with json":', dataApiHub);
+      //console.log("type at api/hub with json:", type);
+      //console.log('"dataApiHub at api/hub with json":', dataApiHub);
     } else {
       /// For request including files.
       formData = await req.formData();
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Check if the request is authenticated
     ///--------------------------------------------------------
     const session = await getServerSession(authOptions);
-    console.log('"session at api/hub":', session);
+    //console.log('"session at api/hub":', session);
 
     if (!session && type !== "sign-in-by-email") {
       return NextResponse.json({
@@ -70,9 +70,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       (session && type === "translate") ||
       (session && type === "summary")
     ) {
-      console.log("type at api/hub with session:", type);
+      //console.log("type at api/hub with session:", type);
       sessionId = session.user?.id;
-      console.log("sessionId at api/hub with session:", sessionId);
+      //console.log("sessionId at api/hub with session:", sessionId);
     }
 
     ///-----------------------------------------------
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///-----------------------------------------------
 
     const statusSanitize = await sanitizeData(dataApiHub, type);
-    console.log('"statusSanitize at api/hub":', statusSanitize);
+    //console.log('"statusSanitize at api/hub":', statusSanitize);
 
     //
     if (statusSanitize.status != 200) {
@@ -151,8 +151,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
         break;
       case "summary":
-        console.log("doing summary at api/hub");
-        console.log("dataApiHub", dataApiHub);
+        //console.log("doing summary at api/hub");
+        //console.log("dataApiHub", dataApiHub);
 
         dataApiHub = dataApiHub;
         type = type;

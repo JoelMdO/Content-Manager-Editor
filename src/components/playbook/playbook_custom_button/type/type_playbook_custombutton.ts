@@ -1,3 +1,4 @@
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { PlaybookMeta } from "../../types/plabookMeta";
 
 export interface CustomDashButtonProps {
@@ -13,7 +14,7 @@ export interface CustomDashButtonProps {
   setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
   "data-cy": string;
   resetForm: () => void;
-  router: any;
+  router: AppRouterInstance;
   noteViewMode: string;
   setNoteViewMode: React.Dispatch<React.SetStateAction<"view" | "edit">>;
 }

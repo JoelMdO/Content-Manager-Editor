@@ -7,7 +7,7 @@ import MenuContext from "./context/menu_context";
 
 const MenuButton = ({
   type,
-  index,
+  // index,
   setIsFontStyleOpen,
   setIsMenuClicked,
   tag,
@@ -16,7 +16,7 @@ const MenuButton = ({
   //=========================================================
   const {
     editorRefs,
-    id,
+    // id,
     fileInputRef,
     dialogRef,
     dbNameToSearch,
@@ -40,13 +40,6 @@ const MenuButton = ({
   //=========================================================
   const [isClicked, setIsClicked] = useState(false);
   //
-  // Ensure safe access to editorRefs for Image and Link buttons
-  let editorRef: HTMLDivElement | null = null;
-  if (editorRefs && typeof index === "number") {
-    const refValue = editorRefs.current ? editorRefs.current[index] : null;
-    editorRef = refValue as HTMLDivElement;
-  }
-
   const { text, icon } = useMemo(
     () => menuButtonStyle(type!, isClicked),
     [type, isClicked]
@@ -79,7 +72,30 @@ const MenuButton = ({
       setLanguage,
       isClicked,
     });
-  }, [type, setIsClicked, id, editorRefs]);
+  }, [
+    type,
+    setIsClicked,
+    // id,
+    editorRefs,
+    isClicked,
+    DRAFT_KEY,
+    dbNameToSearch,
+    fileInputRef,
+    dialogRef,
+    sectionsDialogRef,
+    stylesDialogRef,
+    summaryDialogRef,
+    savedTitleRef,
+    savedBodyRef,
+    setSelectedSection,
+    setIsFontStyleOpen,
+    router,
+    setTranslating,
+    setTranslationReady,
+    setSummaryContent,
+    setIsSummary,
+    setLanguage,
+  ]);
   //
   ///--------------------------------------------------------
   // UI of the button
@@ -97,7 +113,7 @@ const MenuButton = ({
         onClick={() => {
           // Call handleClick which triggers buttonMenuLogic
           handleClick();
-          console.log("Button clicked:", type);
+          //console.log("Button clicked:", type);
 
           // Handle different button types
           switch (type) {

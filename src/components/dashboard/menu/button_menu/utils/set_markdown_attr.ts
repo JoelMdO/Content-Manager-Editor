@@ -1,3 +1,5 @@
+import { SetMarkDownAttr } from "../type/set_markdown_type";
+
 //==========================================
 export const setMarkdownAttr = (
   span: HTMLElement,
@@ -5,8 +7,7 @@ export const setMarkdownAttr = (
   enabled: boolean
 ) => {
   //
-  let primary_style: string = type;
-  let secondary_style: string = "";
+  const primary_style: string = type;
 
   // span.style.fontSize = enabled ? primary_style : secondary_style;
   if (enabled) {

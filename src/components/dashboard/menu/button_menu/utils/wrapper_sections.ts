@@ -1,3 +1,5 @@
+import { SetMarkDownAttr } from "../type/set_markdown_type";
+
 const sectionQuoteListWrapperHtml = (
   type: SetMarkDownAttr,
   selection: Selection,
@@ -19,7 +21,8 @@ const sectionQuoteListWrapperHtml = (
       wrapper.style.height = "10px";
       wrapper.style.width = "100%";
       wrapper.style.display = "block";
-      wrapper.style.border = "dashed 1px blue";
+      wrapper.style.border = "none";
+      wrapper.style.background = "linear-gradient(to right, #4f8cff, #a1ffce)";
       break;
     case "list":
       //------------------------------------------
@@ -43,26 +46,41 @@ const sectionQuoteListWrapperHtml = (
       // Detect if text looks like a list (`- item` or `1. item`)
       ///--------------------------------------------------------
       const plainText = fragment.textContent || "";
-      const listPattern = /^(?:-|\d+\.)\s+/m; // matches `- ` or `1. ` at line start
+      // const listPattern = /^(?:-|\d+\.)\s+/m; // matches `- ` or `1. ` at line start
+      // Split on dash followed by space, keeping the dash for pattern matching
       const lines = plainText
-        .split(/\n+/)
+        .split(/(?:^|\s)(-\s+[^\-]+)/g) // splits on dash-space, keeps the item text
         .map((line) => line.trim())
-        .filter((line) => line.length > 0);
+        .filter((line) => /^-\s+/.test(line));
+      // .split(/(?=-\s+)/)
+      // .map((line) => line.trim())
+      // .filter((line) => line.length > 0);
+      // const listPattern = /^\s*-\s+/; // matches `- ` or `1. ` at line start
+      const listPattern = /-\s+([^\-]+)/g;
+      // const lines = plainText
+      //   .split(/\n+/)
+      //   .map((line) => line.trim())
+      //   .filter((line) => line.length > 0);
 
       wrapper = document.createElement("ol");
       wrapper.style.marginLeft = "20px";
 
-      if (listPattern.test(plainText)) {
+      // If any line matches the list pattern, treat all matching lines as list items
+      // if (listPattern.test(plainText)) {
+      if (lines.some((line) => listPattern.test(line))) {
         // 📝 Parse markdown-style list text
         lines.forEach((line) => {
-          const cleaned = line.replace(/^(?:-|\d+\.)\s+/, ""); // remove - or 1.
-          const li = document.createElement("li");
-          li.textContent = cleaned || "";
-          li.style.listStyleType = "decimal";
-          li.style.marginLeft = "20px";
-          li.style.display = "list-item";
-          li.style.color = "black";
-          wrapper.appendChild(li);
+          // const cleaned = line.replace(/^(?:-|\d+\.)\s+/, ""); // remove - or 1.
+          if (listPattern.test(line)) {
+            const cleaned = line.replace(/^\s*-\s+/, ""); // remove - or 1.
+            const li = document.createElement("li");
+            li.textContent = cleaned || "";
+            li.style.listStyleType = "decimal";
+            li.style.marginLeft = "20px";
+            li.style.display = "list-item";
+            li.style.color = "blue-light";
+            wrapper.appendChild(li);
+          }
         });
       }
 
@@ -82,7 +100,7 @@ const sectionQuoteListWrapperHtml = (
             li.style.listStyleType = "decimal";
             li.style.marginLeft = "20px";
             li.style.display = "list-item";
-            li.style.color = "black";
+            li.style.color = "blue-light";
             wrapper.appendChild(li);
           } else if (
             node.nodeType === Node.TEXT_NODE &&
@@ -93,7 +111,7 @@ const sectionQuoteListWrapperHtml = (
             li.style.listStyleType = "decimal";
             li.style.marginLeft = "20px";
             li.style.display = "list-item";
-            li.style.color = "black";
+            li.style.color = "blue-light";
             wrapper.appendChild(li);
           }
         });
@@ -103,7 +121,7 @@ const sectionQuoteListWrapperHtml = (
         li.style.listStyleType = "decimal";
         li.style.marginLeft = "20px";
         li.style.display = "list-item";
-        li.style.color = "black";
+        li.style.color = "blue-light";
         li.innerHTML = "<br>";
 
         wrapper.appendChild(li);
@@ -114,7 +132,7 @@ const sectionQuoteListWrapperHtml = (
       wrapper.style.borderLeft = "3px solid gray";
       wrapper.style.margin = "8px 0";
       wrapper.style.paddingLeft = "8px";
-      wrapper.style.color = "white";
+      wrapper.style.color = "blue-light";
       wrapper.style.fontStyle = "italic";
       const selectedText = range.cloneContents();
       if (selectedText.childNodes.length > 0) {
@@ -138,13 +156,16 @@ const sectionQuoteListWrapperHtml = (
   if (sel) {
     const newRange = document.createRange();
     newRange.setStart(newDiv, 0);
-
-    if (type !== "section" && type !== "quote") {
+    if (type === "quote") {
+      // Place cursor at the end of the blockquote
+      newRange.selectNodeContents(wrapper);
+      newRange.collapse(false);
+      // if (type !== "section" && type !== "quote") {
+    } else {
       //Moves the cursor to immediately after the <hr> element.
       newRange.setStartAfter(wrapper);
+      newRange.collapse(true);
     }
-    newRange.collapse(true);
-
     //
     //Ensures the new range is applied to the selection.
     sel!.removeAllRanges();

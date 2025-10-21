@@ -2,14 +2,7 @@ import callHub from "./call_hub";
 
 export async function convertHtmlToMarkdownAPI(html: string) {
   try {
-    // const response = await fetch("/api/convert-html-to-markdown", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ html, options }),
-    // });
-    console.log('"html to convertHtmlToMarkdownAPI":', html);
+    //console.log('"html to convertHtmlToMarkdownAPI":', html);
 
     const response = await callHub("markdown", html);
 
@@ -26,7 +19,7 @@ export async function convertHtmlToMarkdownAPI(html: string) {
       };
     }
   } catch (error) {
-    console.error("Error converting HTML to Markdown:", error);
+    // console.error("Error converting HTML to Markdown:", error);
     return {
       status: 500,
       message: "Failed to convert HTML to Markdown",

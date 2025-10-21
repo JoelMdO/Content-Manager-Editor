@@ -37,13 +37,14 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
     width,
   } = useMemo(
     () => playbookButtonStyle(type!, isCreating, noteViewMode),
-    [type, isCreating, isClicked, noteViewMode]
+    [type, isCreating, noteViewMode]
   );
 
   ///--------------------------------------------------------
   // Function to handle the cases of the playbookCustomButton
   ///--------------------------------------------------------
   const handleClick = useCallback(() => {
+    setIsClicked(true);
     playbookButtonLogic({
       type,
       router,
@@ -68,6 +69,7 @@ const PlaybookCustomButton: React.FC<Partial<CustomDashButtonProps>> = ({
     id,
     resetForm,
     setIsCreating,
+    onClick,
   ]);
   //
   ///--------------------------------------------------------

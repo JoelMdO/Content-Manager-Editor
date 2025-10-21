@@ -1,5 +1,6 @@
 //==========================================
 // Original Code (Preserved for Reference)
+import { SetMarkDownAttr } from "../type/set_markdown_type";
 import { setMarkdownAttr } from "./set_markdown_attr";
 import sectionQuoteListWrapperHtml from "./wrapper_sections";
 //==========================================
@@ -35,12 +36,6 @@ export const handleFontChange = (
       ) {
         spanNode = spanNode.parentElement;
       }
-
-      const fontStyle = value === "italic" ? "italic" : "normal";
-      const fontWeight = value === "bold" ? "700" : "400"; // Using numeric values consistently
-      const textDecoration = value === "underline" ? "underline" : "none";
-      const fontSizeH2 = value === "font_h2" ? "1.5em" : "1em";
-      const fontSizeH3 = value === "font_h3" ? "1.17em" : "1em";
 
       if (spanNode && spanNode.tagName === "SPAN") {
         // Update existing <span> stylesis

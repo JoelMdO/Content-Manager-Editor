@@ -42,6 +42,9 @@ const ReadPlaybookPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isEntryLoading, setEntryLoading] = useState<boolean>(false);
   const router = useRouter();
+  const [isMetaToUpdate, setIsMetaToUpdate] = useState<
+    PlaybookMeta | undefined
+  >(undefined);
 
   useEffect(() => {
     ///--------------------------------------------------------
@@ -90,13 +93,13 @@ const ReadPlaybookPage: React.FC = () => {
   //
 
   //
-  let isMetaToUpdate: PlaybookMeta | undefined;
+
   useEffect(() => {
     const entry = entries!.find((e) => e.id === isUpdateNote.noteId);
 
     if (entry) {
       setEntryLoading(true);
-      isMetaToUpdate = {
+      setIsMetaToUpdate({
         id: entry.id,
         title: entry.title,
         category: entry.category,
@@ -106,9 +109,9 @@ const ReadPlaybookPage: React.FC = () => {
         steps: entry.steps || [],
         codeSnippets: entry.codeSnippets || [{ code: "", language: "" }],
         references: entry.references || [{ title: "", link: "" }],
-      };
+      });
     }
-  }, [isUpdateNote.isUpdateNote]);
+  }, [isUpdateNote.isUpdateNote, entries, isUpdateNote.noteId]);
 
   //
   return (

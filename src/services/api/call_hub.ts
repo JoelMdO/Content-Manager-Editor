@@ -43,7 +43,7 @@ const callHub = async (
     //## POST
     case "post":
     case "translate":
-      console.log('doing "post" at callHub, type:', type);
+      //console.log('doing "post" at callHub, type:', type);
 
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
@@ -52,14 +52,14 @@ const callHub = async (
         : [];
 
       const formData = await createFormData(type, formDataItems);
-      console.log('"formData at callHub":', formData);
+      //console.log('"formData at callHub":', formData);
 
       body = formData;
       credentials = "include";
       break;
     default:
-      console.log("doing default at callHub, type:", type);
-      console.log('"data at callHub":', data);
+      //console.log("doing default at callHub, type:", type);
+      //console.log('"data at callHub":', data);
 
       body = JSON.stringify({ data: data, type: type });
       headers["Content-Type"] = "application/json";
@@ -75,7 +75,7 @@ const callHub = async (
       credentials: credentials,
     });
     const jsonResponse = await response.json();
-    console.log("jsonResponse at callHub", jsonResponse);
+    //console.log("jsonResponse at callHub", jsonResponse);
 
     return {
       status: jsonResponse.status,

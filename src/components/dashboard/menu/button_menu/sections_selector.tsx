@@ -7,8 +7,9 @@ const SectionSelector = () => {
   //
   //CONTEXT
   //===================================================
-  const { selectedSection, setSelectedSection, sectionsDialogRef, dbIsReady } =
-    useContext(MenuContext) as ButtonProps;
+  const { selectedSection, setSelectedSection, sectionsDialogRef } = useContext(
+    MenuContext
+  ) as ButtonProps;
   //
   //------------------------------------------
   // Purpose: Safely get db value from dbNameToSearch, handling both string and RefObject<string>.
@@ -50,7 +51,7 @@ const SectionSelector = () => {
       // If the user taps/clicks the backdrop (outside the dialog content)
       if (event.target === dialog) {
         dialog.close();
-        setSelectedSection && setSelectedSection("Select category");
+        setSelectedSection("Select category");
       }
     }
     //
@@ -63,7 +64,7 @@ const SectionSelector = () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("touchstart", handleClickOrTapOutside);
     };
-  }, []);
+  }, [setSelectedSection, sectionsDialogRef]);
   //
   //
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

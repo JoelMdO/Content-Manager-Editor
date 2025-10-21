@@ -29,8 +29,8 @@ export const debouncedUpdateStore = debounce(
       articleContent = articleContent.filter(
         (item: { type: string }) => item.type !== titleKey && item.type !== "id"
       );
-      console.log("newTitle:", newTitle);
-      console.log("titleKey:", titleKey);
+      //console.log("newTitle:", newTitle);
+      //console.log("titleKey:", titleKey);
 
       // Add title and id to articleContent
       articleContent.push({ type: titleKey, content: newTitle });
@@ -41,7 +41,7 @@ export const debouncedUpdateStore = debounce(
         const fullData = `${date}-${month}-${year}`;
         const preSlug = `${title}-${fullData}`;
         const id = slugify(preSlug);
-        console.log("id:", id);
+        //console.log("id:", id);
 
         articleContent.push({ type: "id", content: id });
       }
@@ -54,8 +54,8 @@ export const debouncedUpdateStore = debounce(
         (item: { type: string }) => item.type !== bodyKey
       );
       // Add body to articleContent
-      console.log("newBody:", newBody);
-      console.log("bodyKey:", bodyKey);
+      //console.log("newBody:", newBody);
+      //console.log("bodyKey:", bodyKey);
 
       articleContent.push({ type: bodyKey, content: newBody });
     }

@@ -1,5 +1,6 @@
 import { ProcessedArticle } from "../../../preview/types/previewed_article";
 import { ChangeEvent } from "react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export interface ButtonProps {
   type: string;
@@ -22,7 +23,7 @@ export interface ButtonProps {
   isMediumScreen: boolean;
   setIsClicked: React.Dispatch<React.SetStateAction<boolean>>;
   isClicked: boolean;
-  router: any;
+  router: AppRouterInstance;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
   dialogRef: React.RefObject<HTMLDialogElement | null>;

@@ -38,13 +38,10 @@ export const handleKeyBoardActions = (
         if (selectedNode && selectedNode.tagName === "IMG") {
           e.preventDefault();
 
-          // Remove from IndexedDB if it has a reference ID
-          const selectedText = selection?.toString().trim();
-          //Remove the image from IndexDB
           const refId = selectedNode.dataset.refId;
           if (refId) {
             // 1️ Remove from localStorage object
-            let stored = JSON.parse(localStorage.startWith("images") || "{}");
+            const stored = JSON.parse(localStorage.startWith("images") || "{}");
             for (const key in stored) {
               if (stored[key].imageId === refId || stored[key].type === refId) {
                 delete stored[key];
@@ -53,7 +50,7 @@ export const handleKeyBoardActions = (
             localStorage.setItem("images", JSON.stringify(stored));
 
             // 2️ Remove from sessionStorage object
-            let sessionStored = JSON.parse(
+            const sessionStored = JSON.parse(
               sessionStorage.startWith("images") || "{}"
             );
             for (const key in sessionStored) {

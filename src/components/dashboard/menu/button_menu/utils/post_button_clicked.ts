@@ -1,18 +1,20 @@
+import { StorageItem } from "@/types/storage_item";
 import callHub from "../../../../../services/api/call_hub";
 //------------------------------------------
 // Purpose: This function posts the article content to the database.
 //------------------------------------------
-type ArticleContentItem = {
-  type: string;
-  content?: any;
-  [key: string]: any;
-};
+// type ArticleContentItem = {
+//   type: string;
+//   content?: any;
+//   [key: string]: any;
+// };
 
 const postButtonClicked = async () => {
   ///========================================================
   // Function to post the article to the database
   ///========================================================
-  let articleContent: ArticleContentItem[] = [];
+  // let articleContent: ArticleContentItem[] = [];
+  let articleContent: StorageItem[] = [];
   const dbName = sessionStorage.getItem("db");
 
   articleContent = JSON.parse(
@@ -27,7 +29,7 @@ const postButtonClicked = async () => {
     //Check if session is available at sessionStorage when localStorage is empty
     const checkSessionStorage = JSON.parse(
       sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-    ).find((item: any) => item.type === "section");
+    ).find((item: StorageItem) => item.type === "section");
     if (checkSessionStorage) {
       articleContent.push({
         type: "section",
@@ -38,7 +40,7 @@ const postButtonClicked = async () => {
     }
   }
   articleContent.push({ type: "dbName", content: dbName });
-  console.log('"articleContent at postButtonClicked"', articleContent);
+  //console.log('"articleContent at postButtonClicked"', articleContent);
   // debugger;
   const response = await callHub("post", articleContent);
   return response;

@@ -30,10 +30,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     const title = data.data.title;
     const article = data.data.body;
     const language = data.data.language;
-    // console.log("data at resume", data);
-    // console.log("title", title);
-    // console.log("article", article);
-    // console.log("language", language);
+    // //console.log("data at resume", data);
+    // //console.log("title", title);
+    // //console.log("article", article);
+    // //console.log("language", language);
 
     ///--------------------------------------------------------
     // Create a summary of the article content for description
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       return NextResponse.json({ status: 401, error: "Unauthorized" });
     }
     const newUrl = process.env.RESUME_URL;
-    console.log("newUrl", newUrl);
+    //console.log("newUrl", newUrl);
 
     //
     process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; //TODO delete this line in production
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         language: language,
       }),
     });
-    console.log("response", resumeResponse);
+    //console.log("response", resumeResponse);
 
     if (!resumeResponse.ok) {
       const errorText = await resumeResponse.text();
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
 
     const resume = await resumeResponse.json();
-    console.log("resume", resume);
+    //console.log("resume", resume);
 
     //
     if (resume.success !== true) {

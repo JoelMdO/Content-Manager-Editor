@@ -9,6 +9,7 @@ import DialogsLoader from "../../components/loaders/dialogs_loader";
 import saveArticle from "./utils/save_article";
 import DOMPurify from "dompurify";
 import { cleanNestedDivs } from "./utils/clean_content";
+import { ImageItem } from "@/types/image_item";
 
 const DashboardEditor = () => {
   //
@@ -113,43 +114,44 @@ const DashboardEditor = () => {
         "{image_url_placeholder}"
       );
       if (hasPlaceholders) {
-        console.warn("Found unprocessed image placeholders in content:", {
-          content: savedBodyRef.current,
-        });
+        //TODO ADD LOGS
+        // console.warn("Found unprocessed image placeholders in content:", {
+        //   content: savedBodyRef.current,
+        // });
       }
 
       // Ensure no unprocessed placeholders remain
       if (processedContent.includes("{image_url_placeholder}")) {
         // Try to get images from session storage
-        console.log(
-          "Process includes image placeholders, checking session storage."
-        );
+        //console.log(
+        //   "Process includes image placeholders, checking session storage."
+        // );
 
         const dbName = sessionStorage.getItem("db");
-        console.log(
-          "Dashboard editor checking session storage for db:",
-          dbName
-        );
+        //console.log(
+        //   "Dashboard editor checking session storage for db:",
+        //   dbName
+        // );
 
         const localArticle = localStorage.getItem(
           `draft-articleContent-${dbName}`
         );
         const articleContent = JSON.parse(localArticle!);
-        const images = articleContent.filter((item: any) =>
-          item.type.startsWith("image")
+        const images: ImageItem[] = articleContent.filter((item: ImageItem) =>
+          item.type!.startsWith("image")
         );
 
-        console.log("Available images for placeholder replacement:", images);
+        //console.log("Available images for placeholder replacement:", images);
 
         // Replace any remaining placeholders with actual image data
-        images.forEach((image: any) => {
+        images.forEach((image: ImageItem) => {
           const imgSource = image.base64 || image.blobUrl;
           if (imgSource) {
             const imageIdentifier = image.imageId || image.id;
-            console.log("Dashboard editor trying to replace image:", {
-              imageIdentifier,
-              contentHasId: processedContent.includes(imageIdentifier),
-            });
+            //console.log("Dashboard editor trying to replace image:", {
+            //   imageIdentifier,
+            //   contentHasId: processedContent.includes(imageIdentifier),
+            // });
 
             const placeholder = new RegExp(
               `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
@@ -165,23 +167,23 @@ const DashboardEditor = () => {
 
       editableDiv.innerHTML = processedContent; // Force HTML rendering
     }
-  }, [isDraftArticleButtonClicked, savedBodyRef?.current, article?.content]);
+  }, [isDraftArticleButtonClicked, savedBodyRef, article, editorRefs]);
   ///--------------------------------------------------------
   // Set HTML content from Preview Editor
   ///--------------------------------------------------------
   useEffect(() => {
-    console.log("loading article html");
+    //console.log("loading article html");
     if (!article?.content || !article?.title) {
-      console.log("No article content or title available yet");
+      //console.log("No article content or title available yet");
       return;
     }
 
     const editableBodyDiv = editorRefs?.current[1];
     const editableTitleDiv = editorRefs?.current[0];
-    console.warn("article at UseEffect", article);
+    // console.warn("article at UseEffect", article);
     // Check if both divs exist before setting innerHTML
     if (editableBodyDiv && editableTitleDiv && article) {
-      console.log("article at UseEffect on if", article);
+      //console.log("article at UseEffect on if", article);
 
       try {
         // Sanitize content before setting innerHTML
@@ -193,11 +195,11 @@ const DashboardEditor = () => {
 
         // Update markdown state
         setIsMarkdownText(false);
-      } catch (error) {
-        console.error("Error setting article content:", error);
+      } catch {
+        // console.error("Error setting article content:", error);
       }
     }
-  }, [article]);
+  }, [article, editorRefs, setIsMarkdownText]);
   ///--------------------------------------------------------
   // Save to localStorage every 10 minutes (only if content exists)
   ///--------------------------------------------------------
@@ -205,8 +207,8 @@ const DashboardEditor = () => {
     const interval = setInterval(() => {
       const dbName = sessionStorage.getItem("db");
 
-      let currentTitle = editorRefs?.current[0]?.innerHTML || "";
-      let currentBody = editorRefs?.current[1]?.innerHTML || "";
+      const currentTitle = editorRefs?.current[0]?.innerHTML || "";
+      const currentBody = editorRefs?.current[1]?.innerHTML || "";
       saveArticle({
         dbName,
         currentTitle,
@@ -221,7 +223,14 @@ const DashboardEditor = () => {
     }, 10 * 60000); // 10 minutes.
 
     return () => clearInterval(interval);
-  }, [dbNameToSearch, DRAFT_KEY]);
+  }, [
+    dbNameToSearch,
+    DRAFT_KEY,
+    editorRefs,
+    language,
+    setLastAutoSave,
+    setOpenDialogNoSection,
+  ]);
   ///---------------------------------------------------
   //  Cleanup debounce on unmount
   ///---------------------------------------------------
@@ -240,7 +249,7 @@ const DashboardEditor = () => {
       sectionsDialogRef?.current?.showModal();
     }
     setOpenDialogNoSection(false);
-  }, [openDialogNoSection]);
+  }, [openDialogNoSection, sectionsDialogRef, setOpenDialogNoSection]);
   ///--------------------------------------------------------
   // UI
   ///--------------------------------------------------------
@@ -268,7 +277,7 @@ const DashboardEditor = () => {
           onKeyDown={(e) => handleKeyBoardActions(e, index, editorRefs!)}
           onInput={(e) => {
             const element = e.currentTarget as HTMLElement;
-            console.log("content with styles:", element);
+            //console.log("content with styles:", element);
             handleContentChange(
               index,
               element,
