@@ -78,7 +78,7 @@ const sectionQuoteListWrapperHtml = (
             li.style.listStyleType = "decimal";
             li.style.marginLeft = "20px";
             li.style.display = "list-item";
-            li.style.color = "blue-light";
+            li.style.color = "lightblue";
             wrapper.appendChild(li);
           }
         });
