@@ -9,6 +9,8 @@ import translateButtonClicked from "./translate_button_clicked";
 import router from "next/router";
 import saveArticle from "@/components/dashboard/utils/save_article";
 import summaryButtonClicked from "./summary_button_clicked";
+import { StorageItem } from "@/types/storage_item";
+import { TranslateType } from "@/types/translate_type";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
@@ -55,7 +57,7 @@ export const saveDraft = ({
   sectionsDialogRef,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  console.log("dNameToSearch", dbNameToSearch);
+  //console.log("dNameToSearch", dbNameToSearch);
 
   const dbName =
     dbNameToSearch === undefined
@@ -120,7 +122,7 @@ const openStylesDialog = ({
   isClicked,
 }: Partial<ButtonProps>) => {
   setIsFontStyleOpen!((prev) => !prev);
-  console.log("isClicked", isClicked);
+  //console.log("isClicked", isClicked);
   if (isClicked) {
     setIsClicked!(false);
   } else {
@@ -168,16 +170,16 @@ export const translateToSpanish = ({
           // Check if translation already exists
           // Remove all previous es-title, es-body, es-section items
           const filteredContent = articleContent.filter(
-            (item: any) =>
+            (item: StorageItem) =>
               item.type !== "es-title" &&
               item.type !== "es-body" &&
               item.type !== "es-section"
           );
           //
-          const translated = (response.body as any).translated_text;
-          const title = translated.title || "";
-          const es_body = translated.body || "";
-          const section = translated.section || "";
+          const translated = (response.body as TranslateType).translated_text;
+          const title = translated!.title || "";
+          const es_body = translated!.body || "";
+          const section = translated!.section || "";
 
           // Add new translation
           filteredContent.push({ type: "es-title", content: title });
@@ -305,7 +307,7 @@ export const buttonMenuLogic = ({
       post({ setIsClicked, router });
       break;
     case "save":
-      console.log("calling saveDraft");
+      //console.log("calling saveDraft");
 
       saveDraft({
         dbNameToSearch,
@@ -334,7 +336,7 @@ export const buttonMenuLogic = ({
       });
       break;
     case "summary":
-      console.log("calling summary");
+      //console.log("calling summary");
       getSummary({
         setIsClicked,
         summaryDialogRef,

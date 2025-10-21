@@ -34,7 +34,7 @@ const uploadImage = async (
     const response = await callHub("clean-image", file);
 
     if (response.status === 200) {
-      console.log("Image validated by server at uploadImage");
+      //console.log("Image validated by server at uploadImage");
 
       // Set up a FileReader to read the image file source
       const reader = new FileReader();

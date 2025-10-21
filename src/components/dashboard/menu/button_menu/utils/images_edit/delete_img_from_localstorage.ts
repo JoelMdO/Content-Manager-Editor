@@ -1,3 +1,5 @@
+import { ImageItem } from "@/types/image_item";
+
 export function removeStoredImage(
   imageIdToRemove: string,
   dbName: string,
@@ -8,13 +10,11 @@ export function removeStoredImage(
     const stored = storage.getItem(key);
     if (!stored) return;
 
-    try {
-      const content = JSON.parse(stored);
-      const filtered = content.filter(
-        (item: any) => item.imageId !== imageIdToRemove
-      );
-      storage.setItem(key, JSON.stringify(filtered));
-    } catch (err) {}
+    const content = JSON.parse(stored);
+    const filtered = content.filter(
+      (item: ImageItem) => item.imageId !== imageIdToRemove
+    );
+    storage.setItem(key, JSON.stringify(filtered));
   };
 
   if (dbName === "") {

@@ -1,6 +1,7 @@
 import emailMe from "../../../buttons/utils/email_me";
 import { CustomDashButtonProps } from "../type/type_playbook_custombutton";
 import handleNoteClick from "../../utils/handle_note_click";
+import { PlaybookMeta } from "../../types/plabookMeta";
 
 ///--------------------------------------------------------
 // Function to handle the view note button click
@@ -17,7 +18,7 @@ export function viewNote({
   setNoteViewMode!(toggleMode);
 
   if (noteViewMode === "view") {
-    setEntries?.((prev: any[] | undefined) =>
+    setEntries?.((prev: PlaybookMeta[] | undefined) =>
       prev
         ? prev.map((entry) =>
             entry.id === id ? { ...entry, loading: true } : entry
@@ -26,7 +27,7 @@ export function viewNote({
     );
     handleNoteClick(id!).then((meta) => {
       setViewDetails?.(true);
-      setEntries?.((prev: any[] | undefined) =>
+      setEntries?.((prev: PlaybookMeta[] | undefined) =>
         prev
           ? prev.map((entry) =>
               entry.id === id ? { ...entry, loading: false } : entry
@@ -34,7 +35,7 @@ export function viewNote({
           : []
       );
       if (meta) {
-        setEntries?.((prev: any[] | undefined) =>
+        setEntries?.((prev: PlaybookMeta[] | undefined) =>
           prev ? prev.map((entry) => (entry.id === id ? meta : entry)) : []
         );
       }
@@ -46,21 +47,28 @@ export function viewNote({
 ///--------------------------------------------------------
 // Function to update the playbook
 ///--------------------------------------------------------
-export function updatePlaybook(setUpdateNote?: any) {
+export function updatePlaybook(
+  setUpdateNote?: Partial<CustomDashButtonProps>["setUpdateNote"]
+) {
   setUpdateNote?.({ isUpdateNote: false, noteId: "" });
 }
 
 ///--------------------------------------------------------
 // Function to create a new playbook
 ///--------------------------------------------------------
-export function newPlaybook(resetForm?: any, router?: any) {
+export function newPlaybook(
+  resetForm?: Partial<CustomDashButtonProps>["resetForm"],
+  router?: Partial<CustomDashButtonProps>["router"]
+) {
   resetForm?.();
   router?.push("/home");
 }
 ///--------------------------------------------------------
 //
 ///--------------------------------------------------------
-export function new_playbook_at_readplaybook(setIsCreating?: any) {
+export function new_playbook_at_readplaybook(
+  setIsCreating?: Partial<CustomDashButtonProps>["setIsCreating"]
+) {
   setIsCreating?.(false);
 }
 ///--------------------------------------------------------

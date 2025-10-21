@@ -20,7 +20,7 @@ const PreviewToggle = () => {
   // Add a ref to track if this is the initial render
 
   const loadEditMode = async () => {
-    console.log("Switching to Edit mode");
+    //console.log("Switching to Edit mode");
     setIsMarkdownText(true);
     const loadedArticle = await loadHTMLArticle({ language });
     if (loadedArticle) {
@@ -30,17 +30,17 @@ const PreviewToggle = () => {
   };
 
   const loadPreviewMode = async () => {
-    console.log("Switching to Preview mode");
+    //console.log("Switching to Preview mode");
     setIsLoadingPreview(true);
     try {
       const loadedArticle = await loadMarkdownArticle({ language });
       if (loadedArticle) {
-        console.log("Loaded Article:", loadedArticle);
+        //console.log("Loaded Article:", loadedArticle);
         setArticle(loadedArticle);
         setPreviewReady(true);
       }
-    } catch (error) {
-      console.error("Error loading article:", error);
+    } catch {
+      // console.error("Error loading article:", error);
     } finally {
       setIsLoadingPreview(false);
     }
@@ -48,7 +48,7 @@ const PreviewToggle = () => {
   //
   const togglePreview = () => {
     const newToggleValue = !isView;
-    console.warn("Toggling preview, new value:", newToggleValue);
+    // console.warn("Toggling preview, new value:", newToggleValue);
     setIsView(newToggleValue);
 
     if (newToggleValue) {

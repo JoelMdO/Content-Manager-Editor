@@ -33,13 +33,13 @@ export const sanitizeSummary = (data: dataType): dataType => {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const title = (data as any).title;
+  const title = (data as dataType).title;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const body = (data as any).body;
+  const body = (data as dataType).body;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const language = (data as any).language;
+  const language = (data as dataType).language;
 
   return {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -56,7 +56,7 @@ export const sanitizeSummary = (data: dataType): dataType => {
 
 // Sanitize a single item like { type, content, lan }
 export const sanitizeItem = <
-  T extends { type?: string; content?: any; lan?: string }
+  T extends { type?: string; content?: string; lan?: string }
 >(
   item: T
 ): T => {
@@ -66,35 +66,36 @@ export const sanitizeItem = <
 };
 
 // Update an articleContent array stored in sessionStorage safely.
-export const updateSessionArticleContent = (
-  dbName: string | null,
-  newItem: { type: string; content: string; lan?: string }
-) => {
-  if (!dbName) return;
-  const key = `articleContent-${dbName}`;
-  const raw = sessionStorage.getItem(key);
-  let arr: any[] = [];
-  try {
-    arr = raw ? JSON.parse(raw) : [];
-    if (!Array.isArray(arr)) arr = [];
-  } catch (e) {
-    arr = [];
-  }
+// export const updateSessionArticleContent = (
+//   dbName: string | null,
+//   newItem: { type: string; content: string; lan?: string }
+// ) => {
+//   if (!dbName) return;
+//   const key = `articleContent-${dbName}`;
+//   const raw = sessionStorage.getItem(key);
+//   // let arr: any[] = [];
+//   let arr: StorageItem[] = [];
+//   try {
+//     arr = raw ? JSON.parse(raw) : [];
+//     if (!Array.isArray(arr)) arr = [];
+//   } catch {
+//     arr = [];
+//   }
 
-  const idx = arr.findIndex((it: any) => {
-    if (!it) return false;
-    if (it.type !== newItem.type) return false;
-    if (newItem.lan) return it.lan === newItem.lan;
-    return true;
-  });
+//   const idx = arr.findIndex((it: StorageItem) => {
+//     if (!it) return false;
+//     if (it.type !== newItem.type) return false;
+//     if (newItem.lan) return it.lan === newItem.lan;
+//     return true;
+//   });
 
-  if (idx >= 0) {
-    arr[idx] = { ...arr[idx], content: newItem.content };
-  } else {
-    arr.push(newItem);
-  }
+//   if (idx >= 0) {
+//     arr[idx] = { ...arr[idx], content: newItem.content };
+//   } else {
+//     arr.push(newItem);
+//   }
 
-  sessionStorage.setItem(key, JSON.stringify(arr));
-};
+//   sessionStorage.setItem(key, JSON.stringify(arr));
+// };
 
 export default sanitizeSummary;

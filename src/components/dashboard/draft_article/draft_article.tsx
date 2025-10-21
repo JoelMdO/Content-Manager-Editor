@@ -1,9 +1,10 @@
 import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_context";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import { handleClick } from "./utils/handle_click";
 import draftArticleText from "../../../constants/draft_article_text.json";
 import { iconsMenu } from "../../../constants/icons";
+import { StorageItem } from "../../../types/storage_item";
 
 const DraftArticle = () => {
   //
@@ -43,7 +44,8 @@ const DraftArticle = () => {
       const jsonArticle = JSON.parse(articleStored);
 
       newSavedTitleRef.current =
-        jsonArticle.find((item: any) => item.type === "title")?.content || "";
+        jsonArticle.find((item: StorageItem) => item.type === "title")
+          ?.content || "";
       //
       setText(newSavedTitleRef.current);
       //
@@ -51,7 +53,7 @@ const DraftArticle = () => {
       setText("Without Draft Articles");
     }
     //
-  }, [dbNameToSearch, DRAFT_KEY, savedTitleRef]);
+  }, [dbNameToSearch, DRAFT_KEY, savedTitleRef, setDraftKey, setText]);
   //
 
   //

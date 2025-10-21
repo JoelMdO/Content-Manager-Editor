@@ -1,4 +1,3 @@
-import errorAlert from "../../../../../alerts/error";
 import { FormDataImageItem, FormDataItem } from "../../type/formData";
 //
 
@@ -53,14 +52,14 @@ const createFormData = async (
   //Filter if any image on the data
 
   if (type !== "translate") {
-    console.log('"type is not translate" is', type);
+    //console.log('"type is not translate" is', type);
 
     function getAllImagesFromSessionStorage() {
-      let images: FormDataImageItem[] = [];
+      const images: FormDataImageItem[] = [];
       const items = newData.filter((item: FormDataItem | FormDataImageItem) =>
         item.type.startsWith("image-")
       );
-      console.log('"items at getAllImagesFromSessionStorage"');
+      //console.log('"items at getAllImagesFromSessionStorage"');
 
       for (let i = 0; i < items.length; i++) {
         const key = items[i].type;
@@ -73,7 +72,7 @@ const createFormData = async (
           const blobUrl = (items[i] as FormDataImageItem).blobUrl;
           const fileName = (items[i] as FormDataImageItem).fileName;
           const imageId = (items[i] as FormDataImageItem).imageId;
-          console.log("imageId", imageId);
+          //console.log("imageId", imageId);
 
           images.push({
             type: key as `image-${string}`,

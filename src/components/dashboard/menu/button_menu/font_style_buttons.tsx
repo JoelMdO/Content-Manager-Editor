@@ -7,6 +7,7 @@ import quote from "../../../../../public/quote.svg";
 import Image from "next/image";
 import MenuContext from "./context/menu_context";
 import { ButtonProps } from "./type/type_menu_button";
+import type { SetMarkDownAttr } from "./type/set_markdown_type";
 
 const FontStyleUI: React.FC<{
   setIsFontStyleOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -49,9 +50,9 @@ const FontStyleUI: React.FC<{
                 handleFontChange(
                   font.value as SetMarkDownAttr,
                   editorRefs?.current
-                ),
-                  setIsFontStyleOpen(false),
-                  setIsPressed(true);
+                );
+                setIsFontStyleOpen(false);
+                setIsPressed(true);
                 setTimeout(() => {
                   setIsPressed(false);
                   if (type !== "desktop") {

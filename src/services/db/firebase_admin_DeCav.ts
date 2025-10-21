@@ -27,7 +27,7 @@ export const initializeFirebaseAdmin = () => {
     // Initialize with your existing Realtime Database URL
     const app = initializeApp(
       {
-        credential: cert(serviceAccount as any),
+        credential: cert(serviceAccount as Record<string, string>),
         databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL,
       },
       "admin"

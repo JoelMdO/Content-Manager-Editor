@@ -1,6 +1,7 @@
 import errorAlert from "@/components/alerts/error";
 import { ProcessedArticle } from "../types/previewed_article";
 import replaceImgWithSrc from "../../menu/button_menu/utils/images_edit/replace_img_with_src";
+import { ImageItem } from "@/types/image_item";
 
 const loadHTMLArticle = async ({
   language,
@@ -13,7 +14,7 @@ const loadHTMLArticle = async ({
   const dbName = sessionStorage.getItem("db");
   const article = sessionStorage.getItem(`articleContent-${dbName}`);
   const parsedData = article ? JSON.parse(article) : null;
-  console.log("articleSessionStorage", parsedData);
+  //console.log("articleSessionStorage", parsedData);
 
   //--------------------------------------------------------
   if (parsedData) {
@@ -29,15 +30,19 @@ const loadHTMLArticle = async ({
     }
     //
 
-    const articleTitle = parsedData.find((item: any) => item.type === title);
-    const articleBody = parsedData.find((item: any) => item.type === body);
-    const images = parsedData.filter((item: any) =>
-      item.type.startsWith("image")
+    const articleTitle = parsedData.find(
+      (item: ImageItem) => item.type === title
+    );
+    const articleBody = parsedData.find(
+      (item: ImageItem) => item.type === body
+    );
+    const images = parsedData.filter((item: ImageItem) =>
+      item.type!.startsWith("image")
     );
     //
-    console.log("articleTitle", articleTitle);
-    console.log("articleBody", articleBody);
-    console.log('images"', images);
+    //console.log("articleTitle", articleTitle);
+    //console.log("articleBody", articleBody);
+    //console.log('images"', images);
     //
     ///--------------------------------------------------------
     // Add images src and alt to the body tag
@@ -47,7 +52,7 @@ const loadHTMLArticle = async ({
       images,
       "html"
     );
-    console.log("updatedTagArticleBody at load html", updatedTagArticleBody);
+    //console.log("updatedTagArticleBody at load html", updatedTagArticleBody);
     ///--------------------------------------------------------
     //--------------------------------------------------------
     return {

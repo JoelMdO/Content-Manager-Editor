@@ -11,6 +11,8 @@ import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import LanguageSwitcher from "../language_switcher/language_switcher";
 import replaceSrcWithImagePlaceholders from "../menu/button_menu/utils/images_edit/replace_src_on_img";
 import rehypeRaw from "rehype-raw";
+import { ImageItem } from "@/types/image_item";
+import { Root } from "mdast";
 //
 const PreviewArticle = () => {
   //
@@ -21,30 +23,30 @@ const PreviewArticle = () => {
   const toReadInText = language === "en" ? "Read in " : "Leer en ";
   const [updatedContent, setUpdatedContent] = React.useState<string>("");
   //
-  console.log("article at Preview Article", article);
+  //console.log("article at Preview Article", article);
   //
   useEffect(() => {
-    console.log("doing useEffect in PreviewArticle");
+    //console.log("doing useEffect in PreviewArticle");
 
     if (article?.content) {
       const updatedContent = replaceSrcWithImagePlaceholders(
         article?.content as string
       );
-      console.log("updatedContent at useEffect", updatedContent);
+      //console.log("updatedContent at useEffect", updatedContent);
       setUpdatedContent(updatedContent);
     }
   }, [article?.content]);
   // Custom remark plugin to unwrap images from paragraphs
   //
   function remarkUnwrapImages() {
-    return (tree: any) => {
+    return (tree: Root) => {
       visit(tree, "paragraph", (node, index, parent) => {
         // Check if paragraph contains only an image
         if (!parent || index === null) return;
 
         const onlyImages =
           node.children.length > 0 &&
-          node.children.every((child: any) => child.type === "image");
+          node.children.every((child: ImageItem) => child.type === "image");
         if (onlyImages) {
           // Replace paragraph with all its image children
           parent.children.splice(index!, 1, ...node.children);
@@ -92,7 +94,7 @@ const PreviewArticle = () => {
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkUnwrapImages]}
             rehypePlugins={[rehypeRaw]}
-            urlTransform={(uri, key, node) => {
+            urlTransform={(uri) => {
               if (uri?.startsWith("data:")) return uri; // allow base64
               return uri;
             }}
@@ -136,7 +138,7 @@ const PreviewArticle = () => {
                   ];
                   return blockTypes.includes(child.type as string);
                 });
-                console.log("hasBlockElements", hasBlockElements);
+                //console.log("hasBlockElements", hasBlockElements);
 
                 if (hasBlockElements) {
                   return <div className="image-container my-1">{children}</div>;
@@ -446,8 +448,8 @@ const PreviewArticle = () => {
                   }
                   return false;
                 });
-                console.log("isItalic", isItalic);
-                console.log("isStrong", isStrong);
+                //console.log("isItalic", isItalic);
+                //console.log("isStrong", isStrong);
 
                 if (isStrong && isItalic) {
                   return (

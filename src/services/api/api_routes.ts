@@ -32,7 +32,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       case "summary":
         endPoint = type;
         const mergedData = { data, token: token || "" };
-        console.log("doing summary at api/routes, mergedData:", mergedData);
+        //console.log("doing summary at api/routes, mergedData:", mergedData);
         body = JSON.stringify(mergedData); // Fix: stringify the data for JSON body
         headers["Content-Type"] = "application/json";
         headers["Authorization"] = `Bearer ${JWT!}`;
@@ -105,7 +105,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       jsonResponse.message === "Markdown converted successfully"
     ) {
       const body = jsonResponse.body;
-      console.log("body at apiRoutes if markdown", body);
+      //console.log("body at apiRoutes if markdown", body);
 
       return NextResponse.json({
         status: jsonResponse.status,

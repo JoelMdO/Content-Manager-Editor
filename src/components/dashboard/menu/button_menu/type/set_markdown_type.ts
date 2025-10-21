@@ -1,4 +1,4 @@
-type SetMarkDownAttr =
+export type SetMarkDownAttr =
   | "bold"
   | "italic"
   | "underline"

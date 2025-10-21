@@ -5,6 +5,8 @@
 
 import loadArticle from "../../preview/utils/load_markdown_article";
 import { cleanNestedDivs } from "../../utils/clean_content";
+import { StorageItem, StorageItemOrNull } from "../../../../types/storage_item";
+import { ImageItem } from "@/types/image_item";
 
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
@@ -18,7 +20,7 @@ type HandleClickProps = {
   setLanguage?: (language: "en" | "es") => void;
   language?: string;
   setSummaryContent?: (summaryContent: string) => void;
-  setArticle?: (article: any) => void;
+  setArticle?: (article: StorageItemOrNull) => void;
 };
 
 // Updated function to accept a single props object
@@ -57,7 +59,8 @@ export const handleClick = async ({
     sessionStorage.setItem(`articleContent-${db}`, articleStored!);
   } else if (tag === "draft-es") {
     savedTitleRef!.current =
-      jsonArticle.find((item: any) => item.type === "es-title")?.content || "";
+      jsonArticle.find((item: StorageItem) => item.type === "es-title")
+        ?.content || "";
     dbFieldName = "es-body";
     setLanguage!("es");
     setArticle!(null);
@@ -68,16 +71,18 @@ export const handleClick = async ({
     ///--------------------------------------------------------
     setLanguage!("en");
     let summary =
-      jsonArticle.find((item: any) => item.type === "summary")?.content || "";
-    console.log("summary from handleClick:", summary);
+      jsonArticle.find((item: StorageItem) => item.type === "summary")
+        ?.content || "";
+    //console.log("summary from handleClick:", summary);
 
     //---------------------------------------------------------------------
     // Fallback to sessionStorage if not found in sessionStorage
     //---------------------------------------------------------------------
     if (summary === undefined || summary === null || summary === "") {
       summary =
-        jsonSessionStorageArticle.find((item: any) => item.type === "summary")
-          ?.content || "";
+        jsonSessionStorageArticle.find(
+          (item: StorageItem) => item.type === "summary"
+        )?.content || "";
     }
     setSummaryContent!(summary);
     return;
@@ -85,15 +90,15 @@ export const handleClick = async ({
     // load from sessionStorage.
     setLanguage!("es");
     let summary =
-      jsonArticle.find((item: any) => item.type === "es-summary")?.content ||
-      "";
+      jsonArticle.find((item: StorageItem) => item.type === "es-summary")
+        ?.content || "";
     //---------------------------------------------------------------------
     // Fallback to sessionStorage if not found in sessionStorage
     //---------------------------------------------------------------------
     if (summary === undefined || summary === null || summary === "") {
       summary =
         jsonSessionStorageArticle.find(
-          (item: any) => item.type === "es-summary"
+          (item: StorageItem) => item.type === "es-summary"
         )?.content || "";
     }
     setSummaryContent!(summary);
@@ -115,38 +120,41 @@ export const handleClick = async ({
   //
   if (jsonArticle) {
     //
-    console.log("Loading article from storage:", {
-      hasImages: jsonArticle.some((item: any) => item.type.startsWith("image")),
-      imageData: jsonArticle.filter((item: any) =>
-        item.type.startsWith("image")
-      ),
-    });
+    //console.log("Loading article from storage:", {
+    //   hasImages: jsonArticle.some((item: any) => item.type.startsWith("image")),
+    //   imageData: jsonArticle.filter((item: any) =>
+    //     item.type.startsWith("image")
+    //   ),
+    // });
 
     let preSavedBodyRef =
-      jsonArticle.find((item: any) => item.type === dbFieldName)?.content || "";
+      jsonArticle.find((item: StorageItem) => item.type === dbFieldName)
+        ?.content || "";
 
     //-------------------------------------------------------------------------------------
     // Purpose: Load images from IndexedDB and replace <img src="{image_url_placeholder}">
     // with the blob URL for preview in the content editor.
     //-------------------------------------------------------------------------------------
     try {
-      let images: any[] = [];
+      let images: ImageItem[] = [];
 
-      images = jsonArticle.filter((item: any) => item.type.startsWith("image"));
-      console.log("Processing images for rendering:", {
-        count: images.length,
-        imageDetails: images.map((img) => ({
-          id: img.id || img.imageId,
-          hasBase64: !!img.base64,
-          base64Length: img.base64 ? img.base64.length : 0,
-          hasBlobUrl: !!img.blobUrl,
-        })),
-      });
+      images = jsonArticle.filter((item: ImageItem) =>
+        item.type!.startsWith("image")
+      );
+      //console.log("Processing images for rendering:", {
+      // count: images.length,
+      // imageDetails: images.map((img) => ({
+      //   id: img.id || img.imageId,
+      //   hasBase64: !!img.base64,
+      //   base64Length: img.base64 ? img.base64.length : 0,
+      //   hasBlobUrl: !!img.blobUrl,
+      // })),
+      //});
 
       for (const image of images) {
         // Create a regex to match the <img> tag and its associated <p> tag with the image ID
         const imageIdentifier = image.imageId || image.id; // Handle both possible ID fields
-        console.log("Trying to match image with ID:", imageIdentifier);
+        //console.log("Trying to match image with ID:", imageIdentifier);
 
         const regex = new RegExp(
           `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
@@ -158,12 +166,12 @@ export const handleClick = async ({
 
         // Try to use base64 first, if not available use blobUrl
         const imageSource = image.base64 || image.blobUrl;
-        console.log("Image data available:", {
-          id: image.id,
-          hasBase64: !!image.base64,
-          hasBlobUrl: !!image.blobUrl,
-          selectedSource: imageSource,
-        });
+        //console.log("Image data available:", {
+        //   id: image.id,
+        //   hasBase64: !!image.base64,
+        //   hasBlobUrl: !!image.blobUrl,
+        //   selectedSource: imageSource,
+        // });
 
         if (imageSource) {
           preSavedBodyRef = preSavedBodyRef.replace(
@@ -171,12 +179,12 @@ export const handleClick = async ({
             `<img src="${imageSource}" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
           );
         } else {
-          console.warn(`No valid image source found for image ${image.id}`);
+          // console.warn(`No valid image source found for image ${image.id}`);
         }
       }
       //}
-    } catch (err) {
-      console.error("Error loading images from IndexedDB:", err);
+    } catch {
+      // console.error("Error loading images from IndexedDB:", err);
     }
     //-------------------------------------------------------------------------------------
     // Replace tags with line breaks
@@ -189,7 +197,7 @@ export const handleClick = async ({
 
     // Update the body reference
     const cleanedBody = cleanNestedDivs(preSavedBodyRef);
-    console.log("Cleaned body on draft after cleanNestedDivs:", cleanedBody);
+    //console.log("Cleaned body on draft after cleanNestedDivs:", cleanedBody);
 
     savedBodyRef!.current = cleanedBody;
     //-------------------------------------------------------------------------------------

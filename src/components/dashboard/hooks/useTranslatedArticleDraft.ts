@@ -2,6 +2,7 @@ import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import MenuContext from "../menu/button_menu/context/menu_context";
 import { useContext, useEffect } from "react";
 import { handleClick } from "../draft_article/utils/handle_click";
+import { StorageItem } from "@/types/storage_item";
 
 export function useTranslatedArticleDraft() {
   //CONTEXT
@@ -21,7 +22,7 @@ export function useTranslatedArticleDraft() {
     if (translationReady) {
       const dbName = sessionStorage.getItem("db") as string;
 
-      let articleStored: string | null = sessionStorage.getItem(
+      const articleStored: string | null = sessionStorage.getItem(
         `articleContent-${dbName}`
       );
 
@@ -29,7 +30,7 @@ export function useTranslatedArticleDraft() {
         //
         const jsonArticle = JSON.parse(articleStored);
         const newSavedTitleRef = jsonArticle.find(
-          (item: any) => item.type === "es-title"
+          (item: StorageItem) => item.type === "es-title"
         );
 
         handleClick({
@@ -38,7 +39,7 @@ export function useTranslatedArticleDraft() {
           savedTitleRef: savedTitleRef,
           savedBodyRef: savedBodyRef,
           tag: "translated",
-          setDraftArticleButtonClicked: (clicked) => {
+          setDraftArticleButtonClicked: () => {
             setDraftArticleButtonClicked((prev) => !prev);
           },
         });
@@ -47,7 +48,14 @@ export function useTranslatedArticleDraft() {
         setLanguage("es");
       }
     }
-  }, [translationReady]);
+  }, [
+    translationReady,
+    setLanguage,
+    setText,
+    savedTitleRef,
+    savedBodyRef,
+    setDraftArticleButtonClicked,
+  ]);
 
   return { savedTitleRef, savedBodyRef };
 }

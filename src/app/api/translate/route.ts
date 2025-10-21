@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
     article.section = sectionObj;
     //
     const title = article.title;
-    let body = article.article;
-    let section = article.section;
+    const body = article.article;
+    const section = article.section;
 
     ///--------------------------------------------------------
     // Get the Google access token from next-auth
@@ -107,10 +107,10 @@ export async function POST(request: NextRequest) {
           error: `API returned ${response.status}: ${errorText}`,
         });
       }
-      console.log("response", response);
+      //console.log("response", response);
 
       const data = await response.json();
-      console.log("data translated:", data);
+      //console.log("data translated:", data);
       //
 
       return NextResponse.json({
@@ -118,8 +118,8 @@ export async function POST(request: NextRequest) {
         message: "Data translated successfully",
         body: data,
       });
-    } catch (error) {
-      console.error("Error:", error);
+    } catch {
+      // console.error("Error:", error);
       return NextResponse.json({
         status: 500,
         error: "Failed to translate article",

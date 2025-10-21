@@ -1,3 +1,5 @@
+import { SetMarkDownAttr } from "../type/set_markdown_type";
+
 //==========================================
 export const setMarkdownAttr = (
   span: HTMLElement,
@@ -5,7 +7,7 @@ export const setMarkdownAttr = (
   enabled: boolean
 ) => {
   //
-  let primary_style: string = type;
+  const primary_style: string = type;
 
   if (enabled) {
     span.classList.add(primary_style);

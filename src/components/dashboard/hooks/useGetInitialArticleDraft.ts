@@ -1,6 +1,7 @@
 import { ButtonProps } from "@/components/dashboard/menu/button_menu/type/type_menu_button";
 import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_context";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
+import { StorageItem } from "@/types/storage_item";
 
 export function useGetInitialArticleDraft() {
   //CONTEXT
@@ -18,22 +19,23 @@ export function useGetInitialArticleDraft() {
     );
 
     if (!articleStored) {
-
       articleStored = localStorage.getItem(DRAFT_KEY);
     }
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
 
       savedTitleRef.current =
-        jsonArticle.find((item: any) => item.type === "title")?.content || "";
+        jsonArticle.find((item: StorageItem) => item.type === "title")
+          ?.content || "";
       savedBodyRef.current =
-        jsonArticle.find((item: any) => item.type === "body")?.content || "";
+        jsonArticle.find((item: StorageItem) => item.type === "body")
+          ?.content || "";
 
       sessionStorage.removeItem(`tempTitle-${dbNameToSearch}`);
       sessionStorage.removeItem(`tempBody-${dbNameToSearch}`);
       sessionStorage.removeItem(`articleContent-${dbNameToSearch}`);
     }
-  }, [dbNameToSearch, DRAFT_KEY]);
+  }, [dbNameToSearch, DRAFT_KEY, savedTitleRef, savedBodyRef]);
 
   return { savedTitleRef, savedBodyRef };
 }

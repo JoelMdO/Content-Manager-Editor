@@ -15,8 +15,7 @@ const summaryButtonClicked = async ({
       setSummaryContent!(en_summary.body as string);
 
       // Get Spanish summary after English succeeds
-      const es_summary = await createSummary({ language: "es" });
-
+      createSummary({ language: "es" });
       // Return success even if Spanish fails, as we have English
       return { status: 200, summary: "Summary Created" };
     } else {

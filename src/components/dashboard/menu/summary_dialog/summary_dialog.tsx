@@ -75,8 +75,8 @@ const SummaryDialog = () => {
         summaryContent
       );
       successAlert("summary", "summarySaved");
-    } catch (error) {
-      console.error("Error creating summary:", error);
+    } catch {
+      // console.error("Error creating summary:", error);
     }
   }, 500);
 

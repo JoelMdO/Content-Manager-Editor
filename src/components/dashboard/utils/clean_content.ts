@@ -72,7 +72,7 @@ export function cleanNestedDivs(content: string): string {
           "h3",
         ].includes(tagName)
       ) {
-        let attributes = Array.from(element.attributes)
+        const attributes = Array.from(element.attributes)
           .filter((attr) => {
             // Keep specific classes
             if (attr.name === "class") {
@@ -85,7 +85,7 @@ export function cleanNestedDivs(content: string): string {
           .join(" ");
 
         // Process inner content
-        let innerContent = Array.from(element.childNodes)
+        const innerContent = Array.from(element.childNodes)
           .map(processNode)
           .join("");
 
@@ -151,15 +151,15 @@ export function cleanNestedDivs(content: string): string {
 
   // Remove wrapping <p> around <img> if it’s the only child
   cleanContent = cleanContent.replace(/<p>\s*(<img[^>]+>)\s*<\/p>/gi, "$1");
-  console.log("Cleaned content:", cleanContent);
+  //console.log("Cleaned content:", cleanContent);
 
   //Add DIV tag if needed
   if (!cleanContent.trim().startsWith("<div>")) {
-    console.log("Adding <div> wrapper");
+    //console.log("Adding <div> wrapper");
 
     cleanContent = `<div>${cleanContent}</div>`;
   } else {
-    console.log("No need to add <div> wrapper");
+    //console.log("No need to add <div> wrapper");
   }
   // Sanitize the final output
   return DOMPurify.sanitize(cleanContent, {

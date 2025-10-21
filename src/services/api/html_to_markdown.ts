@@ -65,7 +65,7 @@ class HTMLToMarkdownConverter {
     type?: string
   ): string {
     if (!node) return markdown;
-    //console.log("type", type);
+    ////console.log("type", type);
 
     if (node.nodeType === this.Node.TEXT_NODE) {
       const text = node.textContent || "";
@@ -128,14 +128,9 @@ class HTMLToMarkdownConverter {
             markdown + this.processEmphasis(node as HTMLElement, options, type)
           );
         case "code":
-          return (
-            markdown +
-            this.processInlineCode(node as HTMLElement, options, type)
-          );
+          return markdown + this.processInlineCode(node as HTMLElement);
         case "pre":
-          return (
-            markdown + this.processCodeBlock(node as HTMLElement, options, type)
-          );
+          return markdown + this.processCodeBlock(node as HTMLElement);
         case "a":
           return (
             markdown + this.processLink(node as HTMLElement, options, type)
@@ -147,12 +142,12 @@ class HTMLToMarkdownConverter {
         case "ul":
           return (
             markdown +
-            this.processUnorderedList(node as HTMLElement, depth, options, type)
+            this.processUnorderedList(node as HTMLElement, depth, options)
           );
         case "ol":
           return (
             markdown +
-            this.processOrderedList(node as HTMLElement, depth, options, type)
+            this.processOrderedList(node as HTMLElement, depth, options)
           );
         case "li":
           return (
@@ -166,9 +161,7 @@ class HTMLToMarkdownConverter {
           );
         case "table":
           if (options.convertTables) {
-            return (
-              markdown + this.processTable(node as HTMLElement, options, type)
-            );
+            return markdown + this.processTable(node as HTMLElement, options);
           }
           return (
             markdown + this.processChildren(node as HTMLElement, options, type)
@@ -246,7 +239,7 @@ class HTMLToMarkdownConverter {
     type?: string
   ): string {
     let result = "";
-    for (let child of Array.from(node.childNodes)) {
+    for (const child of Array.from(node.childNodes)) {
       result = this.processNode(child, result, 0, options, type);
     }
     return result;
@@ -293,18 +286,18 @@ class HTMLToMarkdownConverter {
   }
 
   processInlineCode(
-    node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>,
-    type?: string
+    node: HTMLElement
+    // options: Required<HtmlToMarkdownOptions>,
+    // type?: string
   ): string {
     const content = node.textContent || "";
     return `\`${content}\``;
   }
 
   processCodeBlock(
-    node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>,
-    type?: string
+    node: HTMLElement
+    // options: Required<HtmlToMarkdownOptions>,
+    // type?: string
   ): string {
     const codeElement = node.querySelector("code");
     const content = codeElement
@@ -339,21 +332,21 @@ class HTMLToMarkdownConverter {
     options: Required<HtmlToMarkdownOptions>,
     type?: string
   ): string {
-    //console.log("type in processImage", type);
+    ////console.log("type in processImage", type);
 
     const src = node.getAttribute("src") || "";
     const alt = options.includeImageAlt
       ? node.getAttribute("alt") || `Image ${++this.imageCounter}`
       : "";
     // Instead of including the full base64, just use a placeholder
-    let imageMarkdown = `![${alt}]({src_${alt}})`;
-    //console.log("node in processImage", node);
-    //console.log("alt in processImage", alt);
+    const imageMarkdown = `![${alt}]({src_${alt}})`;
+    ////console.log("node in processImage", node);
+    ////console.log("alt in processImage", alt);
 
     //
     if (type === "post") {
-      //console.log("src in processImage", src);
-      //console.log("alt in processImage", alt);
+      ////console.log("src in processImage", src);
+      ////console.log("alt in processImage", alt);
 
       return `![${alt}](${src})`;
     }
@@ -373,8 +366,8 @@ class HTMLToMarkdownConverter {
   processUnorderedList(
     node: HTMLElement,
     depth: number,
-    options: Required<HtmlToMarkdownOptions>,
-    type?: string
+    options: Required<HtmlToMarkdownOptions>
+    // type?: string
   ): string {
     const items = Array.from(node.children).filter(
       (child) => child.tagName.toLowerCase() === "li"
@@ -389,13 +382,13 @@ class HTMLToMarkdownConverter {
   processOrderedList(
     node: HTMLElement,
     depth: number,
-    options: Required<HtmlToMarkdownOptions>,
-    type?: string
+    options: Required<HtmlToMarkdownOptions>
+    // type?: string
   ): string {
     const items = Array.from(node.children).filter(
       (child) => child.tagName.toLowerCase() === "li"
     );
-    console.log("items as processORderedList", items);
+    //console.log("items as processORderedList", items);
 
     let result = "\n";
     items.forEach((item, index) => {
@@ -406,7 +399,7 @@ class HTMLToMarkdownConverter {
         `${index + 1}.`
       );
     });
-    console.log("result as processOrderedList", result);
+    //console.log("result as processOrderedList", result);
 
     return result + "\n";
   }
@@ -415,8 +408,8 @@ class HTMLToMarkdownConverter {
     node: HTMLElement,
     depth: number,
     options: Required<HtmlToMarkdownOptions>,
-    marker = "-",
-    type?: string
+    marker = "-"
+    // type?: string
   ): string {
     const indent = "  ".repeat(depth);
     // Get text content excluding nested lists
@@ -444,7 +437,7 @@ class HTMLToMarkdownConverter {
         child.tagName.toLowerCase() === "ul" ||
         child.tagName.toLowerCase() === "ol"
     );
-    console.log("nestedLists", nestedLists);
+    //console.log("nestedLists", nestedLists);
 
     // let processedContent = content;
     let nestedMarkdown = "";
@@ -456,21 +449,21 @@ class HTMLToMarkdownConverter {
           ? this.processUnorderedList(
               list as HTMLElement,
               depth + 1,
-              options,
-              type
+              options
+              // type
             )
           : this.processOrderedList(
               list as HTMLElement,
               depth + 1,
-              options,
-              type
+              options
+              // type
             );
       // processedContent = processedContent.replace(
       //   list.outerHTML,
       //   nestedMarkdown
       // );
     });
-    console.log("nestedMarkdown processedListItem", nestedMarkdown);
+    //console.log("nestedMarkdown processedListItem", nestedMarkdown);
     // Combine text content with nested lists
     let result = `${indent}${marker} ${textContent}`;
     if (nestedMarkdown) {
@@ -496,8 +489,8 @@ class HTMLToMarkdownConverter {
 
   processTable(
     node: HTMLElement,
-    options: Required<HtmlToMarkdownOptions>,
-    type?: string
+    options: Required<HtmlToMarkdownOptions>
+    // type?: string
   ): string {
     const rows = Array.from(node.querySelectorAll("tr"));
     if (rows.length === 0) return "";
@@ -527,7 +520,7 @@ class HTMLToMarkdownConverter {
   ): string {
     const className = node.getAttribute("class") || "";
     if (className.includes("code-block") || className.includes("highlight")) {
-      return this.processCodeBlock(node, options, type);
+      return this.processCodeBlock(node);
     }
     const content = this.processChildren(node, options, type);
     // return content ? `\n\n${content.trim()}\n\n` : "";
@@ -542,7 +535,7 @@ class HTMLToMarkdownConverter {
     const style = node.getAttribute("style") || "";
     const className = node.getAttribute("class") || "";
     const content = this.processChildren(node, options, type);
-    let newContent: string = "";
+    const newContent: string = "";
     // Heading detection first — return block-level heading markdown
     // check class names or common inline font-size patterns
     const typeH2 =
@@ -571,12 +564,12 @@ class HTMLToMarkdownConverter {
       style.includes("text-decoration:underline") ||
       style.includes("--tw-");
     //
-    // console.log('content in processSpan"', content);
-    // console.log('typeH2 in processSpan"', typeH2);
-    // console.log('typeH3 in processSpan"', typeH3);
-    // console.log('typeBold in processSpan"', typeBold);
-    // console.log('typeItalic in processSpan"', typeItalic);
-    // console.log('typeUnderline in processSpan"', typeUnderline);
+    // //console.log('content in processSpan"', content);
+    // //console.log('typeH2 in processSpan"', typeH2);
+    // //console.log('typeH3 in processSpan"', typeH3);
+    // //console.log('typeBold in processSpan"', typeBold);
+    // //console.log('typeItalic in processSpan"', typeItalic);
+    // //console.log('typeUnderline in processSpan"', typeUnderline);
     // Heading processing
     if (typeH2) {
       if (typeBold && !typeItalic && !typeUnderline)
@@ -624,7 +617,7 @@ class HTMLToMarkdownConverter {
       return `${content}`;
     }
     // }
-    //console.log('newContent in processSpan"', newContent);
+    ////console.log('newContent in processSpan"', newContent);
 
     return newContent;
   }

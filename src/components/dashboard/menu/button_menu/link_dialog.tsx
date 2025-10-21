@@ -52,7 +52,7 @@ const LinkDialog = ({ index }: { index?: number }) => {
     if (linkInputRef.current) {
       link_url = linkInputRef.current.value;
       // Try to fetch the <title> tag (may fail due to CORS)
-      let title = extractTitleFromUrl(link_url);
+      const title = extractTitleFromUrl(link_url);
       setSuggestedTitle(title);
       setEditableTitle(title);
     }
@@ -70,7 +70,7 @@ const LinkDialog = ({ index }: { index?: number }) => {
   const handleInsertLink = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const link_url = linkInputRef.current?.value || "";
-    console.log("edited text", editableTitle);
+    //console.log("edited text", editableTitle);
 
     insertLink("cms", link_url, editorRef, editableTitle)
       .then((response) => {

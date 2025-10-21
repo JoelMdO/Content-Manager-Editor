@@ -11,54 +11,58 @@ import { Database } from "firebase-admin/lib/database/database";
 import { initializeFirebaseAdmin } from "../../../services/db/firebase_admin_DeCav";
 import { adminDB } from "../../../services/db/firebase-admin";
 import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
-import { convertHtmlToMarkdown } from "@/services/api/html_to_markdown";
 import { FormDataImageItem } from "@/components/dashboard/menu/button_menu/type/formData";
 import { cleanNestedDivsServer } from "@/components/dashboard/utils/clean_content_server";
-import { language } from "gray-matter";
+import {
+  CloudinaryResource,
+  CloudinarySearchResponse,
+} from "@/types/cloudinary_type";
 //
 async function searchImageByFilename(
   filename: string,
   dbName: string
-): Promise<any | null> {
+): Promise<CloudinaryResource | null> {
   try {
     // Extract descriptive part
-    const filenameRegex = /\d{2}-\d{2}-\d{2}-(.*?)\.webp$/;
+    const filenameRegex: RegExp = /\d{2}-\d{2}-\d{2}-(.*?)\.webp$/;
     const match = filename.match(filenameRegex);
 
     if (match) {
       //
-      let descriptivePart = match[1];
+      const descriptivePart = match[1];
 
       // Clean the search term: remove spaces, special chars
       const cleanSearchTerm = descriptivePart
         .replace(/\s+/g, "_") // Replace spaces with underscores
         .replace(/[^\w-]/g, ""); // Remove special characters except underscore and dash
 
-      console.log("Searching Cloudinary for:", cleanSearchTerm);
-      let result;
+      //console.log("Searching Cloudinary for:", cleanSearchTerm);
+
       // Option 1: Search by public_id pattern
-      result = await cloudinary.search
+      const result: CloudinarySearchResponse = await cloudinary.search
         .expression(`folder:"${dbName}"`)
         .max_results(10)
         .execute();
       // Filter results to find exact or partial match
-      const matchingResource = result.resources.find((resource: any) => {
-        const publicId = resource.public_id;
-        const filename = publicId.split("/").pop() || "";
+      const matchingResource = result.resources.find(
+        (resource: CloudinaryResource) => {
+          const publicId = resource.public_id;
+          const filename: string = publicId.split("/").pop() || "";
 
-        // Check if the filename contains our search term
-        return filename.includes(cleanSearchTerm);
-      });
+          // Check if the filename contains our search term
+          return filename.includes(cleanSearchTerm);
+        }
+      );
 
       if (matchingResource) {
-        console.log("Image found via folder search:", matchingResource);
+        //console.log("Image found via folder search:", matchingResource);
         return matchingResource;
       }
       //
     }
     return null;
-  } catch (error) {
-    console.error("Error checking if image exists:", error);
+  } catch {
+    // console.error("Error checking if image exists:", error);
     return null;
   }
 }
@@ -73,7 +77,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   const imageUrls: { url: string; fileId: string }[] = [];
   const formData = await req.formData();
   const dbName = formData.get("dbName") as string;
-  console.log('doing POST at /api/post, dbName:"', dbName, '"');
+  //console.log('doing POST at /api/post, dbName:"', dbName, '"');
 
   interface Article {
     id: string;
@@ -103,7 +107,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
   }
   //
-  let pre_images: Array<File | string> = [];
+
   const article: Article = {
     id: "",
     title: "",
@@ -132,30 +136,30 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///================================================================
 
     let imageFiles: FormDataImageItem[] = [];
-    let fileName: string = "";
-    console.log("auth ok");
+
+    //console.log("auth ok");
 
     const files = formData.get("images");
-    //console.log('files type of "images"', typeof files);
+    ////console.log('files type of "images"', typeof files);
     const filesObj = JSON.parse(files as string);
-    //console.log('"filesObj at uploadImage"', filesObj);
+    ////console.log('"filesObj at uploadImage"', filesObj);
 
     imageFiles = filesObj as FormDataImageItem[];
 
     if (imageFiles.length > 0) {
       //Filter valid file objects
-      console.log("pre_images > 0");
+      //console.log("pre_images > 0");
       await Promise.all(
         imageFiles.map(async (item: FormDataImageItem) => {
           return new Promise<void>(async (resolve) => {
-            let fileUri: string = "";
+            // let fileUri: string = "";
             let uploadFileName: string = "";
             if (typeof item === "string") {
               // If item is a string, use it directly as the URL
-              fileUri = item;
+              // fileUri = item;
               uploadFileName = item;
             } else {
-              fileUri = item.base64;
+              // fileUri = item.base64;
               uploadFileName = item.imageId;
             }
             ///--------------------------------------------------------
@@ -165,17 +169,17 @@ export async function POST(req: NextRequest): Promise<Response> {
               uploadFileName,
               dbName
             );
-            console.log('"existingImage at uploadImage":', existingImage);
+            //console.log('"existingImage at uploadImage":', existingImage);
 
             if (existingImage) {
-              console.log("Image already exists, using existing URL");
+              //console.log("Image already exists, using existing URL");
               imageUrls.push({
                 url: existingImage.secure_url,
                 fileId: existingImage.public_id,
               });
             } else {
               // Upload new image
-              console.log("Uploading new image:", uploadFileName);
+              //console.log("Uploading new image:", uploadFileName);
               ///--------------------------------------------------------
               // Load the image into Cloudinary
               ///--------------------------------------------------------
@@ -185,8 +189,8 @@ export async function POST(req: NextRequest): Promise<Response> {
             // Update image URL in article content
             // If any images were uploaded, update the article's images array
             if (imageUrls.length > 0) {
-              console.log('"imageUrls.length > 0 at uploadImage"');
-              console.log('"imageUrls"', imageUrls);
+              //console.log('"imageUrls.length > 0 at uploadImage"');
+              //console.log('"imageUrls"', imageUrls);
               article.images = imageUrls; // Append image URLs to article.images
             }
           });
@@ -237,9 +241,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     // article.markdownEsArticle = markdownEsArticleObj;
 
     // SAVE in db.
-    let images = article.images;
-    let section = article.section;
-    //console.log('article images after cloudinary upload:"', images);
+    const images = article.images;
+    const section = article.section;
+    ////console.log('article images after cloudinary upload:"', images);
 
     //
     // log("article before replaceSrcWithImagePlaceholdersAtPost");
@@ -248,7 +252,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     //------------------------------------------
 
     const articlesBodies = [article.body, article.esBody];
-    //console.log("articlesBodie", article.body);
+    ////console.log("articlesBodie", article.body);
     const articlesReplaced = articlesBodies.map((body, index) => {
       if (body) {
         return replaceImgWithSrc(
@@ -277,7 +281,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     //   "post",
     //   "es"
     // );
-    // console.log(
+    // //console.log(
     //   '"articleReplaced at post after replaceImgWithSrc:"',
     //   articleReplaced
     // );
@@ -289,7 +293,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     // Find Category and Section Code
     ///--------------------------------------------------------
 
-    let sectionCode = sectionsCode[dbNameObj].find(
+    const sectionCode = sectionsCode[dbNameObj].find(
       (item) => item.label === section
     );
 
@@ -325,11 +329,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     //     "post"
     //   )
     // );
-    // console.log("markdownContent", markdownContent[0]);
+    // //console.log("markdownContent", markdownContent[0]);
     // debugger;
     // article.markdownArticle = markdownContent[0];
     // article.markdownEsArticle = markdownContent[1];
-    //console.log("article.markdownArticle", article.markdownArticle);
+    ////console.log("article.markdownArticle", article.markdownArticle);
     // ///--------------------------------------------------------
     // // HTML articles
     // ///--------------------------------------------------------
@@ -379,7 +383,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
     // Obtain id
     ///--------------------------------------------------------
-    let id = article.id;
+    const id = article.id;
 
     // Validate required fields
     if (!id || !article.title || !article.esTitle) {
@@ -389,7 +393,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         data: { id, title: article.title, esTitle: article.esTitle },
       });
     }
-    let newId = id.replace(/\s+/g, "-").replace(/\./g, "");
+    const newId = id.replace(/\s+/g, "-").replace(/\./g, "");
     // /--------------------------------------------------------
     // Create Metadata Object
     // /--------------------------------------------------------
@@ -465,7 +469,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       .createHmac("sha256", secret!)
       .update(body)
       .digest("hex");
-    console.log("url preboarding", api_call_url);
+    //console.log("url preboarding", api_call_url);
 
     const response = await fetch(api_call_url, {
       method: "POST",
@@ -477,7 +481,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       },
       body: body,
     });
-    console.log("response api", response);
+    //console.log("response api", response);
     //
     if (response.status !== 200) {
       const errorText = await response.text();
