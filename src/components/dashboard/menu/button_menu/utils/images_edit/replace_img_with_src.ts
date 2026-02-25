@@ -16,11 +16,12 @@ const replaceImgWithSrc = (
     //console.log('"hasImagePlaceholders"', hasImagePlaceholders);
     let newHtmlContent: string = htmlContent;
     //console.log("images in replaceImgWithSrc", images);
-
+    let replacementCount = 0;
     ///--------------------------------------------------------
     // Replace image placeholders with actual image sources
     ///--------------------------------------------------------
-    images.forEach((image: ImageItem) => {
+
+    images.forEach((image: ImageItem, index: number) => {
       const imgSource = image.base64 || image.blobUrl || image.url;
       //console.log("imgSource in replaceImgWithSrc", imgSource);
 
@@ -31,10 +32,10 @@ const replaceImgWithSrc = (
           image.fileId ||
           ""
         ).trim();
-        //console.log("Dashboard editor trying to replace image:", {
-        //   imageIdentifier,
-        //   contentHasId: htmlContent.includes(imageIdentifier),
-        // });
+        console.log("Dashboard editor trying to replace image:", {
+          imageIdentifier,
+          contentHasId: htmlContent.includes(imageIdentifier),
+        });
         // As the image can be stored on different date, check if the name exists in the content
         if (!htmlContent.includes(imageIdentifier)) {
           const suffixMatch = imageIdentifier.match(
@@ -51,20 +52,28 @@ const replaceImgWithSrc = (
 
           if (matches.length > 0) {
             const matchedText = matches[0][1]; // capture group 1 is the text we want
-            //console.log("✅ Matched text:", matchedText);
+            console.log("✅ Matched text:", matchedText);
             imageIdentifier = matchedText;
           } else {
-            // console.log(
-            //   "⚠️ No placeholder matched using suffix:",
-            //   stableSuffix
-            // );
+            console.log(
+              "⚠️ No placeholder matched using suffix:",
+              stableSuffix
+            );
           }
         }
         //console.log("Final imageIdentifier:", imageIdentifier);
+        console.log(
+          `[Image ${index}] Processing with identifier:`,
+          imageIdentifier
+        );
+        console.log(
+          `[Image ${index}] Looking for in content:`,
+          newHtmlContent.includes(imageIdentifier)
+        );
         let placeholder: RegExp;
         if (language === "es") {
           placeholder = new RegExp(
-            `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*(?:<p[^>]*>\\s*<\/p>\\s*)*${imageIdentifier}\\s*(?:<p[^>]*>\\s*<\/p>\\s*)*`,
+            `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
             "g"
           );
         } else {
@@ -73,29 +82,38 @@ const replaceImgWithSrc = (
             "g"
           );
         }
+        //
+        //
         switch (type) {
           case "post":
           case "html":
-            //console.log('"Replacing image for type post or html"');
-            //console.log("placeholder:", placeholder);
+            console.log('"Replacing image for type post or html"');
+            console.log("placeholder:", placeholder);
 
-            newHtmlContent = newHtmlContent.replaceAll(
+            newHtmlContent = newHtmlContent.replace(
               placeholder,
               `<img src="${imgSource}" alt="${imageIdentifier}"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
             );
-            ///    //console.log('"newHtmlContent after replace"', newHtmlContent);
+            console.log('"newHtmlContent after replace"', newHtmlContent);
 
             break;
           default:
-            newHtmlContent = htmlContent.replaceAll(
-              placeholder,
-              `<img src="" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+            newHtmlContent = newHtmlContent.replace(
+              new RegExp(`<img[^>]*alt=["']${imageIdentifier}["'][^>]*>`, "gi"),
+              `<img src="" alt="${imageIdentifier}" width="25%"/>`
             );
+            // newHtmlContent = htmlContent.replaceAll(
+            //   placeholder,
+            //   `<img src="" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+            // );
             break;
         }
       }
     });
     // //console.log('"After replacing images, newHtmlContent"', newHtmlContent);
+    console.log(
+      `[replaceImgWithSrc] Total successful replacements: ${replacementCount}/${images.length}`
+    );
     ///
     if (!newHtmlContent.trim().startsWith("<div>")) {
       //console.log("doing if branch of newHtmlContent");
@@ -112,7 +130,7 @@ const replaceImgWithSrc = (
     ///--------------------------------------------------------
     // If no images, just ensure content is wrapped in <div>
     ///--------------------------------------------------------
-    //console.log('"No image placeholders found"');
+    console.log('"No image placeholders found"');
 
     return !htmlContent.trim().startsWith("<div>")
       ? `<div>${htmlContent}</div>`

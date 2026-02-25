@@ -26,7 +26,7 @@ type HandleClickProps = {
 // Updated function to accept a single props object
 export const handleClick = async ({
   newSavedTitleRef,
-  DRAFT_KEY,
+  // DRAFT_KEY,
   savedTitleRef,
   savedBodyRef,
   setDraftArticleButtonClicked,
@@ -40,11 +40,11 @@ export const handleClick = async ({
   //
   let dbFieldName: string = "body";
   const db = sessionStorage.getItem("dbName") || "DeCav";
-  if (DRAFT_KEY === null || DRAFT_KEY === undefined) {
-    DRAFT_KEY = `draft-articleContent-${db}`;
-  }
+  const DRAFT_KEY = `draft-articleContent-${db}`;
+
   const articleStored = localStorage.getItem(DRAFT_KEY);
   const jsonArticle = JSON.parse(articleStored!);
+
   const sessionStorageArticle = sessionStorage.getItem(`articleContent-${db}`);
   const jsonSessionStorageArticle = JSON.parse(sessionStorageArticle!);
   //
@@ -61,6 +61,11 @@ export const handleClick = async ({
     savedTitleRef!.current =
       jsonArticle.find((item: StorageItem) => item.type === "es-title")
         ?.content || "";
+    console.log(
+      jsonArticle.find((item: StorageItem) => item.type === "es-title")
+        ?.content || "",
+    );
+
     dbFieldName = "es-body";
     setLanguage!("es");
     setArticle!(null);
@@ -81,9 +86,17 @@ export const handleClick = async ({
     if (summary === undefined || summary === null || summary === "") {
       summary =
         jsonSessionStorageArticle.find(
-          (item: StorageItem) => item.type === "summary"
+          (item: StorageItem) => item.type === "summary",
         )?.content || "";
     }
+    // Clean the summary content (remove extra divs, ensure proper formatting)
+    if (summary) {
+      summary = summary
+        .replace(/<div>/g, "")
+        .replace(/<\/div>/g, "")
+        .trim();
+    }
+    //
     setSummaryContent!(summary);
     return;
   } else if (tag === "summary-es") {
@@ -98,9 +111,17 @@ export const handleClick = async ({
     if (summary === undefined || summary === null || summary === "") {
       summary =
         jsonSessionStorageArticle.find(
-          (item: StorageItem) => item.type === "es-summary"
+          (item: StorageItem) => item.type === "es-summary",
         )?.content || "";
     }
+    // Clean the summary content (remove extra divs, ensure proper formatting)
+    if (summary) {
+      summary = summary
+        .replace(/<div>/g, "")
+        .replace(/<\/div>/g, "")
+        .trim();
+    }
+    //
     setSummaryContent!(summary);
     return;
   } else if (tag === "preview-en") {
@@ -139,7 +160,7 @@ export const handleClick = async ({
       let images: ImageItem[] = [];
 
       images = jsonArticle.filter((item: ImageItem) =>
-        item.type!.startsWith("image")
+        item.type!.startsWith("image"),
       );
       //console.log("Processing images for rendering:", {
       // count: images.length,
@@ -158,7 +179,7 @@ export const handleClick = async ({
 
         const regex = new RegExp(
           `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
-          "g"
+          "g",
         );
 
         // Only generate blobUrl for valid images
@@ -176,7 +197,7 @@ export const handleClick = async ({
         if (imageSource) {
           preSavedBodyRef = preSavedBodyRef.replace(
             regex,
-            `<img src="${imageSource}" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`
+            `<img src="${imageSource}" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`,
           );
         } else {
           // console.warn(`No valid image source found for image ${image.id}`);

@@ -84,7 +84,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     //
     if (statusSanitize.status != 200) {
-      return NextResponse.json({ status: 403, message: "Unauthorized data" });
+      return NextResponse.json({
+        status: statusSanitize.status,
+        message: statusSanitize.message,
+      });
     }
     //
     switch (type) {

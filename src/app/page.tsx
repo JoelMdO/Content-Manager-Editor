@@ -105,12 +105,17 @@ const Login: React.FC = () => {
           >
             <div className="flex flex-row">
               {isSubmittedGoogle ? null : (
-                <Image
+                // <Image
+                //   src={process.env.NEXT_PUBLIC_GOOGLE_DEV_URL!}
+                //   alt="Google logo"
+                //   className="w-6 h-6 mr-2 rounded-xl"
+                //   width={50}
+                //   height={50}
+                // />
+                <img
                   src={process.env.NEXT_PUBLIC_GOOGLE_DEV_URL!}
                   alt="Google logo"
                   className="w-6 h-6 mr-2 rounded-xl"
-                  width={50}
-                  height={50}
                 />
               )}
             </div>

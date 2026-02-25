@@ -343,6 +343,7 @@ export const buttonMenuLogic = ({
         setIsSummary,
         setSummaryContent,
         setLanguage,
+        dbNameToSearch,
       });
       break;
     default:
