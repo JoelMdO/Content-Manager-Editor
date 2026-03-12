@@ -1,30 +1,35 @@
 import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import { cleanNestedDivs } from "./clean_content";
 
+// TipTap emits "<p></p>" for an empty editor — treat that the same as "".
+const TIPTAP_EMPTY = "<p></p>";
+
 const saveArticle = ({
   dbName,
   currentTitle,
   currentBody,
 }: Partial<ButtonProps>) => {
   //
-  // Purpose: Check if the currentTitle contains a placeholder "Title" or a gray placeholder span.
+  // Purpose: Skip saving when the editor is empty (no real content).
   //---------------------------------------------------------------------------------------------
   if (currentTitle !== undefined && currentBody !== undefined) {
-    // Check for placeholders in the title
-    const hasTitlePlaceholder =
-      /<span class="text-gray-400">.*?<\/span>/g.test(currentTitle) &&
-      currentTitle.includes("Title");
-    if (hasTitlePlaceholder) return;
-    // Check for placeholders in the body
-    const hasBodyPlaceholder =
-      /<span class="text-gray-400">.*?<\/span>/g.test(currentBody) &&
-      currentBody.includes("Article");
-    if (hasBodyPlaceholder) return;
+    if (
+      !currentTitle ||
+      currentTitle === TIPTAP_EMPTY ||
+      !currentBody ||
+      currentBody === TIPTAP_EMPTY
+    ) {
+      console.log({ currentTitle, currentBody });
+
+      console.log("empty currentBody and Title at saveArticle");
+
+      return;
+    }
     //------------------------------------------
     // Load if any draft on localStorage
     //------------------------------------------
     const localStoreText = localStorage.getItem(
-      `draft-articleContent-${dbName}`
+      `draft-articleContent-${dbName}`,
     );
     const localStoreArticle = JSON.parse(localStoreText || "[]");
     //------------------------------------------
@@ -39,7 +44,7 @@ const saveArticle = ({
       //console.log("saveArticle - if 1");
       sessionStorage.setItem(
         `articleContent-${dbName}`,
-        JSON.stringify(localStoreArticle)
+        JSON.stringify(localStoreArticle),
       );
       return;
     }
@@ -59,10 +64,10 @@ const saveArticle = ({
     //console.log('doing more checks before saving..."');
 
     const localMap = new Map<string, ArticleItem>(
-      (localStoreArticle as ArticleItem[]).map((item) => [item.type, item])
+      (localStoreArticle as ArticleItem[]).map((item) => [item.type, item]),
     );
     const sessionMap = new Map<string, ArticleItem>(
-      (sessionStorageAticle as ArticleItem[]).map((item) => [item.type, item])
+      (sessionStorageAticle as ArticleItem[]).map((item) => [item.type, item]),
     );
     const hasChanges = new Set<string>();
     //console.log("localMap", localMap);
@@ -91,14 +96,14 @@ const saveArticle = ({
             return { ...item, content: cleanNestedDivs(item.content) };
           }
           return item;
-        }
+        },
       );
 
       //console.log("updatedArticles", updatedArticles);
 
       localStorage.setItem(
         `draft-articleContent-${dbName}`,
-        JSON.stringify(updatedArticles)
+        JSON.stringify(updatedArticles),
       );
       //console.log("Updated types:", Array.from(hasChanges));
     }

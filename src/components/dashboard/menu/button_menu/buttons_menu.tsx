@@ -1,9 +1,12 @@
-import React, { useMemo, useState, useCallback, useContext } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { buttonMenuLogic } from "./utils/logic_menu_button";
 import { ButtonProps } from "./type/type_menu_button";
 import { menuButtonStyle } from "./style/style_menu_button";
-import MenuContext from "./context/menu_context";
+import { useEditorStore } from "@/store/useEditorStore";
+import { useUIStore } from "@/store/useUIStore";
+import { useDraftStore } from "@/store/useDraftStore";
+import { useTranslationStore } from "@/store/useTranslationStore";
 
 const MenuButton = ({
   type,
@@ -12,27 +15,31 @@ const MenuButton = ({
   setIsMenuClicked,
   tag,
 }: Partial<ButtonProps>) => {
-  // CONTEXT
-  //=========================================================
-  const {
-    editorRefs,
-    // id,
-    fileInputRef,
-    dialogRef,
-    dbNameToSearch,
-    DRAFT_KEY,
-    savedBodyRef,
-    savedTitleRef,
-    setSelectedSection,
-    sectionsDialogRef,
-    stylesDialogRef,
-    setTranslating,
-    setTranslationReady,
-    summaryDialogRef,
-    setSummaryContent,
-    setIsSummary,
-    setLanguage,
-  } = useContext(MenuContext) as ButtonProps;
+  // CHANGE LOG
+  // Changed by : Copilot
+  // Date       : 2026-03-11
+  // Reason     : Read state from Zustand stores instead of MenuContext.
+  //              Refs accessed via getState() (non-reactive); reactive state
+  //              subscribed via hook selectors.
+  // Impact     : MenuContext no longer needed in this file.
+  //
+  // Use Zustand hooks for up-to-date refs
+  const editorRefs = useEditorStore((s) => s.editorRefs);
+  const fileInputRef = useEditorStore((s) => s.fileInputRef);
+  const savedBodyRef = useEditorStore((s) => s.savedBodyRef);
+  const savedTitleRef = useEditorStore((s) => s.savedTitleRef);
+  const dialogRef = useUIStore((s) => s.dialogRef);
+  const sectionsDialogRef = useUIStore((s) => s.sectionsDialogRef);
+  const stylesDialogRef = useUIStore((s) => s.stylesDialogRef);
+  const summaryDialogRef = useUIStore((s) => s.summaryDialogRef);
+  const setSelectedSection = useUIStore((s) => s.setSelectedSection);
+  const setSummaryContent = useUIStore((s) => s.setSummaryContent);
+  const setIsSummary = useUIStore((s) => s.setIsSummary);
+  const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
+  const dbName = useDraftStore((s) => s.dbName);
+  const setLanguage = useDraftStore((s) => s.setLanguage);
+  const setTranslating = useTranslationStore((s) => s.setTranslating);
+  const setTranslationReady = useTranslationStore((s) => s.setTranslationReady);
   // CONSTANTS
   //=========================================================
   const router = useRouter();
@@ -42,7 +49,7 @@ const MenuButton = ({
   //
   const { text, icon } = useMemo(
     () => menuButtonStyle(type!, isClicked),
-    [type, isClicked]
+    [type, isClicked],
   );
 
   ///--------------------------------------------------------
@@ -55,7 +62,7 @@ const MenuButton = ({
       dialogRef,
       sectionsDialogRef,
       router,
-      dbNameToSearch,
+      dbNameToSearch: dbName,
       DRAFT_KEY,
       savedTitleRef,
       savedBodyRef,
@@ -75,11 +82,10 @@ const MenuButton = ({
   }, [
     type,
     setIsClicked,
-    // id,
     editorRefs,
     isClicked,
     DRAFT_KEY,
-    dbNameToSearch,
+    dbName,
     fileInputRef,
     dialogRef,
     sectionsDialogRef,

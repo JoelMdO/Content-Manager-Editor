@@ -11,6 +11,7 @@ import saveArticle from "@/components/dashboard/utils/save_article";
 import summaryButtonClicked from "./summary_button_clicked";
 import { StorageItem } from "@/types/storage_item";
 import { TranslateType } from "@/types/translate_type";
+import { useEditorStore } from "@/store/useEditorStore";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
@@ -63,15 +64,18 @@ export const saveDraft = ({
     dbNameToSearch === undefined
       ? sessionStorage.getItem("db")
       : typeof dbNameToSearch === "string"
-      ? dbNameToSearch
-      : dbNameToSearch?.current;
+        ? dbNameToSearch
+        : dbNameToSearch?.current;
+  const { titleEditorRef, bodyEditorRef } = useEditorStore.getState();
+  const currentTitle = titleEditorRef.current?.getHTML() ?? "";
+  const currentBody = bodyEditorRef.current?.getHTML() ?? "";
   ///--------------------------------------------------------
   // Load if any draft on sessionStorage
   ///--------------------------------------------------------
   saveArticle({
     dbName,
-    currentTitle: "",
-    currentBody: "",
+    currentTitle,
+    currentBody,
     language,
     DRAFT_KEY,
     openDialogNoSection,
@@ -87,16 +91,11 @@ export const saveDraft = ({
 // Clear the UI
 ///--------------------------------------------------------
 export const clearUI = ({
-  editorRefs,
   setSelectedSection,
-  savedTitleRef,
-  savedBodyRef,
   setIsClicked,
 }: Partial<ButtonProps>) => {
   setIsClicked!(true);
-  handleClear(editorRefs!);
-  savedTitleRef!.current = "";
-  savedBodyRef!.current = "";
+  handleClear();
   setSelectedSection!("Select category");
 };
 ///--------------------------------------------------------
@@ -164,7 +163,7 @@ export const translateToSpanish = ({
 
           // Get existing content
           const articleContent = JSON.parse(
-            sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+            sessionStorage.getItem(`articleContent-${dbName}`) || "[]",
           );
 
           // Check if translation already exists
@@ -173,7 +172,7 @@ export const translateToSpanish = ({
             (item: StorageItem) =>
               item.type !== "es-title" &&
               item.type !== "es-body" &&
-              item.type !== "es-section"
+              item.type !== "es-section",
           );
           //
           const translated = (response.body as TranslateType).translated_text;
@@ -189,13 +188,13 @@ export const translateToSpanish = ({
           // Store updated content in sessionStorage
           sessionStorage.setItem(
             `articleContent-${dbName}`,
-            JSON.stringify(filteredContent)
+            JSON.stringify(filteredContent),
           );
 
           // Also update localStorage if needed
           localStorage.setItem(
             `draft-articleContent-${dbName}`,
-            JSON.stringify(filteredContent)
+            JSON.stringify(filteredContent),
           );
           //
           //
@@ -249,7 +248,7 @@ export const getSummary = ({
         errorAlert(
           "summary",
           "nonSummary",
-          response?.summary || "Failed to create summary"
+          response?.summary || "Failed to create summary",
         );
       }
     })
@@ -308,7 +307,6 @@ export const buttonMenuLogic = ({
       break;
     case "save":
       //console.log("calling saveDraft");
-
       saveDraft({
         dbNameToSearch,
         DRAFT_KEY,
