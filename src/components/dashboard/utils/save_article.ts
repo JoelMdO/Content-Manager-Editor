@@ -3,6 +3,7 @@ import { cleanNestedDivs } from "./clean_content";
 
 // TipTap emits "<p></p>" for an empty editor — treat that the same as "".
 const TIPTAP_EMPTY = "<p></p>";
+const DEBUG_AUTOSAVE_EMPTY = false;
 
 const saveArticle = ({
   dbName,
@@ -19,9 +20,10 @@ const saveArticle = ({
       !currentBody ||
       currentBody === TIPTAP_EMPTY
     ) {
-      console.log({ currentTitle, currentBody });
-
-      console.log("empty currentBody and Title at saveArticle");
+      if (DEBUG_AUTOSAVE_EMPTY) {
+        console.log({ currentTitle, currentBody });
+        console.log("empty currentBody and Title at saveArticle");
+      }
 
       return;
     }
