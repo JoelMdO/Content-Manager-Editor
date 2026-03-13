@@ -14,7 +14,8 @@ const SectionSelector = () => {
   // const { selectedSection, setSelectedSection, sectionsDialogRef }
   //   = useContext(MenuContext) as ButtonProps;
   const selectedSection = useUIStore((s) => s.selectedSection);
-  const { setSelectedSection, sectionsDialogRef } = useUIStore.getState();
+  const setSelectedSection = useUIStore((s) => s.setSelectedSection);
+  const sectionsDialogRef = useUIStore((s) => s.sectionsDialogRef);
   //
   //------------------------------------------
   // Purpose: Safely get db value from dbNameToSearch, handling both string and RefObject<string>.
