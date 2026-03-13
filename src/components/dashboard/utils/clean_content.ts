@@ -41,14 +41,14 @@ export function cleanNestedDivs(content: string): string {
         }
         if (classList.includes("font_h2")) {
           return `<h2 style="font-size: 1.5em; font-weight: bold;">${Array.from(
-            element.childNodes
+            element.childNodes,
           )
             .map((child) => processNode(child))
             .join("")}</h2>`;
         }
         if (classList.includes("font_h3")) {
           return `<h3 style="font-size: 1.17em; font-weight: bold;">${Array.from(
-            element.childNodes
+            element.childNodes,
           )
             .map((child) => processNode(child))
             .join("")}</h3>`;
@@ -72,6 +72,7 @@ export function cleanNestedDivs(content: string): string {
           "h3",
           "blockquote",
           "ol",
+          "ul",
           "li",
         ].includes(tagName)
       ) {
@@ -82,7 +83,9 @@ export function cleanNestedDivs(content: string): string {
               const classes = attr.value.split(" ");
               return classes.some((cls) => preserveClasses.includes(cls));
             }
-            return ["href", "src", "alt", "style"].includes(attr.name);
+            return ["href", "src", "alt", "style", "data-ref-id"].includes(
+              attr.name,
+            );
           })
           .map((attr) => `${attr.name}="${attr.value}"`)
           .join(" ");
@@ -140,7 +143,7 @@ export function cleanNestedDivs(content: string): string {
   // Remove nested identical block elements like <p><p>Text</p></p>
   cleanContent = cleanContent.replace(
     /<p>\s*(<p>[\s\S]*?<\/p>)\s*<\/p>/gi,
-    "$1"
+    "$1",
   );
 
   // Flatten <div><p>Text</p></div> to just <p>Text</p>
@@ -183,9 +186,10 @@ export function cleanNestedDivs(content: string): string {
       "div",
       "blockquote",
       "ol",
+      "ul",
       "li",
     ],
-    ALLOWED_ATTR: ["href", "src", "alt", "class", "style"],
-    ADD_ATTR: ["style"],
+    ALLOWED_ATTR: ["href", "src", "alt", "class", "style", "data-ref-id"],
+    ADD_ATTR: ["style", "data-ref-id"],
   });
 }

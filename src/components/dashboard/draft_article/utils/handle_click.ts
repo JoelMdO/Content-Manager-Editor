@@ -2,19 +2,17 @@
 // HANDLE CLICK, purpose:
 // Update UI with the draft article content
 //=========================================================
-
 import loadArticle from "../../preview/utils/load_markdown_article";
 import { cleanNestedDivs } from "../../utils/clean_content";
 import { StorageItem, StorageItemOrNull } from "../../../../types/storage_item";
-import { ImageItem } from "@/types/image_item";
+import { useDraftStore } from "@/store/useDraftStore";
+import { hydrateImagesInHTML } from "@/lib/imageStore/hydrateImages";
 
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
   newSavedTitleRef?: React.RefObject<string>;
-  DRAFT_KEY?: string;
+  DRAFT_KEY: string;
   savedTitleRef?: React.RefObject<string | null>;
-  savedBodyRef?: React.RefObject<string | null>;
-  setDraftArticleButtonClicked?: (clicked: boolean) => void;
   tag: string;
   newTitleRef?: string;
   setLanguage?: (language: "en" | "es") => void;
@@ -26,10 +24,8 @@ type HandleClickProps = {
 // Updated function to accept a single props object
 export const handleClick = async ({
   newSavedTitleRef,
-  // DRAFT_KEY,
+  DRAFT_KEY,
   savedTitleRef,
-  savedBodyRef,
-  setDraftArticleButtonClicked,
   tag,
   newTitleRef,
   setLanguage,
@@ -40,8 +36,6 @@ export const handleClick = async ({
   //
   let dbFieldName: string = "body";
   const db = sessionStorage.getItem("dbName") || "DeCav";
-  const DRAFT_KEY = `draft-articleContent-${db}`;
-
   const articleStored = localStorage.getItem(DRAFT_KEY);
   const jsonArticle = JSON.parse(articleStored!);
 
@@ -61,10 +55,10 @@ export const handleClick = async ({
     savedTitleRef!.current =
       jsonArticle.find((item: StorageItem) => item.type === "es-title")
         ?.content || "";
-    console.log(
-      jsonArticle.find((item: StorageItem) => item.type === "es-title")
-        ?.content || "",
-    );
+    // console.log(
+    //   jsonArticle.find((item: StorageItem) => item.type === "es-title")
+    //     ?.content || "",
+    // );
 
     dbFieldName = "es-body";
     setLanguage!("es");
@@ -151,62 +145,8 @@ export const handleClick = async ({
     let preSavedBodyRef =
       jsonArticle.find((item: StorageItem) => item.type === dbFieldName)
         ?.content || "";
+    //console.log("preSavedBodyRef before image processing:", preSavedBodyRef);
 
-    //-------------------------------------------------------------------------------------
-    // Purpose: Load images from IndexedDB and replace <img src="{image_url_placeholder}">
-    // with the blob URL for preview in the content editor.
-    //-------------------------------------------------------------------------------------
-    try {
-      let images: ImageItem[] = [];
-
-      images = jsonArticle.filter((item: ImageItem) =>
-        item.type!.startsWith("image"),
-      );
-      //console.log("Processing images for rendering:", {
-      // count: images.length,
-      // imageDetails: images.map((img) => ({
-      //   id: img.id || img.imageId,
-      //   hasBase64: !!img.base64,
-      //   base64Length: img.base64 ? img.base64.length : 0,
-      //   hasBlobUrl: !!img.blobUrl,
-      // })),
-      //});
-
-      for (const image of images) {
-        // Create a regex to match the <img> tag and its associated <p> tag with the image ID
-        const imageIdentifier = image.imageId || image.id; // Handle both possible ID fields
-        //console.log("Trying to match image with ID:", imageIdentifier);
-
-        const regex = new RegExp(
-          `<img\\s+src=["']\\{image_url_placeholder\\}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
-          "g",
-        );
-
-        // Only generate blobUrl for valid images
-        // const blobUrl = URL.createObjectURL(image.data);
-
-        // Try to use base64 first, if not available use blobUrl
-        const imageSource = image.base64 || image.blobUrl;
-        //console.log("Image data available:", {
-        //   id: image.id,
-        //   hasBase64: !!image.base64,
-        //   hasBlobUrl: !!image.blobUrl,
-        //   selectedSource: imageSource,
-        // });
-
-        if (imageSource) {
-          preSavedBodyRef = preSavedBodyRef.replace(
-            regex,
-            `<img src="${imageSource}" alt="${imageIdentifier}" width="25%"/><p class="text-xs text-gray-500" style="justify-self: center;">${imageIdentifier}</p>`,
-          );
-        } else {
-          // console.warn(`No valid image source found for image ${image.id}`);
-        }
-      }
-      //}
-    } catch {
-      // console.error("Error loading images from IndexedDB:", err);
-    }
     //-------------------------------------------------------------------------------------
     // Replace tags with line breaks
     //-------------------------------------------------------------------------------------
@@ -220,9 +160,33 @@ export const handleClick = async ({
     const cleanedBody = cleanNestedDivs(preSavedBodyRef);
     //console.log("Cleaned body on draft after cleanNestedDivs:", cleanedBody);
 
-    savedBodyRef!.current = cleanedBody;
-    //-------------------------------------------------------------------------------------
+    // Replace <img ... data-ref-id> tags with blob URLs from IndexedDB
+    // so the editor receives HTML with valid src attributes.
+    let hydratedBody = cleanedBody;
+    try {
+      hydratedBody = await hydrateImagesInHTML(cleanedBody);
+      //console.log("hydratedBody after hydrateImagesInHTML:", hydratedBody);
+    } catch (e) {
+      //console.warn("[handleClick] hydrateImagesInHTML failed:", e);
+    }
 
-    setDraftArticleButtonClicked!(true);
+    // ORIGINAL — replaced by: loadDraftIntoEditor imperative action in useDraftStore
+    // CHANGE LOG
+    // Changed by : Copilot
+    // Date       : 2026-03-11
+    // Reason     : Removed reactive setDraftArticleButtonClicked trigger. Draft
+    //              content is now written directly to the editor DOM via the
+    //              imperative loadDraftIntoEditor action, eliminating the
+    //              useEffect re-render cascade that caused paragraph collapse.
+    // Impact     : DashboardEditor no longer needs isDraftArticleButtonClicked
+    //              in its useEffect dependency array.
+    //
+    // setDraftArticleButtonClicked!(true);
+    useDraftStore.getState().loadDraftIntoEditor(
+      savedTitleRef?.current ?? "",
+      // pass hydrated HTML (blob URLs inserted) to the editor
+      typeof hydratedBody === "string" ? hydratedBody : cleanedBody,
+    );
+    //-------------------------------------------------------------------------------------
   }
 };

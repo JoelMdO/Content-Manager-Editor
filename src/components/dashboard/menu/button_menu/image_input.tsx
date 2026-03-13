@@ -1,25 +1,18 @@
-import { ChangeEvent, useContext } from "react";
-import MenuContext from "./context/menu_context";
-import { ButtonProps } from "./type/type_menu_button";
+import { ChangeEvent } from "react";
+import { useEditorStore } from "@/store/useEditorStore";
 import uploadImage from "./utils/images_edit/upload_image";
 import successAlert from "@/components/alerts/sucess";
 import errorAlert from "@/components/alerts/error";
 
 const ImageInput = ({ index }: { index: number }) => {
-  //CONTEXT
-  //===========================================================
-  const { editorRefs, fileInputRef } = useContext(MenuContext) as ButtonProps;
-  //
+  const fileInputRef = useEditorStore((s) => s.fileInputRef);
+  void index; // index no longer used — images always go into the body editor
 
-  ///--------------------------------------------------------
-  // Function to handle the cases of the MenuButtons
-  ///--------------------------------------------------------
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const editorRef = editorRefs?.current ? editorRefs.current[index] : null;
-
-    if (editorRef) {
+    const editor = useEditorStore.getState().bodyEditorRef.current;
+    if (editor) {
       const dbName = sessionStorage.getItem("db");
-      uploadImage(e, editorRef, dbName!)
+      uploadImage(e, editor, dbName!)
         .then((response) => {
           if (response.status === 200) {
             successAlert("image");
@@ -32,10 +25,11 @@ const ImageInput = ({ index }: { index: number }) => {
         });
     }
   };
-  //
+
   return (
     <label htmlFor={"file-input"} hidden>
       <input
+        data-cy="file-input"
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
