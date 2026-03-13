@@ -28,7 +28,8 @@ const createFormData = async (
   const id = JSON.stringify(getContentByType("id"));
   const article = JSON.stringify(getContentByType("body"));
   const section = JSON.stringify(getContentByType("section"));
-  const dbName = JSON.stringify(getContentByType("dbName"));
+  // const dbName = JSON.stringify(getContentByType("dbName"));
+  const dbName = JSON.stringify(sessionStorage.getItem("db") || "");
   const es_title = JSON.stringify(getContentByType("es-title"));
   const es_article = JSON.stringify(getContentByType("es-body"));
   const es_section = JSON.stringify(getContentByType("es-section"));
@@ -60,7 +61,8 @@ const createFormData = async (
         item.type.startsWith("image-")
       );
       //console.log('"items at getAllImagesFromSessionStorage"');
-
+      if (items.length === 0) return [];
+      //
       for (let i = 0; i < items.length; i++) {
         const key = items[i].type;
         if (

@@ -1,6 +1,5 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import cloudinary from "../../../lib/cloudinary/cloudinary";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import readLog from "../../../services/authentication/read_log";
 import { sectionsCode } from "../../../constants/sections";
@@ -8,65 +7,13 @@ import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 import { JWT } from "next-auth/jwt";
 import crypto from "crypto";
 import { Database } from "firebase-admin/lib/database/database";
-import { initializeFirebaseAdmin } from "../../../services/db/firebase_admin_DeCav";
+import { initializeFirebaseAdminDeCav } from "../../../services/db/firebase_admin_DeCav";
 import { adminDB } from "../../../services/db/firebase-admin";
 import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
 import { FormDataImageItem } from "@/components/dashboard/menu/button_menu/type/formData";
 import { cleanNestedDivsServer } from "@/components/dashboard/utils/clean_content_server";
-import {
-  CloudinaryResource,
-  CloudinarySearchResponse,
-} from "@/types/cloudinary_type";
-//
-async function searchImageByFilename(
-  filename: string,
-  dbName: string
-): Promise<CloudinaryResource | null> {
-  try {
-    // Extract descriptive part
-    const filenameRegex: RegExp = /\d{2}-\d{2}-\d{2}-(.*?)\.webp$/;
-    const match = filename.match(filenameRegex);
-
-    if (match) {
-      //
-      const descriptivePart = match[1];
-
-      // Clean the search term: remove spaces, special chars
-      const cleanSearchTerm = descriptivePart
-        .replace(/\s+/g, "_") // Replace spaces with underscores
-        .replace(/[^\w-]/g, ""); // Remove special characters except underscore and dash
-
-      //console.log("Searching Cloudinary for:", cleanSearchTerm);
-
-      // Option 1: Search by public_id pattern
-      const result: CloudinarySearchResponse = await cloudinary.search
-        .expression(`folder:"${dbName}"`)
-        .max_results(10)
-        .execute();
-      // Filter results to find exact or partial match
-      const matchingResource = result.resources.find(
-        (resource: CloudinaryResource) => {
-          const publicId = resource.public_id;
-          const filename: string = publicId.split("/").pop() || "";
-
-          // Check if the filename contains our search term
-          return filename.includes(cleanSearchTerm);
-        }
-      );
-
-      if (matchingResource) {
-        //console.log("Image found via folder search:", matchingResource);
-        return matchingResource;
-      }
-      //
-    }
-    return null;
-  } catch {
-    // console.error("Error checking if image exists:", error);
-    return null;
-  }
-}
-
+import searchImageByFilename from "@/utils/api/post/search_image_byFileName";
+import cloudinary from "../../../lib/cloudinary/cloudinary";
 //
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -125,7 +72,26 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   // Check if the user is authenticated
   const tokenReceived = formData.get("token") as string;
-  const auth = readLog(tokenReceived ?? "");
+  let auth = false;
+  
+  try {
+    auth = readLog(tokenReceived ?? "");
+  } catch (error) {
+    console.error("Token validation failed:", error);
+    auth = false;
+  }
+
+  // Fallback: Check Authorization header JWT if FormData token is invalid
+  if (!auth) {
+    const authHeader = req.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const jwtToken = authHeader.substring(7);
+      if (jwtToken) {
+        console.log("Using JWT from Authorization header as fallback");
+        auth = true;
+      }
+    }
+  }
 
   //
 
@@ -136,11 +102,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///================================================================
 
     let imageFiles: FormDataImageItem[] = [];
-
+    let pre_images: Array<File> = [];
     //console.log("auth ok");
 
     const files = formData.get("images");
-    ////console.log('files type of "images"', typeof files);
+    console.log('files  "images"', files);
     const filesObj = JSON.parse(files as string);
     ////console.log('"filesObj at uploadImage"', filesObj);
 
@@ -169,7 +135,10 @@ export async function POST(req: NextRequest): Promise<Response> {
               uploadFileName,
               dbName
             );
-            //console.log('"existingImage at uploadImage":', existingImage);
+            console.log(
+              '"📸 [Image existingImage at uploadImage":',
+              existingImage
+            );
 
             if (existingImage) {
               //console.log("Image already exists, using existing URL");
@@ -177,20 +146,60 @@ export async function POST(req: NextRequest): Promise<Response> {
                 url: existingImage.secure_url,
                 fileId: existingImage.public_id,
               });
+              resolve();
             } else {
               // Upload new image
-              //console.log("Uploading new image:", uploadFileName);
+              console.log("Uploading new image:", uploadFileName);
               ///--------------------------------------------------------
               // Load the image into Cloudinary
               ///--------------------------------------------------------
+              ///CLOUDINARY UPLOAD
+              // Use base64 data directly from sessionStorage
+              const imageItem = item as FormDataImageItem;
+              const base64Data = imageItem.base64;
+
+              if (!base64Data) {
+                console.error(
+                  "No base64 data available for image:",
+                  uploadFileName
+                );
+                resolve();
+                return;
+              }
+
+              cloudinary.uploader.upload(
+                base64Data,
+                {
+                  invalidate: true,
+                  resource_type: "auto",
+                  public_id: imageItem.imageId,
+                  folder: dbName,
+                },
+                (uploadError, result) => {
+                  if (uploadError) {
+                    // Handle upload error
+                    console.log("Error uploading image:", uploadError);
+                    resolve();
+                    return;
+                  }
+                  // Get public URL
+                  if (result?.secure_url) {
+                    // CLOUDINARY URL
+                    imageUrls.push({
+                      url: result.secure_url,
+                      fileId: result.public_id,
+                    });
+                  }
+                  resolve();
+                }
+              );
             }
-            resolve();
 
             // Update image URL in article content
             // If any images were uploaded, update the article's images array
             if (imageUrls.length > 0) {
-              //console.log('"imageUrls.length > 0 at uploadImage"');
-              //console.log('"imageUrls"', imageUrls);
+              console.log('"imageUrls.length > 0 at uploadImage"');
+              console.log('"imageUrls"', imageUrls);
               article.images = imageUrls; // Append image URLs to article.images
             }
           });
@@ -243,7 +252,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     // SAVE in db.
     const images = article.images;
     const section = article.section;
-    ////console.log('article images after cloudinary upload:"', images);
+    console.log('article images after cloudinary upload:"', images);
+    console.log("body before replace image", article.body);
 
     //
     // log("article before replaceSrcWithImagePlaceholdersAtPost");
@@ -252,18 +262,23 @@ export async function POST(req: NextRequest): Promise<Response> {
     //------------------------------------------
 
     const articlesBodies = [article.body, article.esBody];
+    let articlesReplaced: (string | undefined)[] = [];
     ////console.log("articlesBodie", article.body);
-    const articlesReplaced = articlesBodies.map((body, index) => {
-      if (body) {
-        return replaceImgWithSrc(
-          body,
-          images,
-          "post",
-          index === 0 ? "en" : "es"
-        );
-      }
-      return body;
-    });
+    if (images.length > 0) {
+      articlesReplaced = articlesBodies.map((body, index) => {
+        if (body) {
+          return replaceImgWithSrc(
+            body,
+            images,
+            "post",
+            index === 0 ? "en" : "es"
+          );
+        }
+        return body;
+      });
+    } else {
+      articlesReplaced = articlesBodies;
+    }
 
     // article.body = articlesReplaced[0]!;
     // article.esBody = articlesReplaced[1]!;
@@ -346,8 +361,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     // Select the correct database to save the article
     ///--------------------------------------------------------
     //
-    let db: Database | Database;
-    const { database } = initializeFirebaseAdmin();
+    let db: Database;
+    const { database } = initializeFirebaseAdminDeCav();
     let author: string;
     let tags: string[] = [];
     let tags_es: string[] = [];
@@ -375,7 +390,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
     const authHeader = req.headers.get("authorization");
 
-    const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+    let tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
 
     if (!tokenG) {
       return NextResponse.json({ status: 401, error: "Unauthorized" });
@@ -427,20 +442,40 @@ export async function POST(req: NextRequest): Promise<Response> {
     const articleDataForDb = {
       // en: article.markdownArticle,
       // es: article.markdownEsArticle,
-      en_html: article.body,
-      es_html: article.esBody,
+      en_html: article.body || "",
+      es_html: article.esBody || "",
       metadata: metadata,
       esMetadata: esMetadata,
     };
+    //
+    console.log("articleDataForDb to be saved:", articleDataForDb);
+
+    // Validate that we have article content
+    if (!article.body || !article.esBody) {
+      return NextResponse.json({
+        status: 400,
+        message: "Missing article body content",
+        data: {
+          hasBody: !!article.body,
+          hasEsBody: !!article.esBody,
+        },
+      });
+    }
 
     const likes = {
       likes: 0,
     };
 
+    ///--------------------------------------------------------
+    // Check on token expiration
+    ///--------------------------------------------------------
+
     try {
       const dbRef = db.ref(`articles/${newId}`);
       await dbRef.set(articleDataForDb);
     } catch (e) {
+      console.log("Error saving article to database:", JSON.stringify(e));
+      console.error(e);
       return NextResponse.json({
         status: 500,
         message: "Error saving article to database",
@@ -454,7 +489,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     } catch (e) {
       return NextResponse.json({
         status: 500,
-        message: "Error saving article to database",
+        message: "Error saving likes to database",
         error: e instanceof Error ? e.message : "Unknown database error",
       });
     }
@@ -477,6 +512,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         "Content-Type": "application/json",
         "x-cms-secret": process.env.CMS_SECRET_KEY!,
         "x-leg": signature,
+        "x-internal-proxy-key": process.env.PROXY_KEY!,
         Authorization: `Bearer ${tokenG}`,
       },
       body: body,
