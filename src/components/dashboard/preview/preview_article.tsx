@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { visit } from "unist-util-visit";
+// import { visit } from "unist-util-visit";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import previewArticleStyles from "./style/preview_article_styles";
 import MenuContext from "../menu/button_menu/context/menu_context";
@@ -40,19 +40,18 @@ const PreviewArticle = () => {
   //
   function remarkUnwrapImages() {
     return (tree: Root) => {
-      visit(tree, "paragraph", (node, index, parent) => {
-        // Check if paragraph contains only an image
-        if (!parent || index === null) return;
-
-        const onlyImages =
-          node.children.length > 0 &&
-          node.children.every((child: ImageItem) => child.type === "image");
-        if (onlyImages) {
-          // Replace paragraph with all its image children
-          parent.children.splice(index!, 1, ...node.children);
-          return index;
-        }
-      });
+      // visit(tree, "paragraph", (node, index, parent) => {
+      //   // Check if paragraph contains only an image
+      //   if (!parent || index === null) return;
+      //   const onlyImages =
+      //     node.children.length > 0 &&
+      //     node.children.every((child: ImageItem) => child.type === "image");
+      //   if (onlyImages) {
+      //     // Replace paragraph with all its image children
+      //     parent.children.splice(index!, 1, ...node.children);
+      //     return index;
+      //   }
+      // });
     };
   }
   //

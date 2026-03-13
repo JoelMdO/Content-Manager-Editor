@@ -70,6 +70,9 @@ export function cleanNestedDivs(content: string): string {
           "h1",
           "h2",
           "h3",
+          "blockquote",
+          "ol",
+          "li",
         ].includes(tagName)
       ) {
         const attributes = Array.from(element.attributes)
@@ -178,6 +181,9 @@ export function cleanNestedDivs(content: string): string {
       "h2",
       "h3",
       "div",
+      "blockquote",
+      "ol",
+      "li",
     ],
     ALLOWED_ATTR: ["href", "src", "alt", "class", "style"],
     ADD_ATTR: ["style"],

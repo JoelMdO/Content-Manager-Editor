@@ -4,6 +4,7 @@ import { FirestoreAdapter } from "@auth/firebase-adapter";
 import { adminDB } from "../../services/db/firebase-admin";
 import CredentialsProvider from "next-auth/providers/credentials";
 import callHub from "@/services/api/call_hub";
+import refreshGoogleAccessToken from "@/services/authentication/refresh_token";
 
 ///--------------------------------------------------------
 // Authentication Options to be used on server side
@@ -70,6 +71,8 @@ export const authOptions: NextAuthOptions = {
       if (account) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
+        token.accessTokenExpires =
+          Date.now() + Number(account.expires_in ?? 3600) * 1000;
       }
 
       if (user) {
@@ -77,6 +80,20 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name;
       }
 
+      // Return existing token if still valid (or if no expiration set)
+      if (
+        !token.accessTokenExpires ||
+        Date.now() < (token.accessTokenExpires as number)
+      ) {
+        return token;
+      }
+
+      // Token expired and we have a refresh token → try to refresh
+      if (token.refreshToken) {
+        return await refreshGoogleAccessToken(token);
+      }
+
+      // No refresh token available, return as-is (will have error flag from refresh attempt)
       return token;
     },
     async session({ session, token }) {
@@ -86,6 +103,12 @@ export const authOptions: NextAuthOptions = {
           session.user.name = token.name ?? "";
           //##Note: typescript definition was extended on next-auth.d.ts file.
           //Module augmentation
+        }
+        // Add accessToken to session so it can be used by API calls
+        (session as any).accessToken = token.accessToken;
+        // Check if token has refresh error
+        if (token.error) {
+          (session as any).error = token.error;
         }
       }
 

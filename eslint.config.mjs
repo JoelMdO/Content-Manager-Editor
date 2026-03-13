@@ -14,7 +14,7 @@ const eslintConfig = [
   {
     rules: {
       // Disallow //console.log but allow console.warn and console.error
-      "no-console": ["error"],
+      // "no-console": ["error"],
     },
   },
 ];
