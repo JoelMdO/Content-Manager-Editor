@@ -24,78 +24,48 @@ export async function hydrateImages(editors: (Editor | null)[]): Promise<void> {
   for (const editor of editors) {
     if (!editor) continue;
 
-    const { state } = editor.view;
+    try {
+      const { state } = editor.view;
 
-    // 1. Quick check: are there any images with data-ref-id to hydrate?
-    const imageNodes: Record<string, unknown>[] = [];
-    state.doc.descendants((node) => {
-      if (node.type.name !== "image") return;
-      const imageId = node.attrs["data-ref-id"] as string | null;
-      if (imageId) imageNodes.push(node.attrs);
-    });
+      // Gather image nodes that have a data-ref-id attribute
+      const imageNodes: { attrs: Record<string, any>; pos: number }[] = [];
+      state.doc.descendants((node, pos) => {
+        if (node.type.name !== "image") return;
+        const imageId = node.attrs["data-ref-id"] as string | null;
+        if (imageId) imageNodes.push({ attrs: node.attrs, pos });
+      });
 
-    console.debug(
-      "[hydrateImages] editor editable:",
-      editor.isEditable,
-      "| images with data-ref-id:",
-      imageNodes.length,
-      imageNodes.map((a) => a["data-ref-id"]),
-    );
+      if (imageNodes.length === 0) continue;
 
-    if (imageNodes.length === 0) continue;
-
-    // 2. Fetch all blobs in parallel
-    const resolved = await Promise.all(
-      imageNodes.map(async (attrs) => ({
-        attrs,
-        blob: await getBlob(attrs["data-ref-id"] as string),
-      })),
-    );
-
-    // 3. Build imageId → blob map from resolved results
-    const blobMap = new Map<string, Blob>();
-    for (const { attrs, blob } of resolved) {
-      const id = attrs["data-ref-id"] as string;
-      console.debug(
-        "[hydrateImages] IDB lookup for",
-        id,
-        "→",
-        blob ? "FOUND" : "NOT FOUND",
+      // Fetch blobs for each image in parallel
+      const resolved = await Promise.all(
+        imageNodes.map(async (item) => ({
+          attrs: item.attrs,
+          pos: item.pos,
+          blob: await getBlob(item.attrs["data-ref-id"] as string),
+        })),
       );
-      if (blob && id) blobMap.set(id, blob);
-    }
-    if (blobMap.size === 0) continue;
 
-    // 4. Use the CURRENT state (not the pre-await snapshot) so positions are
-    //    guaranteed to be valid even if a plugin dispatched a transaction while
-    //    the IDB reads were in flight.
-    const currentState = editor.view.state;
-    const tr = currentState.tr;
-    let modified = false;
+      const tr = editor.view.state.tr;
+      let modified = false;
 
-    currentState.doc.descendants((node, pos) => {
-      if (node.type.name !== "image") return;
-      const imageId = node.attrs["data-ref-id"] as string | null;
-      if (!imageId) return;
-      const blob = blobMap.get(imageId);
-      if (!blob) return;
+      for (const { attrs, pos, blob } of resolved) {
+        const id = attrs["data-ref-id"] as string;
+        if (!blob) continue;
 
-      // Revoke the stale blob: URL if present
-      const oldSrc = node.attrs.src as string | undefined;
-      if (oldSrc?.startsWith("blob:")) URL.revokeObjectURL(oldSrc);
+        const oldSrc = attrs.src as string | undefined;
+        if (oldSrc?.startsWith("blob:")) URL.revokeObjectURL(oldSrc);
 
-      const newSrc = URL.createObjectURL(blob);
-      tr.setNodeMarkup(pos, undefined, { ...node.attrs, src: newSrc });
-      modified = true;
-    });
+        const newSrc = URL.createObjectURL(blob);
+        tr.setNodeMarkup(pos, undefined, { ...attrs, src: newSrc });
+        modified = true;
+      }
 
-    if (modified) {
-      console.debug("[hydrateImages] dispatching setNodeMarkup transaction");
-      editor.view.dispatch(tr);
-    } else {
-      console.debug(
-        "[hydrateImages] no nodes matched in current state doc — no dispatch",
-      );
+      if (modified) {
+        editor.view.dispatch(tr);
+      }
+    } catch (err) {
+      console.error("[hydrateImages] unexpected error:", err);
     }
   }
 }
@@ -222,26 +192,54 @@ export async function hydrateImagesInHTML(html: string): Promise<string> {
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
-  const images = Array.from(doc.querySelectorAll<HTMLImageElement>("img[data-ref-id]"));
+  const images = Array.from(
+    doc.querySelectorAll<HTMLImageElement>("img[data-ref-id]"),
+  );
 
   if (images.length === 0) {
     return html;
   }
 
-  // Fetch blobs for each image in parallel.
+  // Fetch blobs for each image in parallel. Try direct lookup first, then
+  // attempt a few common normalizations (non-breaking spaces → plain space,
+  // trimming, collapsing multiple spaces) in case the `data-ref-id` was
+  // altered by the translation roundtrip.
   const blobPromises = images.map(async (img) => {
-    const imageId = img.getAttribute("data-ref-id");
-    if (!imageId) {
+    const rawId = img.getAttribute("data-ref-id");
+    if (!rawId) {
       return { img, imageId: null as string | null, blob: null as Blob | null };
     }
 
-    try {
-      const blob = await getBlob(imageId);
-      return { img, imageId, blob: blob ?? null };
-    } catch (e) {
-      console.warn("[hydrateImagesInHTML] failed to get blob for", imageId, e);
-      return { img, imageId, blob: null as Blob | null };
+    const tryIds = [rawId];
+
+    const normalize = (s: string) =>
+      s
+        .replace(/\u00A0|\u202F/g, " ") // NBSP / narrow NBSP → space
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const normalized = normalize(rawId);
+    if (normalized !== rawId) tryIds.push(normalized);
+
+    // Some filenames / ids may have multiple dots or invisible chars — try a
+    // trimmed/dot-normalized variant as a last resort.
+    const dotNormalized = normalized.replace(/\.{2,}/g, ".").trim();
+    if (dotNormalized !== normalized) tryIds.push(dotNormalized);
+
+    for (const id of tryIds) {
+      try {
+        const blob = await getBlob(id);
+        if (blob) return { img, imageId: id, blob };
+      } catch (e) {
+        console.warn("[hydrateImagesInHTML] lookup error for", id, e);
+      }
     }
+
+    console.debug(
+      "[hydrateImagesInHTML] no blob found for any id variants:",
+      tryIds,
+    );
+    return { img, imageId: rawId, blob: null as Blob | null };
   });
 
   const results = await Promise.all(blobPromises);

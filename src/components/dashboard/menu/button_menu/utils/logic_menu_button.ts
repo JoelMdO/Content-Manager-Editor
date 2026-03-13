@@ -12,6 +12,8 @@ import summaryButtonClicked from "./summary_button_clicked";
 import { StorageItem } from "@/types/storage_item";
 import { TranslateType } from "@/types/translate_type";
 import { useEditorStore } from "@/store/useEditorStore";
+import { useDraftStore } from "@/store/useDraftStore";
+import { tagsReplace } from "@/components/dashboard/draft_article/utils/tags_replace";
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
@@ -146,6 +148,18 @@ const openSelectorDialog = ({
 ///--------------------------------------------------------
 // Translate to Spanish
 ///--------------------------------------------------------
+// ORIGINAL — replaced by updated version that syncs Zustand from sessionStorage
+// export const translateToSpanish = ({
+//   setTranslationReady,
+//   setIsClicked,
+//   setTranslating,
+// }: Partial<ButtonProps>) => {
+//   ... original implementation ...
+// };
+
+// UPDATED — after writing translation to sessionStorage/localStorage,
+// call `useDraftStore.getState().syncFromSession(dbName)` so the in-memory
+// Zustand state reflects the latest session data.
 export const translateToSpanish = ({
   setTranslationReady,
   setIsClicked,
@@ -154,7 +168,7 @@ export const translateToSpanish = ({
   setIsClicked!(true);
   setTranslating!(true);
   translateButtonClicked()
-    .then((response) => {
+    .then(async (response) => {
       setTranslating!(false);
       if (response.status === 200) {
         successAlert("translate");
@@ -196,8 +210,22 @@ export const translateToSpanish = ({
             `draft-articleContent-${dbName}`,
             JSON.stringify(filteredContent),
           );
-          //
-          //
+
+          // Sync in-memory Zustand store from sessionStorage so UI updates
+          if (dbName) {
+            try {
+              console.log("calling sybcFromSession");
+
+              // ORIGINAL: Replaced with tags_replace function that updates the editor content directly.
+              // await useDraftStore.getState().syncFromSession(dbName);
+
+              // UPDATED: Call a new function that updates blobs URLS and the editor
+              tagsReplace({ dbName });
+            } catch (e) {
+              console.warn("[translateToSpanish] syncFromSession failed:", e);
+            }
+          }
+
           setTranslationReady!(true);
         }
       } else if (

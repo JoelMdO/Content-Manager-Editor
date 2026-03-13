@@ -1,6 +1,6 @@
 import { debouncedUpdateStore } from "./utils/debounceUpdateStore";
 import { useEffect } from "react";
-import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
+//import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
 import DialogsLoader from "../../components/loaders/dialogs_loader";
 import saveArticle from "./utils/save_article";
 import DOMPurify from "dompurify";
@@ -147,7 +147,7 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   // Get the translated article draft
   ///--------------------------------------------------------
-  useTranslatedArticleDraft();
+  //useTranslatedArticleDraft();
 
   ///--------------------------------------------------------
   // Set HTML content from Preview / published article

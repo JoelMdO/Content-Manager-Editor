@@ -11,7 +11,7 @@ import { hydrateImagesInHTML } from "@/lib/imageStore/hydrateImages";
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
   newSavedTitleRef?: React.RefObject<string>;
-  DRAFT_KEY: string;
+  DRAFT_KEY?: string;
   savedTitleRef?: React.RefObject<string | null>;
   tag: string;
   newTitleRef?: string;
@@ -36,16 +36,19 @@ export const handleClick = async ({
   //
   let dbFieldName: string = "body";
   const db = sessionStorage.getItem("dbName") || "DeCav";
-  const articleStored = localStorage.getItem(DRAFT_KEY);
+  const articleStored = localStorage.getItem(DRAFT_KEY!);
   const jsonArticle = JSON.parse(articleStored!);
 
   const sessionStorageArticle = sessionStorage.getItem(`articleContent-${db}`);
   const jsonSessionStorageArticle = JSON.parse(sessionStorageArticle!);
   //
-  if (tag === "translated") {
-    savedTitleRef!.current = newTitleRef!;
-    dbFieldName = "es-body";
-  } else if (tag === "draft-en") {
+  // ORIGINAL - replaced by update editor directly.
+  // if (tag === "translated") {
+  //   savedTitleRef!.current = newTitleRef!;
+  //   dbFieldName = "es-body";
+  // } else if (tag === "draft-en") {
+  // UPDATED :
+  if (tag === "draft-en") {
     savedTitleRef!.current = newSavedTitleRef!.current;
     dbFieldName = "body";
     setLanguage!("en");
