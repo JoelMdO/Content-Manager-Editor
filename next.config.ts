@@ -61,11 +61,38 @@ const nextConfig = {
     return config;
   },
   images: {
+    unoptimized: true, // Temporarily disable image optimization
+    domains: [
+      "developers.google.com",
+      "chiyikfwnkgnirmwizsz.supabase.co",
+      "res.cloudinary.com",
+      "firebasestorage.googleapis.com",
+    ],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "developers.google.com",
-        pathname: "/identity/images/g-logo.png",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "chiyikfwnkgnirmwizsz.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.firebasestorage.app",
+        pathname: "/**",
       },
     ],
   },

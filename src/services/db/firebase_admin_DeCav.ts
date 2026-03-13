@@ -3,7 +3,7 @@ import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { getDatabase as getAdminDatabase } from "firebase-admin/database";
 
 // Initialize Firebase Admin SDK for server-side operations
-export const initializeFirebaseAdmin = () => {
+export const initializeFirebaseAdminDeCav = () => {
   // Check if we already have an admin app initialized
   const existingApp = getApps().find((app) => app.name === "admin");
 

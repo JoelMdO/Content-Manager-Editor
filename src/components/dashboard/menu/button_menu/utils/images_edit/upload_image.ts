@@ -158,7 +158,7 @@ const uploadImage = async (
       // Return success after the reader has been initialized
       return { status: 200, message: "Image upload initiated" };
     } else {
-      return { status: 205, message: "Image not valid" };
+      return { status: response.status, message: response.message as string };
     }
   } catch (error) {
     return { status: 205, message: error as string };
