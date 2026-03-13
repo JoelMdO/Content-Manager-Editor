@@ -13,7 +13,7 @@ Next.js 15 (TypeScript) frontend application. Allows authenticated users to crea
 | Framework         | Next.js 15 (App Router)                  |
 | Language          | TypeScript                               |
 | Styling           | Tailwind CSS                             |
-| State             | Zustand + React Redux                    |
+| State             | Zustand                                  |
 | Auth              | next-auth 4 (credentials + Google OAuth) |
 | Database          | Firebase (auth) + Firebase Realtime DB   |
 | Image hosting     | Cloudinary                               |
