@@ -35,7 +35,9 @@ const insertLink = async (
       editor
         .chain()
         .focus()
-        .insertContent(`<a href="${link_url}">${text}</a>`)
+        .insertContent({ type: "text", text })
+        .setTextSelection({ from, to: from + text.length })
+        .setLink({ href: link_url })
         .run();
     } else {
       // Wrap the selected text with the link
