@@ -17,7 +17,7 @@ export interface ButtonProps {
   selectedSection: string;
   // setSelectedSection: React.Dispatch<React.SetStateAction<string>>;
   setSelectedSection: (v: string) => void;
-  handleClear: (editorRefs: React.RefObject<(HTMLDivElement | null)[]>) => void;
+  handleClear: () => void;
   savedTitleRef: React.RefObject<string | null>;
   savedBodyRef: React.RefObject<string | null>;
   setIsFontStyleOpen: React.Dispatch<React.SetStateAction<boolean>>;
