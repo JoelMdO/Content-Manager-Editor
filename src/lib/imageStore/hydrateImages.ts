@@ -211,49 +211,57 @@ export async function hydrateImages(editors: (Editor | null)[]): Promise<void> {
 export async function hydrateImagesInHTML(html: string): Promise<string> {
   if (!html) return html;
 
-  // Match <img ... alt="..." ... data-ref-id="ID" ...>
-  const imgRegex = /<img([^>]*)\sdata-ref-id=["']([^"']+)["']([^>]*)>/g;
-  const replacements: Array<Promise<{ from: string; to: string }>> = [];
-
-  let match: RegExpExecArray | null;
-  // eslint-disable-next-line no-cond-assign
-  while ((match = imgRegex.exec(html)) !== null) {
-    const fullMatch = match[0];
-    const beforeAttrs = match[1] || "";
-    const imageId = match[2];
-    const afterAttrs = match[3] || "";
-
-    // Try to extract alt text for nicer fallback; fall back to imageId
-    const altMatch = /alt=["']([^"']*)["']/.exec(beforeAttrs + afterAttrs);
-    const altText = altMatch ? altMatch[1] : imageId;
-
-    const p = (async () => {
-      try {
-        const blob = await getBlob(imageId);
-        if (!blob) return { from: fullMatch, to: fullMatch };
-
-        const objectUrl = URL.createObjectURL(blob);
-        const replacement = `<img src="${objectUrl}" alt="${altText}" width="25%" data-ref-id="${imageId}" />`;
-
-        return { from: fullMatch, to: replacement };
-      } catch (e) {
-        console.warn("[hydrateImagesInHTML] failed for", imageId, e);
-        return { from: fullMatch, to: fullMatch };
-      }
-    })();
-
-    replacements.push(p);
+  // Prefer DOM-based parsing/mutation over string reconstruction to avoid
+  // injection issues and to preserve existing attributes/styles.
+  if (typeof DOMParser === "undefined") {
+    console.warn(
+      "[hydrateImagesInHTML] DOMParser is not available; returning HTML unchanged.",
+    );
+    return html;
   }
 
-  if (replacements.length === 0) return html;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const images = Array.from(doc.querySelectorAll<HTMLImageElement>("img[data-ref-id]"));
 
-  const resolved = await Promise.all(replacements);
-  let newHtml = html;
-  for (const r of resolved) {
-    if (r.from !== r.to) {
-      newHtml = newHtml.replace(r.from, r.to);
+  if (images.length === 0) {
+    return html;
+  }
+
+  // Fetch blobs for each image in parallel.
+  const blobPromises = images.map(async (img) => {
+    const imageId = img.getAttribute("data-ref-id");
+    if (!imageId) {
+      return { img, imageId: null as string | null, blob: null as Blob | null };
     }
+
+    try {
+      const blob = await getBlob(imageId);
+      return { img, imageId, blob: blob ?? null };
+    } catch (e) {
+      console.warn("[hydrateImagesInHTML] failed to get blob for", imageId, e);
+      return { img, imageId, blob: null as Blob | null };
+    }
+  });
+
+  const results = await Promise.all(blobPromises);
+
+  for (const { img, imageId, blob } of results) {
+    if (!imageId || !blob) {
+      continue;
+    }
+
+    const objectUrl = URL.createObjectURL(blob);
+
+    // Preserve existing alt text; if missing, fall back to imageId (as before).
+    const existingAlt = img.getAttribute("alt") ?? imageId;
+
+    img.setAttribute("src", objectUrl);
+    img.setAttribute("alt", existingAlt);
+    // Preserve previous behavior of forcing a width of 25%, but keep all
+    // other attributes/styles intact.
+    img.setAttribute("width", "25%");
   }
 
-  return newHtml;
+  return doc.body.innerHTML;
 }
