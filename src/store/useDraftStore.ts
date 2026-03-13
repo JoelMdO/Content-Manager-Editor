@@ -3,8 +3,8 @@
 // language, title preview text, the loaded preview article,
 // and the critical loadDraftIntoEditor imperative action.
 //
-// KEY DESIGN: loadDraftIntoEditor sets innerHTML DIRECTLY on
-// the editor DOM nodes via editorRefs (from useEditorStore).
+// KEY DESIGN: loadDraftIntoEditor calls TipTap commands.setContent()
+// on the title and body editor instances retrieved from useEditorStore.
 // It is called ONCE from the user's click action — never from
 // a useEffect dependency array — eliminating the re-render
 // cascade that caused paragraph collapse in previous attempts.
