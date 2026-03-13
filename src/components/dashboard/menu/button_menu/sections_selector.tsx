@@ -1,15 +1,21 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { sections, SectionsType } from "../../../../constants/sections";
-import { ButtonProps } from "./type/type_menu_button";
-import MenuContext from "./context/menu_context";
+import { useUIStore } from "@/store/useUIStore";
 
 const SectionSelector = () => {
   //
-  //CONTEXT
-  //===================================================
-  const { selectedSection, setSelectedSection, sectionsDialogRef } = useContext(
-    MenuContext
-  ) as ButtonProps;
+  // CHANGE LOG
+  // Changed by : Copilot
+  // Date       : 2026-03-11
+  // Reason     : Read state from Zustand stores instead of MenuContext.
+  // Impact     : MenuContext no longer needed in this file.
+  //
+  // ORIGINAL:
+  // const { selectedSection, setSelectedSection, sectionsDialogRef }
+  //   = useContext(MenuContext) as ButtonProps;
+  const selectedSection = useUIStore((s) => s.selectedSection);
+  const setSelectedSection = useUIStore((s) => s.setSelectedSection);
+  const sectionsDialogRef = useUIStore((s) => s.sectionsDialogRef);
   //
   //------------------------------------------
   // Purpose: Safely get db value from dbNameToSearch, handling both string and RefObject<string>.
@@ -72,14 +78,14 @@ const SectionSelector = () => {
     let articleContent: { type: string; content: string }[] = [];
     //
     articleContent = JSON.parse(
-      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+      sessionStorage.getItem(`articleContent-${dbName}`) || "[]",
     );
 
     //
     articleContent.push({ type: "section", content: e.target.value });
     sessionStorage.setItem(
       `articleContent-${dbName}`,
-      JSON.stringify(articleContent)
+      JSON.stringify(articleContent),
     );
 
     // Clear the section selector dialog
@@ -110,7 +116,7 @@ const SectionSelector = () => {
                   <option key={index} value={section}>
                     {section}
                   </option>
-                )
+                ),
               )}
           </select>
         </div>

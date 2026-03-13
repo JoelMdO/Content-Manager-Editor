@@ -2,9 +2,9 @@ import insertLink from "./utils/insert_link";
 import successAlert from "../../../alerts/sucess";
 import errorAlert from "../../../alerts/error";
 import text from "../../../../constants/buttons_data_text.json";
-import { useContext, useRef, useState } from "react";
-import { ButtonProps } from "./type/type_menu_button";
-import MenuContext from "./context/menu_context";
+import { useRef, useState } from "react";
+import { useEditorStore } from "@/store/useEditorStore";
+import { useUIStore } from "@/store/useUIStore";
 
 const LinkDialog = ({ index }: { index?: number }) => {
   ///========================================================
@@ -13,11 +13,13 @@ const LinkDialog = ({ index }: { index?: number }) => {
   //
   //CONTEXT
   //=========================================================
-  const { editorRefs, dialogRef } = useContext(MenuContext) as ButtonProps;
+  // ORIGINAL: const { editorRefs, dialogRef } = useContext(MenuContext) as ButtonProps;
+  const { bodyEditorRef } = useEditorStore();
+  const { dialogRef } = useUIStore.getState();
   // Ensure dialogRef is defined
 
-  // Ensure safe access to editorRefs
-  const editorRef = editorRefs?.current ? editorRefs.current[index!] : null;
+  // TipTap body editor for link insertion
+  const editorRef = bodyEditorRef?.current ?? null;
   const linkInputRef = useRef<HTMLInputElement>(null);
 
   let link_url: string;

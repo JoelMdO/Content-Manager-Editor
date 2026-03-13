@@ -1,3 +1,154 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* TipTap Placeholder extension — show placeholder via CSS ::before
+   Note: TipTap v3 automatically prepends the "tiptap" class to the
+   ProseMirror DOM element (Editor.prependClass()), so these selectors
+   match without needing to add "tiptap" explicitly in editorProps. */
+.tiptap p.is-editor-empty:first-child::before,
+.tiptap.is-editor-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #a1a1aa;
+  pointer-events: none;
+  height: 0;
+}
+
+/* ─── TipTap content typography ─────────────────────────────────────────── */
+/* Tailwind preflight resets all HTML element styles, so we add them back    */
+/* explicitly inside the .tiptap wrapper that TipTap always renders.         */
+
+.tiptap h1 {
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0.75em 0 0.4em;
+}
+.tiptap h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0.75em 0 0.4em;
+}
+.tiptap h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0.6em 0 0.3em;
+}
+
+.tiptap p {
+  margin: 0.4em 0;
+  line-height: 1.6;
+}
+
+.tiptap blockquote {
+  border-left: 4px solid #60a5fa;
+  margin: 0.75em 0;
+  padding: 0.5em 0 0.5em 1.25em;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.tiptap hr {
+  border: none;
+  border-top: 2px solid #60a5fa;
+  margin: 1.5em 0;
+  opacity: 0.5;
+}
+
+.tiptap ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+.tiptap ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+.tiptap li {
+  margin: 0.25em 0;
+  line-height: 1.6;
+}
+
+.tiptap strong {
+  font-weight: 700;
+}
+.tiptap em {
+  font-style: italic;
+}
+.tiptap u {
+  text-decoration: underline;
+}
+.tiptap s {
+  text-decoration: line-through;
+}
+
+.tiptap a {
+  color: #93c5fd;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.tiptap a:hover {
+  opacity: 0.8;
+}
+
+.tiptap code {
+  background: rgba(99, 102, 241, 0.15);
+  border-radius: 0.25em;
+  font-family: ui-monospace, monospace;
+  font-size: 0.875em;
+  padding: 0.1em 0.35em;
+}
+
+.tiptap pre {
+  background: #1e1e2e;
+  border-radius: 0.5em;
+  color: #cdd6f4;
+  font-family: ui-monospace, monospace;
+  font-size: 0.875em;
+  margin: 0.75em 0;
+  overflow-x: auto;
+  padding: 1em 1.25em;
+}
+.tiptap pre code {
+  background: none;
+  padding: 0;
+  font-size: 1em;
+}
+
+.tiptap table {
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  width: 100%;
+  overflow: hidden;
+}
+.tiptap th,
+.tiptap td {
+  border: 1px solid #374151;
+  padding: 0.5em 0.75em;
+  vertical-align: top;
+}
+.tiptap th {
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+}
+
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375em;
+  margin: 0.25em 0;
+}
+
+/* Selected cell highlight */
+.selectedCell::after {
+  background: rgba(96, 165, 250, 0.15);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}

@@ -1,8 +1,10 @@
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
 
-const window = new JSDOM("").window;
-const DOMPurify = createDOMPurify(window);
+const jsdomwindow = new JSDOM("").window as unknown as Parameters<
+  typeof createDOMPurify
+>[0];
+const DOMPurify = createDOMPurify(jsdomwindow);
 
 export function cleanNestedDivsServer(content: string): string {
   //
@@ -99,7 +101,9 @@ export function cleanNestedDivsServer(content: string): string {
               // ❗ Remove style from h1/h2/h3/hr
               if (["h1", "h2", "h3"].includes(tagName)) return false;
             }
-            return ["href", "src", "alt", "style"].includes(attr.name);
+            return ["href", "src", "alt", "style", "data-ref-id"].includes(
+              attr.name,
+            );
           })
           .map((attr) => `${attr.name}="${attr.value}"`)
           .join(" ");
@@ -158,7 +162,7 @@ export function cleanNestedDivsServer(content: string): string {
   // Remove nested identical block elements like <p><p>Text</p></p>
   cleanContent = cleanContent.replace(
     /<p>\s*(<p>[\s\S]*?<\/p>)\s*<\/p>/gi,
-    "$1"
+    "$1",
   );
 
   // Flatten <div><p>Text</p></div> to just <p>Text</p>
@@ -199,6 +203,6 @@ export function cleanNestedDivsServer(content: string): string {
       "ul",
       "li",
     ],
-    ALLOWED_ATTR: ["href", "src", "alt", "class", "style"],
+    ALLOWED_ATTR: ["href", "src", "alt", "class", "style", "data-ref-id"],
   });
 }

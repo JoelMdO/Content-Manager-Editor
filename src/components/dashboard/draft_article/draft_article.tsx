@@ -1,6 +1,6 @@
-import MenuContext from "@/components/dashboard/menu/button_menu/context/menu_context";
-import { useContext, useEffect, useRef } from "react";
-import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
+import { useEffect, useRef } from "react";
+import { useDraftStore } from "@/store/useDraftStore";
+import { useEditorStore } from "@/store/useEditorStore";
 import { handleClick } from "./utils/handle_click";
 import draftArticleText from "../../../constants/draft_article_text.json";
 import { iconsMenu } from "../../../constants/icons";
@@ -8,20 +8,28 @@ import { StorageItem } from "../../../types/storage_item";
 
 const DraftArticle = () => {
   //
-  // CONTEXT
-  //=========================================================
-  const {
-    dbNameToSearch,
-    DRAFT_KEY,
-    savedTitleRef,
-    savedBodyRef,
-    setDraftArticleButtonClicked,
-    setText,
-    text,
-    setLanguage,
-    setArticle,
-    setDraftKey,
-  } = useContext(MenuContext) as ButtonProps;
+  // CHANGE LOG
+  // Changed by : Copilot
+  // Date       : 2026-03-11
+  // Reason     : Read state from Zustand stores instead of MenuContext.
+  // Impact     : MenuContext no longer needed in this file.
+  //              setDraftArticleButtonClicked removed — handleClick now calls
+  //              loadDraftIntoEditor() directly.
+  //
+  // ORIGINAL:
+  // const { dbNameToSearch, DRAFT_KEY, savedTitleRef, savedBodyRef,
+  //         setDraftArticleButtonClicked, setText, text, setLanguage,
+  //         setArticle, setDraftKey } = useContext(MenuContext) as ButtonProps;
+  const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
+  const dbName = useDraftStore((s) => s.dbName);
+  const text = useDraftStore((s) => s.text);
+  if (process.env.NODE_ENV !== "production") {
+    console.log({ text });
+  }
+
+  const { savedTitleRef, savedBodyRef } = useEditorStore.getState();
+  const { setText, setLanguage, setArticle, setDraftKey } =
+    useDraftStore.getState();
   const newSavedTitleRef = useRef<string>("");
   // NOT USED const newSavedBodyRef = useRef<string>("");
   //
@@ -53,7 +61,7 @@ const DraftArticle = () => {
       setText("Without Draft Articles");
     }
     //
-  }, [dbNameToSearch, DRAFT_KEY, savedTitleRef, setDraftKey, setText]);
+  }, [dbName, DRAFT_KEY, setDraftKey, setText]);
   //
 
   //
@@ -63,7 +71,7 @@ const DraftArticle = () => {
         {draftArticleText.title}
       </h1>
       <div className="flex flex-row items-center w-[40vw] max-w-4xl md:w-[22vw] g:w-[20vw] h-[3dvh] md:h-[5dvh]  bg-gray-400 rounded-3xl ">
-        <span className="text-[clamp(0.6rem,0.8rem,1rem)] w-[30vw] max-w-3xl md:w-[14vw] g:w-[14vw] ml-1 text-black overflow-hidden whitespace-nowrap text-ellipsis">
+        <span className="text-[clamp(0.6rem,0.8rem,1rem)] w-[30vw] max-w-3xl md:w-[14vw] g:w-[14vw] ml-1 text-black pl-1 overflow-hidden whitespace-nowrap text-ellipsis">
           {text}
         </span>
         {draftButtons.map((button) => (
@@ -71,6 +79,7 @@ const DraftArticle = () => {
             <div className="flex h-[2.5dvh] md:h-[4.5dvh] bg-gray-500 w-[0.7] ml-1 mr-1"></div>
             <button
               type="button"
+              data-cy={`draft-load-${button.tag}`}
               className="flex w-5 h-5 mr-2"
               //------------------------------------------
               // Purpose: handleClick function to retrieve the draft language article.
@@ -80,8 +89,10 @@ const DraftArticle = () => {
                   newSavedTitleRef: newSavedTitleRef,
                   DRAFT_KEY: DRAFT_KEY,
                   savedTitleRef: savedTitleRef,
-                  savedBodyRef: savedBodyRef,
-                  setDraftArticleButtonClicked: setDraftArticleButtonClicked,
+                  //savedBodyRef: savedBodyRef,
+                  // ORIGINAL — setDraftArticleButtonClicked removed;
+                  // handleClick calls loadDraftIntoEditor() directly.
+                  // setDraftArticleButtonClicked: setDraftArticleButtonClicked,
                   tag: button.tag,
                   setLanguage: setLanguage,
                   setArticle: setArticle,

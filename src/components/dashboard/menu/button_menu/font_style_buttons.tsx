@@ -1,25 +1,20 @@
 import { handleFontChange } from "./utils/handle_font_change";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { menuButtonStyle } from "./style/style_menu_button";
 import section from "../../../../../public/section.svg";
 import list from "../../../../../public/list.svg";
 import quote from "../../../../../public/quote.svg";
 import Image from "next/image";
-import MenuContext from "./context/menu_context";
-import { ButtonProps } from "./type/type_menu_button";
-import type { SetMarkDownAttr } from "./type/set_markdown_type";
+import { useEditorStore } from "@/store/useEditorStore";
 
 const FontStyleUI: React.FC<{
   setIsFontStyleOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsMenuClicked?: React.Dispatch<React.SetStateAction<boolean>>;
   type: string;
 }> = ({ setIsFontStyleOpen, setIsMenuClicked, type }) => {
-  ///========================================================
-  // To give to the font style as Bold or Italic
-  ///========================================================
   const { defaultProperties } = menuButtonStyle("styles", false);
   const [isPressed, setIsPressed] = useState<boolean>(false);
-  const { editorRefs } = useContext(MenuContext) as ButtonProps;
+
   const fontTypes = [
     { type: "B", value: "bold" },
     { type: "I", value: "italic" },
@@ -29,13 +24,16 @@ const FontStyleUI: React.FC<{
     { type: section, value: "section" },
     { type: list, value: "list" },
     { type: quote, value: "quote" },
+    { type: "OL", value: "ordered_list" },
+    { type: "</>", value: "code_block" },
+    { type: "T", value: "table" },
+    { type: "H", value: "highlight" },
   ];
-  //
 
   return (
     <>
       <div className="md:top-1/2 md:left-1/2 md:transform md:translate-x-1/2 md:translate-y-1/2 flex flex-col justify-center items-center md:justify-normal md:items-start">
-        <div className="flex flex-row space-x-3">
+        <div className="flex flex-row flex-wrap gap-1">
           {Array.from(fontTypes).map((font) => (
             <button
               key={font.value}
@@ -47,10 +45,8 @@ const FontStyleUI: React.FC<{
                   : defaultProperties
               } mt-2 text-lg text-white border-2 border-green w-10 h-9`}
               onClick={() => {
-                handleFontChange(
-                  font.value as SetMarkDownAttr,
-                  editorRefs?.current
-                );
+                const editor = useEditorStore.getState().bodyEditorRef.current;
+                if (editor) handleFontChange(font.value, editor);
                 setIsFontStyleOpen(false);
                 setIsPressed(true);
                 setTimeout(() => {

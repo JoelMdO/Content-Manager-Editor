@@ -1,167 +1,125 @@
-import { ChangeEvent } from "react";
-import callHub from "../../../../../../services/api/call_hub";
+// CHANGE LOG
+// Changed by : Copilot
+// Date       : 2026-03-11 (TipTap migration)
+// Reason     : Replace manual DOM image insertion (document.createElement +
+//              range.insertNode) with TipTap's insertContent command so that
+//              the image node is managed by the ProseMirror document model.
+//              The custom `data-ref-id` attribute is preserved by CustomImage
+//              extension and round-trips through getHTML() / setContent().
+// ORIGINAL: created <img> DOM element, mutated editorRef.innerHTML directly.
 //
-interface TrackedImage {
-  id: string;
-  element: HTMLImageElement;
-  fileName: string;
-}
+import { ChangeEvent } from "react";
+import type { Editor } from "@tiptap/core";
+import callHub from "../../../../../../services/api/call_hub";
+import { storeBlob } from "@/lib/imageStore/imageStore";
+// import { cleanNestedDivs } from "@/components/dashboard/utils/clean_content";
 //
 type UploadImageResult = { status: number; message?: string };
 //
 
 const uploadImage = async (
   e: ChangeEvent<HTMLInputElement>,
-  editorRef: HTMLDivElement | null,
-  dbName: string
+  editor: Editor,
+  dbName: string,
 ): Promise<UploadImageResult> => {
   ///========================================================
-  // Function to upload an image
+  // Function to upload an image via TipTap editor
   ///========================================================
   //
   try {
-    //Array sintax
     const file = e.target.files?.[0];
     const fileName = file?.name;
     //
-    // Store reference before API call
-    const editorRefBefore = editorRef;
-    if (!file || !editorRef) {
+    if (!file || !editor) {
       return { status: 400, message: "No file or editor reference provided" };
     }
 
-    // Check if the file is a valid image and if its save it on the server
+    // Check if the file is a valid image
     const response = await callHub("clean-image", file);
 
     if (response.status === 200) {
-      //console.log("Image validated by server at uploadImage");
+      // Create a formatted date string (dd-mm-yy)
+      const date = new Date();
+      const formattedDate = `${String(date.getDate()).padStart(2, "0")}-${String(
+        date.getMonth() + 1,
+      ).padStart(2, "0")}-${date.getFullYear().toString().slice(-2)}`;
+      const imageId = `${formattedDate}-${fileName}`;
 
-      // Set up a FileReader to read the image file source
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        if (!event.target?.result) return;
+      // Store raw Blob in IndexedDB — no base64 / no sessionStorage size hit
+      await storeBlob(imageId, file);
 
-        // Set the image to Base64 for serialization before redux
-        const base64Data = event.target.result as string;
-        const img = document.createElement("img");
-        img.src = base64Data;
-        img.style.justifySelf = "center";
-        img.style.maxWidth = "25%";
+      // Blob URL for immediate in-editor display (revived by hydrateImages on
+      // draft reload)
+      const objectUrl = URL.createObjectURL(file);
 
-        // Create a formatted date string (dd-mm-yy)
-        const date = new Date();
-        const formattedDate = `${String(date.getDate()).padStart(
-          2,
-          "0"
-        )}-${String(date.getMonth() + 1).padStart(2, "0")}-${date
-          .getFullYear()
-          .toString()
-          .slice(-2)}`;
-        const imageId = `${formattedDate}-${fileName}`;
+      // Record image metadata in sessionStorage — base64 intentionally empty;
+      // create_formData reads the Blob from IDB at publish time.
+      const articleContent = JSON.parse(
+        sessionStorage.getItem(`articleContent-${dbName}`) || "[]",
+      );
+      articleContent.push({
+        type: `image-${imageId}`,
+        imageId: imageId,
+        fileName: file.name,
+        blobUrl: objectUrl,
+        base64: "",
+      });
+      sessionStorage.setItem(
+        `articleContent-${dbName}`,
+        JSON.stringify(articleContent),
+      );
 
-        img.setAttribute("id", imageId); // Set image Id to allow selection
+      // Insert image into TipTap document via insertContent (supports custom
+      // attributes from CustomImage extension, unlike setImage which only
+      // accepts src/alt/title).
+      editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: "image",
+          attrs: {
+            src: objectUrl,
+            alt: fileName,
+            "data-ref-id": imageId,
+          },
+        })
+        .run();
 
-        // Add a reference to the image in the editor
-        const imgRef = document.createElement("p");
-        imgRef.textContent = imageId;
-        imgRef.style.justifySelf = "center";
-        imgRef.className = "text-xs text-gray-500";
+      // Immediately persist the updated body to localStorage so the image
+      // survives page navigation. The 10-minute autosave may not have fired
+      // yet, which would otherwise leave the draft without image content.
+      // try {
+      //   const currentBody = editor.getHTML();
+      //   if (currentBody) {
+      //     const draftKey = `draft-articleContent-${dbName}`;
+      //     const stored = localStorage.getItem(draftKey);
+      //     const storedArticle: { type: string; content?: string }[] =
+      //       JSON.parse(stored || "[]");
+      //     const updated = storedArticle.filter((i) => i.type !== "body");
+      //     updated.push({ type: "body", content: cleanNestedDivs(currentBody) });
+      //     localStorage.setItem(draftKey, JSON.stringify(updated));
+      //     const hasDataRefId = currentBody.includes("data-ref-id");
+      //     console.debug(
+      //       "[upload_image] saved to localStorage key:",
+      //       draftKey,
+      //       "| data-ref-id in body:",
+      //       hasDataRefId,
+      //     );
+      //   }
+      // } catch {
+      // Non-critical — the 10-minute autosave will catch this later
+      //}
 
-        // Store `imgRef` on `img` so it can be accessed later
-        img.dataset.refId = imageId;
-        document.body.appendChild(imgRef);
-        document.body.appendChild(img);
-        // Create a temporary blob URL for image preview
-        const objectUrl = URL.createObjectURL(file);
-        // Get current article content from sessionStorage
-        const articleContent = JSON.parse(
-          sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
-        );
-
-        // Add image data to articleContent with the base64 data we already have
-        articleContent.push({
-          type: `image-${imageId}`,
-          imageId: imageId,
-          fileName: file.name,
-          blobUrl: objectUrl,
-          base64: base64Data,
-        });
-        //
-        sessionStorage.setItem(
-          `articleContent-${dbName}`,
-          JSON.stringify(articleContent)
-        );
-        //Clic handler to make the image selectable
-        img.onclick = (e) => {
-          const selection = window.getSelection();
-          const range = document.createRange();
-          range.selectNode(e.target as HTMLElement);
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-        };
-        // Handle image deletion with the use of right button
-        img.oncontextmenu = (e) => {
-          e.preventDefault(); // Prevent context menu from opening
-          const currentImages: TrackedImage[] = JSON.parse(
-            sessionStorage.getItem(`editorImages-${dbName}`) || "[]"
-          );
-          const updatedImages = currentImages.filter(
-            (img) => img.id !== imageId
-          );
-          sessionStorage.setItem(
-            `editorImages-${dbName}`,
-            JSON.stringify(updatedImages)
-          );
-          // Find and remove the correct reference element
-          const imgRefToDelete = document.querySelector(
-            `p:contains('${imageId}')`
-          );
-          if (imgRefToDelete) imgRefToDelete.remove();
-          img.remove();
-        };
-        // Insert the image at cursor position
-        const editor = editorRefBefore;
-        const selection = window.getSelection();
-        const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
-
-        if (range) {
-          range.deleteContents();
-          range?.insertNode(img);
-          range?.collapse(false);
-          range?.setStartAfter(img);
-          range?.insertNode(imgRef);
-          range?.collapse(false);
-          // Add a space after image for better editing
-          const space = document.createTextNode("\u00A0");
-          range.insertNode(space);
-          //
-          // Trigger input event to save content
-          const inputEvent = new Event("input", {
-            bubbles: true,
-            cancelable: true,
-          });
-          editorRef.dispatchEvent(inputEvent);
-          //
-        } else {
-          // If no selection, append at the end of the editor
-          editor?.appendChild(img);
-          editor?.appendChild(imgRef);
-        }
-
-        // Clear file input
-        e.target.value = "";
-      };
-
-      // Start reading the file (only once)
-      reader.readAsDataURL(file);
-
-      // Return success after the reader has been initialized
-      return { status: 200, message: "Image upload initiated" };
+      e.target.value = "";
+      return { status: 200, message: "Image uploaded" };
     } else {
       return { status: response.status, message: response.message as string };
     }
   } catch (error) {
-    return { status: 205, message: error as string };
+    return {
+      status: 205,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 };
 

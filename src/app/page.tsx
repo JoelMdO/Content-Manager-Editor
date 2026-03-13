@@ -68,6 +68,7 @@ const Login: React.FC = () => {
             className="flex flex-col align-center items-center space-y-4 border-cyan-200 border-2 rounded-lg p-4 xs:w-[250px] md:w-[360px]"
           >
             <input
+              data-cy="email-input"
               className="w-[75%] flex align-center justify-center"
               type="email"
               placeholder="Email"
@@ -76,6 +77,7 @@ const Login: React.FC = () => {
               required
             />
             <input
+              data-cy="password-input"
               className="w-[75%] flex align-center justify-center"
               type="password"
               placeholder="Password"
@@ -84,6 +86,7 @@ const Login: React.FC = () => {
               required
             />
             <button
+              data-cy="login-button"
               type="submit"
               className="bg-green text-white rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center shadow-md shadow-dark-background"
             >
@@ -105,13 +108,6 @@ const Login: React.FC = () => {
           >
             <div className="flex flex-row">
               {isSubmittedGoogle ? null : (
-                // <Image
-                //   src={process.env.NEXT_PUBLIC_GOOGLE_DEV_URL!}
-                //   alt="Google logo"
-                //   className="w-6 h-6 mr-2 rounded-xl"
-                //   width={50}
-                //   height={50}
-                // />
                 <img
                   src={process.env.NEXT_PUBLIC_GOOGLE_DEV_URL!}
                   alt="Google logo"
