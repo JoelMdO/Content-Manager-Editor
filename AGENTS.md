@@ -182,7 +182,7 @@ All user-visible strings are stored in JSON files under `src/constants/`. The `l
 
 ```bash
 pnpm install
-pnpm dev          # starts next dev on port 3000
+pnpm dev          # starts next dev on port 8000
 ```
 
 Or via Docker (from the project root):
