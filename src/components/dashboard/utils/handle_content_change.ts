@@ -31,7 +31,6 @@ export const handleContentChange = (
   } else {
     // Body — strip residual base64 data-URIs before storing
     const htmlCleaned = removeBase64FromImgTags(html);
-    console.log({ htmlCleaned });
 
     sessionStorage.setItem(`${languageKey}-tempBody-${dbName}`, htmlCleaned);
     debouncedUpdateStore(
