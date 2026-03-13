@@ -123,7 +123,9 @@ const DashboardEditor = () => {
     },
     onUpdate({ editor }) {
       const html = editor.getHTML();
-      console.log({ html });
+      if (process.env.NODE_ENV === "development") {
+        console.log({ html });
+      }
 
       savedBodyRef.current = html;
       handleContentChange(1, html, language, setText, debouncedUpdateStore);
