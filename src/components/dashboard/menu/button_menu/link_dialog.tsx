@@ -14,7 +14,7 @@ const LinkDialog = ({ index }: { index?: number }) => {
   //CONTEXT
   //=========================================================
   // ORIGINAL: const { editorRefs, dialogRef } = useContext(MenuContext) as ButtonProps;
-  const { bodyEditorRef } = useEditorStore.getState();
+  const { bodyEditorRef } = useEditorStore();
   const { dialogRef } = useUIStore.getState();
   // Ensure dialogRef is defined
 
