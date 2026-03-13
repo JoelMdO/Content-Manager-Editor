@@ -23,7 +23,9 @@ const DraftArticle = () => {
   const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
   const dbName = useDraftStore((s) => s.dbName);
   const text = useDraftStore((s) => s.text);
-  console.log({ text });
+  if (process.env.NODE_ENV !== "production") {
+    console.log({ text });
+  }
 
   const { savedTitleRef, savedBodyRef } = useEditorStore.getState();
   const { setText, setLanguage, setArticle, setDraftKey } =
