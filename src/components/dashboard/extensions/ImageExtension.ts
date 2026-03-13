@@ -36,7 +36,9 @@ export const CustomImage = Image.extend({
         const imageId = node.attrs["data-ref-id"] as string | null;
         if (imageId) {
           const dbName = sessionStorage.getItem("db") ?? "";
-          deleteBlob(imageId);
+          void deleteBlob(imageId).catch((error) => {
+            console.error("Failed to delete image blob from IndexedDB:", error);
+          });
           removeStoredImage(imageId, dbName, true);
           removeStoredImage(imageId, dbName, false);
         }
