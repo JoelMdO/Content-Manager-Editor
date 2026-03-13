@@ -63,10 +63,6 @@ const Dashboard: React.FC = () => {
   const savedBodyRef = useRef<string>("");
   const pageRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
-  const summaryDialogRef = useRef<HTMLDialogElement | null>(null);
-  const sectionsDialogRef = useRef<HTMLDialogElement | null>(null);
-  const stylesDialogRef = useRef<HTMLDialogElement | null>(null);
   //
   // Local state — only dbIsReady remains to trigger the db-setup useEffect.
   // All other state lives in Zustand stores.
@@ -102,12 +98,6 @@ const Dashboard: React.FC = () => {
       savedTitleRef,
       savedBodyRef,
       fileInputRef,
-    });
-    useUIStore.getState().initDialogRefs({
-      dialogRef,
-      sectionsDialogRef,
-      summaryDialogRef,
-      stylesDialogRef,
     });
   }, []);
   //

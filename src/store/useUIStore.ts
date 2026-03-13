@@ -11,8 +11,18 @@
 //              to re-render unnecessarily.
 // Impact     : Components using isSummary, openDialogNoSection, previewReady,
 //              selectedSection etc. must read from useUIStore instead of
-//              MenuContext. dashboard/page.tsx hands over dialog refs via
-//              initDialogRefs() on mount.
+//              MenuContext. Dialog refs are stable objects owned by the store;
+//              initDialogRefs() mutates their .current values rather than
+//              replacing the objects so that components already holding a
+//              reference to the stub are never desynchronised.
+// Changed by : Copilot
+// Date       : 2026-03-13
+// Reason     : initDialogRefs previously called set(refs), replacing the
+//              stored ref objects entirely. Any component that rendered with
+//              the stub as its ref prop would not reattach unless it
+//              re-rendered with the new value, causing ref desynchronization.
+//              Fix: keep the stable stub objects; only mutate .current.
+// Impact     : initDialogRefs no longer causes store subscribers to re-render.
 
 import { create } from "zustand";
 
@@ -36,7 +46,9 @@ interface UIState {
   // Auto-save timestamp shown in sidebar
   lastAutoSave: Date | null;
 
-  // Dialog refs — set once from dashboard/page.tsx on mount
+  // Dialog refs — stable objects; .current is set by React (via ref={storeRef}
+  // in child components). Use initDialogRefs() only when external code needs to
+  // populate .current directly (e.g. forwarding a ref from outside the tree).
   dialogRef: Ref<HTMLDialogElement | null>;
   sectionsDialogRef: Ref<HTMLDialogElement | null>;
   summaryDialogRef: Ref<HTMLDialogElement | null>;
@@ -60,7 +72,7 @@ interface UIState {
   setLastAutoSave: (v: Date | null) => void;
 }
 
-export const useUIStore = create<UIState>((set) => ({
+export const useUIStore = create<UIState>((set, get) => ({
   isMediumScreen: false,
   selectedSection: "Select category",
   openDialogNoSection: false,
@@ -71,13 +83,34 @@ export const useUIStore = create<UIState>((set) => ({
   isLoadingPreview: false,
   lastAutoSave: null,
 
-  // Stub refs — replaced by initDialogRefs() before any dialog is shown
+  // Stable stub refs — never replaced, only .current is mutated by React
+  // (via ref={storeRef} in child components) or via initDialogRefs().
   dialogRef: { current: null },
   sectionsDialogRef: { current: null },
   summaryDialogRef: { current: null },
   stylesDialogRef: { current: null },
 
-  initDialogRefs: (refs) => set(refs),
+  // Keep the stable ref objects; only update .current so that components
+  // already holding a reference to the stub are never desynchronised.
+  //
+  // NOTE: This intentionally bypasses Zustand's set() / reactivity system.
+  // Ref objects are mutable containers by design — their .current value
+  // changing should NOT trigger re-renders (that is the entire contract of
+  // React refs). Using set() here would replace the object identity, forcing
+  // every subscriber to re-render with a new ref, which is exactly the
+  // desynchronisation problem we are solving. Only pass non-null elements;
+  // null values are ignored to preserve any .current already assigned by React.
+  initDialogRefs: (refs) => {
+    const state = get();
+    if (refs.dialogRef.current !== null)
+      state.dialogRef.current = refs.dialogRef.current;
+    if (refs.sectionsDialogRef.current !== null)
+      state.sectionsDialogRef.current = refs.sectionsDialogRef.current;
+    if (refs.summaryDialogRef.current !== null)
+      state.summaryDialogRef.current = refs.summaryDialogRef.current;
+    if (refs.stylesDialogRef.current !== null)
+      state.stylesDialogRef.current = refs.stylesDialogRef.current;
+  },
   setIsMediumScreen: (v) => set({ isMediumScreen: v }),
   setSelectedSection: (v) => set({ selectedSection: v }),
   setOpenDialogNoSection: (v) => set({ openDialogNoSection: v }),

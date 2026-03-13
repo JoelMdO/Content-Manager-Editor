@@ -56,22 +56,35 @@ describe("useUIStore", () => {
     expect(useUIStore.getState().lastAutoSave).toBe(now);
   });
 
-  it("initDialogRefs replaces stub refs with real ref objects", () => {
-    const mockSectionsRef = {
-      current: document.createElement("dialog") as HTMLDialogElement | null,
-    };
-    const mockSummaryRef = {
-      current: document.createElement("dialog") as HTMLDialogElement | null,
-    };
+  it("initDialogRefs mutates .current on stable refs without replacing the objects", () => {
+    const dialogElement = document.createElement("dialog") as HTMLDialogElement;
+    const sectionsElement = document.createElement(
+      "dialog",
+    ) as HTMLDialogElement;
+
+    // Capture the stable ref objects before calling initDialogRefs
+    const stableDialogRef = useUIStore.getState().dialogRef;
+    const stableSectionsRef = useUIStore.getState().sectionsDialogRef;
 
     useUIStore.getState().initDialogRefs({
-      dialogRef: { current: null },
-      sectionsDialogRef: mockSectionsRef,
-      summaryDialogRef: mockSummaryRef,
+      dialogRef: { current: dialogElement },
+      sectionsDialogRef: { current: sectionsElement },
+      summaryDialogRef: { current: null },
       stylesDialogRef: { current: null },
     });
 
-    expect(useUIStore.getState().sectionsDialogRef).toBe(mockSectionsRef);
-    expect(useUIStore.getState().summaryDialogRef).toBe(mockSummaryRef);
+    const state = useUIStore.getState();
+
+    // The ref objects must be the same stable instances — not replaced
+    expect(state.dialogRef).toBe(stableDialogRef);
+    expect(state.sectionsDialogRef).toBe(stableSectionsRef);
+
+    // Only .current should have been updated
+    expect(state.dialogRef.current).toBe(dialogElement);
+    expect(state.sectionsDialogRef.current).toBe(sectionsElement);
+
+    // null values passed in must not overwrite an already-set .current
+    expect(state.summaryDialogRef.current).toBeNull();
+    expect(state.stylesDialogRef.current).toBeNull();
   });
 });
