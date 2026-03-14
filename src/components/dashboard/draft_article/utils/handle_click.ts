@@ -7,6 +7,8 @@ import { cleanNestedDivs } from "../../utils/clean_content";
 import { StorageItem, StorageItemOrNull } from "../../../../types/storage_item";
 import { useDraftStore } from "@/store/useDraftStore";
 import { hydrateImagesInHTML } from "@/lib/imageStore/hydrateImages";
+import { useUIStore } from "@/store/useUIStore";
+import { useEditorStore } from "@/store/useEditorStore";
 
 // Define a single props object type that combines all required properties
 type HandleClickProps = {
@@ -38,10 +40,10 @@ export const handleClick = async ({
   const db = sessionStorage.getItem("dbName") || "DeCav";
   const articleStored = localStorage.getItem(DRAFT_KEY!);
   const jsonArticle = JSON.parse(articleStored!);
+  console.log({ jsonArticleFromLocalStorage: jsonArticle });
 
   const sessionStorageArticle = sessionStorage.getItem(`articleContent-${db}`);
-  const jsonSessionStorageArticle = JSON.parse(sessionStorageArticle!);
-  //
+  const jsonSessionStorageArticle = JSON.parse(sessionStorageArticle!); //
   // ORIGINAL - replaced by update editor directly.
   // if (tag === "translated") {
   //   savedTitleRef!.current = newTitleRef!;
@@ -98,10 +100,14 @@ export const handleClick = async ({
     return;
   } else if (tag === "summary-es") {
     // load from sessionStorage.
+    console.log("doing Summary ESP");
+
     setLanguage!("es");
     let summary =
       jsonArticle.find((item: StorageItem) => item.type === "es-summary")
         ?.content || "";
+    console.log({ summaryFromLocalStorage: summary });
+
     //---------------------------------------------------------------------
     // Fallback to sessionStorage if not found in sessionStorage
     //---------------------------------------------------------------------
@@ -111,6 +117,8 @@ export const handleClick = async ({
           (item: StorageItem) => item.type === "es-summary",
         )?.content || "";
     }
+    console.log({ summaryFromSessionStorage: summary });
+
     // Clean the summary content (remove extra divs, ensure proper formatting)
     if (summary) {
       summary = summary
@@ -119,6 +127,8 @@ export const handleClick = async ({
         .trim();
     }
     //
+    console.log("Final summary content to set:", summary);
+
     setSummaryContent!(summary);
     return;
   } else if (tag === "preview-en") {

@@ -31,10 +31,10 @@ const ImageInput = dynamic(
 const LinkDialog = dynamic(
   () => import("../../components/dashboard/menu/button_menu/link_dialog"),
 );
-// const SummaryDialog = dynamic(
-//   () => import("../../components/dashboard/menu/summary_dialog/summary_dialog"),
-//   { ssr: false },
-// );
+const SummaryDialog = dynamic(
+  () => import("../../components/dashboard/menu/summary_dialog/summary_dialog"),
+  { ssr: false },
+);
 const SectionSelector = dynamic(
   () => import("../../components/dashboard/menu/button_menu/sections_selector"),
 );
@@ -172,7 +172,7 @@ const Dashboard: React.FC = () => {
         <SectionSelector />
         <ImageInput index={1} />
         <LinkDialog index={1} />
-        {/* <SummaryDialog /> */}
+        <SummaryDialog />
       </main>
     </section>
   );
