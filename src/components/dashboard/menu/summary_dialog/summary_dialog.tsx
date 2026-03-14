@@ -28,7 +28,7 @@ const SummaryDialog = () => {
   const summaryContent = useUIStore((s) => s.summaryContent);
   const setLanguage = useDraftStore((s) => s.setLanguage);
   const language = useDraftStore((s) => s.language);
-  const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
+  //const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
 
   const summaryButtons = [
     { label: "summary-en", icon: iconsMenu.english },
@@ -149,7 +149,7 @@ const SummaryDialog = () => {
               type="button"
               onClick={() => {
                 handleClick({
-                  DRAFT_KEY,
+                  //DRAFT_KEY,
                   setSummaryContent,
                   setLanguage,
                   tag: button.label,

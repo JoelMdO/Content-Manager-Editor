@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from "react";
+/* eslint-disable jsx-a11y */
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
@@ -30,7 +31,7 @@ const PreviewArticle = () => {
 
     if (article?.content) {
       const updatedContent = replaceSrcWithImagePlaceholders(
-        article?.content as string
+        article?.content as string,
       );
       //console.log("updatedContent at useEffect", updatedContent);
       setUpdatedContent(updatedContent);
@@ -188,7 +189,7 @@ const PreviewArticle = () => {
                   (child) =>
                     React.isValidElement(child) &&
                     child.type === "input" &&
-                    child.props === "checkbox"
+                    child.props === "checkbox",
                 );
 
                 if (hasCheckbox) {
@@ -197,7 +198,7 @@ const PreviewArticle = () => {
                     (child) =>
                       React.isValidElement(child) &&
                       child.type === "input" &&
-                      child.props === "checkbox"
+                      child.props === "checkbox",
                   );
 
                   const textContent = childrenArray.filter(
@@ -206,42 +207,45 @@ const PreviewArticle = () => {
                         React.isValidElement(child) &&
                         child.type === "input" &&
                         child.props === "checkbox"
-                      )
+                      ),
                   );
 
                   const isChecked =
                     React.isValidElement(checkbox) && checkbox.props;
 
-                  return (
-                    <li className="items-start gap-2" {...props}>
-                      <input
-                        type="checkbox"
-                        aria-label="Task completed"
-                        checked={isChecked as boolean}
-                        disabled
-                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue focus:ring-blue dark:border-gray-600 dark:bg-gray-700"
-                      />
-                      <span
-                        className={`${
+                  return React.createElement(
+                    "li",
+                    { className: "items-start gap-2", ...props },
+                    React.createElement("input", {
+                      type: "checkbox",
+                      "aria-label": "Task completed",
+                      checked: isChecked as boolean,
+                      disabled: true,
+                      className:
+                        "mt-1 h-4 w-4 rounded border-gray-300 text-blue focus:ring-blue dark:border-gray-600 dark:bg-gray-700",
+                    }),
+                    React.createElement(
+                      "span",
+                      {
+                        className: `${
                           isChecked
                             ? "text-gray-500 dark:text-gray-400"
                             : "text-gray-700 dark:text-gray-700"
-                        }`}
-                      >
-                        {textContent}
-                      </span>
-                    </li>
+                        }`,
+                      },
+                      textContent,
+                    ),
                   );
                 }
 
                 // Regular list item
-                return (
-                  <li
-                    className={`${previewArticleStyles.list} text-black`}
-                    {...props}
-                  >
-                    {children}
-                  </li>
+                return React.createElement(
+                  "li",
+                  {
+                    className: `${previewArticleStyles.list} text-black`,
+                    ...props,
+                  },
+                  children,
                 );
               },
 
@@ -257,7 +261,7 @@ const PreviewArticle = () => {
                       (grandChild) =>
                         React.isValidElement(grandChild) &&
                         grandChild.type === "input" &&
-                        grandChild.props === "checkbox"
+                        grandChild.props === "checkbox",
                     );
                   }
                   return false;

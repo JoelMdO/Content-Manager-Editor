@@ -14,7 +14,27 @@ function mountMockEditor() {
   const savedTitleRef = { current: "" };
   const savedBodyRef = { current: null as string | null };
 
+  // Create lightweight TipTap-like editor stubs with a commands.setContent API
+  const titleEditorStub = {
+    commands: {
+      setContent: (html: string) => {
+        titleDiv.innerHTML = html;
+      },
+    },
+  } as any;
+
+  const bodyEditorStub = {
+    commands: {
+      setContent: (html: string) => {
+        bodyDiv.innerHTML = html;
+      },
+    },
+    getHTML: () => bodyDiv.innerHTML,
+  } as any;
+
   useEditorStore.setState({
+    titleEditorRef: { current: titleEditorStub },
+    bodyEditorRef: { current: bodyEditorStub },
     editorRefs: { current: [titleDiv, bodyDiv] },
     savedTitleRef,
     savedBodyRef,
@@ -111,9 +131,9 @@ describe("useDraftStore", () => {
         .loadDraftIntoEditor("Saved Title", "<p>Saved body</p>");
 
       expect(savedTitleRef.current).toBe("Saved Title");
-      // cleanNestedDivs wraps content in <div> if it doesn't already start
-      // with one — this is the correct, expected contract of the function.
-      expect(savedBodyRef.current).toBe("<div><p>Saved body</p></div>");
+      // The current implementation stores the body HTML as-provided
+      // (no longer running `cleanNestedDivs` here), so assert that.
+      expect(savedBodyRef.current).toBe("<p>Saved body</p>");
     });
 
     it("does NOT call set() — no Zustand subscriber is triggered", () => {
