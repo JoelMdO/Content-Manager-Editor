@@ -1,4 +1,6 @@
 import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import routeButtonConfig from "./utils/route_button.config";
 
 interface RouteButtonProps {
   type?: string;
@@ -11,46 +13,41 @@ const RouteButton: React.FC<RouteButtonProps> = ({
 }) => {
   //
   const router = useRouter();
-  let path: string = "";
-  let label: string = "";
-  let features: string = "bg-gray-500 text-white";
+  const [isPending, startTransition] = useTransition();
+  //ORIGINAL
+  // let path: string = "";
+  // let label: string = "";
+  // let features: string = "bg-gray-500 text-white";
   //
   // Define the button type
-  switch (type) {
-    case "playbook":
-      path = "/playbook";
-      label = "Create New";
-      break;
-    case "read-playbook":
-      path = "/readPlaybook";
-      label = "Read Playbook";
-      break;
-    case "with-item-playbook":
-      path = "/playbook";
-      label = "Continue Editing";
-      features = "flex bg-yellow-button text-black w-[38vw] self-center";
-      break;
-    default:
-      path = "/dashboard";
-      label = "New Article";
-  }
-  //
+  // UPDATED to use a config object for better scalability and maintainability
+  const { path, label, features } =
+    routeButtonConfig[type as keyof typeof routeButtonConfig] ||
+    routeButtonConfig["default"];
+  // ORIGINAL
+  // const handleClick = () => {
+  //   if (type === "with-item-playbook") {
+  //     router.push(`${path}?modal=true`);
+  //   } else {
+  //     router.push(path);
+  //   }
+  // };
+
+  // UPDATED with startTransition for better UX
   const handleClick = () => {
-    if (type === "with-item-playbook") {
+    startTransition(() => {
       router.push(`${path}?modal=true`);
-    } else {
-      router.push(path);
-    }
+    });
   };
   //
   return (
     <button
-      className={`${features} py-3 px-4 rounded mt-2`}
+      className={`${isPending ? "bg-lime-600" : features} py-3 px-4 rounded mt-2`}
       data-cy={dataCity}
       type="button"
       onClick={() => handleClick()}
     >
-      {label}
+      {isPending ? "Loading..." : label}
     </button>
   );
 };
