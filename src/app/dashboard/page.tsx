@@ -134,40 +134,25 @@ const Dashboard: React.FC = () => {
   // for tablet and desktop and a <nav> for mobile
   ///======================================================
   return (
-    <section
-      ref={pageRef}
-      className="flex flex-col md:flex-row h-screen bg-gray-100"
-    >
+    <section ref={pageRef} className="flex flex-col h-screen bg-blue">
       {/* TABLET / DESKTOP */}
-      <aside className="hidden md:flex w-[25vw] h-full gap-y-2 bg-gray-800 text-white items-center flex-col">
-        <DraftArticle />
-        {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
-        <MenuDesktop />
-        <div className="flex flex-row w-full justify-center items-center mt-2">
-          <HomeButton />
-          <LogOutButton type={"dashboard"} />
+      <nav className="flex pb-3 w-screen h-[12dvh] bg-gray-800 text-white align-middleitems-center flex-row gap-2 md:justify-between">
+        <div className="flex flex-col">
+          <DraftArticle />
+          {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
         </div>
-      </aside>
-      {/* MENU MOBILE */}
-      <nav className="md:hidden w-full h-[12dvh] bg-gray-800">
-        <div className="w-full flex flex-row justify-between mt-2 px-2">
-          {/* HomeButton at the start (left) */}
-          <div className="flex-shrink-0">
-            <HomeButton type="mobile" />
-          </div>
-          <div className="flex-grow text-center flex flex-col">
-            <DraftArticle />
-            {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
-          </div>
-          {/* LogOutButton at the end (right) */}
-          <div className="flex-shrink-0">
-            <LogOutButton />
-          </div>
-        </div>
+        {/* MENU MOBILE */}
         <MenuMobile />
+        {/* <div className="flex flex-row w-full justify-center items-center mt-2"> */}
+        <HomeButton />
+        <LogOutButton type={"dashboard"} />
+        {/* </div> */}
       </nav>
       {/* Main Content */}
-      <main className="flex-1 p-4 pt-2 h-[80dvh] md:h-full md:w-[75vw] overflow-y-auto">
+      <main className="flex h-full">
+        <aside className="hidden md:flex w-[10vw] h-screen bg-gray-800 text-white align-middle items-center flex-col justify-between">
+          <MenuDesktop />
+        </aside>
         {previewReady ? <PreviewArticle /> : <DashboardEditor />}
         <SectionSelector />
         <ImageInput index={1} />

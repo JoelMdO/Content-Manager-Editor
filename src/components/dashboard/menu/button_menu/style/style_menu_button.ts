@@ -8,11 +8,11 @@ type styleMenuButton = {
 
 export function menuButtonStyle(
   type: string,
-  isClicked: boolean
+  isClicked: boolean,
 ): styleMenuButton {
   //
 
-  const defaultProperties = `bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-white hover:text-black hover:to-orange-300  hover:border-amber-500 font-bold mt-4 shadow-md shadow-black`; // isClicked ? "bg-cream text-black" : ""
+  const defaultProperties = `bg-gradient-to-r from-transparent from-[95%] to-secondMenuButtonColor text-white hover:text-black hover:to-orange-300  hover:border-amber-500  mt-4 shadow-md shadow-black`; // isClicked ? "bg-cream text-black" : ""
   //
   const defaultStyle: styleMenuButton = {
     text: "Clear",

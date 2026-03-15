@@ -33,6 +33,8 @@ export default {
         "blur-toast-color": colors.blur_toast_color,
         secondMenuButtonColor: colors.secondMenuButtonColor,
         gold: colors.gold,
+        "editor-background": colors.editor_background,
+        "editor-text": colors.editor_text,
       },
     },
   },

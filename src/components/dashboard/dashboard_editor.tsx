@@ -26,6 +26,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { all, createLowlight } from "lowlight";
 import { CustomImage } from "./extensions/ImageExtension";
 import { handleContentChange } from "./utils/handle_content_change";
+import FontStyleUI from "./menu/button_menu/font_style_buttons";
 
 const lowlight = createLowlight(all);
 
@@ -83,7 +84,7 @@ const DashboardEditor = () => {
     editorProps: {
       attributes: {
         class:
-          "h-[10dvh] font-bold p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-blue-light overflow-hidden",
+          "h-[10dvh] font-bold p-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text overflow-hidden",
         "data-cy": "editor-title",
       },
       handleKeyDown(view, event) {
@@ -117,7 +118,7 @@ const DashboardEditor = () => {
     editorProps: {
       attributes: {
         class:
-          "h-[70dvh] md:h-[85dvh] overflow-auto p-4 border rounded-g shadow-sm focus:outline-none cursor-pointer text-blue-light",
+          "h-[70dvh] md:h-[85dvh] overflow-auto p-4 pl-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text",
         "data-cy": "editor-body",
       },
     },
@@ -211,13 +212,17 @@ const DashboardEditor = () => {
   // UI
   ///--------------------------------------------------------
   return (
-    <div className="border border-gray-600 border-1px">
+    <div className="flex flex-col w-full h-full border-4 border-blue rounded-tl-lg bg-editor-background">
       {isTranslating && <DialogsLoader type={"translation"} />}
       {isSummary && <DialogsLoader type={"summary"} />}
       {isLoadingPreview && <DialogsLoader type={"preview"} />}
       {isMarkdownText && <DialogsLoader type={"load_html"} />}
 
       <EditorContent editor={titleEditor} />
+      <div className="hidden md:flex absolute md:right-[20vw] top-[13dvh] gap-3 items-center">
+        <FontStyleUI type={`desktop`} />
+      </div>
+      <div className="h-[1px] w-full bg-gradient-to-r from-blue from-[15%] to-transparent" />
       <EditorContent editor={bodyEditor} />
     </div>
   );

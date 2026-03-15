@@ -21,6 +21,8 @@ const Colors = {
   blur_toast_color: "#8F92A2",
   secondMenuButtonColor: "#2A7B9B",
   gold: "#e5a21e",
+  editor_background: "#0F172A",
+  editor_text: "#E2E8F0",
 };
 
 export default Colors;

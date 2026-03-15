@@ -11,7 +11,7 @@ const MenuMobile = () => {
   //
   return (
     <>
-      <div className="flex justify-center items-center w-full h-full">
+      <div className="md:hidden fixed justify-center items-center bottom-3 right-2">
         <button
           type="button"
           className={`fixed bottom-[20px] right-[20px] w-[50px] h-[50px] z-50 bg-gradient-to-r ${
@@ -48,7 +48,7 @@ const MenuMobile = () => {
           <MenuButton type={"save"} setIsMenuClicked={setIsMenuClicked} />
           <div className="relative flex flex-col items-center">
             {isStylesOpen && (
-              <div className="absolute left-[-40vw] top-1/2 -translate-y-1/2 gap-3 items-center">
+              <div className="absolute left-[-55vw] top-1/2 -translate-y-1/2 items-center">
                 <FontStyleUI
                   type="mobile"
                   setIsFontStyleOpen={setIsFontStyleOpen}

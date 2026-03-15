@@ -37,8 +37,8 @@ const DraftArticle = () => {
   // Read the if any draft article exists in localStorage
   //=========================================================
   const draftButtons = [
-    { tag: "draft-en", icon: iconsMenu.english },
-    { tag: "draft-es", icon: iconsMenu.spanish },
+    { tag: "draft-en", icon: iconsMenu.english, label: "English" },
+    { tag: "draft-es", icon: iconsMenu.spanish, label: "Spanish" },
   ];
 
   useEffect(() => {
@@ -66,16 +66,19 @@ const DraftArticle = () => {
 
   //
   return (
-    <div className="flex flex-col mt-2 md:mt-4">
-      <h1 className="text-[clamp(0.6rem,1rem,1.5rem)] text-white">
+    <div className="flex flex-col mt-2 ml-2">
+      <h1 className="text-[clamp(0.6rem,2dvh,1.5rem)] text-white">
         {draftArticleText.title}
       </h1>
-      <div className="flex flex-row items-center w-[40vw] max-w-4xl md:w-[22vw] g:w-[20vw] h-[3dvh] md:h-[5dvh]  bg-gray-400 rounded-3xl ">
-        <span className="text-[clamp(0.6rem,0.8rem,1rem)] w-[30vw] max-w-3xl md:w-[14vw] g:w-[14vw] ml-1 text-black pl-1 overflow-hidden whitespace-nowrap text-ellipsis">
+      <div className="flex flex-wrap items-center w-[60vw] max-w-4xl md:w-[28vw] h-[3dvh] md:h-[5dvh]  bg-gray-400 rounded-3xl gap-y-2">
+        <span className="text-[clamp(0.6rem,2dvh,1rem)] w-[16vw] md:w-[14vw] ml-1 text-black pl-1 overflow-hidden whitespace-nowrap text-ellipsis">
           {text}
         </span>
         {draftButtons.map((button) => (
-          <div key={button.tag} className="flex flex-row items-center">
+          <div
+            key={button.tag}
+            className="flex flex-row items-center ml-1 mr-1"
+          >
             <div className="flex h-[2.5dvh] md:h-[4.5dvh] bg-gray-500 w-[0.7] ml-1 mr-1"></div>
             <button
               type="button"
@@ -103,6 +106,9 @@ const DraftArticle = () => {
                 {button.icon}
               </span>
             </button>
+            <span className="text-[8px] md:text-sm text-cyan-950">
+              {button.label}
+            </span>
           </div>
         ))}
       </div>
