@@ -21,6 +21,9 @@ const config: Config = {
     "src/store/**/*.{ts,tsx}",
     "src/lib/**/*.{ts,tsx}",
     "src/components/dashboard/**/*.{ts,tsx}",
+    "src/utils/**/*.{ts,tsx}",
+    "src/services/**/*.{ts,tsx}",
+    "src/app/api/**/*.{ts,tsx}",
     "!src/**/*.d.ts",
   ],
 };
