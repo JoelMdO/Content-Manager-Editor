@@ -1,0 +1,12 @@
+{
+  "dbName": "DeCav",
+  "draftKey": "draft-articleContent-DeCav",
+  "draftContent": [
+    { "type": "title", "content": "Draft Test Article" },
+    {
+      "type": "body",
+      "content": "<p>Paragraph one in draft.</p><p>Paragraph two in draft.</p><p>Paragraph three in draft.</p>"
+    },
+    { "type": "id", "content": "draft-test-article-11-3-2026" }
+  ]
+}
