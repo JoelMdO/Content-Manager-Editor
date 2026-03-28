@@ -89,11 +89,16 @@ jobs:
 
   # ─── Job 3: E2E Tests (Cypress) ──────────────────────────────────────────
   # Requires the following GitHub Secrets to be configured:
-  #   NEXTAUTH_SECRET       — NextAuth signing secret
-  #   FIREBASE_*            — Firebase Admin credentials
-  #   CLOUDINARY_*          — Cloudinary credentials
-  #   CYPRESS_TEST_EMAIL    — Test user email for cy.login()
-  #   CYPRESS_TEST_PASSWORD — Test user password for cy.login()
+  #   NEXTAUTH_SECRET           — NextAuth signing secret
+  #   GOOGLE_CLIENT_ID          — Google OAuth client ID
+  #   GOOGLE_CLIENT_SECRET      — Google OAuth client secret
+  #   LOGIN_API_ENDPOINT        — Django /auth/login/ URL
+  #   USERS_API_ENDPOINT        — Django /auth/users/ URL
+  #   PASSWORD_RESET_API_ENDPOINT — Django /auth/password-reset/ URL
+  #   INTERNAL_API_KEY          — Shared internal secret for /api/auth/users/
+  #   CLOUDINARY_*              — Cloudinary credentials
+  #   CYPRESS_TEST_EMAIL        — Test user email for cy.login()
+  #   CYPRESS_TEST_PASSWORD     — Test user password for cy.login()
   e2e:
     name: E2E Tests (Cypress)
     runs-on: ubuntu-latest
@@ -128,12 +133,24 @@ jobs:
         env:
           NEXTAUTH_URL: "http://localhost:8000"
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          LOGIN_API_ENDPOINT: ${{ secrets.LOGIN_API_ENDPOINT }}
+          USERS_API_ENDPOINT: ${{ secrets.USERS_API_ENDPOINT }}
+          PASSWORD_RESET_API_ENDPOINT: ${{ secrets.PASSWORD_RESET_API_ENDPOINT }}
+          INTERNAL_API_KEY: ${{ secrets.INTERNAL_API_KEY }}
 
       - name: Start production server in background
         run: pnpm start &
         env:
           NEXTAUTH_URL: "http://localhost:8000"
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          LOGIN_API_ENDPOINT: ${{ secrets.LOGIN_API_ENDPOINT }}
+          USERS_API_ENDPOINT: ${{ secrets.USERS_API_ENDPOINT }}
+          PASSWORD_RESET_API_ENDPOINT: ${{ secrets.PASSWORD_RESET_API_ENDPOINT }}
+          INTERNAL_API_KEY: ${{ secrets.INTERNAL_API_KEY }}
 
       - name: Wait for server to be ready
         run: |

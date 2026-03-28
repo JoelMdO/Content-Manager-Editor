@@ -7,6 +7,6 @@ export type callHubType =
   | Blob
   | FormDataItem
   | PlaybookMetaWithUseRecord
-  | { email: string; password: string }
+  | { email: string; password?: string; provider?: string }
   | { title: string; body: string; language: string }
   | object[];

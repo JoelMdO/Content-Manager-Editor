@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/services/authentication/admin_config";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 
 export async function POST(request: NextRequest) {
@@ -28,7 +27,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const response = await fetch(url, {
+    await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,14 +35,16 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({ email }),
     });
 
+    // Always return 200 regardless of backend outcome — never reveal if email exists
     return NextResponse.json({
       status: 200,
       message: "If this email exists, a password reset link has been generated",
     });
-  } catch (err: any) {
+  } catch {
+    // Swallow errors — same generic 200 to prevent email enumeration
     return NextResponse.json({
-      status: 500,
-      error: err?.message ?? String(err),
+      status: 200,
+      message: "If this email exists, a password reset link has been generated",
     });
   }
 }

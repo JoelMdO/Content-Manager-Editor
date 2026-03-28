@@ -110,9 +110,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         dataApiHub = statusSanitize.message as dataType;
         break;
       ///--------------------------------------------------------
-      // Sign in by email
+      // Sign in by email and Save user
       ///--------------------------------------------------------
       case "sign-in-by-email":
+      case "save-user":
+      case "password-reset":
         if (
           typeof statusSanitize.message === "object" &&
           statusSanitize.message !== null &&
@@ -120,7 +122,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         ) {
           dataApiHub = {
             email: (statusSanitize.message as { email: string }).email,
-            password: (statusSanitize.message as { password: string }).password,
+            ...(type === "sign-in-by-email" && {
+              password: (statusSanitize.message as { password: string })
+                .password,
+            }),
+            ...(type === "save-user" && {
+              provider: (statusSanitize.message as { provider?: string })
+                .provider,
+            }),
           };
         } else {
           return NextResponse.json({

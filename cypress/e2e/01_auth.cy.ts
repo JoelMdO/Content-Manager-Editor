@@ -55,3 +55,67 @@ describe("01 Auth — non-happy paths", () => {
     cy.get('[data-cy="login-button"]').should("exist");
   });
 });
+
+// ─── Password reset flow ───────────────────────────────────────────────────
+// handleSendResetLink() calls callHub("password-reset", { email }),
+// which POSTs to NEXT_PUBLIC_url_api/api/hub — intercepted below.
+describe("01 Auth — password reset flow", () => {
+  beforeEach(() => {
+    cy.visit("/");
+  });
+
+  it("reveals the password reset form when the forgot-password button is clicked", () => {
+    cy.get('[data-cy="reset-email-input"]').should("not.be.visible");
+    cy.get('[data-cy="forgot-password-button"]').click();
+    cy.get('[data-cy="reset-email-input"]').should("be.visible");
+  });
+
+  it("calls the hub with password-reset and shows a generic success message on submit", () => {
+    cy.intercept("POST", "**/api/hub", {
+      statusCode: 200,
+      body: {
+        status: 200,
+        message:
+          "If this email exists, a password reset link has been generated",
+      },
+    }).as("resetRequest");
+
+    cy.get('[data-cy="forgot-password-button"]').click();
+    cy.get('[data-cy="reset-email-input"]').type("user@example.com");
+    cy.get('[data-cy="send-reset-button"]').click();
+
+    cy.wait("@resetRequest");
+    // The reset form should hide after submission
+    cy.get('[data-cy="reset-email-input"]').should("not.be.visible");
+  });
+
+  it("shows the same generic success message for an unknown email (no enumeration)", () => {
+    cy.intercept("POST", "**/api/hub", {
+      statusCode: 200,
+      body: {
+        status: 200,
+        message:
+          "If this email exists, a password reset link has been generated",
+      },
+    }).as("resetRequest");
+
+    cy.get('[data-cy="forgot-password-button"]').click();
+    cy.get('[data-cy="reset-email-input"]').type("unknown@noone.com");
+    cy.get('[data-cy="send-reset-button"]').click();
+
+    cy.wait("@resetRequest");
+    cy.get('[data-cy="reset-email-input"]').should("not.be.visible");
+  });
+
+  it("shows a Google account management hint when the reset form is open", () => {
+    cy.get('[data-cy="forgot-password-button"]').click();
+    cy.contains("myaccount.google.com").should("be.visible");
+  });
+
+  it("hides the reset form when Cancel is clicked", () => {
+    cy.get('[data-cy="forgot-password-button"]').click();
+    cy.get('[data-cy="reset-email-input"]').should("be.visible");
+    cy.get('[data-cy="reset-cancel-button"]').click();
+    cy.get('[data-cy="reset-email-input"]').should("not.be.visible");
+  });
+});

@@ -21,14 +21,14 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
-    const { email, password } = body;
+    const { email, name, provider } = body;
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Internal-Key": process.env.INTERNAL_API_KEY || "",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, name, provider }),
     });
 
     if (response.status !== 200 && response.status !== 201) {

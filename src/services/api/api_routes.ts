@@ -71,6 +71,22 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         endPoint = "search";
         credentials = "include";
         break;
+      ///--------------------------------------------------------
+      // Sign in by email
+      ///--------------------------------------------------------
+      case "sign-in-by-email":
+      case "save-user":
+      case "password-reset":
+        endPoint =
+          type === "sign-in-by-email"
+            ? "login"
+            : type === "password-reset"
+              ? "reset"
+              : "users";
+        body = JSON.stringify(data);
+        headers["Content-Type"] = "application/json";
+        credentials = "include";
+        break;
       default:
         return NextResponse.json({ status: 205, message: "type not found" });
     }

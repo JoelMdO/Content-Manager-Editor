@@ -1,10 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { FirestoreAdapter } from "@auth/firebase-adapter";
-import { adminDB } from "../../services/db/firebase-admin";
 import CredentialsProvider from "next-auth/providers/credentials";
-import callHub from "@/services/api/call_hub";
 import refreshGoogleAccessToken from "@/services/authentication/refresh_token";
+import callHub from "@/services/api/call_hub";
 
 ///--------------------------------------------------------
 // Authentication Options to be used on server side
@@ -22,49 +20,43 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        //
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        const email = credentials?.email;
-        const password = credentials?.password;
-        const response = await callHub("sign-in-by-email", { email, password });
-
-        if (response.status !== 200) {
-          return null;
-        }
-
-        if (response.status === 200) {
-          // Return a user object as required by NextAuth
-          return {
-            id: "id",
-            name: "name",
-            email: "email",
-            // Add any other properties as needed
-          };
-        }
-
-        return null;
+        const res = await callHub("sign-by-email", {
+          email: credentials.email,
+          password: credentials.password,
+        });
+        if (res.status !== 200) return null;
+        const user = res.body as { id: string; email: string; name?: string };
+        return {
+          id: String(user.id),
+          email: user.email,
+          name: user.name || user.email,
+        };
       },
     }),
   ],
-  adapter: FirestoreAdapter(adminDB),
+  //TODO add db support previous was adapter: FirebaseAdapter(adminDB),
   callbacks: {
     ///--------------------------------------------------------
     // Sign In
     ///--------------------------------------------------------
-    async signIn({ account }) {
-      // For email and password sign-in
-      if (account?.type === "credentials") {
+    async signIn({ user, account }) {
+      // Upsert user in Django on every sign-in (idempotent)
+      if (account?.type === "credentials" || account?.id_token) {
+        const provider = account.id_token ? "google" : "credentials";
+        await fetch(`${process.env.NEXTAUTH_URL}/api/auth/users/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.name,
+            provider,
+          }),
+        });
         return true;
       }
-      // For Google sign-in
-      if (account?.id_token) {
-        const response = true;
-
-        return response;
-      }
-      // Return false if sign-in is not allowed
       return false;
     },
     async jwt({ token, user, account }) {
