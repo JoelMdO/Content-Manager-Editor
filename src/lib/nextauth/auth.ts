@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        const res = await callHub("sign-by-email", {
+        const res = await callHub("sign-in-by-email", {
           email: credentials.email,
           password: credentials.password,
         });

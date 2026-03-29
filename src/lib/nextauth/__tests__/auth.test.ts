@@ -2,7 +2,7 @@
  * @jest-environment node
  *
  * Tests for auth.ts (NextAuth + Django, no Firebase):
- *   - authorize()  calls callHub("sign-by-email", {email, password})
+ *   - authorize()  calls callHub("sign-in-by-email", {email, password})
  *   - signIn()     calls fetch to /api/auth/users/ directly using user.email/name
  */
 import { expect } from "@jest/globals";
@@ -41,7 +41,7 @@ describe("authOptions.authorize (CredentialsProvider)", () => {
     expect(result).toBeNull();
   });
 
-  it("calls callHub with 'sign-by-email' and the given email and password", async () => {
+  it("calls callHub with 'sign-in-by-email' and the given email and password", async () => {
     mockCallHub.mockResolvedValueOnce({
       status: 200,
       message: "ok",
@@ -53,7 +53,7 @@ describe("authOptions.authorize (CredentialsProvider)", () => {
       {},
     );
 
-    expect(mockCallHub).toHaveBeenCalledWith("sign-by-email", {
+    expect(mockCallHub).toHaveBeenCalledWith("sign-in-by-email", {
       email: "user@example.com",
       password: "secret",
     });
