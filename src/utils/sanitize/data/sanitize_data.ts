@@ -135,14 +135,13 @@ export async function sanitizeData(
       if (newEmail === "") {
         sanitizedData = { status: 400, message: "Invalid email" };
       } else {
-        const provider =
-          "provider" in data
-            ? sanitizeHtml((data as { provider: string }).provider)
-            : undefined;
-        sanitizedData = {
-          status: 200,
-          message: { email: newEmail, ...(provider ? { provider } : {}) },
-        };
+        const message: { email: string; provider?: string } = { email: newEmail };
+        if ("provider" in data) {
+          message.provider = sanitizeHtml(
+            (data as { provider: string }).provider,
+          );
+        }
+        sanitizedData = { status: 200, message };
       }
     } else {
       sanitizedData = { status: 400, message: "Invalid save-user data" };
