@@ -79,10 +79,10 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       case "password-reset":
         endPoint =
           type === "sign-in-by-email"
-            ? "login"
+            ? "auth/login"
             : type === "password-reset"
-              ? "reset"
-              : "users";
+              ? "auth/reset"
+              : "auth/users";
         body = JSON.stringify(data);
         headers["Content-Type"] = "application/json";
         credentials = "include";

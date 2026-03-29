@@ -122,6 +122,71 @@ describe("sanitizeData", () => {
     });
   });
 
+  // ─── password-reset ────────────────────────────────────────────────────
+
+  describe("type: password-reset", () => {
+    it("returns status 200 with sanitised email for valid input", async () => {
+      const result = await sanitizeData(
+        { email: "user@example.com" } as any,
+        "password-reset",
+      );
+      expect(result.status).toBe(200);
+      expect((result.message as any).email).toBeTruthy();
+    });
+
+    it("returns status 400 when email is missing", async () => {
+      const result = await sanitizeData({} as any, "password-reset");
+      expect(result.status).toBe(400);
+    });
+
+    it("returns status 400 when email is invalid", async () => {
+      const result = await sanitizeData(
+        { email: "not-an-email" } as any,
+        "password-reset",
+      );
+      expect(result.status).toBe(400);
+    });
+
+    it("returns status 400 for non-object input", async () => {
+      const result = await sanitizeData("user@example.com" as any, "password-reset");
+      expect(result.status).toBe(400);
+    });
+  });
+
+  // ─── save-user ────────────────────────────────────────────────────────
+
+  describe("type: save-user", () => {
+    it("returns status 200 with sanitised email for valid input", async () => {
+      const result = await sanitizeData(
+        { email: "user@example.com", provider: "google" } as any,
+        "save-user",
+      );
+      expect(result.status).toBe(200);
+      expect((result.message as any).email).toBeTruthy();
+    });
+
+    it("returns status 200 when provider is omitted", async () => {
+      const result = await sanitizeData(
+        { email: "user@example.com" } as any,
+        "save-user",
+      );
+      expect(result.status).toBe(200);
+    });
+
+    it("returns status 400 when email is missing", async () => {
+      const result = await sanitizeData(
+        { provider: "google" } as any,
+        "save-user",
+      );
+      expect(result.status).toBe(400);
+    });
+
+    it("returns status 400 for non-object input", async () => {
+      const result = await sanitizeData("notanobject" as any, "save-user");
+      expect(result.status).toBe(400);
+    });
+  });
+
   // ─── summary ─────────────────────────────────────────────────────────
 
   describe("type: summary", () => {

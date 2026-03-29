@@ -54,7 +54,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const session = await getServerSession(authOptions);
     //console.log('"session at api/hub":', session);
 
-    if (!session && type !== "sign-in-by-email") {
+    if (!session && type !== "sign-in-by-email" && type !== "password-reset") {
       return NextResponse.json({
         status: 401,
         message: "User without a valid session",

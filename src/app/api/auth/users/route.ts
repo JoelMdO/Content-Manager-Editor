@@ -22,11 +22,18 @@ export async function POST(request: NextRequest) {
       );
     }
     const { email, name, provider } = body;
+    const internalApiKey = process.env.INTERNAL_API_KEY;
+    if (!internalApiKey) {
+      return NextResponse.json(
+        { error: "INTERNAL_API_KEY is not configured" },
+        { status: 500 },
+      );
+    }
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Internal-Key": process.env.INTERNAL_API_KEY || "",
+        "X-Internal-Key": internalApiKey,
       },
       body: JSON.stringify({ email, name, provider }),
     });

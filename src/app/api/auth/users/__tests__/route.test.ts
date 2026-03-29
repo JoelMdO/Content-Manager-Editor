@@ -152,6 +152,21 @@ describe("POST /api/auth/users", () => {
     expect(json.error).toBe("USERS_API_ENDPOINT is not configured");
   });
 
+  it("returns 500 when INTERNAL_API_KEY env var is not configured", async () => {
+    delete process.env.INTERNAL_API_KEY;
+
+    const res = await POST(
+      makeRequest({
+        email: "x@x.com",
+        name: "X",
+        provider: "credentials",
+      }) as any,
+    );
+    const json = await res.json();
+
+    expect(json.error).toBe("INTERNAL_API_KEY is not configured");
+  });
+
   it("returns 500 when the backend responds with a non-200/201 status", async () => {
     jest
       .spyOn(global, "fetch")

@@ -110,6 +110,43 @@ export async function sanitizeData(
     } else {
       sanitizedData = { status: 400, message: "Invalid sign-in data" };
     }
+  } else if (type === "password-reset") {
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      "email" in data
+    ) {
+      const newEmail = sanitizeEmail((data as { email: string }).email);
+      if (newEmail === "") {
+        sanitizedData = { status: 400, message: "Invalid email" };
+      } else {
+        sanitizedData = { status: 200, message: { email: newEmail } };
+      }
+    } else {
+      sanitizedData = { status: 400, message: "Invalid password-reset data" };
+    }
+  } else if (type === "save-user") {
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      "email" in data
+    ) {
+      const newEmail = sanitizeEmail((data as { email: string }).email);
+      if (newEmail === "") {
+        sanitizedData = { status: 400, message: "Invalid email" };
+      } else {
+        const provider =
+          "provider" in data
+            ? sanitizeHtml((data as { provider: string }).provider)
+            : undefined;
+        sanitizedData = {
+          status: 200,
+          message: { email: newEmail, ...(provider ? { provider } : {}) },
+        };
+      }
+    } else {
+      sanitizedData = { status: 400, message: "Invalid save-user data" };
+    }
   } else if (type === "summary") {
     const sanitizedText = sanitizeSummary(data);
     sanitizedData = { status: 200, message: sanitizedText };
