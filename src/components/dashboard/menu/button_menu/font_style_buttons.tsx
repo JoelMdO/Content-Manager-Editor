@@ -135,7 +135,12 @@ const FontStyleUI: React.FC<{
                 ? font.type
                 : (() => {
                     const Icon =
-                      font.type as unknown as React.ComponentType<any>;
+                      font.type as unknown as React.ComponentType<{
+                        title?: string;
+                        "aria-label"?: string;
+                        className?: string;
+                        size?: number;
+                      }>;
                     return (
                       <Icon
                         title={font.value}

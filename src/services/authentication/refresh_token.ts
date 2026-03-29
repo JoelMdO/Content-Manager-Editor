@@ -1,4 +1,6 @@
-async function refreshGoogleAccessToken(token: any) {
+import type { JWT } from "next-auth/jwt";
+
+async function refreshGoogleAccessToken(token: JWT) {
   try {
     const url =
       "https://oauth2.googleapis.com/token?" +

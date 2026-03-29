@@ -97,10 +97,10 @@ export const authOptions: NextAuthOptions = {
           //Module augmentation
         }
         // Add accessToken to session so it can be used by API calls
-        (session as any).accessToken = token.accessToken;
+        session.accessToken = token.accessToken;
         // Check if token has refresh error
         if (token.error) {
-          (session as any).error = token.error;
+          session.error = token.error;
         }
       }
 

@@ -102,7 +102,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///================================================================
 
     let imageFiles: FormDataImageItem[] = [];
-    let pre_images: Array<File> = [];
+    const pre_images: Array<File> = [];
     //console.log("auth ok");
 
     const files = formData.get("images");
@@ -390,7 +390,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
     const authHeader = req.headers.get("authorization");
 
-    let tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+    const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
 
     if (!tokenG) {
       return NextResponse.json({ status: 401, error: "Unauthorized" });

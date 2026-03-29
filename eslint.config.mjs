@@ -17,6 +17,14 @@ const eslintConfig = [
       // "no-console": ["error"],
     },
   },
+  // ─── Test files: relax strict typing rules ───────────────────────────────
+  {
+    files: ["**/__tests__/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

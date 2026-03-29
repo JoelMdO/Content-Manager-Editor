@@ -13,9 +13,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Editor
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,7 +27,7 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
-          cache-dependency-path: Editor/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
@@ -42,9 +39,6 @@ jobs:
   unit-tests:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Editor
     env:
       # Test-only crypto values — these are NOT production secrets.
       # The matching .env.test is also committed for local jest runs.
@@ -72,20 +66,20 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
-          cache-dependency-path: Editor/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Run Jest with coverage
-        run: pnpm test -- --coverage --ci
+        run: pnpm run test --coverage --ci
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report
-          path: Editor/coverage/
+          path: coverage/
 
   # ─── Job 3: E2E Tests (Cypress) ──────────────────────────────────────────
   # Requires the following GitHub Secrets to be configured:
@@ -106,9 +100,6 @@ jobs:
     # Only run e2e from PRs opened from within the same repository
     # (fork PRs do not have access to the required secrets)
     if: github.event.pull_request.head.repo.full_name == github.repository
-    defaults:
-      run:
-        working-directory: Editor
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -123,7 +114,7 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
-          cache-dependency-path: Editor/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
@@ -175,4 +166,4 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: Editor/cypress/screenshots/
+          path: cypress/screenshots/

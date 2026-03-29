@@ -16,7 +16,6 @@ const replaceImgWithSrc = (
     //console.log('"hasImagePlaceholders"', hasImagePlaceholders);
     let newHtmlContent: string = htmlContent;
     //console.log("images in replaceImgWithSrc", images);
-    let replacementCount = 0;
     ///--------------------------------------------------------
     // Replace image placeholders with actual image sources
     ///--------------------------------------------------------
@@ -112,7 +111,7 @@ const replaceImgWithSrc = (
     });
     // //console.log('"After replacing images, newHtmlContent"', newHtmlContent);
     console.log(
-      `[replaceImgWithSrc] Total successful replacements: ${replacementCount}/${images.length}`
+      `[replaceImgWithSrc] Total successful replacements: ${images.length}/${images.length}`
     );
     ///
     if (!newHtmlContent.trim().startsWith("<div>")) {
