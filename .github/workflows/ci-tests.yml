@@ -130,6 +130,23 @@ jobs:
           USERS_API_ENDPOINT: ${{ secrets.USERS_API_ENDPOINT }}
           PASSWORD_RESET_API_ENDPOINT: ${{ secrets.PASSWORD_RESET_API_ENDPOINT }}
           INTERNAL_API_KEY: ${{ secrets.INTERNAL_API_KEY }}
+          # Placeholder Firebase config — allows the Firebase SDK to initialise
+          # without throwing "Can't determine Firebase Database URL".
+          # Real connectivity is not needed for E2E tests (routes are intercepted).
+          NEXT_PUBLIC_FIREBASE_projectId: "ci-placeholder"
+          NEXT_PUBLIC_FIREBASE_databaseURL: "https://ci-placeholder-default-rtdb.firebaseio.com"
+          NEXT_PUBLIC_FIREBASE_apiKey: "ci-placeholder-api-key"
+          NEXT_PUBLIC_FIREBASE_authDomain: "ci-placeholder.firebaseapp.com"
+          NEXT_PUBLIC_FIREBASE_storageBucket: "ci-placeholder.appspot.com"
+          NEXT_PUBLIC_FIREBASE_messagingSenderId: "000000000000"
+          NEXT_PUBLIC_FIREBASE_appId: "1:000000000000:web:000000000000000000000000"
+          NEXT_PUBLIC_FIREBASE_DeCav_projectId: "ci-placeholder-decav"
+          NEXT_PUBLIC_FIREBASE_DeCav_databaseURL: "https://ci-placeholder-decav-default-rtdb.firebaseio.com"
+          NEXT_PUBLIC_FIREBASE_DeCav_apiKey: "ci-placeholder-api-key"
+          NEXT_PUBLIC_FIREBASE_DeCav_authDomain: "ci-placeholder-decav.firebaseapp.com"
+          NEXT_PUBLIC_FIREBASE_DeCav_storageBucket: "ci-placeholder-decav.appspot.com"
+          NEXT_PUBLIC_FIREBASE_DeCav_messagingSenderId: "000000000000"
+          NEXT_PUBLIC_FIREBASE_DeCav_appId: "1:000000000000:web:000000000000000000000001"
 
       - name: Start production server in background
         run: pnpm start &
@@ -142,6 +159,21 @@ jobs:
           USERS_API_ENDPOINT: ${{ secrets.USERS_API_ENDPOINT }}
           PASSWORD_RESET_API_ENDPOINT: ${{ secrets.PASSWORD_RESET_API_ENDPOINT }}
           INTERNAL_API_KEY: ${{ secrets.INTERNAL_API_KEY }}
+          # Placeholder Firebase config — prevents Firebase SDK initialisation crash
+          NEXT_PUBLIC_FIREBASE_projectId: "ci-placeholder"
+          NEXT_PUBLIC_FIREBASE_databaseURL: "https://ci-placeholder-default-rtdb.firebaseio.com"
+          NEXT_PUBLIC_FIREBASE_apiKey: "ci-placeholder-api-key"
+          NEXT_PUBLIC_FIREBASE_authDomain: "ci-placeholder.firebaseapp.com"
+          NEXT_PUBLIC_FIREBASE_storageBucket: "ci-placeholder.appspot.com"
+          NEXT_PUBLIC_FIREBASE_messagingSenderId: "000000000000"
+          NEXT_PUBLIC_FIREBASE_appId: "1:000000000000:web:000000000000000000000000"
+          NEXT_PUBLIC_FIREBASE_DeCav_projectId: "ci-placeholder-decav"
+          NEXT_PUBLIC_FIREBASE_DeCav_databaseURL: "https://ci-placeholder-decav-default-rtdb.firebaseio.com"
+          NEXT_PUBLIC_FIREBASE_DeCav_apiKey: "ci-placeholder-api-key"
+          NEXT_PUBLIC_FIREBASE_DeCav_authDomain: "ci-placeholder-decav.firebaseapp.com"
+          NEXT_PUBLIC_FIREBASE_DeCav_storageBucket: "ci-placeholder-decav.appspot.com"
+          NEXT_PUBLIC_FIREBASE_DeCav_messagingSenderId: "000000000000"
+          NEXT_PUBLIC_FIREBASE_DeCav_appId: "1:000000000000:web:000000000000000000000001"
 
       - name: Wait for server to be ready
         run: |
