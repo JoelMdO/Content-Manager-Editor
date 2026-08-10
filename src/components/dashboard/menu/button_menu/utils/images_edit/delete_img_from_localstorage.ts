@@ -16,17 +16,15 @@ export function deleteImageFromLocalStorageIndexDB(
 
   const content = JSON.parse(stored);
   const imageToDelete = content.find(
-    (item: ImageItem) => item.fileName === imageIdToRemove,
+    (item: ImageItem) => item.imageId === imageIdToRemove,
   );
   console.log("Image to delete from localStorage", { imageToDelete });
   if (!imageToDelete) return;
   const filtered = content.filter(
-    (item: ImageItem) => item.fileName !== imageIdToRemove,
+    (item: ImageItem) => item.imageId !== imageIdToRemove,
   );
   console.log("Filtered content after deletion", { filtered });
   localStorage.setItem(key, JSON.stringify(filtered));
 
-  const imageIdTDelete = imageToDelete.imageId;
-  console.log("Deleting image from IndexedDB", { imageIdTDelete });
-  deleteBlob(imageIdTDelete);
+  deleteBlob(imageIdToRemove);
 }
