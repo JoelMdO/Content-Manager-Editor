@@ -85,12 +85,16 @@ export const saveDraft = ({
     type: "store",
   })
     .then(async (response) => {
+      if (!response) {
+        errorAlert("saved-locally", "non200", "Nothing to save");
+        return;
+      }
       console.log("response at savearticle function", response);
-      if (response!.status === 200 || response!.status === 201) {
-        console.log("doing sweet alert on", response!.status);
+      if (response.status === 200 || response.status === 201) {
+        console.log("doing sweet alert on", response.status);
         successAlert("saved-locally");
       } else {
-        errorAlert("saved-locally", "non200", response?.message);
+        errorAlert("saved-locally", "non200", response.message);
       }
     })
     .catch((error) => {
