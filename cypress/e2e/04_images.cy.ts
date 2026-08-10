@@ -8,8 +8,8 @@
 //                2. Select a synthetic 1×1 PNG (no fixture binary needed).
 //                3. Server-side clean-image validation is intercepted → 200.
 //                4. <img> appears in the editor body after storeBlob + createObjectURL.
-//                5. Verifies the image metadata is written to sessionStorage.
-//                6. Verifies the saved draft (localStorage) also records the entry.
+//                5. Verifies the image metadata is written to the draft in localStorage.
+//                6. Verifies the saved draft also records the entry after an input event.
 
 describe("04 Images — upload and persistence", () => {
   beforeEach(() => {
@@ -51,7 +51,7 @@ describe("04 Images — upload and persistence", () => {
       .and("match", /^blob:/);
   });
 
-  it("writes image metadata to sessionStorage articleContent", () => {
+  it("writes image metadata to the draft in localStorage", () => {
     cy.intercept("POST", "/api/hub", { status: 200, message: "ok" }).as(
       "imageValidation"
     );
@@ -60,16 +60,21 @@ describe("04 Images — upload and persistence", () => {
     cy.uploadTestImage();
     cy.wait("@imageValidation", { timeout: 8000 });
 
-    // After the upload, sessionStorage should contain an image entry
+    // After the upload, the draft should contain an image entry
     cy.window().then((win) => {
-      const raw = win.sessionStorage.getItem("articleContent-DeCav");
+      const raw = win.localStorage.getItem("draft-articleContent-DeCav");
       cy.wrap(raw).should("not.be.null");
 
       const content: { type: string; imageId?: string; fileName?: string }[] =
         JSON.parse(raw ?? "[]");
-      const imageEntry = content.find((item) => item.type.startsWith("image-"));
+      const imageEntry = content.find(
+        (item) =>
+          item.fileName === "test-image.png" &&
+          item.imageId === "image-test-image.png",
+      );
 
       cy.wrap(imageEntry).should("not.be.undefined");
+      cy.wrap(imageEntry?.type).should("eq", "image/png");
       cy.wrap(imageEntry?.imageId).should("exist");
       cy.wrap(imageEntry?.fileName).should("eq", "test-image.png");
     });
@@ -93,11 +98,16 @@ describe("04 Images — upload and persistence", () => {
     });
 
     cy.window().then((win) => {
-      const sessionRaw = win.sessionStorage.getItem("articleContent-DeCav");
-      const content: { type: string }[] = JSON.parse(sessionRaw ?? "[]");
-      const imageEntry = content.find((item) => item.type.startsWith("image-"));
+      const localRaw = win.localStorage.getItem("draft-articleContent-DeCav");
+      const content: { type: string; imageId?: string; fileName?: string }[] =
+        JSON.parse(localRaw ?? "[]");
+      const imageEntry = content.find(
+        (item) =>
+          item.fileName === "test-image.png" &&
+          item.imageId === "image-test-image.png",
+      );
       cy.wrap(imageEntry).should("not.be.undefined");
-      void win.localStorage; // accessed above — lint guard
+      cy.wrap(imageEntry?.type).should("eq", "image/png");
     });
   });
 });
@@ -155,7 +165,6 @@ describe("04 Images — non-happy paths", () => {
     // Do NOT pick a file — simulates the user dismissing the dialog
 
     // Wait a tick to let any async handlers settle
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(600);
 
     cy.get('[data-cy="editor-body"]')

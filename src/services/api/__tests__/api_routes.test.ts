@@ -1,7 +1,28 @@
-/**
- * @jest-environment node
- */
-import apiRoutes from "@/services/api/api_routes";
+const globalWithWebApis = globalThis as typeof globalThis & {
+  Request?: typeof Request;
+  Response?: typeof Response;
+  Headers?: typeof Headers;
+  FormData?: typeof FormData;
+};
+
+jest.mock("next/server", () => ({
+  NextResponse: {
+    json: jest.fn((body: unknown) => body),
+  },
+}));
+
+globalWithWebApis.Request ??= class Request {} as typeof Request;
+globalWithWebApis.Response ??= class Response {
+  static json(body: unknown, init?: ResponseInit) {
+    return { body, ...init };
+  }
+} as typeof Response;
+globalWithWebApis.Headers ??= class Headers {} as typeof Headers;
+globalWithWebApis.FormData ??= class FormData {
+  append() {}
+} as typeof FormData;
+
+const apiRoutes = require("@/services/api/api_routes").default as typeof import("@/services/api/api_routes").default;
 
 describe("apiRoutes save", () => {
   const originalFetch = global.fetch;
@@ -13,13 +34,13 @@ describe("apiRoutes save", () => {
 
   it("sends saves to the editor API instead of the translation API", async () => {
     const fetchMock = jest.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
+      {
+        json: async () => ({
           status: 200,
           message: "Playbook Data Saved Successfully",
         }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      ),
+        status: 200,
+      } as Response,
     );
     global.fetch = fetchMock;
 

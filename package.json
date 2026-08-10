@@ -6,7 +6,7 @@
     "dev": "NODE_OPTIONS='--inspect' next dev --turbopack -p 8000",
     "build": "next build --webpack",
     "start": "next start -p 8000",
-    "lint": "next lint",
+    "lint": "eslint cypress \"src/**/__tests__/**/*.{ts,tsx}\" \"src/**/*.test.{ts,tsx}\" jest.config.ts jest.setup.ts cypress.config.ts eslint.config.mjs",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test": "jest"

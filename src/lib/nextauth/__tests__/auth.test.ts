@@ -1,6 +1,4 @@
 /**
- * @jest-environment node
- *
  * Tests for auth.ts (NextAuth + Django, no Firebase):
  *   - authorize()  fetches POST /api/auth/login directly
  *   - signIn()     calls fetch to /api/auth/users/ directly using user.email/name
@@ -9,6 +7,18 @@ import { expect } from "@jest/globals";
 
 import { authOptions } from "../auth";
 import type { CredentialsConfig } from "next-auth/providers/credentials";
+
+const globalWithFetch = globalThis as typeof globalThis & {
+  fetch?: typeof fetch;
+};
+
+const originalFetch = globalWithFetch.fetch;
+
+const createMockResponse = <T>(status: number, body: T): Response =>
+  ({
+    status,
+    json: async () => body,
+  }) as Response;
 
 // ─── Helpers to extract the functions under test ─────────────────────────────
 const credentialsProvider = authOptions.providers.find(
@@ -25,10 +35,16 @@ const signInCallback = authOptions.callbacks!.signIn!;
 describe("authOptions.authorize (CredentialsProvider)", () => {
   beforeEach(() => {
     process.env.NEXTAUTH_URL = "http://localhost:8000";
+    globalWithFetch.fetch = jest.fn() as unknown as typeof fetch;
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    if (originalFetch) {
+      globalWithFetch.fetch = originalFetch;
+    } else {
+      delete globalWithFetch.fetch;
+    }
   });
 
   it("returns null when email is missing from credentials", async () => {
@@ -42,11 +58,13 @@ describe("authOptions.authorize (CredentialsProvider)", () => {
   });
 
   it("calls fetch POST /api/auth/login with the given email and password", async () => {
-    const mockFetch = jest.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({ id: "42", email: "user@example.com", name: "User" }),
-        { status: 200 },
-      ),
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse(200, {
+        id: "42",
+        email: "user@example.com",
+        name: "User",
+      }),
     );
 
     await authorize(
@@ -64,11 +82,12 @@ describe("authOptions.authorize (CredentialsProvider)", () => {
   });
 
   it("returns a user object with id, email, and name when login responds with status 200", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({ id: "42", email: "user@example.com", name: "Test User" }),
-        { status: 200 },
-      ),
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(200, {
+        id: "42",
+        email: "user@example.com",
+        name: "Test User",
+      }),
     );
 
     const result = await authorize(
@@ -84,9 +103,9 @@ describe("authOptions.authorize (CredentialsProvider)", () => {
   });
 
   it("returns null when login responds with a non-200 status", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify({ detail: "Invalid credentials" }), {
-        status: 401,
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(401, {
+        detail: "Invalid credentials",
       }),
     );
 
@@ -104,11 +123,17 @@ describe("authOptions.callbacks.signIn", () => {
 
   beforeEach(() => {
     process.env.NEXTAUTH_URL = "http://localhost:8000";
+    globalWithFetch.fetch = jest.fn() as unknown as typeof fetch;
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
     process.env.NEXTAUTH_URL = originalUrl;
+    if (originalFetch) {
+      globalWithFetch.fetch = originalFetch;
+    } else {
+      delete globalWithFetch.fetch;
+    }
   });
 
   const user = {
@@ -119,9 +144,8 @@ describe("authOptions.callbacks.signIn", () => {
   };
 
   it("calls /api/auth/users/ with provider 'credentials' for email/password sign-in", async () => {
-    const mockFetch = jest
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(createMockResponse(200, {}));
 
     await signInCallback({
       user,
@@ -143,9 +167,9 @@ describe("authOptions.callbacks.signIn", () => {
   });
 
   it("returns true for email/password sign-in", async () => {
-    jest
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(200, {}),
+    );
 
     const result = await signInCallback({
       user,
@@ -161,9 +185,8 @@ describe("authOptions.callbacks.signIn", () => {
   });
 
   it("calls /api/auth/users/ with provider 'google' for Google sign-in", async () => {
-    const mockFetch = jest
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(createMockResponse(200, {}));
 
     await signInCallback({
       user,
@@ -186,9 +209,9 @@ describe("authOptions.callbacks.signIn", () => {
   });
 
   it("returns true for Google sign-in", async () => {
-    jest
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(200, {}),
+    );
 
     const result = await signInCallback({
       user,
@@ -205,9 +228,8 @@ describe("authOptions.callbacks.signIn", () => {
   });
 
   it("sends user.email and user.name (not credentials) for Google sign-in", async () => {
-    const mockFetch = jest
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(createMockResponse(200, {}));
 
     await signInCallback({
       user,
