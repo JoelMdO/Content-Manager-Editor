@@ -3,6 +3,29 @@ import { ImageItem } from "@/types/image_item";
 const escapeRegExp = (value: string): string =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const hasSaveImagePlaceholder = (htmlContent: string): boolean => {
+  const lowerContent = htmlContent.toLowerCase();
+  let imageStart = lowerContent.indexOf("<img");
+
+  while (imageStart !== -1) {
+    const imageEnd = lowerContent.indexOf(">", imageStart);
+
+    if (imageEnd === -1) {
+      return false;
+    }
+
+    const imageTag = lowerContent.slice(imageStart, imageEnd + 1);
+
+    if (imageTag.includes("alt=")) {
+      return true;
+    }
+
+    imageStart = lowerContent.indexOf("<img", imageEnd + 1);
+  }
+
+  return false;
+};
+
 const replaceImgWithSrc = (
   htmlContent: string,
   images: Array<{ url: string; fileId: string }>,
@@ -14,7 +37,7 @@ const replaceImgWithSrc = (
   ///--------------------------------------------------------
   const hasImagePlaceholders =
     type === "save"
-      ? /<img\s+[^>]*\balt\s*=\s*['"][^'"]*['"]/i.test(htmlContent)
+      ? hasSaveImagePlaceholder(htmlContent)
       : /<img src="{image_url_placeholder}">/i.test(htmlContent);
   console.log('"at REPLACEIMAGE hasImagePlaceholders"', hasImagePlaceholders);
   if (hasImagePlaceholders !== false) {
