@@ -1,3 +1,4 @@
+import { deleteAllBlobs } from "@/lib/imageStore/imageStore";
 import { useEditorStore } from "@/store/useEditorStore";
 
 export const handleClear = () => {
@@ -26,4 +27,5 @@ export const handleClear = () => {
   sessionStorage.removeItem(`tempBody-${dbName}`);
   sessionStorage.removeItem(`articleContent-${dbName}`);
   localStorage.removeItem(`draft-articleContent-${dbName}`);
+  deleteAllBlobs();
 };

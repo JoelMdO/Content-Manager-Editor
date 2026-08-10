@@ -23,6 +23,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       //## POST
       case "post":
       case "translate":
+        console.log("doing post at api/routes after sanitize");
         endPoint = type;
         body = data as FormData;
         body.append("token", token || "");
@@ -55,6 +56,8 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         break;
       //## PLAYBOOK SAVE
       case "playbook-save":
+      case "save":
+        console.log("doing save at api/routes after sanitize");
         endPoint = "save";
         body = JSON.stringify(data);
         headers["Content-Type"] = "application/json";
@@ -71,20 +74,71 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         endPoint = "search";
         credentials = "include";
         break;
+      ///--------------------------------------------------------
+      // Sign in by email
+      ///--------------------------------------------------------
+      case "sign-in-by-email":
+      case "save-user":
+      case "password-reset":
+        endPoint =
+          type === "sign-in-by-email"
+            ? "auth/login"
+            : type === "password-reset"
+              ? "auth/reset"
+              : "auth/users";
+        body = JSON.stringify(data);
+        headers["Content-Type"] = "application/json";
+        credentials = "include";
+        break;
       default:
         return NextResponse.json({ status: 205, message: "type not found" });
     }
     ///-----------------------------------------------
     /// Call the corresponding API endpoint
     ///-----------------------------------------------
-    const response = await fetch(`${url}/api/${endPoint}`, {
-      method: "POST",
-      body: body,
-      headers: headers,
-      credentials: credentials,
+    // Article saves are handled by the editor API route. They must not be sent
+    // to FastAPI: FastAPI exposes translation/summary endpoints, not /api/save.
+    const targetUrl =
+      type === "save"
+        ? `${process.env.NEXTAUTH_URL || "http://localhost:8000"}/api/save`
+        : `${url}/api/${endPoint}`;
+    console.error("[SAVE_FORWARD_V4]", { type, targetUrl });
+    console.log("api_routes: calling backend ->", targetUrl, {
+      headers,
+      credentials,
+      endPoint,
     });
-    // Wait for the JSON response
-    const jsonResponse = await response.json();
+
+    let response: Response;
+    try {
+      response = await fetch(targetUrl, {
+        method: "POST",
+        body: body,
+        headers: headers,
+        credentials: credentials,
+      });
+    } catch (err) {
+      console.error("api_routes: fetch failed", err);
+      return NextResponse.json({ status: 500, message: `error: ${err}` });
+    }
+    // Log status and attempt to parse JSON response
+    console.log("api_routes: backend response status", response.status);
+    let jsonResponse: any;
+    try {
+      jsonResponse = await response.json();
+    } catch (parseErr) {
+      const text = await response.text().catch(() => "");
+      console.error(
+        "api_routes: failed to parse JSON response",
+        parseErr,
+        text,
+      );
+      return NextResponse.json({
+        status: 500,
+        message: `error: ${parseErr}`,
+        raw: text,
+      });
+    }
     ///-----------------------------------------------
     /// From api/post return the body.
     ///-----------------------------------------------

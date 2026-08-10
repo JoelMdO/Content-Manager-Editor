@@ -20,8 +20,9 @@ export const debouncedUpdateStore = debounce(
     // Remove previous Title and Body content before adding the new one
     //----------------------------------------------------
     const dbName = sessionStorage.getItem("db");
+    const draftKey = `draft-articleContent-${dbName}`;
     let articleContent = JSON.parse(
-      sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+      localStorage.getItem(draftKey) || "[]"
     );
 
     if (newTitle !== "") {
@@ -59,10 +60,7 @@ export const debouncedUpdateStore = debounce(
 
       articleContent.push({ type: bodyKey, content: newBody });
     }
-    sessionStorage.setItem(
-      `articleContent-${dbName}`,
-      JSON.stringify(articleContent)
-    );
+    localStorage.setItem(draftKey, JSON.stringify(articleContent));
   },
   500 // Wait 500ms after last change before updating store
 );

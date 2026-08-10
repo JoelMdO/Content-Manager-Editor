@@ -6,7 +6,7 @@ import { TranslateType } from "../../types/translate_type";
 
 const callHub = async (
   type: string,
-  data?: callHubType
+  data?: callHubType,
 ): Promise<{
   status: number;
   message: string | unknown;
@@ -20,7 +20,7 @@ const callHub = async (
   let body: FormData | string | callHubType | undefined = new FormData();
   const headers: HeadersInit = {};
   let credentials: RequestCredentials = "omit";
-  const url = `${process.env.NEXT_PUBLIC_url_api}/api/hub`;
+  const url = "/api/hub";
   //
   ///-----------------------------------------------
   /// Build the body of the request as each one it has
@@ -34,7 +34,7 @@ const callHub = async (
         body.append("file", data);
       } else {
         throw new Error(
-          "Invalid data type for 'clean-image'. Expected string or Blob."
+          "Invalid data type for 'clean-image'. Expected string or Blob.",
         );
       }
       body.append("type", type);
@@ -48,8 +48,8 @@ const callHub = async (
       const formDataItems: FormDataItem[] = Array.isArray(data)
         ? (data as FormDataItem[])
         : data !== undefined
-        ? [data as FormDataItem]
-        : [];
+          ? [data as FormDataItem]
+          : [];
 
       const formData = await createFormData(type, formDataItems);
       //console.log('"formData at callHub":', formData);
@@ -58,7 +58,7 @@ const callHub = async (
       credentials = "include";
       break;
     default:
-      //console.log("doing default at callHub, type:", type);
+      console.log("doing default at callHub, type:", type);
       //console.log('"data at callHub":', data);
 
       body = JSON.stringify({ data: data, type: type });

@@ -12,9 +12,13 @@ const summaryButtonClicked = async ({
     // Check if the summary has been already created.
     //===================================================
     const dbName = sessionStorage.getItem("db");
-    const existingStorage = sessionStorage.getItem(`articleContent-${dbName}`);
+    const existingStorage = localStorage.getItem(
+      `draft-articleContent-${dbName}`,
+    );
     const existingSummary = existingStorage
-      ? JSON.parse(existingStorage).summary
+      ? JSON.parse(existingStorage).find(
+          (item: { type: string }) => item.type === "summary",
+        )?.content
       : null;
     // Check if the summary exists
     if (existingSummary) {

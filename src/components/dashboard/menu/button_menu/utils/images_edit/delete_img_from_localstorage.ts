@@ -1,42 +1,30 @@
+import { deleteBlob } from "@/lib/imageStore/imageStore";
 import { ImageItem } from "@/types/image_item";
 
-export function removeStoredImage(
+export function deleteImageFromLocalStorageIndexDB(
   imageIdToRemove: string,
   dbName: string,
-  useSession = true
 ) {
-  const deleteData = (key: string, useSession: boolean) => {
-    const storage = useSession ? sessionStorage : localStorage;
-    const stored = storage.getItem(key);
-    if (!stored) return;
+  const key = `draft-articleContent-${dbName}`;
+  console.log("Deleting image from localStorage", {
+    imageIdToRemove,
+    dbName,
+    key,
+  });
+  const stored = localStorage.getItem(key);
+  if (!stored) return;
 
-    const content = JSON.parse(stored);
-    const filtered = content.filter(
-      (item: ImageItem) => item.imageId !== imageIdToRemove
-    );
-    storage.setItem(key, JSON.stringify(filtered));
-  };
+  const content = JSON.parse(stored);
+  const imageToDelete = content.find(
+    (item: ImageItem) => item.imageId === imageIdToRemove,
+  );
+  console.log("Image to delete from localStorage", { imageToDelete });
+  if (!imageToDelete) return;
+  const filtered = content.filter(
+    (item: ImageItem) => item.imageId !== imageIdToRemove,
+  );
+  console.log("Filtered content after deletion", { filtered });
+  localStorage.setItem(key, JSON.stringify(filtered));
 
-  if (dbName === "") {
-    const newDbName = ["DeCav", "Joe"];
-    const newKeysSessionStorage = [
-      "articleContent-DeCav",
-      "articleContent-Joe",
-    ];
-    const newKeysLocalStorage = [
-      "draft-articleContent-DeCav",
-      "draft-articleContent-Joe",
-    ];
-
-    newDbName.forEach((name, index) => {
-      deleteData(newKeysSessionStorage[index], true);
-      deleteData(newKeysLocalStorage[index], false);
-    });
-  } else {
-    let key = `articleContent-${dbName}`;
-    if (!useSession) {
-      key = `draft-articleContent-${dbName}`;
-    }
-    deleteData(key, useSession);
-  }
+  deleteBlob(imageIdToRemove);
 }

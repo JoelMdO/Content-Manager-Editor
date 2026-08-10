@@ -16,15 +16,15 @@ export const handleContentChange = (
     setText: (text: string) => void,
   ) => void,
 ) => {
-  const dbName = sessionStorage.getItem("db");
+  const dbName = localStorage.getItem("db");
   const languageKey = language === "es" ? "es" : "en";
 
   if (index === 0) {
     // Title
-    sessionStorage.setItem(`${languageKey}-tempTitle-${dbName}`, html);
+    localStorage.setItem(`${languageKey}-tempTitle-${dbName}`, html);
     debouncedUpdateStore(
       html,
-      sessionStorage.getItem(`${languageKey}-tempBody-${dbName}`) || "",
+      localStorage.getItem(`${languageKey}-tempBody-${dbName}`) || "",
       language,
       setText,
     );
@@ -32,9 +32,9 @@ export const handleContentChange = (
     // Body — strip residual base64 data-URIs before storing
     const htmlCleaned = removeBase64FromImgTags(html);
 
-    sessionStorage.setItem(`${languageKey}-tempBody-${dbName}`, htmlCleaned);
+    localStorage.setItem(`${languageKey}-tempBody-${dbName}`, htmlCleaned);
     debouncedUpdateStore(
-      sessionStorage.getItem(`${languageKey}-tempTitle-${dbName}`) || "",
+      localStorage.getItem(`${languageKey}-tempTitle-${dbName}`) || "",
       htmlCleaned,
       language,
       setText,

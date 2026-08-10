@@ -143,6 +143,28 @@
   margin: 0.25em 0;
 }
 
+/* Tiptap creates these handles as empty absolutely-positioned divs. Give
+   them a usable hit area; without this, resize is technically enabled but
+   there is nothing to grab with the pointer. */
+.tiptap [data-resize-handle] {
+  z-index: 10;
+  width: 12px;
+  height: 12px;
+  background: #60a5fa;
+  border: 2px solid white;
+  border-radius: 9999px;
+}
+
+.tiptap [data-resize-handle="top-left"],
+.tiptap [data-resize-handle="bottom-right"] {
+  cursor: nwse-resize;
+}
+
+.tiptap [data-resize-handle="top-right"],
+.tiptap [data-resize-handle="bottom-left"] {
+  cursor: nesw-resize;
+}
+
 /* Selected cell highlight */
 .selectedCell::after {
   background: rgba(96, 165, 250, 0.15);

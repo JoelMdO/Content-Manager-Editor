@@ -1,4 +1,6 @@
-async function refreshGoogleAccessToken(token: any) {
+import type { JWT } from "next-auth/jwt";
+
+async function refreshGoogleAccessToken(token: JWT) {
   try {
     const url =
       "https://oauth2.googleapis.com/token?" +
@@ -6,7 +8,7 @@ async function refreshGoogleAccessToken(token: any) {
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
         grant_type: "refresh_token",
-        refresh_token: token.refreshToken,
+        refresh_token: token.refreshToken ?? "",
       });
 
     const res = await fetch(url, { method: "POST" });

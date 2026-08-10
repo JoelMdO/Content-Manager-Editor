@@ -1,5 +1,4 @@
 import React, { useContext, useEffect } from "react";
-/* eslint-disable jsx-a11y */
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";

@@ -5,7 +5,7 @@ const successAlert = (
   type: string,
   data?: string,
   resetForm?: () => void,
-  router?: AppRouterInstance
+  router?: AppRouterInstance,
 ) => {
   ///=============================================================
   // Sucess Alerts with use of sweetalert
@@ -18,6 +18,9 @@ const successAlert = (
   switch (type) {
     case "link":
       text = "Link inserted";
+      break;
+    case "saved-locally":
+      text = "Article saved locally";
       break;
     case "saved":
       text = "Article sent";
@@ -60,6 +63,8 @@ const successAlert = (
       }
     });
   } else {
+    console.log("triggering sweet alert");
+
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",

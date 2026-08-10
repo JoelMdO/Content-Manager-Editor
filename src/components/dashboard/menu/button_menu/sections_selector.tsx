@@ -78,14 +78,17 @@ const SectionSelector = () => {
     let articleContent: { type: string; content: string }[] = [];
     //
     articleContent = JSON.parse(
-      sessionStorage.getItem(`articleContent-${dbName}`) || "[]",
+      localStorage.getItem(`draft-articleContent-${dbName}`) || "[]",
     );
 
     //
-    articleContent.push({ type: "section", content: e.target.value });
-    sessionStorage.setItem(
-      `articleContent-${dbName}`,
-      JSON.stringify(articleContent),
+    const filteredContent = articleContent.filter(
+      (item) => item.type !== "section",
+    );
+    filteredContent.push({ type: "section", content: e.target.value });
+    localStorage.setItem(
+      `draft-articleContent-${dbName}`,
+      JSON.stringify(filteredContent),
     );
 
     // Clear the section selector dialog

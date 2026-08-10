@@ -1,0 +1,261 @@
+/**
+ * Tests for auth.ts (NextAuth + Django, no Firebase):
+ *   - authorize()  fetches POST /api/auth/login directly
+ *   - signIn()     calls fetch to /api/auth/users/ directly using user.email/name
+ */
+import { expect } from "@jest/globals";
+
+import { authOptions } from "../auth";
+import type { CredentialsConfig } from "next-auth/providers/credentials";
+
+const globalWithFetch = globalThis as typeof globalThis & {
+  fetch?: typeof fetch;
+};
+
+const originalFetch = globalWithFetch.fetch;
+
+const createMockResponse = <T>(status: number, body: T): Response =>
+  ({
+    status,
+    json: async () => body,
+  }) as Response;
+
+// ─── Helpers to extract the functions under test ─────────────────────────────
+const credentialsProvider = authOptions.providers.find(
+  (p) => (p as any).id === "credentials",
+) as CredentialsConfig;
+// In next-auth 4.x CredentialsProvider compiles to { authorize: () => null, options: { authorize: fn } }
+// The real authorize lives at .options.authorize
+const authorize = (credentialsProvider as any).options.authorize as NonNullable<
+  CredentialsConfig["authorize"]
+>;
+const signInCallback = authOptions.callbacks!.signIn!;
+
+// ─── Tests ───────────────────────────────────────────────────────────────────
+describe("authOptions.authorize (CredentialsProvider)", () => {
+  beforeEach(() => {
+    process.env.NEXTAUTH_URL = "http://localhost:8000";
+    globalWithFetch.fetch = jest.fn() as unknown as typeof fetch;
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    if (originalFetch) {
+      globalWithFetch.fetch = originalFetch;
+    } else {
+      delete globalWithFetch.fetch;
+    }
+  });
+
+  it("returns null when email is missing from credentials", async () => {
+    const result = await authorize({ password: "secret" } as any, {});
+    expect(result).toBeNull();
+  });
+
+  it("returns null when password is missing from credentials", async () => {
+    const result = await authorize({ email: "user@example.com" } as any, {});
+    expect(result).toBeNull();
+  });
+
+  it("calls fetch POST /api/auth/login with the given email and password", async () => {
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse(200, {
+        id: "42",
+        email: "user@example.com",
+        name: "User",
+      }),
+    );
+
+    await authorize(
+      { email: "user@example.com", password: "secret" } as any,
+      {},
+    );
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8000/api/auth/login",
+      expect.objectContaining({
+        method: "POST",
+        body: expect.stringContaining('"email":"user@example.com"'),
+      }),
+    );
+  });
+
+  it("returns a user object with id, email, and name when login responds with status 200", async () => {
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(200, {
+        id: "42",
+        email: "user@example.com",
+        name: "Test User",
+      }),
+    );
+
+    const result = await authorize(
+      { email: "user@example.com", password: "secret" } as any,
+      {},
+    );
+
+    expect(result).toEqual({
+      id: "42",
+      email: "user@example.com",
+      name: "Test User",
+    });
+  });
+
+  it("returns null when login responds with a non-200 status", async () => {
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(401, {
+        detail: "Invalid credentials",
+      }),
+    );
+
+    const result = await authorize(
+      { email: "user@example.com", password: "wrongpassword" } as any,
+      {},
+    );
+
+    expect(result).toBeNull();
+  });
+});
+
+describe("authOptions.callbacks.signIn", () => {
+  const originalUrl = process.env.NEXTAUTH_URL;
+
+  beforeEach(() => {
+    process.env.NEXTAUTH_URL = "http://localhost:8000";
+    globalWithFetch.fetch = jest.fn() as unknown as typeof fetch;
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NEXTAUTH_URL = originalUrl;
+    if (originalFetch) {
+      globalWithFetch.fetch = originalFetch;
+    } else {
+      delete globalWithFetch.fetch;
+    }
+  });
+
+  const user = {
+    id: "1",
+    email: "user@example.com",
+    name: "Test User",
+    emailVerified: null,
+  };
+
+  it("calls /api/auth/users/ with provider 'credentials' for email/password sign-in", async () => {
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(createMockResponse(200, {}));
+
+    await signInCallback({
+      user,
+      account: {
+        type: "credentials",
+        provider: "credentials",
+        providerAccountId: "1",
+      },
+      profile: undefined,
+    } as any);
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8000/api/auth/users/",
+      expect.objectContaining({
+        method: "POST",
+        body: expect.stringContaining('"provider":"credentials"'),
+      }),
+    );
+  });
+
+  it("returns true for email/password sign-in", async () => {
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(200, {}),
+    );
+
+    const result = await signInCallback({
+      user,
+      account: {
+        type: "credentials",
+        provider: "credentials",
+        providerAccountId: "1",
+      },
+      profile: undefined,
+    } as any);
+
+    expect(result).toBe(true);
+  });
+
+  it("calls /api/auth/users/ with provider 'google' for Google sign-in", async () => {
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(createMockResponse(200, {}));
+
+    await signInCallback({
+      user,
+      account: {
+        type: "oauth",
+        provider: "google",
+        providerAccountId: "g-123",
+        id_token: "some-id-token",
+      },
+      profile: undefined,
+    } as any);
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8000/api/auth/users/",
+      expect.objectContaining({
+        method: "POST",
+        body: expect.stringContaining('"provider":"google"'),
+      }),
+    );
+  });
+
+  it("returns true for Google sign-in", async () => {
+    (globalWithFetch.fetch as jest.Mock).mockResolvedValueOnce(
+      createMockResponse(200, {}),
+    );
+
+    const result = await signInCallback({
+      user,
+      account: {
+        type: "oauth",
+        provider: "google",
+        providerAccountId: "g-123",
+        id_token: "some-id-token",
+      },
+      profile: undefined,
+    } as any);
+
+    expect(result).toBe(true);
+  });
+
+  it("sends user.email and user.name (not credentials) for Google sign-in", async () => {
+    const mockFetch = globalWithFetch.fetch as jest.Mock;
+    mockFetch.mockResolvedValueOnce(createMockResponse(200, {}));
+
+    await signInCallback({
+      user,
+      account: {
+        type: "oauth",
+        provider: "google",
+        providerAccountId: "g-123",
+        id_token: "some-id-token",
+      },
+      profile: undefined,
+    } as any);
+
+    const body = JSON.parse(
+      (mockFetch.mock.calls[0][1] as RequestInit).body as string,
+    );
+    expect(body.email).toBe("user@example.com");
+    expect(body.name).toBe("Test User");
+  });
+
+  it("returns false when account type is neither credentials nor has an id_token", async () => {
+    const result = await signInCallback({
+      user,
+      account: { type: "email", provider: "email", providerAccountId: "1" },
+      profile: undefined,
+    } as any);
+
+    expect(result).toBe(false);
+  });
+});

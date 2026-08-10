@@ -1,4 +1,5 @@
 import { FormDataImageItem, FormDataItem } from "../../type/formData";
+import { blobToBase64, getBlob } from "@/lib/imageStore/imageStore";
 //
 
 //
@@ -55,40 +56,48 @@ const createFormData = async (
   if (type !== "translate") {
     //console.log('"type is not translate" is', type);
 
-    function getAllImagesFromSessionStorage() {
-      const images: FormDataImageItem[] = [];
+    async function getAllImagesFromLocalDraft() {
       const items = newData.filter((item: FormDataItem | FormDataImageItem) =>
         item.type.startsWith("image-")
       );
       //console.log('"items at getAllImagesFromSessionStorage"');
       if (items.length === 0) return [];
       //
-      for (let i = 0; i < items.length; i++) {
-        const key = items[i].type;
-        if (
-          "base64" in items[i] &&
-          typeof key === "string" &&
-          key.startsWith("image-")
-        ) {
-          const base64 = (items[i] as FormDataImageItem).base64;
-          const blobUrl = (items[i] as FormDataImageItem).blobUrl;
-          const fileName = (items[i] as FormDataImageItem).fileName;
-          const imageId = (items[i] as FormDataImageItem).imageId;
-          //console.log("imageId", imageId);
+      const images = await Promise.all(
+        items.map(async (item: FormDataItem | FormDataImageItem) => {
+          const key = item.type;
+          if (
+            "base64" in item &&
+            typeof key === "string" &&
+            key.startsWith("image-")
+          ) {
+            const imageItem = item as FormDataImageItem;
+            const blobUrl = imageItem.blobUrl;
+            const fileName = imageItem.fileName;
+            const imageId = imageItem.imageId;
+            //console.log("imageId", imageId);
+            const blob = imageId ? await getBlob(imageId) : undefined;
+            const base64 = blob
+              ? await blobToBase64(blob)
+              : imageItem.base64;
 
-          images.push({
-            type: key as `image-${string}`,
-            base64: base64 ?? "",
-            blobUrl: blobUrl ?? "",
-            fileName: fileName ?? "",
-            imageId: imageId ?? "",
-          });
-        }
-      }
+            return {
+              type: key as `image-${string}`,
+              base64: base64 ?? "",
+              blobUrl: blobUrl ?? "",
+              fileName: fileName ?? "",
+              imageId: imageId ?? "",
+            };
+          }
+          return null;
+        }),
+      );
 
-      return images;
+      return images.filter(
+        (image): image is FormDataImageItem => image !== null,
+      );
     }
-    const images = JSON.stringify(getAllImagesFromSessionStorage());
+    const images = JSON.stringify(await getAllImagesFromLocalDraft());
     formData.append("images", images);
 
     // await Promise.all(imagePromises);

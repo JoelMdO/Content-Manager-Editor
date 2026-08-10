@@ -1,7 +1,6 @@
 import TerserPlugin from "terser-webpack-plugin";
 
 //
-
 const nextConfig = {
   async headers() {
     return [
@@ -31,11 +30,15 @@ const nextConfig = {
           { key: "Access-Control-Allow-Credentials", value: "true" },
           {
             key: "Access-Control-Allow-Methods",
-            value: process.env.NEXT_PUBLIC_ALLOWED_METHODS!,
+            value:
+              process.env.NEXT_PUBLIC_ALLOWED_METHODS ||
+              "GET, POST, PUT, DELETE, OPTIONS, PATCH",
           },
           {
             key: "Access-Control-Allow-Headers",
-            value: process.env.NEXT_PUBLIC_ALLOWED_HEADERS!,
+            value:
+              process.env.NEXT_PUBLIC_ALLOWED_HEADERS ||
+              "Content-Type, Authorization, X-Internal-Key",
           },
         ],
       },

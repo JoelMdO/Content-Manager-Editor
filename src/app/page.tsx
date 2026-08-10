@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Loader from "../components/buttons/loader_saving";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import callHub from "../services/api/call_hub";
 import text from "../constants/mainPage_data_text.json";
 
 const Login: React.FC = () => {
@@ -15,6 +16,8 @@ const Login: React.FC = () => {
   ///===================================================
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showReset, setShowReset] = useState<boolean>(false);
+  const [isResetSubmitting, setIsResetSubmitting] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isSubmittedGoogle, setIsSubmittedGoogle] = useState<boolean>(false);
   const router = useRouter();
@@ -42,6 +45,28 @@ const Login: React.FC = () => {
     router.push("/home");
   };
   //
+
+  const handleSendResetLink = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!email) {
+      errorAlert("auth", "", "Please enter your email to reset password");
+      return;
+    }
+    setIsResetSubmitting(true);
+    try {
+      await callHub("password-reset", { email });
+      // Always show generic message — never reveal if email exists
+      successAlert(
+        "auth",
+        "If this email exists, a password reset link has been generated",
+      );
+      setShowReset(false);
+    } catch {
+      errorAlert("auth", "", "Could not send reset email. Try again.");
+    } finally {
+      setIsResetSubmitting(false);
+    }
+  };
 
   ///--------------------------------------------------------
   /// UI with a login form and a contact button for the
@@ -96,7 +121,66 @@ const Login: React.FC = () => {
                 `${text.mainPage.login}`
               )}
             </button>
+            <button
+              type="button"
+              data-cy="forgot-password-button"
+              onClick={() => setShowReset((s) => !s)}
+              className="text-sm underline mt-2 text-slate-700"
+            >
+              Forgot password?
+            </button>
           </form>
+          {showReset ? (
+            <>
+              <form
+                onSubmit={handleSendResetLink}
+                className="flex flex-col items-center space-y-3 mt-3"
+              >
+              <input
+                data-cy="reset-email-input"
+                className="w-[75%] flex align-center justify-center"
+                type="email"
+                placeholder="Type your email here"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <div className="flex space-x-2">
+                <button
+                  data-cy="send-reset-button"
+                  type="submit"
+                  className="bg-blue text-white text-xs rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center shadow-md shadow-dark-background"
+                >
+                  {isResetSubmitting ? (
+                    <Loader type={`Sending...`} />
+                  ) : (
+                    `Send reset link`
+                  )}
+                </button>
+                <button
+                  type="button"
+                  data-cy="reset-cancel-button"
+                  onClick={() => setShowReset(false)}
+                  className="bg-gray-200 rounded-lg text-xs md:w-[70px] h-[30px] w-[70px] flex justify-center items-center"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+            <p className="text-xs text-slate-500 mt-2 text-center">
+              Signed in with Google? Manage your password at{" "}
+              <a
+                href="https://myaccount.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                myaccount.google.com
+              </a>
+              .
+            </p>
+            </>
+          ) : null}
           <button
             type="button"
             data-cy="google-signin-button"

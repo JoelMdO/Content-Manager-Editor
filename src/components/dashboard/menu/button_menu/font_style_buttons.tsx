@@ -1,11 +1,10 @@
 import { handleFontChange } from "./utils/handle_font_change";
-import { useState } from "react";
+import React, { useState } from "react";
 import { menuButtonStyle } from "./style/style_menu_button";
 // import section from "../../../../../public/section.svg";
 // import list from "../../../../../public/list.svg";
 // import quote from "../../../../../public/quote.svg";
 import {
-  TableCellsSplit,
   AArrowUp,
   AArrowDown,
   Baseline,
@@ -19,14 +18,17 @@ import {
   Italic,
   Bold,
 } from "lucide-react";
-import Image from "next/image";
 import { useEditorStore } from "@/store/useEditorStore";
 
-const FontStyleUI: React.FC<{
+const FontStyleUI = ({
+  setIsFontStyleOpen,
+  setIsMenuClicked,
+  type,
+}: {
   setIsFontStyleOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   setIsMenuClicked?: React.Dispatch<React.SetStateAction<boolean>>;
   type: string;
-}> = ({ setIsFontStyleOpen, setIsMenuClicked, type }) => {
+}) => {
   const { defaultProperties } = menuButtonStyle("styles", false);
   const [isPressed, setIsPressed] = useState<boolean>(false);
 
@@ -40,9 +42,9 @@ const FontStyleUI: React.FC<{
     { type: List, value: "list" },
     { type: Quote, value: "quote" },
     { type: ListOrdered, value: "ordered_list" },
-    { type: Code, value: "code_block" },
+    { type: Code, value: "code" },
     { type: Table, value: "table" },
-    { type: Highlighter, value: "highlight" },
+    { type: Highlighter, value: "marker" },
   ];
   // CHANGE LOG // Changed by : Copilot // Date : 2026-03-15
   // Reason : Use 3-column grid layout on mobile for font style buttons.
@@ -134,16 +136,41 @@ const FontStyleUI: React.FC<{
               {typeof font.type === "string"
                 ? font.type
                 : (() => {
-                    const Icon =
-                      font.type as unknown as React.ComponentType<any>;
-                    return (
-                      <Icon
-                        title={font.value}
-                        aria-label={font.value}
-                        className="ml-1 hover:text-amber-500"
-                        size={25}
-                      />
-                    );
+                    const Icon = font.type as unknown as React.ComponentType<{
+                      title?: string;
+                      "aria-label"?: string;
+                      className?: string;
+                      size?: number;
+                    }>;
+                    if (
+                      font.value === "section" ||
+                      font.value === "table" ||
+                      font.value === "quote" ||
+                      font.value === "code" ||
+                      font.value === "marker"
+                    ) {
+                      return (
+                        <div className="flex flex-col items-center justify-center">
+                          <Icon
+                            title={font.value}
+                            aria-label={font.value}
+                            className="ml-1 hover:text-amber-500"
+                            size={25}
+                          />
+                          <span className="text-xs capitalize">
+                            {font.value}
+                          </span>
+                        </div>
+                      );
+                    } else
+                      return (
+                        <Icon
+                          title={font.value}
+                          aria-label={font.value}
+                          className="ml-1 hover:text-amber-500"
+                          size={25}
+                        />
+                      );
                   })()}
             </button>
           ))}

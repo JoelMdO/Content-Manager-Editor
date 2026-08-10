@@ -6,7 +6,6 @@ import { sectionsCode } from "../../../constants/sections";
 import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 import { JWT } from "next-auth/jwt";
 import crypto from "crypto";
-import { Database } from "firebase-admin/lib/database/database";
 import { initializeFirebaseAdminDeCav } from "../../../services/db/firebase_admin_DeCav";
 import { adminDB } from "../../../services/db/firebase-admin";
 import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
@@ -24,7 +23,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   const imageUrls: { url: string; fileId: string }[] = [];
   const formData = await req.formData();
   const dbName = formData.get("dbName") as string;
-  //console.log('doing POST at /api/post, dbName:"', dbName, '"');
+  console.log('doing POST at /api/post, dbName:"', dbName, '"');
 
   interface Article {
     id: string;
@@ -73,7 +72,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   // Check if the user is authenticated
   const tokenReceived = formData.get("token") as string;
   let auth = false;
-  
+
   try {
     auth = readLog(tokenReceived ?? "");
   } catch (error) {
@@ -102,7 +101,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///================================================================
 
     let imageFiles: FormDataImageItem[] = [];
-    let pre_images: Array<File> = [];
+    const pre_images: Array<File> = [];
     //console.log("auth ok");
 
     const files = formData.get("images");
@@ -133,11 +132,11 @@ export async function POST(req: NextRequest): Promise<Response> {
             ///--------------------------------------------------------
             const existingImage = await searchImageByFilename(
               uploadFileName,
-              dbName
+              dbName,
             );
             console.log(
               '"📸 [Image existingImage at uploadImage":',
-              existingImage
+              existingImage,
             );
 
             if (existingImage) {
@@ -161,7 +160,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               if (!base64Data) {
                 console.error(
                   "No base64 data available for image:",
-                  uploadFileName
+                  uploadFileName,
                 );
                 resolve();
                 return;
@@ -191,7 +190,7 @@ export async function POST(req: NextRequest): Promise<Response> {
                     });
                   }
                   resolve();
-                }
+                },
               );
             }
 
@@ -203,7 +202,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               article.images = imageUrls; // Append image URLs to article.images
             }
           });
-        })
+        }),
       );
     }
     ///================================================================
@@ -246,8 +245,19 @@ export async function POST(req: NextRequest): Promise<Response> {
     article.esSection = esSectionObj;
     article.summary = summaryObj;
     article.esSummary = esSummaryObj;
-    // article.markdownArticle = markdownArticleObj;
-    // article.markdownEsArticle = markdownEsArticleObj;
+    console.log('"article at post before replace image:"', article);
+    console.log("articles title and esTitle", article.title, article.esTitle);
+    console.log("articles body and esBody", article.body, article.esBody);
+    console.log(
+      "articles section and esSection",
+      article.section,
+      article.esSection,
+    );
+    console.log(
+      "articles summary and esSummary",
+      article.summary,
+      article.esSummary,
+    );
 
     // SAVE in db.
     const images = article.images;
@@ -271,7 +281,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             body,
             images,
             "post",
-            index === 0 ? "en" : "es"
+            index === 0 ? "en" : "es",
           );
         }
         return body;
@@ -301,7 +311,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     //   articleReplaced
     // );
     const cleanedBody = articlesReplaced.map((body) =>
-      body ? cleanNestedDivsServer(body) : body
+      body ? cleanNestedDivsServer(body) : body,
     );
     //
     ///--------------------------------------------------------
@@ -309,7 +319,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
 
     const sectionCode = sectionsCode[dbNameObj].find(
-      (item) => item.label === section
+      (item) => item.label === section,
     );
 
     ///--------------------------------------------------------
@@ -361,21 +371,21 @@ export async function POST(req: NextRequest): Promise<Response> {
     // Select the correct database to save the article
     ///--------------------------------------------------------
     //
-    let db: Database;
-    const { database } = initializeFirebaseAdminDeCav();
+    // let db: Database;
+    // const { database } = initializeFirebaseAdminDeCav();
     let author: string;
     let tags: string[] = [];
     let tags_es: string[] = [];
     let api_call_url: string;
-    //
+    // //
     if (dbNameObj === "DeCav") {
-      db = database;
+      // db = database;
       author = process.env.AUTHOR_DECAV || "Default Author";
       tags = ["Aviation", "DecodingAviation", "DeCav"];
       tags_es = ["Aviación", "DecodingAviation", "DeCav"];
       api_call_url = process.env.URL_API_DECAV || "";
     } else {
-      db = adminDB as unknown as Database;
+      // db = adminDB as unknown as Database;
       author = process.env.AUTHOR || "Default Author";
       tags = ["Software Engineering", "Joel Montes de Oca Lopez", "AI"];
       tags_es = [
@@ -390,7 +400,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
     const authHeader = req.headers.get("authorization");
 
-    let tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
+    const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
 
     if (!tokenG) {
       return NextResponse.json({ status: 401, error: "Unauthorized" });
@@ -471,8 +481,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     ///--------------------------------------------------------
 
     try {
-      const dbRef = db.ref(`articles/${newId}`);
-      await dbRef.set(articleDataForDb);
+      //TODO add new DB.
+      // const dbRef = db.ref(`articles/${newId}`);
+      // await dbRef.set(articleDataForDb);
     } catch (e) {
       console.log("Error saving article to database:", JSON.stringify(e));
       console.error(e);
@@ -484,8 +495,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
 
     try {
-      const dbLikes = db.ref(`likes/${newId}`);
-      await dbLikes.set(likes);
+      //TODO add new DB. LIKES
+      // const dbLikes = db.ref(`likes/${newId}`);
+      // await dbLikes.set(likes);
     } catch (e) {
       return NextResponse.json({
         status: 500,

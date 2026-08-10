@@ -1,0 +1,10 @@
+packages:
+  - "."
+allowBuilds:
+  '@tailwindcss/oxide': true
+  '@vercel/speed-insights': true
+  core-js: true
+  cypress: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true

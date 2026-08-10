@@ -13,7 +13,7 @@ import { sanitizeSummary } from "./sanitize_summary";
 
 export async function sanitizeData(
   data: dataType,
-  type: string
+  type: string,
 ): Promise<{ status: number; message: string | object | dataType }> {
   //
   ///========================================================
@@ -63,7 +63,7 @@ export async function sanitizeData(
         Object.entries(data).map(([key, value]) => [
           key,
           sanitizePost(value as string | undefined),
-        ])
+        ]),
       );
       sanitizedData = {
         status: 200,
@@ -97,7 +97,7 @@ export async function sanitizeData(
     ) {
       const newEmail = sanitizeEmail((data as { email: string }).email);
       const newPassword = sanitizePassword(
-        (data as { password: string }).password
+        (data as { password: string }).password,
       );
       if (newEmail == "" || newPassword == "") {
         sanitizedData = { status: 400, message: "Invalid text input" };
@@ -110,9 +110,58 @@ export async function sanitizeData(
     } else {
       sanitizedData = { status: 400, message: "Invalid sign-in data" };
     }
+  } else if (type === "password-reset") {
+    if (typeof data === "object" && data !== null && "email" in data) {
+      const newEmail = sanitizeEmail((data as { email: string }).email);
+      if (newEmail === "") {
+        sanitizedData = { status: 400, message: "Invalid email" };
+      } else {
+        sanitizedData = { status: 200, message: { email: newEmail } };
+      }
+    } else {
+      sanitizedData = { status: 400, message: "Invalid password-reset data" };
+    }
+  } else if (type === "save-user") {
+    if (typeof data === "object" && data !== null && "email" in data) {
+      const newEmail = sanitizeEmail((data as { email: string }).email);
+      if (newEmail === "") {
+        sanitizedData = { status: 400, message: "Invalid email" };
+      } else {
+        const message: { email: string; provider?: string } = {
+          email: newEmail,
+        };
+        if ("provider" in data) {
+          message.provider = sanitizeHtml(
+            (data as { provider: string }).provider,
+          );
+        }
+        sanitizedData = { status: 200, message };
+      }
+    } else {
+      sanitizedData = { status: 400, message: "Invalid save-user data" };
+    }
   } else if (type === "summary") {
     const sanitizedText = sanitizeSummary(data);
     sanitizedData = { status: 200, message: sanitizedText };
+  } else if (type === "save") {
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      !(data instanceof File) &&
+      !(data instanceof FormData) &&
+      "title" in data &&
+      "body" in data
+    ) {
+      sanitizedData = {
+        status: 200,
+        message: {
+          title: sanitizePost((data as { title: string }).title),
+          body: sanitizePost((data as { body: string }).body),
+        },
+      };
+    } else {
+      sanitizedData = { status: 400, message: "Invalid save data" };
+    }
   } else {
     ///--------------------------------------------------------
     // Clean Text

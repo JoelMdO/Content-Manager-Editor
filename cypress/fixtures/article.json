@@ -1,0 +1,6 @@
+{
+  "title": "Test Article Title",
+  "body": "<p>First paragraph of the test article.</p><p>Second paragraph with more content.</p><p>Third paragraph to verify structure preservation.</p>",
+  "section": "Technology",
+  "language": "en"
+}

@@ -1,0 +1,11 @@
+import { getUploadedImageAttributes } from "../upload_image";
+
+describe("getUploadedImageAttributes", () => {
+  it("starts uploaded images at a maximum width of 200 pixels", () => {
+    expect(getUploadedImageAttributes("blob:image", "photo.png")).toEqual({
+      src: "blob:image",
+      alt: "photo.png",
+      width: 200,
+    });
+  });
+});

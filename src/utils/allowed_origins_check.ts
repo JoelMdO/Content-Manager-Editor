@@ -17,10 +17,10 @@ const allowedOriginsCheck = (req: NextRequest) => {
     referer &&
     !allowedOrigins.some((origin) => referer.startsWith(origin))
   ) {
-    return NextResponse.json({
-      status: 403,
-      message: "Forbidden origin",
-    });
+    return NextResponse.json(
+      { status: 403, message: "Forbidden origin" },
+      { status: 403 },
+    );
   }
   return NextResponse.json({
     status: 200,

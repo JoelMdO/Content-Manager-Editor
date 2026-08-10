@@ -9,26 +9,13 @@ import { useDraftStore } from "@/store/useDraftStore";
 import { useUIStore } from "@/store/useUIStore";
 import { useTranslationStore } from "@/store/useTranslationStore";
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import Link from "@tiptap/extension-link";
-import { TextStyle } from "@tiptap/extension-text-style";
-import { Color } from "@tiptap/extension-color";
-import Highlight from "@tiptap/extension-highlight";
-import {
-  Table,
-  TableRow,
-  TableHeader,
-  TableCell,
-} from "@tiptap/extension-table";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Placeholder from "@tiptap/extension-placeholder";
-import { all, createLowlight } from "lowlight";
-import { CustomImage } from "./extensions/ImageExtension";
 import { handleContentChange } from "./utils/handle_content_change";
 import FontStyleUI from "./menu/button_menu/font_style_buttons";
-
-const lowlight = createLowlight(all);
+import { createDashboardEditorExtensions } from "./extensions/sharedExtensions";
+// import uploadImage from "./menu/button_menu/utils/images_edit/upload_image";
+// import deleteImage from "./menu/button_menu/utils/images_edit/delete_image";
+import { deleteImageFromLocalStorageIndexDB } from "./menu/button_menu/utils/images_edit/delete_img_from_localstorage";
 
 const DashboardEditor = () => {
   // Refs — non-reactive
@@ -53,32 +40,14 @@ const DashboardEditor = () => {
   const { setOpenDialogNoSection, setLastAutoSave } = useUIStore.getState();
 
   ///--------------------------------------------------------
-  // Shared extensions used by both editors
+  // Each editor gets its own extension instances, including Image's node view
   ///--------------------------------------------------------
-  const sharedExtensions = [
-    StarterKit.configure({
-      // Disable code block from StarterKit so CodeBlockLowlight takes over
-      codeBlock: false,
-    }),
-    Underline,
-    Link.configure({ openOnClick: false }),
-    TextStyle,
-    Color,
-    Highlight.configure({ multicolor: true }),
-    Table.configure({ resizable: false }),
-    TableRow,
-    TableHeader,
-    TableCell,
-    CodeBlockLowlight.configure({ lowlight }),
-    CustomImage.configure({ inline: true }),
-  ];
-
   ///--------------------------------------------------------
   // Title editor — single paragraph, Enter shifts focus
   ///--------------------------------------------------------
   const titleEditor = useEditor({
     extensions: [
-      ...sharedExtensions,
+      ...createDashboardEditorExtensions(),
       Placeholder.configure({ placeholder: "Title here..." }),
     ],
     editorProps: {
@@ -87,7 +56,7 @@ const DashboardEditor = () => {
           "h-[10dvh] font-bold p-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text overflow-hidden",
         "data-cy": "editor-title",
       },
-      handleKeyDown(view, event) {
+      handleKeyDown(_view, event) {
         // Enter in title → focus body editor, do not insert newline
         if (event.key === "Enter") {
           event.preventDefault();
@@ -112,7 +81,7 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   const bodyEditor = useEditor({
     extensions: [
-      ...sharedExtensions,
+      ...createDashboardEditorExtensions(),
       Placeholder.configure({ placeholder: "Write your Article here..." }),
     ],
     editorProps: {
@@ -122,6 +91,18 @@ const DashboardEditor = () => {
         "data-cy": "editor-body",
       },
     },
+
+    onDelete: (event) => {
+      if (!("node" in event)) return;
+
+      const { node } = event;
+      const dbName = sessionStorage.getItem("db");
+      if (node.type.name !== "image") return;
+      const imageIdToRemove = (node.attrs["data-ref-id"] || node.attrs["alt"]) as string;
+      if (!imageIdToRemove || !dbName) return;
+      deleteImageFromLocalStorageIndexDB(imageIdToRemove, dbName);
+    },
+
     onUpdate({ editor }) {
       const html = editor.getHTML();
       if (process.env.NODE_ENV === "development") {

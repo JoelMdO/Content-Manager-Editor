@@ -5,10 +5,8 @@ import { StorageItem } from "@/types/storage_item";
 const createSummary = async ({ language }: { language: string }) => {
   //
   const db = sessionStorage.getItem("db");
-  const article = sessionStorage.getItem(`articleContent-${db}`);
   const articleLocal = localStorage.getItem(`draft-articleContent-${db}`);
-  const articleJson = JSON.parse(article || "{}");
-  const articleLocalJson = JSON.parse(articleLocal || "{}");
+  const articleLocalJson = JSON.parse(articleLocal || "[]");
   let title: string = "";
   let body: string = "";
   //
@@ -18,18 +16,18 @@ const createSummary = async ({ language }: { language: string }) => {
     case "es":
       title = articleLocalJson.find(
         (item: StorageItem) => item.type === "es-title"
-      ).content;
+      )?.content || "";
       body = articleLocalJson.find(
         (item: StorageItem) => item.type === "es-body"
-      ).content;
+      )?.content || "";
       break;
     default:
-      title = articleJson.find(
+      title = articleLocalJson.find(
         (item: StorageItem) => item.type === "title"
-      ).content;
-      body = articleJson.find(
+      )?.content || "";
+      body = articleLocalJson.find(
         (item: StorageItem) => item.type === "body"
-      ).content;
+      )?.content || "";
       break;
   }
   //
@@ -42,13 +40,14 @@ const createSummary = async ({ language }: { language: string }) => {
   if (response.status === 200) {
     const summaryLan = language === "es" ? "es-" : "";
     const summary = (response.body as StorageItem) || "";
-    //Store summary in sessionStorage and localStorage
-    articleJson.push({ type: `${summaryLan}summary`, content: summary });
-    sessionStorage.setItem(`articleContent-${db}`, JSON.stringify(articleJson));
-    articleLocalJson.push({ type: `${summaryLan}summary`, content: summary });
+    const summaryKey = `${summaryLan}summary`;
+    const updatedArticle = articleLocalJson.filter(
+      (item: StorageItem) => item.type !== summaryKey,
+    );
+    updatedArticle.push({ type: summaryKey, content: summary });
     localStorage.setItem(
       `draft-articleContent-${db}`,
-      JSON.stringify(articleLocalJson)
+      JSON.stringify(updatedArticle)
     );
   }
   return response;

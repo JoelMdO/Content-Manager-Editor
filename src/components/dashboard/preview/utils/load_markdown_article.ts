@@ -15,7 +15,7 @@ const loadMarkdownArticle = async ({
   //
   const dbName = sessionStorage.getItem("db");
   const idiom = language === "en" ? "" : "es-";
-  const article = sessionStorage.getItem(`articleContent-${dbName}`);
+  const article = localStorage.getItem(`draft-articleContent-${dbName}`);
   const parsedData = article ? JSON.parse(article) : null;
 
   ///--------------------------------------------------------
@@ -69,9 +69,6 @@ const loadMarkdownArticle = async ({
       const { data, content } = matter(articleBodyMarkdown.body as string);
       //console.log("data from matter", data);
       //console.log("content from matter", content);
-      ///--------------------------------------------------------
-      // Store the markdown in sessionStorage
-      ///--------------------------------------------------------
       parsedData.push({
         type: `markdown-${idiom}title`,
         content: articleTitle.content || "",
@@ -82,8 +79,8 @@ const loadMarkdownArticle = async ({
         content: data.readTime || 0,
       });
 
-      sessionStorage.setItem(
-        `articleContent-${dbName}`,
+      localStorage.setItem(
+        `draft-articleContent-${dbName}`,
         JSON.stringify(parsedData)
       );
       //--------------------------------------------------------
