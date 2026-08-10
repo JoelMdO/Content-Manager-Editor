@@ -1,7 +1,6 @@
 import TerserPlugin from "terser-webpack-plugin";
 
 //
-
 const nextConfig = {
   async headers() {
     return [

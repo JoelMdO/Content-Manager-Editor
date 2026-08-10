@@ -1,14 +1,18 @@
+import callHub from "@/services/api/call_hub";
 import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import { cleanNestedDivs } from "./clean_content";
+import { blobToBase64, getBlob } from "@/lib/imageStore/imageStore";
 
 // TipTap emits "<p></p>" for an empty editor — treat that the same as "".
 const TIPTAP_EMPTY = "<p></p>";
 const DEBUG_AUTOSAVE_EMPTY = false;
 
-const saveArticle = ({
+const saveArticle = async ({
   dbName,
   currentTitle,
   currentBody,
+  language,
+  type,
 }: Partial<ButtonProps>) => {
   //
   // Purpose: Skip saving when the editor is empty (no real content).
@@ -27,33 +31,11 @@ const saveArticle = ({
 
       return;
     }
-    //------------------------------------------
-    // Load if any draft on localStorage
-    //------------------------------------------
     const localStoreText = localStorage.getItem(
       `draft-articleContent-${dbName}`,
     );
     const localStoreArticle = JSON.parse(localStoreText || "[]");
-    //------------------------------------------
-    // Load if any draft on sessionStorage
-    //------------------------------------------
-    const sessionStoreText = sessionStorage.getItem(`articleContent-${dbName}`);
-    const sessionStorageAticle = JSON.parse(sessionStoreText || "[]");
-    ///--------------------------------------------------------
-    // If session storage is empty and local storage has data, load local to session
-    ///--------------------------------------------------------
-    if (sessionStorageAticle.length === 0 && localStoreArticle.length > 0) {
-      //console.log("saveArticle - if 1");
-      sessionStorage.setItem(
-        `articleContent-${dbName}`,
-        JSON.stringify(localStoreArticle),
-      );
-      return;
-    }
-    ///--------------------------------------------------------
-    // Function to compare and update localStorage from sessionStorage
-    ///--------------------------------------------------------
-    // Create maps for easier lookup
+
     type ArticleItem = {
       type: string;
       content?: string;
@@ -63,52 +45,68 @@ const saveArticle = ({
       base64?: string;
       // add other fields as needed
     };
-    //console.log('doing more checks before saving..."');
 
     const localMap = new Map<string, ArticleItem>(
       (localStoreArticle as ArticleItem[]).map((item) => [item.type, item]),
     );
-    const sessionMap = new Map<string, ArticleItem>(
-      (sessionStorageAticle as ArticleItem[]).map((item) => [item.type, item]),
-    );
-    const hasChanges = new Set<string>();
-    //console.log("localMap", localMap);
 
-    // Compare session items with local
-    for (const [type, sessionItem] of sessionMap) {
-      const localItem = localMap.get(type);
+    const titleKey = language === "es" ? "es-title" : "title";
+    const bodyKey = language === "es" ? "es-body" : "body";
+    localMap.set(titleKey, { type: titleKey, content: currentTitle });
+    localMap.set(bodyKey, {
+      type: bodyKey,
+      content: cleanNestedDivs(currentBody),
+    });
 
-      // If type doesn't exist in local or content is different
-      if (!localItem || localItem.content !== sessionItem.content) {
-        localMap.set(type, { ...sessionItem });
-        hasChanges.add(type);
+    if (language !== "es") {
+      const existingId = localMap.get("id");
+      if (!existingId?.content) {
+        localMap.set("id", { type: "id", content: "" });
       }
     }
-    //console.log("hasChanges", hasChanges);
 
-    // If we found differences, update localStorage
-    if (hasChanges.size > 0) {
-      // const updatedArticles = Array.from(localMap.values());
-      const updatedArticles = Array.from(localMap.values()).map(
-        (item: ArticleItem) => {
-          if (item.type === "body" && typeof item.content === "string") {
-            return { ...item, content: cleanNestedDivs(item.content) };
-          }
-          if (item.type === "es-body" && typeof item.content === "string") {
-            return { ...item, content: cleanNestedDivs(item.content) };
-          }
-          return item;
-        },
+    localStorage.setItem(
+      `draft-articleContent-${dbName}`,
+      JSON.stringify(Array.from(localMap.values())),
+    );
+
+    if (type === "store") {
+      // Retrieve the image blob from IndexedDB and convert it to base64
+      const imageItems = Array.from(localMap.values()).filter((item) =>
+        item.type.startsWith("image"),
       );
 
-      //console.log("updatedArticles", updatedArticles);
-
-      localStorage.setItem(
-        `draft-articleContent-${dbName}`,
-        JSON.stringify(updatedArticles),
+      console.log("saveArticle imageItems", imageItems);
+      console.log(
+        "imageid",
+        imageItems.map((item) => item.imageId),
       );
-      //console.log("Updated types:", Array.from(hasChanges));
+
+      const images = await Promise.all(
+        imageItems.map(async (item) => {
+          const blob = item.imageId ? await getBlob(item.imageId) : undefined;
+          console.log("saveArticle image blob", blob);
+          console.log("saveArticle image item", item);
+
+          return {
+            type: item.type,
+            imageId: item.imageId ?? "",
+            fileName: item.fileName ?? "",
+            base64: blob ? await blobToBase64(blob) : (item.base64 ?? ""),
+          };
+        }),
+      );
+      //
+      console.log("saveArticle images", images);
+      const saveData = {
+        title: localMap.get(titleKey)?.content || "",
+        body: localMap.get(bodyKey)?.content || "",
+        images: images,
+      };
+      const response = await callHub("save", saveData);
+      return response;
     }
+    return { status: 200, message: "Article saved locally" };
   }
 };
 export default saveArticle;

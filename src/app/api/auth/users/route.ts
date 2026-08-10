@@ -50,6 +50,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching data:", error);
-    return NextResponse.error();
+    return NextResponse.json(
+      { error: "Unable to process user" },
+      { status: 500 },
+    );
   }
 }

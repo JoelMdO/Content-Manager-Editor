@@ -12,7 +12,7 @@ const loadHTMLArticle = async ({
   let body: string = "";
   //
   const dbName = sessionStorage.getItem("db");
-  const article = sessionStorage.getItem(`articleContent-${dbName}`);
+  const article = localStorage.getItem(`draft-articleContent-${dbName}`);
   const parsedData = article ? JSON.parse(article) : null;
   //console.log("articleSessionStorage", parsedData);
 

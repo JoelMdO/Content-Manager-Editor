@@ -50,10 +50,11 @@ const DraftArticle = () => {
     }
     if (articleStored) {
       const jsonArticle = JSON.parse(articleStored);
-
+      console.log({ jsonArticleFromLocalStorage: jsonArticle });
       newSavedTitleRef.current =
         jsonArticle.find((item: StorageItem) => item.type === "title")
           ?.content || "";
+      console.log({ newSavedTitleRef: newSavedTitleRef.current });
       //
       setText(newSavedTitleRef.current);
       //

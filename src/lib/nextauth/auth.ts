@@ -2,7 +2,6 @@ import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import refreshGoogleAccessToken from "@/services/authentication/refresh_token";
-import callHub from "@/services/api/call_hub";
 
 ///--------------------------------------------------------
 // Authentication Options to be used on server side
@@ -23,12 +22,22 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        const res = await callHub("sign-in-by-email", {
-          email: credentials.email,
-          password: credentials.password,
+        // Use a server-side fetch to the internal login route instead of
+        // importing client-side helpers at module initialization. Dynamic or
+        // client imports can cause the NextAuth API route to fail to load
+        // and return 404 in some environments.
+        const loginUrl = `${process.env.NEXTAUTH_URL}/api/auth/login`;
+        const raw = await fetch(loginUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
         });
-        if (res.status !== 200) return null;
-        const user = res.body as { id: string; email: string; name?: string };
+        const json = await raw.json();
+        if (raw.status !== 200) return null;
+        const user = json as { id: string; email: string; name?: string };
         return {
           id: String(user.id),
           email: user.email,

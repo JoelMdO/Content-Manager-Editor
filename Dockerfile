@@ -16,5 +16,5 @@ COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 RUN corepack enable && corepack prepare pnpm@9.4.0 --activate && pnpm --version && pnpm install --frozen-lockfile --prod
-EXPOSE 8080
+EXPOSE 8000
 CMD ["pnpm", "start"]

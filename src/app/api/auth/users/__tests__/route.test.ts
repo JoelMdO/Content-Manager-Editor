@@ -183,4 +183,21 @@ describe("POST /api/auth/users", () => {
 
     expect(json.error).toContain("Error user not found");
   });
+
+  it("returns an explicit 500 when the backend request fails", async () => {
+    jest
+      .spyOn(global, "fetch")
+      .mockRejectedValueOnce(new Error("backend unavailable"));
+
+    const res = await POST(
+      makeRequest({
+        email: "x@x.com",
+        name: "X",
+        provider: "credentials",
+      }) as any,
+    );
+
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({ error: "Unable to process user" });
+  });
 });

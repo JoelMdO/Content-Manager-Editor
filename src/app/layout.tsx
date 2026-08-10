@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
+import "sweetalert2/dist/sweetalert2.min.css";
 import { Lexend } from "next/font/google";
+import { headers } from "next/headers";
 
 const lexend = Lexend({
   weight: ["400", "700"],
@@ -35,13 +36,15 @@ export const metadata: Metadata = {
   },
 };
 //
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") || "";
+
   return (
-    <html lang="en">
+    <html lang="en" nonce={nonce}>
       <body className={lexend.className}>
         {children}
         <SpeedInsights />

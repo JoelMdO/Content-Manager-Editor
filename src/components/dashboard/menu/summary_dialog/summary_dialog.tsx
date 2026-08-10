@@ -66,20 +66,8 @@ const SummaryDialog = () => {
     const summary = language === "en" ? "summary" : "es-summary";
     const db = sessionStorage.getItem("db") || "DeCav";
     try {
-      ///--------------------------------------------------------
-      // Save the summary to the article content in sessionStorage
-      ///--------------------------------------------------------
       updateStorage(
-        sessionStorage, // pass sessionStorage or localStorage
-        `articleContent-${db}`,
-        summary,
-        summaryContent,
-      );
-      ///--------------------------------------------------------
-      // Update the article content in localStorage
-      ///--------------------------------------------------------
-      updateStorage(
-        localStorage, // pass sessionStorage or localStorage
+        localStorage,
         `draft-articleContent-${db}`,
         summary,
         summaryContent,

@@ -9,14 +9,8 @@ const translateButtonClicked = async () => {
   const dbName = sessionStorage.getItem("db");
 
   articleContent = JSON.parse(
-    sessionStorage.getItem(`articleContent-${dbName}`) || "[]"
+    localStorage.getItem(`draft-articleContent-${dbName}`) || "[]"
   );
-  //Check article from local storage if not on session storage
-  if (articleContent.length <= 1) {
-    articleContent = JSON.parse(
-      localStorage.getItem(`draft-articleContent-${dbName}`) || "[]"
-    );
-  }
 
   const response = await callHub("translate", articleContent);
 

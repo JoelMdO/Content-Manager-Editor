@@ -169,6 +169,12 @@ export const handleClick = async (props: HandleClickProps) => {
   // Compose default handler context and dispatch to registered handlers.
   const db = sessionStorage.getItem("dbName") || "DeCav";
   const ctx = defaultHandlerContext(db);
+  console.log(
+    "[handleClick] dispatching tag:",
+    props.tag,
+    "with context:",
+    ctx,
+  );
   try {
     await defaultDispatcher.dispatch(props.tag, props as DispatchProps, ctx);
   } catch (e) {

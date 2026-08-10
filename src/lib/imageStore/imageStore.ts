@@ -59,6 +59,9 @@ export async function getBlob(imageId: string): Promise<Blob | undefined> {
 /** Remove a Blob from the store. */
 export async function deleteBlob(imageId: string): Promise<void> {
   const db = await getDb();
+  console.log("Deleting blob from IndexedDB", { STORE_NAME, imageId });
+  const dbget = await db.get(STORE_NAME, imageId);
+  console.log("db.get result for imageId", { imageId, dbget });
   await db.delete(STORE_NAME, imageId);
 }
 
@@ -73,4 +76,9 @@ export function blobToBase64(blob: Blob): Promise<string> {
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
+}
+
+export async function deleteAllBlobs(): Promise<void> {
+  const db = await getDb();
+  await db.clear(STORE_NAME);
 }

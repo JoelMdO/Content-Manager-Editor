@@ -6,4 +6,5 @@ export interface ImageItem {
   type?: string;
   url?: string;
   fileId?: string;
+  fileName?: string;
 }

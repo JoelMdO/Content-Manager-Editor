@@ -320,7 +320,10 @@ export const useDraftStore = create<DraftState>((set) => ({
     //savedBodyRef.current = cleanBody;
     //UPDATE
     savedBodyRef.current = body;
-
+    console.log("[loadDraftIntoEditor] saved refs updated:", {
+      savedTitleRef: savedTitleRef.current,
+      savedBodyRef: savedBodyRef.current,
+    });
     // ORIGINAL — immediate call (could run before setContent applied):
     //hydrateImages([titleEditorRef.current, bodyEditorRef.current]);
 
@@ -328,6 +331,16 @@ export const useDraftStore = create<DraftState>((set) => ({
     titleEditorRef.current?.commands.setContent(title, { emitUpdate: false });
     bodyEditorRef.current?.commands.setContent(body, {
       emitUpdate: false,
+    });
+
+    // Restore image blobs after the draft HTML has been placed in TipTap.
+    // The hydrator preserves data-ref-id and replaces stale blob URLs with a
+    // fresh URL created from the IndexedDB blob.
+    void hydrateImagesInHTML(body).then((hydratedBody) => {
+      savedBodyRef.current = hydratedBody;
+      bodyEditorRef.current?.commands.setContent(hydratedBody, {
+        emitUpdate: false,
+      });
     });
 
     // Phase 5: replace stale blob: URLs with fresh ones from IndexedDB.

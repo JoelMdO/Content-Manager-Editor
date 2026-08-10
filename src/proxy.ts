@@ -4,9 +4,8 @@ import rateLimit from "./services/api/rate_limit";
 import generateNonce from "./utils/nonce";
 
 //
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const response: NextResponse = NextResponse.next();
   const database_url = process.env.NEXT_PUBLIC_FIREBASE_databaseURL;
   const database_2_url = process.env.NEXT_PUBLIC_FIREBASE_DeCav_databaseURL;
   const nonce = generateNonce();
@@ -30,13 +29,11 @@ export async function middleware(req: NextRequest) {
   ///----------------------------------------------------------------
   ///------ Add headers ----------------
   ///----------------------------------------------------------------
-  response.headers.set(
-    "Content-Security-Policy",
-    `
+  const cspHeader = `
     default-src 'self';
     script-src 'self' 'nonce-${nonce}';
-    style-src 'self';
-    img-src 'self';
+    style-src 'self' 'nonce-${nonce}';
+    img-src 'self' ${process.env.GOOGLE_LOGO_URL}  blob: data:;
     font-src 'self';
     connect-src 'self' ${database_url} ${database_2_url};
     object-src 'none';
@@ -46,9 +43,18 @@ export async function middleware(req: NextRequest) {
     upgrade-insecure-requests;
     block-all-mixed-content;
     `
-      .replace(/\s{2,}/g, " ")
-      .trim()
-  );
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("Content-Security-Policy", cspHeader);
+  requestHeaders.set("x-nonce", nonce);
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
   return response;
 }

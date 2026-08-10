@@ -1,7 +1,7 @@
 import type { IStorageProvider } from "../storage";
 import type { IContentProcessor } from "../processor";
 import type { IEditorLoader } from "../editorLoader";
-import { LocalStorageProvider, SessionStorageProvider } from "../storage";
+import { LocalStorageProvider } from "../storage";
 import { ContentProcessor } from "../processor";
 import { DraftEditorLoader } from "../editorLoader";
 import loadArticle from "../../../preview/utils/load_markdown_article";
@@ -19,7 +19,6 @@ export type DispatchProps = {
 
 export type HandlerContext = {
   storage: IStorageProvider;
-  sessionStorageProvider: IStorageProvider; // for fallback reads
   processor: IContentProcessor;
   editor: IEditorLoader;
   dbName: string;
@@ -56,10 +55,6 @@ class DraftEnHandler implements ITagHandler {
     }
     props.setArticle?.(null);
 
-    // persist local draft into session so preview/loading uses same source
-    const raw = localStorage.getItem(`draft-articleContent-${ctx.dbName}`);
-    if (raw) sessionStorage.setItem(`articleContent-${ctx.dbName}`, raw);
-
     const items = (await ctx.storage.readDraft(ctx.dbName)) as StorageItem[];
     const body = items.find((i) => i.type === "body")?.content || "";
     const processed = await ctx.processor.processHtml(body);
@@ -72,10 +67,6 @@ class SummaryEnHandler implements ITagHandler {
     props.setLanguage?.("en");
     const local = (await ctx.storage.readDraft(ctx.dbName)) as StorageItem[];
     let summary = local.find((i) => i.type === "summary")?.content || "";
-    if (!summary) {
-      const session = (await ctx.sessionStorageProvider.readDraft(ctx.dbName)) as StorageItem[];
-      summary = session.find((i) => i.type === "summary")?.content || "";
-    }
     if (summary) summary = summary.replace(/<div>|<\/div>/g, "").trim();
     props.setSummaryContent?.(summary);
   }
@@ -90,10 +81,6 @@ class DraftEsHandler implements ITagHandler {
     if (props.savedTitleRef) props.savedTitleRef.current = esTitle;
     props.setArticle?.(null);
 
-    // persist local draft into session for preview
-    const raw = localStorage.getItem(`draft-articleContent-${ctx.dbName}`);
-    if (raw) sessionStorage.setItem(`articleContent-${ctx.dbName}`, raw);
-
     const body = items.find((i) => i.type === "es-body")?.content || "";
     const processed = await ctx.processor.processHtml(body);
     ctx.editor.load(props.savedTitleRef?.current ?? "", processed);
@@ -105,10 +92,6 @@ class SummaryEsHandler implements ITagHandler {
     props.setLanguage?.("es");
     const local = (await ctx.storage.readDraft(ctx.dbName)) as StorageItem[];
     let summary = local.find((i) => i.type === "es-summary")?.content || "";
-    if (!summary) {
-      const session = (await ctx.sessionStorageProvider.readDraft(ctx.dbName)) as StorageItem[];
-      summary = session.find((i) => i.type === "es-summary")?.content || "";
-    }
     if (summary) summary = summary.replace(/<div>|<\/div>/g, "").trim();
     props.setSummaryContent?.(summary);
   }
@@ -134,7 +117,6 @@ export const defaultDispatcher = new TagDispatcher();
 
 // concrete providers used for default wiring
 const localProvider = new LocalStorageProvider();
-const sessionProvider = new SessionStorageProvider();
 const processor = new ContentProcessor();
 const editor = new DraftEditorLoader();
 
@@ -149,7 +131,6 @@ defaultDispatcher.register("preview-es", new PreviewHandler());
 export function defaultHandlerContext(dbName: string): HandlerContext {
   return {
     storage: localProvider,
-    sessionStorageProvider: sessionProvider,
     processor,
     editor,
     dbName,

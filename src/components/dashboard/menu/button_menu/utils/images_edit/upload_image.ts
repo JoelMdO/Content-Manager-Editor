@@ -15,6 +15,12 @@ import { storeBlob } from "@/lib/imageStore/imageStore";
 // import { cleanNestedDivs } from "@/components/dashboard/utils/clean_content";
 //
 type UploadImageResult = { status: number; message?: string };
+
+export const getUploadedImageAttributes = (src: string, alt: string) => ({
+  src,
+  alt,
+  width: 200,
+});
 //
 
 const uploadImage = async (
@@ -40,10 +46,10 @@ const uploadImage = async (
     if (response.status === 200) {
       // Create a formatted date string (dd-mm-yy)
       const date = new Date();
-      const formattedDate = `${String(date.getDate()).padStart(2, "0")}-${String(
-        date.getMonth() + 1,
-      ).padStart(2, "0")}-${date.getFullYear().toString().slice(-2)}`;
-      const imageId = `${formattedDate}-${fileName}`;
+      // const formattedDate = `${String(date.getDate()).padStart(2, "0")}-${String(
+      //   date.getMonth() + 1,
+      // ).padStart(2, "0")}-${date.getFullYear().toString().slice(-2)}`;
+      const imageId = `image-${fileName}`;
 
       // Store raw Blob in IndexedDB — no base64 / no sessionStorage size hit
       await storeBlob(imageId, file);
@@ -52,22 +58,24 @@ const uploadImage = async (
       // draft reload)
       const objectUrl = URL.createObjectURL(file);
 
-      // Record image metadata in sessionStorage — base64 intentionally empty;
+      // Record image metadata in localStorage — base64 intentionally empty;
       // create_formData reads the Blob from IDB at publish time.
-      const articleContent = JSON.parse(
-        sessionStorage.getItem(`articleContent-${dbName}`) || "[]",
+      const draftKey = `draft-articleContent-${dbName}`;
+      const articleContent = JSON.parse(localStorage.getItem(draftKey) || "[]");
+      const filteredContent = articleContent.filter(
+        (item: { type: string }) => item.type !== `image-${imageId}`,
       );
-      articleContent.push({
-        type: `image-${imageId}`,
+
+      console.log("file data at upload_image", file);
+
+      filteredContent.push({
+        type: file.type ?? "image",
         imageId: imageId,
         fileName: file.name,
         blobUrl: objectUrl,
         base64: "",
       });
-      sessionStorage.setItem(
-        `articleContent-${dbName}`,
-        JSON.stringify(articleContent),
-      );
+      localStorage.setItem(draftKey, JSON.stringify(filteredContent));
 
       // Insert image into TipTap document via insertContent (supports custom
       // attributes from CustomImage extension, unlike setImage which only
@@ -78,9 +86,9 @@ const uploadImage = async (
         .insertContent({
           type: "image",
           attrs: {
-            src: objectUrl,
-            alt: fileName,
+            ...getUploadedImageAttributes(objectUrl, imageId),
             "data-ref-id": imageId,
+            label: fileName,
           },
         })
         .run();

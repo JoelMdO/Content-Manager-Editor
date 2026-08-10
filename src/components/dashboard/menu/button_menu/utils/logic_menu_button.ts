@@ -12,7 +12,6 @@ import summaryButtonClicked from "./summary_button_clicked";
 import { StorageItem } from "@/types/storage_item";
 import { TranslateType } from "@/types/translate_type";
 import { useEditorStore } from "@/store/useEditorStore";
-import { useDraftStore } from "@/store/useDraftStore";
 import { tagsReplace } from "@/components/dashboard/draft_article/utils/tags_replace";
 ///--------------------------------------------------------
 // Post function to handle the save button click
@@ -83,7 +82,20 @@ export const saveDraft = ({
     openDialogNoSection,
     setOpenDialogNoSection,
     sectionsDialogRef,
-  });
+    type: "store",
+  })
+    .then(async (response) => {
+      console.log("response at savearticle function", response);
+      if (response!.status === 200 || response!.status === 201) {
+        console.log("doing sweet alert on", response!.status);
+        successAlert("saved-locally");
+      } else {
+        errorAlert("saved-locally", "non200", response?.message);
+      }
+    })
+    .catch((error) => {
+      errorAlert("saved-locally", "non200", error);
+    });
   setTimeout(() => {
     setIsClicked!(false);
   }, 1000);
@@ -157,9 +169,8 @@ const openSelectorDialog = ({
 //   ... original implementation ...
 // };
 
-// UPDATED — after writing translation to sessionStorage/localStorage,
-// call `useDraftStore.getState().syncFromSession(dbName)` so the in-memory
-// Zustand state reflects the latest session data.
+// UPDATED — after writing translation to localStorage,
+// update the editor content directly so the UI reflects the latest draft data.
 export const translateToSpanish = ({
   setTranslationReady,
   setIsClicked,
@@ -177,7 +188,7 @@ export const translateToSpanish = ({
 
           // Get existing content
           const articleContent = JSON.parse(
-            sessionStorage.getItem(`articleContent-${dbName}`) || "[]",
+            localStorage.getItem(`draft-articleContent-${dbName}`) || "[]",
           );
 
           // Check if translation already exists
@@ -199,19 +210,12 @@ export const translateToSpanish = ({
           filteredContent.push({ type: "es-body", content: es_body });
           filteredContent.push({ type: "es-section", content: section });
 
-          // Store updated content in sessionStorage
-          sessionStorage.setItem(
-            `articleContent-${dbName}`,
-            JSON.stringify(filteredContent),
-          );
-
-          // Also update localStorage if needed
           localStorage.setItem(
             `draft-articleContent-${dbName}`,
             JSON.stringify(filteredContent),
           );
 
-          // Sync in-memory Zustand store from sessionStorage so UI updates
+          // Sync in-memory editor state so UI updates
           if (dbName) {
             try {
               console.log("calling sybcFromSession");

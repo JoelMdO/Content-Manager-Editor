@@ -31,8 +31,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
       type = getDataAtApiHub.type;
       dataApiHub = dataApiHub;
-      //console.log("type at api/hub with json:", type);
-      //console.log('"dataApiHub at api/hub with json":', dataApiHub);
+      console.log("type at api/hub with json:", type);
+      console.log('"dataApiHub at api/hub with json":', dataApiHub);
     } else {
       /// For request including files.
       formData = await req.formData();
@@ -51,28 +51,50 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///--------------------------------------------------------
     // Check if the request is authenticated
     ///--------------------------------------------------------
-    const session = await getServerSession(authOptions);
-    //console.log('"session at api/hub":', session);
+    // Saving only needs the local JWT cookie. getServerSession() performs an
+    // internal HTTP request to /api/auth/session, which can fail when the
+    // editor is addressed through a container/proxy boundary.
+    let session: Awaited<ReturnType<typeof getServerSession>> = null;
+    let saveJwt: Awaited<ReturnType<typeof getToken>> = null;
+    if (type === "save") {
+      saveJwt = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+      console.log('"save JWT at api/hub":', Boolean(saveJwt?.sub));
+    } else {
+      session = await getServerSession(authOptions);
+      console.log('"session at api/hub":', session);
+    }
 
-    if (!session && type !== "sign-in-by-email" && type !== "password-reset") {
+    if (
+      !session &&
+      !saveJwt?.sub &&
+      type !== "sign-in-by-email" &&
+      type !== "password-reset"
+    ) {
       return NextResponse.json({
         status: 401,
         message: "User without a valid session",
       });
     }
 
-    if (session && type !== "sign-in-by-email") {
-      token = createLog(session?.user.id);
+    if (saveJwt?.sub) {
+      token = createLog(saveJwt.sub);
+      nextAuthToken = saveJwt.accessToken;
     }
+    // else if (session && type !== "sign-in-by-email") {
+    //   token = createLog(session?.user?.id);
+    // }
 
     if (
       (session && type === "post") ||
       (session && type === "translate") ||
       (session && type === "summary")
     ) {
-      //console.log("type at api/hub with session:", type);
-      sessionId = session.user?.id;
-      //console.log("sessionId at api/hub with session:", sessionId);
+      console.log("type at api/hub with session:", type);
+      //sessionId = session.user?.id;
+      console.log("sessionId at api/hub with session:", sessionId);
     }
 
     ///-----------------------------------------------
@@ -80,7 +102,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///-----------------------------------------------
 
     const statusSanitize = await sanitizeData(dataApiHub, type);
-    //console.log('"statusSanitize at api/hub":', statusSanitize);
+    console.log('"statusSanitize at api/hub":', statusSanitize);
 
     //
     if (statusSanitize.status != 200) {
@@ -139,6 +161,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
         break;
       case "post":
+        console.log("doing post at api/hub after sanitize");
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
@@ -147,6 +170,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           secret: process.env.NEXTAUTH_SECRET,
         });
         nextAuthToken = nextToken?.accessToken;
+        break;
+      case "save":
+        console.log("doing save at api/hub after sanitize");
+        dataApiHub = dataApiHub;
+        type = type;
         break;
       case "translate":
         formData.append("session", sessionId || "");
@@ -185,13 +213,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ///-----------------------------------------------
     /// Redirect the request to the apiRoutes endpoints
     ///-----------------------------------------------
-
-    const response = await apiRoutes({
-      token: token,
-      JWT: nextAuthToken,
-      data: dataApiHub,
-      type: type,
+    console.log("api/hub: forwarding to apiRoutes", {
+      type,
+      token: Boolean(token),
+      hasNextAuthToken: Boolean(nextAuthToken),
+      NEXT_PUBLIC_url_api: process.env.NEXT_PUBLIC_url_api,
     });
+
+    let response;
+    try {
+      response = await apiRoutes({
+        token: token,
+        JWT: nextAuthToken,
+        data: dataApiHub,
+        type: type,
+      });
+    } catch (err) {
+      console.error("api/hub: apiRoutes threw error", err);
+      throw err;
+    }
 
     const jsonResponse = await response.json();
     ///-----------------------------------------------
@@ -239,6 +279,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       });
     }
   } catch (error) {
+    console.error("[api/hub] request failed before response", error);
     return NextResponse.json({
       status: 500,
       message: `Internal Server Error: ${error}`,
