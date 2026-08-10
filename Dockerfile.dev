@@ -26,4 +26,4 @@ ENV CHOKIDAR_USEPOLLING=true
 
 EXPOSE 8000 9229
 
-CMD ["pnpm", "dev", "--port", "8080"]
+CMD ["pnpm", "dev", "--port", "8000"]

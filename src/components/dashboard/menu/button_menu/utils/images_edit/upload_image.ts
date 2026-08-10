@@ -63,7 +63,7 @@ const uploadImage = async (
       const draftKey = `draft-articleContent-${dbName}`;
       const articleContent = JSON.parse(localStorage.getItem(draftKey) || "[]");
       const filteredContent = articleContent.filter(
-        (item: { type: string }) => item.type !== `image-${imageId}`,
+        (item: { imageId: string }) => item.imageId !== imageId,
       );
 
       console.log("file data at upload_image", file);
