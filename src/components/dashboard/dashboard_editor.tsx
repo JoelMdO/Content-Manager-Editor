@@ -97,7 +97,7 @@ const DashboardEditor = () => {
       console.log("onDelete called with node:", node);
       const dbName = sessionStorage.getItem("db");
       if (node.type.name !== "image") return;
-      const imageIdToRemove = node.attrs["alt"] as string;
+      const imageIdToRemove = (node.attrs["data-ref-id"] || node.attrs["alt"]) as string;
       if (!imageIdToRemove) return;
       deleteImageFromLocalStorageIndexDB(imageIdToRemove, dbName!);
     },
