@@ -57,7 +57,7 @@ const DashboardEditor = () => {
           "h-[10dvh] font-bold p-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text overflow-hidden",
         "data-cy": "editor-title",
       },
-      handleKeyDown(event) {
+      handleKeyDown(_view, event) {
         // Enter in title → focus body editor, do not insert newline
         if (event.key === "Enter") {
           event.preventDefault();
