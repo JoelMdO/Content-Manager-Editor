@@ -1,10 +1,9 @@
 const uploadImagesToCMS = async (images: any) =>
   await Promise.all(
     images.map(async (image: any) => {
-      console.log("image at uploadImagesToCMS", "image", image);
-      const url = "http://proxy:80/api/articles/images/";
-      // const url = process.env.URL_IMAGES_STORE";
-      const response = await fetch(url || "", {
+      const url =
+        process.env.URL_IMAGES_STORE || "http://proxy:80/api/articles/images/";
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
