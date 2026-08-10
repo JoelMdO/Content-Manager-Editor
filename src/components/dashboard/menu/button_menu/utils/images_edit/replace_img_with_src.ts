@@ -1,5 +1,8 @@
 import { ImageItem } from "@/types/image_item";
 
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const replaceImgWithSrc = (
   htmlContent: string,
   images: Array<{ url: string; fileId: string }>,
@@ -45,8 +48,9 @@ const replaceImgWithSrc = (
           const stableSuffix = suffixMatch ? suffixMatch[1] : imageIdentifier;
           //console.log("Searching for stable suffix:", stableSuffix);
 
+          const safeStableSuffix = escapeRegExp(stableSuffix);
           const suffixRegex = new RegExp(
-            `(\\d{2}-\\d{2}-\\d{2}-${stableSuffix})`,
+            `(\\d{2}-\\d{2}-\\d{2}-${safeStableSuffix})`,
             "g",
           );
           const matches = [...htmlContent.matchAll(suffixRegex)];
@@ -77,14 +81,15 @@ const replaceImgWithSrc = (
           case "post":
           case "html":
             let placeholder: RegExp;
+            const safeImageIdentifier = escapeRegExp(imageIdentifier);
             if (language === "es") {
               placeholder = new RegExp(
-                `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
+                `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*<p[^>]*>${safeImageIdentifier}</p>`,
                 "g",
               );
             } else {
               placeholder = new RegExp(
-                `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*<p[^>]*>${imageIdentifier}</p>`,
+                `<img[^>]*src=["']{image_url_placeholder}["'][^>]*>\\s*<p[^>]*>${safeImageIdentifier}</p>`,
                 "g",
               );
             }
