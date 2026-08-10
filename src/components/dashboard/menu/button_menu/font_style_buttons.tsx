@@ -1,5 +1,5 @@
 import { handleFontChange } from "./utils/handle_font_change";
-import { useState } from "react";
+import React, { useState } from "react";
 import { menuButtonStyle } from "./style/style_menu_button";
 // import section from "../../../../../public/section.svg";
 // import list from "../../../../../public/list.svg";
@@ -25,8 +25,8 @@ const FontStyleUI = ({
   setIsMenuClicked,
   type,
 }: {
-  setIsFontStyleOpen?: boolean;
-  setIsMenuClicked?: boolean;
+  setIsFontStyleOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMenuClicked?: React.Dispatch<React.SetStateAction<boolean>>;
   type: string;
 }) => {
   const { defaultProperties } = menuButtonStyle("styles", false);
