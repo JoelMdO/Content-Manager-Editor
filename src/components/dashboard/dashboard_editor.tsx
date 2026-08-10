@@ -11,7 +11,6 @@ import { useTranslationStore } from "@/store/useTranslationStore";
 import { useEditor, EditorContent } from "@tiptap/react";
 import Placeholder from "@tiptap/extension-placeholder";
 import { handleContentChange } from "./utils/handle_content_change";
-import { deleteBlob } from "@/lib/imageStore/imageStore";
 import FontStyleUI from "./menu/button_menu/font_style_buttons";
 import { createDashboardEditorExtensions } from "./extensions/sharedExtensions";
 // import uploadImage from "./menu/button_menu/utils/images_edit/upload_image";
@@ -93,13 +92,15 @@ const DashboardEditor = () => {
       },
     },
 
-    onDelete: ({ node }) => {
-      console.log("onDelete called with node:", node);
+    onDelete: (event) => {
+      if (!("node" in event)) return;
+
+      const { node } = event;
       const dbName = sessionStorage.getItem("db");
       if (node.type.name !== "image") return;
       const imageIdToRemove = (node.attrs["data-ref-id"] || node.attrs["alt"]) as string;
-      if (!imageIdToRemove) return;
-      deleteImageFromLocalStorageIndexDB(imageIdToRemove, dbName!);
+      if (!imageIdToRemove || !dbName) return;
+      deleteImageFromLocalStorageIndexDB(imageIdToRemove, dbName);
     },
 
     onUpdate({ editor }) {
