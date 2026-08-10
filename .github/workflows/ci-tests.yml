@@ -33,7 +33,7 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Run ESLint
-        run: pnpm run lint
+        run: pnpm run lint -- .
 
   # ─── Job 2: Unit & Integration Tests ─────────────────────────────────────
   unit-tests:

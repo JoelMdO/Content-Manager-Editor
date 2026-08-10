@@ -2,17 +2,13 @@
  * @jest-environment node
  *
  * Tests for auth.ts (NextAuth + Django, no Firebase):
- *   - authorize()  calls callHub("sign-in-by-email", {email, password})
+ *   - authorize()  fetches POST /api/auth/login directly
  *   - signIn()     calls fetch to /api/auth/users/ directly using user.email/name
  */
 import { expect } from "@jest/globals";
-import callHub from "@/services/api/call_hub";
 
 import { authOptions } from "../auth";
 import type { CredentialsConfig } from "next-auth/providers/credentials";
-
-jest.mock("@/services/api/call_hub");
-const mockCallHub = callHub as jest.MockedFunction<typeof callHub>;
 
 // ─── Helpers to extract the functions under test ─────────────────────────────
 const credentialsProvider = authOptions.providers.find(
@@ -28,7 +24,11 @@ const signInCallback = authOptions.callbacks!.signIn!;
 // ─── Tests ───────────────────────────────────────────────────────────────────
 describe("authOptions.authorize (CredentialsProvider)", () => {
   beforeEach(() => {
-    mockCallHub.mockReset();
+    process.env.NEXTAUTH_URL = "http://localhost:8000";
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it("returns null when email is missing from credentials", async () => {
@@ -41,30 +41,35 @@ describe("authOptions.authorize (CredentialsProvider)", () => {
     expect(result).toBeNull();
   });
 
-  it("calls callHub with 'sign-in-by-email' and the given email and password", async () => {
-    mockCallHub.mockResolvedValueOnce({
-      status: 200,
-      message: "ok",
-      body: { id: "42", email: "user@example.com", name: "User" } as any,
-    });
+  it("calls fetch POST /api/auth/login with the given email and password", async () => {
+    const mockFetch = jest.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: "42", email: "user@example.com", name: "User" }),
+        { status: 200 },
+      ),
+    );
 
     await authorize(
       { email: "user@example.com", password: "secret" } as any,
       {},
     );
 
-    expect(mockCallHub).toHaveBeenCalledWith("sign-in-by-email", {
-      email: "user@example.com",
-      password: "secret",
-    });
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8000/api/auth/login",
+      expect.objectContaining({
+        method: "POST",
+        body: expect.stringContaining('"email":"user@example.com"'),
+      }),
+    );
   });
 
-  it("returns a user object with id, email, and name when callHub responds with status 200", async () => {
-    mockCallHub.mockResolvedValueOnce({
-      status: 200,
-      message: "ok",
-      body: { id: "42", email: "user@example.com", name: "Test User" } as any,
-    });
+  it("returns a user object with id, email, and name when login responds with status 200", async () => {
+    jest.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: "42", email: "user@example.com", name: "Test User" }),
+        { status: 200 },
+      ),
+    );
 
     const result = await authorize(
       { email: "user@example.com", password: "secret" } as any,
@@ -78,11 +83,12 @@ describe("authOptions.authorize (CredentialsProvider)", () => {
     });
   });
 
-  it("returns null when callHub responds with a non-200 status", async () => {
-    mockCallHub.mockResolvedValueOnce({
-      status: 401,
-      message: "Invalid credentials",
-    });
+  it("returns null when login responds with a non-200 status", async () => {
+    jest.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({ detail: "Invalid credentials" }), {
+        status: 401,
+      }),
+    );
 
     const result = await authorize(
       { email: "user@example.com", password: "wrongpassword" } as any,

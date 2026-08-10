@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import apiRoutes from "@/services/api/api_routes";
 
 describe("apiRoutes save", () => {
