@@ -6,8 +6,6 @@ import { sectionsCode } from "../../../constants/sections";
 import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 import { JWT } from "next-auth/jwt";
 import crypto from "crypto";
-import { initializeFirebaseAdminDeCav } from "../../../services/db/firebase_admin_DeCav";
-import { adminDB } from "../../../services/db/firebase-admin";
 import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
 import { FormDataImageItem } from "@/components/dashboard/menu/button_menu/type/formData";
 import { cleanNestedDivsServer } from "@/components/dashboard/utils/clean_content_server";

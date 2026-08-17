@@ -5,7 +5,8 @@
     "summary": "Creating a desciption of the article ...",
     "summary_text": "AI Summarizing for you, please wait...",
     "preview": "Generating preview ...",
-    "preview_text": "Generating a preview for you, please wait..."
+    "preview_text": "Generating a preview for you, please wait...",
+    "loading_article": "Loading Article, please wait..."
   },
   "autosave": {
     "last_auto_save": "Article auto-saved: "

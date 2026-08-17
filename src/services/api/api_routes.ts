@@ -100,7 +100,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     // to FastAPI: FastAPI exposes translation/summary endpoints, not /api/save.
     const targetUrl =
       type === "save"
-        ? `${process.env.NEXTAUTH_URL || "http://localhost:8000"}/api/save`
+        ? `${process.env.INTERNAL_APP_URL}/api/save`
         : `${url}/api/${endPoint}`;
     console.error("[SAVE_FORWARD_V4]", { type, targetUrl });
     console.log("api_routes: calling backend ->", targetUrl, {
@@ -123,7 +123,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     }
     // Log status and attempt to parse JSON response
     console.log("api_routes: backend response status", response.status);
-    let jsonResponse: any;
+    let jsonResponse: { status: number; message: string; body?: unknown };
     try {
       jsonResponse = await response.json();
     } catch (parseErr) {

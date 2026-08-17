@@ -2,6 +2,7 @@ import callHub from "@/services/api/call_hub";
 import { ButtonProps } from "../menu/button_menu/type/type_menu_button";
 import { cleanNestedDivs } from "./clean_content";
 import { blobToBase64, getBlob } from "@/lib/imageStore/imageStore";
+import { useUIStore } from "@/store/useUIStore";
 
 // TipTap emits "<p></p>" for an empty editor — treat that the same as "".
 const TIPTAP_EMPTY = "<p></p>";
@@ -71,6 +72,15 @@ const saveArticle = async ({
     );
 
     if (type === "store") {
+      // Check if the article has section in place already.
+      const { setOpenDialogNoSection } = useUIStore.getState();
+      const sectionItem = localMap.get("section");
+      console.log("saveArticle sectionItem", sectionItem);
+      if (!sectionItem || !sectionItem.content) {
+        setOpenDialogNoSection(true);
+        console.log({ status: 400, message: "No section selected" });
+      }
+
       // Retrieve the image blob from IndexedDB and convert it to base64
       const imageItems = Array.from(localMap.values()).filter((item) =>
         item.type.startsWith("image"),
@@ -82,7 +92,13 @@ const saveArticle = async ({
         imageItems.map((item) => item.imageId),
       );
 
-      const images = await Promise.all(
+      let images;
+      if (!imageItems.length) {
+        console.warn(`No image items found`);
+        images = ["Body has the images already"];
+      }
+
+      images = await Promise.all(
         imageItems.map(async (item) => {
           const blob = item.imageId ? await getBlob(item.imageId) : undefined;
           console.log("saveArticle image blob", blob);
@@ -100,9 +116,16 @@ const saveArticle = async ({
       console.log("saveArticle images", images);
       const saveData = {
         title: localMap.get(titleKey)?.content || "",
+        es_title: localMap.get("es-title")?.content || "",
         body: localMap.get(bodyKey)?.content || "",
+        es_body: localMap.get("es-body")?.content || "",
+        section: localMap.get("section")?.content || "",
+        es_section: localMap.get("es-section")?.content || "",
+        summary: localMap.get("summary")?.content || "",
+        es_summary: localMap.get("es-summary")?.content || "",
         images: images,
       };
+      console.log("saveArticle saveData", saveData);
       const response = await callHub("save", saveData);
       return response;
     }

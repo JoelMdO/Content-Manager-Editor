@@ -2,6 +2,12 @@ import { iconsMenu } from "../../constants/icons";
 import text from "../../constants/dasboardPage_data_text.json";
 import animation from "./style/loader.module.css";
 
+// CHANGE LOG
+// Changed by : Joel Montes de Oca
+// Date       : 2026-08-12
+// Reason     : Added dialog for articles loading.
+// Impact     : Update data of the dialogs.
+//
 const DialogsLoader = ({ type }: { type: string }) => {
   // Destructure text object
   const {
@@ -11,6 +17,7 @@ const DialogsLoader = ({ type }: { type: string }) => {
     summary_text,
     preview,
     preview_text,
+    loading_article,
   } = text.dashboard;
   //
   let title: string = "";
@@ -33,6 +40,11 @@ const DialogsLoader = ({ type }: { type: string }) => {
       break;
     case "load_html":
       title = "Loading article...";
+      content = "Please wait while we load your article.";
+      icon = iconsMenu.preview;
+      break;
+    case "loading_article":
+      title = loading_article;
       content = "Please wait while we load your article.";
       icon = iconsMenu.preview;
       break;

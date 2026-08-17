@@ -1,20 +1,25 @@
+// CHANGE LOG
+// Changed by : Joel Montes de Oca
+// Date       : 2026-08-12
+// Reason     : Added dialog for articles loading.
+// Impact     : Update data of the dialogs.
+//
+
 import { debouncedUpdateStore } from "./utils/debounceUpdateStore";
 import { useEffect } from "react";
-//import { useTranslatedArticleDraft } from "../dashboard/hooks/useTranslatedArticleDraft";
 import DialogsLoader from "../../components/loaders/dialogs_loader";
 import saveArticle from "./utils/save_article";
-import DOMPurify from "dompurify";
+// import DOMPurify from "dompurify";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useDraftStore } from "@/store/useDraftStore";
 import { useUIStore } from "@/store/useUIStore";
 import { useTranslationStore } from "@/store/useTranslationStore";
 import { useEditor, EditorContent } from "@tiptap/react";
+import { useLoadArticleStore } from "@/store/useLoadArticleStore";
 import Placeholder from "@tiptap/extension-placeholder";
 import { handleContentChange } from "./utils/handle_content_change";
 import FontStyleUI from "./menu/button_menu/font_style_buttons";
 import { createDashboardEditorExtensions } from "./extensions/sharedExtensions";
-// import uploadImage from "./menu/button_menu/utils/images_edit/upload_image";
-// import deleteImage from "./menu/button_menu/utils/images_edit/delete_image";
 import { deleteImageFromLocalStorageIndexDB } from "./menu/button_menu/utils/images_edit/delete_img_from_localstorage";
 
 const DashboardEditor = () => {
@@ -24,15 +29,16 @@ const DashboardEditor = () => {
   //
   // Reactive state subscriptions
   const isMarkdownText = useEditorStore((s) => s.isMarkdownText);
-  const { setIsMarkdownText } = useEditorStore.getState();
+  // const { setIsMarkdownText } = useEditorStore.getState();
   //
   const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
   const dbName = useDraftStore((s) => s.dbName);
   const language = useDraftStore((s) => s.language);
-  const article = useDraftStore((s) => s.article);
+  // const article = useDraftStore((s) => s.article);
   const { setText } = useDraftStore.getState();
   //
   const isTranslating = useTranslationStore((s) => s.isTranslating);
+  const isLoadingArticle = useLoadArticleStore((s) => s.isLoading);
   //
   const openDialogNoSection = useUIStore((s) => s.openDialogNoSection);
   const isSummary = useUIStore((s) => s.isSummary);
@@ -98,7 +104,8 @@ const DashboardEditor = () => {
       const { node } = event;
       const dbName = sessionStorage.getItem("db");
       if (node.type.name !== "image") return;
-      const imageIdToRemove = (node.attrs["data-ref-id"] || node.attrs["alt"]) as string;
+      const imageIdToRemove = (node.attrs["data-ref-id"] ||
+        node.attrs["alt"]) as string;
       if (!imageIdToRemove || !dbName) return;
       deleteImageFromLocalStorageIndexDB(imageIdToRemove, dbName);
     },
@@ -134,26 +141,26 @@ const DashboardEditor = () => {
   ///--------------------------------------------------------
   // Set HTML content from Preview / published article
   ///--------------------------------------------------------
-  useEffect(() => {
-    if (!article?.content || !article?.title) return;
-    if (!titleEditor || !bodyEditor) return;
+  // useEffect(() => {
+  //   if (!article?.content || !article?.title) return;
+  //   if (!titleEditor || !bodyEditor) return;
 
-    try {
-      const sanitizedTitle = DOMPurify.sanitize(article.title);
-      const sanitizedContent = DOMPurify.sanitize(article.content);
+  //   try {
+  //     const sanitizedTitle = DOMPurify.sanitize(article.title);
+  //     const sanitizedContent = DOMPurify.sanitize(article.content);
 
-      titleEditor.commands.setContent(sanitizedTitle, { emitUpdate: false });
-      bodyEditor.commands.setContent(sanitizedContent, { emitUpdate: false });
+  //     titleEditor.commands.setContent(sanitizedTitle, { emitUpdate: false });
+  //     bodyEditor.commands.setContent(sanitizedContent, { emitUpdate: false });
 
-      savedTitleRef.current = sanitizedTitle;
-      savedBodyRef.current = sanitizedContent;
+  //     savedTitleRef.current = sanitizedTitle;
+  //     savedBodyRef.current = sanitizedContent;
 
-      setIsMarkdownText(false);
-    } catch {
-      // ignore parse errors
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [article]);
+  //     setIsMarkdownText(false);
+  //   } catch {
+  //     // ignore parse errors
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [article]);
 
   ///--------------------------------------------------------
   // Autosave to localStorage every 10 minutes
@@ -168,7 +175,7 @@ const DashboardEditor = () => {
     }, 10 * 60_000);
 
     return () => clearInterval(interval);
-  }, [dbName, DRAFT_KEY, language]);
+  }, [dbName, DRAFT_KEY, language, setLastAutoSave]);
 
   ///---------------------------------------------------
   //  Cleanup debounce on unmount
@@ -198,6 +205,7 @@ const DashboardEditor = () => {
       {isSummary && <DialogsLoader type={"summary"} />}
       {isLoadingPreview && <DialogsLoader type={"preview"} />}
       {isMarkdownText && <DialogsLoader type={"load_html"} />}
+      {isLoadingArticle && <DialogsLoader type={"loading_article"} />}
 
       <EditorContent editor={titleEditor} />
       <div className="hidden md:flex absolute md:right-[20vw] top-[13dvh] gap-3 items-center">

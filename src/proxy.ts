@@ -33,7 +33,7 @@ export async function proxy(req: NextRequest) {
     default-src 'self';
     script-src 'self' 'nonce-${nonce}';
     style-src 'self' 'nonce-${nonce}';
-    img-src 'self' ${process.env.GOOGLE_LOGO_URL}  blob: data:;
+    img-src 'self' ${process.env.GOOGLE_LOGO_URL} ${process.env.NEXT_PUBLIC_CSP_IMAGES_URL} blob: data:;
     font-src 'self';
     connect-src 'self' ${database_url} ${database_2_url};
     object-src 'none';

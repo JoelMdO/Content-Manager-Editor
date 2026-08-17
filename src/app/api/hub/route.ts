@@ -14,7 +14,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let type: string = "clean-image";
   let token: string | undefined = "";
   let nextAuthToken: string | undefined = "";
-  let sessionId: string | undefined = "";
+  const sessionId: string | undefined = "";
   let formData: FormData = new FormData();
 
   ///___________________________________________________

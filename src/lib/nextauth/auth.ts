@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         // importing client-side helpers at module initialization. Dynamic or
         // client imports can cause the NextAuth API route to fail to load
         // and return 404 in some environments.
-        const loginUrl = `${process.env.NEXTAUTH_URL}/api/auth/login`;
+        const loginUrl = `${process.env.INTERNAL_APP_URL}/api/auth/login`;
         const raw = await fetch(loginUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
       // Upsert user in Django on every sign-in (idempotent)
       if (account?.type === "credentials" || account?.id_token) {
         const provider = account.id_token ? "google" : "credentials";
-        await fetch(`${process.env.NEXTAUTH_URL}/api/auth/users/`, {
+        await fetch(`${process.env.INTERNAL_APP_URL}/api/auth/users/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

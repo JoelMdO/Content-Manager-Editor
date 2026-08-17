@@ -71,6 +71,7 @@ export async function deleteBlob(imageId: string): Promise<void> {
  */
 export function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
+    if (blob === undefined) return;
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = reject;

@@ -1,6 +1,5 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import generateSearchIndex from "@/utils/api/generate_search_index";
 import uploadImagesToCMS from "@/utils/api/save/upload_images_to_CMS";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import readLog from "@/services/authentication/read_log";
@@ -37,12 +36,34 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (auth) {
       // Parse the request body
       console.log("AUTH OK");
-      const { title, body, images = [] } = data;
+      const {
+        title,
+        body,
+        images = [],
+        section,
+        es_title,
+        es_body,
+        summary,
+        es_summary,
+        es_section,
+      } = data;
       console.log("title at api/save", title);
       console.log("body at api/save", body);
       console.log("images at api/save", images);
+      console.log("section at api/save", section);
       //Retieve the image URLs from the req and upload them to the CMS /images.
-      const imageUrls = (await uploadImagesToCMS(images)).map(
+
+      let imageUrls: { url: string; fileId: string }[] = [];
+      let updatedBody;
+      let updatedEsBody;
+
+      if (images[0] === "Body has the images already") {
+        console.log("No new images to upload, using existing body content");
+        updatedBody = body;
+        updatedEsBody = es_body;
+      }
+
+      imageUrls = (await uploadImagesToCMS(images)).map(
         (image: { url: string; image_id: string }) => ({
           url: image.url,
           fileId: image.image_id,
@@ -50,7 +71,8 @@ export async function POST(req: NextRequest): Promise<Response> {
       );
       console.log("imageUrls at api/save", imageUrls);
       // Update the body content with the uploaded image URLs
-      const updatedBody = replaceImgWithSrc(body, imageUrls, "save", "en");
+      updatedBody = replaceImgWithSrc(body, imageUrls, "save", "en");
+      updatedEsBody = replaceImgWithSrc(es_body, imageUrls, "save", "es");
       console.log("updatedBody at api/save", updatedBody);
       const configuredApiUrl =
         process.env.URL_API_DECAV || process.env.URL_API_JOE || "";
@@ -74,6 +96,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         body: JSON.stringify({
           article_id: title + Date.now(),
           title: title,
+          es_title: es_title,
           status: "draft",
           body: [
             {
@@ -81,6 +104,16 @@ export async function POST(req: NextRequest): Promise<Response> {
               content: updatedBody,
             },
           ],
+          es_body: [
+            {
+              type: "paragraph",
+              content: updatedEsBody,
+            },
+          ],
+          section: section || "",
+          es_section: es_section || "",
+          summary: summary || "",
+          es_summary: es_summary || "",
           images: [],
         }),
       });

@@ -9,17 +9,11 @@ import { StorageItem } from "../../../types/storage_item";
 const DraftArticle = () => {
   //
   // CHANGE LOG
-  // Changed by : Copilot
-  // Date       : 2026-03-11
-  // Reason     : Read state from Zustand stores instead of MenuContext.
-  // Impact     : MenuContext no longer needed in this file.
-  //              setDraftArticleButtonClicked removed — handleClick now calls
-  //              loadDraftIntoEditor() directly.
+  // Changed by : Joel Montes de Oca
+  // Date       : 2026-08-12
+  // Reason     : Non used variable removed
+  // Impact     : NIL
   //
-  // ORIGINAL:
-  // const { dbNameToSearch, DRAFT_KEY, savedTitleRef, savedBodyRef,
-  //         setDraftArticleButtonClicked, setText, text, setLanguage,
-  //         setArticle, setDraftKey } = useContext(MenuContext) as ButtonProps;
   const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
   const dbName = useDraftStore((s) => s.dbName);
   const text = useDraftStore((s) => s.text);
@@ -27,7 +21,7 @@ const DraftArticle = () => {
     console.log({ text });
   }
 
-  const { savedTitleRef, savedBodyRef } = useEditorStore.getState();
+  const { savedTitleRef } = useEditorStore.getState();
   const { setText, setLanguage, setArticle, setDraftKey } =
     useDraftStore.getState();
   const newSavedTitleRef = useRef<string>("");

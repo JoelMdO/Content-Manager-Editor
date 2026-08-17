@@ -1,6 +1,6 @@
-import { useState } from "react";
+import HomeButton from "@/components/buttons/home_button";
+import LogOutButton from "@/components/buttons/logout_buttons";
 import MenuButton from "./button_menu/buttons_menu";
-import FontStyleUI from "./button_menu/font_style_buttons";
 //import PreviewToggle from "./preview_toggle/preview_toggle";
 
 //--------------------------------------------------------
@@ -34,6 +34,8 @@ const MenuDesktop = () => {
       <MenuButton type={"summary"} tag={"desktop"} />
       <MenuButton type={"translate"} tag={"desktop"} />
       <MenuButton type="post" tag={"desktop"} />
+      <HomeButton />
+      <LogOutButton type={"dashboard"} />
     </div>
   );
 };

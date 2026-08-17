@@ -8,6 +8,8 @@ import dbSelector from "../../components/alerts/db_selector";
 import DraftArticle from "../../components/dashboard/draft_article/draft_article";
 import AutoSaveScreen from "../../components/loaders/auto_save";
 import PreviewArticle from "@/components/dashboard/preview/preview_article";
+import LoadArticles from "@/components/dashboard/menu/load_articles/load_articles";
+import fetchArticlesFromDb from "@/components/dashboard/menu/load_articles/services/fetch_article_fromDb";
 // CHANGE LOG
 // Changed by : Copilot
 // Date       : 2026-03-11
@@ -38,12 +40,7 @@ const SummaryDialog = dynamic(
 const SectionSelector = dynamic(
   () => import("../../components/dashboard/menu/button_menu/sections_selector"),
 );
-const LogOutButton = dynamic(
-  () => import("../../components/buttons/logout_buttons"),
-);
-const HomeButton = dynamic(
-  () => import("../../components/buttons/home_button"),
-);
+
 const MenuDesktop = dynamic(
   () => import("../../components/dashboard/menu/desktop_menu"),
 );
@@ -63,7 +60,7 @@ const Dashboard: React.FC = () => {
   const savedBodyRef = useRef<string>("");
   const pageRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  //
+  const [articles, setArticles] = useState<{ id: string; title: string }[]>([]);
   // Local state — only dbIsReady remains to trigger the db-setup useEffect.
   // All other state lives in Zustand stores.
   const [dbIsReady, setDbIsReady] = useState<boolean>(false);
@@ -84,6 +81,7 @@ const Dashboard: React.FC = () => {
     }
 
     if (sessionStorage.getItem("db") !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDbIsReady(true);
     }
 
@@ -115,10 +113,18 @@ const Dashboard: React.FC = () => {
   // }, [dbIsReady]);
   useEffect(() => {
     if (!dbIsReady) return;
+    console.log("dbIsReady is true, setting up draft store...");
     const dbName = sessionStorage.getItem("db") as string;
     useDraftStore.getState().setDbName(dbName);
     useDraftStore.getState().setDraftKey(`draft-articleContent-${dbName}`);
     useDraftStore.getState().setDbIsReady(true);
+    const fetchArticles = async () => {
+      console.log("Fetching articles from DB...");
+      const fetchedArticles = await fetchArticlesFromDb();
+      console.log("Fetched articles:", fetchedArticles);
+      setArticles(fetchedArticles);
+    };
+    fetchArticles();
   }, [dbIsReady]);
   // CHANGE LOG
   // Changed by : Copilot
@@ -137,15 +143,16 @@ const Dashboard: React.FC = () => {
     <section ref={pageRef} className="flex flex-col h-screen bg-blue">
       {/* TABLET / DESKTOP */}
       <nav className="flex pb-3 w-screen h-[12dvh] bg-gray-800 text-white align-middleitems-center flex-row gap-2 md:justify-between">
-        <div className="flex flex-col">
-          <DraftArticle />
-          {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
+        <div className="flex flex-row w-full items-center gap-2 ml-2">
+          <div className="flex flex-col">
+            <DraftArticle />
+            {lastAutoSave && <AutoSaveScreen lastAutoSave={lastAutoSave} />}
+          </div>
+          <LoadArticles articles={articles} />
         </div>
         {/* MENU MOBILE */}
         <MenuMobile />
         {/* <div className="flex flex-row w-full justify-center items-center mt-2"> */}
-        <HomeButton />
-        <LogOutButton type={"dashboard"} />
         {/* </div> */}
       </nav>
       {/* Main Content */}
