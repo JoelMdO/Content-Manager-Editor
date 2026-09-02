@@ -4,19 +4,16 @@
 // Reason     : Added dialog for articles loading.
 // Impact     : Update data of the dialogs.
 //
-import { useEditorStore } from "@/store/useEditorStore";
 import fetchArticleContentFromDb from "./services/fetch_article_fromDb";
 import { useLoadArticleStore } from "@/store/useLoadArticleStore";
 import { text } from "@/constants/load_articles.json";
-import { handleClick } from "../../draft_article/utils/handle_click";
 import { useDraftStore } from "@/store/useDraftStore";
-const LoadArticles = ({
-  articles,
-}: {
-  articles: { id: string; title: string }[];
-}) => {
+import { ArticleItem } from "@/types/storage_item";
+const LoadArticles = ({ articles }: { articles: ArticleItem[] }) => {
   //
   const { setLoading } = useLoadArticleStore.getState();
+  // const setArticleStored = useDraftStore.getState().setArticleStored;
+  let articleTitle: string, articleBody: string, articleId: string;
   //
   return (
     <>
@@ -33,21 +30,31 @@ const LoadArticles = ({
             console.log("OnClick Articles");
             setLoading(true);
             fetchArticleContentFromDb({
+              type: "single",
               article_title: e.currentTarget.value,
             }).then((response) => {
               console.log("Fetched article content from DB:", response);
-              if (response.title) {
+              const article = response as ArticleItem | undefined;
+              console.log("Article content type:", typeof article);
+              console.log("Article from response[0]:", article);
+              if (article) {
                 setLoading(false);
+                articleTitle = article?.title ?? "";
+                articleBody = article.body ?? "";
                 console.log("Setting title and body in editor store:", {
-                  title: response.title,
-                  body: response.body[0].content,
+                  articleTitle,
+                  articleBody,
+                });
+                articleId = article?.id ?? "";
+                console.log("Setting title, body, and ID in editor store:", {
+                  articleTitle,
+                  articleBody,
+                  articleId,
                 });
                 useDraftStore
                   .getState()
-                  .loadDraftIntoEditor(
-                    response.title,
-                    response.body[0].content,
-                  );
+                  .loadDraftIntoEditor(articleTitle, articleBody);
+                // setArticleStored(true);
               }
             });
           }}
@@ -55,13 +62,13 @@ const LoadArticles = ({
           <option value="" disabled hidden>
             {text.choose_article}
           </option>
-          {articles.map((article: { id: string; title: string }) => (
+          {articles.map((article: ArticleItem) => (
             <option
               className="font-bold text-base text-black"
               key={article.id}
               value={article.title}
             >
-              {article.title.replace(/<\/?p[^>]*>/gi, "").toUpperCase()}
+              {article.title?.replace(/<\/?p[^>]*>/gi, "").toLocaleUpperCase()}
             </option>
           ))}
         </select>

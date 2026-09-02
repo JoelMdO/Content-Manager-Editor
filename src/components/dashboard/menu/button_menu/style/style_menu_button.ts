@@ -56,7 +56,7 @@ export function menuButtonStyle(
       defaultProperties: defaultProperties,
       icon: iconsMenu.translate,
     },
-    summary: {
+    summary_selector: {
       text: "Summary",
       defaultProperties: defaultProperties,
       icon: iconsMenu.summary,

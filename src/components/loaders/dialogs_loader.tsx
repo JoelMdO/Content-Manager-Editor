@@ -1,7 +1,10 @@
 import { iconsMenu } from "../../constants/icons";
 import text from "../../constants/dasboardPage_data_text.json";
 import animation from "./style/loader.module.css";
-
+import { useTranslationStore } from "@/store/useTranslationStore";
+import { useUIStore } from "@/store/useUIStore";
+import { useLoadArticleStore } from "@/store/useLoadArticleStore";
+import { translateController } from "../dashboard/menu/button_menu/utils/translate_button_clicked";
 // CHANGE LOG
 // Changed by : Joel Montes de Oca
 // Date       : 2026-08-12
@@ -23,6 +26,10 @@ const DialogsLoader = ({ type }: { type: string }) => {
   let title: string = "";
   let content: string = "";
   let icon: string = "";
+  //
+  const setTranslating = useTranslationStore((s) => s.setTranslating);
+  const setIsSummary = useUIStore((s) => s.setIsSummary);
+  const setLoading = useLoadArticleStore((s) => s.setLoading);
   //
   ///--------------------------------------------------------
   // Determine content based on type
@@ -54,7 +61,22 @@ const DialogsLoader = ({ type }: { type: string }) => {
       icon = iconsMenu.summary;
       break;
   }
-  //if
+  //
+  const closeDialogs = ({ type }: { type: string }) => {
+    switch (type) {
+      case "translation":
+        translateController.abort();
+        setTranslating(false);
+        break;
+      case "loading_article":
+        setLoading(false);
+        break;
+      default:
+        setIsSummary(false);
+        break;
+    }
+  };
+  //
   return (
     <div
       className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100"
@@ -85,6 +107,14 @@ const DialogsLoader = ({ type }: { type: string }) => {
           >
             {iconsMenu.spanish}
           </div>
+          <button
+            className="mt-4 px-4 py-2 bg-blue-500 text-red rounded hover:bg-blue-600 transition-colors duration-300"
+            onClick={() => {
+              closeDialogs({ type });
+            }}
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>

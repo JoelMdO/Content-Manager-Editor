@@ -4,6 +4,7 @@ import uploadImagesToCMS from "@/utils/api/save/upload_images_to_CMS";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import readLog from "@/services/authentication/read_log";
 import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
+import { ImageData } from "@/utils/api/save/upload_images_to_CMS";
 
 export async function POST(req: NextRequest): Promise<Response> {
   console.error("[SAVE_ROUTE_V4] entered", req.url);
@@ -57,23 +58,41 @@ export async function POST(req: NextRequest): Promise<Response> {
       let updatedBody;
       let updatedEsBody;
 
-      if (images[0] === "Body has the images already") {
+      const imagesCheckBase64Empty = images.filter(
+        (image: ImageData) =>
+          image.type.startsWith("image") && image.base64 !== "",
+      );
+      const imagesCheckText =
+        images === "Body has the images already" ? [images] : images;
+
+      console.log(
+        "Without images check",
+        imagesCheckBase64Empty.length === 0 ||
+          imagesCheckText[0] === "Body has the images already",
+      );
+
+      if (
+        imagesCheckBase64Empty.length === 0 ||
+        imagesCheckText[0] === "Body has the images already"
+      ) {
         console.log("No new images to upload, using existing body content");
         updatedBody = body;
         updatedEsBody = es_body;
+      } else {
+        imageUrls = (await uploadImagesToCMS(images)).map(
+          (image: { url: string; image_id: string }) => ({
+            url: image.url,
+            fileId: image.image_id,
+          }),
+        );
+        console.log("imageUrls at api/save", imageUrls);
+        // Update the body content with the uploaded image URLs
+        updatedBody = replaceImgWithSrc(body, imageUrls, "save", "en");
+        updatedEsBody = replaceImgWithSrc(es_body, imageUrls, "save", "es");
+        console.log("updatedBody at api/save", updatedBody);
       }
 
-      imageUrls = (await uploadImagesToCMS(images)).map(
-        (image: { url: string; image_id: string }) => ({
-          url: image.url,
-          fileId: image.image_id,
-        }),
-      );
-      console.log("imageUrls at api/save", imageUrls);
-      // Update the body content with the uploaded image URLs
-      updatedBody = replaceImgWithSrc(body, imageUrls, "save", "en");
-      updatedEsBody = replaceImgWithSrc(es_body, imageUrls, "save", "es");
-      console.log("updatedBody at api/save", updatedBody);
+      // Call the CMS article endpoint
       const configuredApiUrl =
         process.env.URL_API_DECAV || process.env.URL_API_JOE || "";
       const api_call_url = configuredApiUrl.replace(/\/$/, "") + "/";
@@ -98,23 +117,13 @@ export async function POST(req: NextRequest): Promise<Response> {
           title: title,
           es_title: es_title,
           status: "draft",
-          body: [
-            {
-              type: "paragraph",
-              content: updatedBody,
-            },
-          ],
-          es_body: [
-            {
-              type: "paragraph",
-              content: updatedEsBody,
-            },
-          ],
+          body: updatedBody,
+          es_body: updatedEsBody,
           section: section || "",
           es_section: es_section || "",
           summary: summary || "",
           es_summary: es_summary || "",
-          images: [],
+          // images: [],
         }),
       });
       console.log("api/save downstream RESPONSE", {

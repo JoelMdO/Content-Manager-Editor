@@ -42,6 +42,7 @@ const DashboardEditor = () => {
   //
   const openDialogNoSection = useUIStore((s) => s.openDialogNoSection);
   const isSummary = useUIStore((s) => s.isSummary);
+  const setArticleStored = useDraftStore.getState().setArticleStored;
   const isLoadingPreview = useUIStore((s) => s.isLoadingPreview);
   const { setOpenDialogNoSection, setLastAutoSave } = useUIStore.getState();
 
@@ -170,12 +171,18 @@ const DashboardEditor = () => {
       const { titleEditorRef, bodyEditorRef } = useEditorStore.getState();
       const currentTitle = titleEditorRef.current?.getHTML() ?? "";
       const currentBody = bodyEditorRef.current?.getHTML() ?? "";
-      saveArticle({ dbName, currentTitle, currentBody });
+      saveArticle({
+        dbName,
+        currentTitle,
+        currentBody,
+        setArticleStored,
+        language,
+      });
       setLastAutoSave(new Date());
     }, 10 * 60_000);
 
     return () => clearInterval(interval);
-  }, [dbName, DRAFT_KEY, language, setLastAutoSave]);
+  }, [dbName, DRAFT_KEY, language, setLastAutoSave, setArticleStored]);
 
   ///---------------------------------------------------
   //  Cleanup debounce on unmount

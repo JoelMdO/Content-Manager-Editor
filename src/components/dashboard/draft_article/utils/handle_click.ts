@@ -2,7 +2,7 @@
 // HANDLE CLICK, purpose:
 // Update UI with the draft article content
 //=========================================================
-import { StorageItemOrNull } from "../../../../types/storage_item";
+import { ArticleItemOrNull } from "../../../../types/storage_item";
 import {
   defaultDispatcher,
   defaultHandlerContext,
@@ -18,7 +18,7 @@ type HandleClickProps = {
   setLanguage?: (language: "en" | "es") => void;
   language?: string;
   setSummaryContent?: (summaryContent: string) => void;
-  setArticle?: (article: StorageItemOrNull | null) => void;
+  setArticle?: (article: ArticleItemOrNull | null) => void;
 };
 
 export const handleClick = async (props: HandleClickProps) => {

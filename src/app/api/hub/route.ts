@@ -80,8 +80,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     if (saveJwt?.sub) {
+      console.log("saveJwt.sub at api/hub:", saveJwt.sub);
+      console.log("Creating log for saveJwt.sub at api/hub");
       token = createLog(saveJwt.sub);
+      console.log("token at api/hub:", token);
       nextAuthToken = saveJwt.accessToken;
+      console.log("nextAuthToken at api/hub:", nextAuthToken);
     }
     // else if (session && type !== "sign-in-by-email") {
     //   token = createLog(session?.user?.id);

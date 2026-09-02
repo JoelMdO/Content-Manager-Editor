@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+// import React, { useEffe} from "react";
 import LogOutButton from "../../components/buttons/logout_buttons";
 import LogoButton from "@/components/buttons/logo_button";
 import InopButton from "@/components/buttons/inop_button";
@@ -8,18 +8,18 @@ import text from "../../constants/homePage_data_text.json";
 import withSessionProvider from "../../utils/withSessionProvider";
 
 const Home: React.FC = () => {
-  const [thereIsPlaybook, setThereIsPlaybook] = useState<boolean>(false);
+  // const [thereIsPlaybook, setThereIsPlaybook] = useState<boolean>(false);
   ///--------------------------------------------------------
   // Check if a playbook item is already temporary stored
   // and user was asked to signin again.
   ///--------------------------------------------------------
-  useEffect(() => {
-    const playbook_item = sessionStorage.getItem("playbook-item");
+  // useEffect(() => {
+  //   const playbook_item = sessionStorage.getItem("playbook-item");
 
-    if (playbook_item) {
-      setThereIsPlaybook(true);
-    }
-  }, []);
+  //   if (playbook_item) {
+  //     setThereIsPlaybook(true);
+  //   }
+  // }, []);
   //
 
   return (
@@ -49,7 +49,7 @@ const Home: React.FC = () => {
               <p className="text-gray-500 text-xs pl-2">
                 {text.homePage.slogan}
               </p>
-              {thereIsPlaybook && <RouteButton type="with-item-playbook" />}
+              {/* {thereIsPlaybook && <RouteButton type="with-item-playbook" />} */}
               <div className="flex flex-row self-center pt-2 gap-4">
                 <RouteButton type="playbook" data-cy="route-button-playbook" />
                 <RouteButton

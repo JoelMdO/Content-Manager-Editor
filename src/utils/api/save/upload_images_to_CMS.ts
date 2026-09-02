@@ -1,4 +1,4 @@
-interface ImageData {
+export type ImageData = {
   type: string;
   imageId: string;
   fileName: string;
@@ -6,7 +6,7 @@ interface ImageData {
   url?: string;
   fileUrl?: string;
   cloudinaryUrl?: string;
-}
+};
 
 const uploadImagesToCMS = async (images: ImageData[]) =>
   await Promise.all(

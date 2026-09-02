@@ -5,12 +5,15 @@ import readLog from "../../../services/authentication/read_log";
 import { sectionsCode } from "../../../constants/sections";
 import { getTranslatedSection } from "@/utils/api/post/get_translated_section";
 import { JWT } from "next-auth/jwt";
-import crypto from "crypto";
-import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
-import { FormDataImageItem } from "@/components/dashboard/menu/button_menu/type/formData";
+// import crypto from "crypto";
+// import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
+// import { FormDataImageItem } from "@/components/dashboard/menu/button_menu/type/formData";
 import { cleanNestedDivsServer } from "@/components/dashboard/utils/clean_content_server";
-import searchImageByFilename from "@/utils/api/post/search_image_byFileName";
+// import searchImageByFilename from "@/utils/api/post/search_image_byFileName";
 import cloudinary from "../../../lib/cloudinary/cloudinary";
+import replaceSrcWithImagePlaceholdersAtPost from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_src_on_img_at_post";
+import generateNonce from "@/utils/nonce";
+import { createSignature } from "@/utils/create_signatures";
 //
 export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
@@ -18,7 +21,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   ///---------------------------------------------------
   ///
   /// Variables.
-  const imageUrls: { url: string; fileId: string }[] = [];
+  // const imageUrls: { url: string; fileId: string }[] = [];
   const formData = await req.formData();
   const dbName = formData.get("dbName") as string;
   console.log('doing POST at /api/post, dbName:"', dbName, '"');
@@ -26,17 +29,17 @@ export async function POST(req: NextRequest): Promise<Response> {
   interface Article {
     id: string;
     title: string;
-    esTitle?: string;
+    es_title?: string;
     body: string;
-    esBody?: string;
-    images?: { url: string; fileId: string }[];
+    es_body?: string;
+    // images?: { url: string; fileId: string }[];
     category?: string;
     version?: string;
     section?: string;
-    esSection?: string;
+    es_section?: string;
     sectionCode?: string;
     summary?: string;
-    esSummary?: string;
+    es_summary?: string;
     markdownArticle?: string;
     markdownEsArticle?: string;
   }
@@ -55,14 +58,14 @@ export async function POST(req: NextRequest): Promise<Response> {
   const article: Article = {
     id: "",
     title: "",
-    esTitle: "",
+    es_title: "",
     body: "",
-    esBody: "",
+    es_body: "",
     section: "",
-    esSection: "",
-    images: [],
+    es_section: "",
+    // images: [],
     summary: "",
-    esSummary: "",
+    es_summary: "",
     markdownArticle: "",
     markdownEsArticle: "",
   };
@@ -98,132 +101,210 @@ export async function POST(req: NextRequest): Promise<Response> {
     /// SAVE IMAGE :
     ///================================================================
 
-    let imageFiles: FormDataImageItem[] = [];
-    const pre_images: Array<File> = [];
-    //console.log("auth ok");
+    // let imageFiles: FormDataImageItem[] = [];
+    // //const pre_images: Array<File> = [];
+    // //console.log("auth ok");
 
-    const files = formData.get("images");
-    console.log('files  "images"', files);
-    const filesObj = JSON.parse(files as string);
-    ////console.log('"filesObj at uploadImage"', filesObj);
+    // const files = formData.get("images");
+    // console.log('files  "images"', files);
+    // const filesObj = JSON.parse(files as string);
+    // ////console.log('"filesObj at uploadImage"', filesObj);
 
-    imageFiles = filesObj as FormDataImageItem[];
+    // imageFiles = filesObj as FormDataImageItem[];
 
-    if (imageFiles.length > 0) {
-      //Filter valid file objects
-      //console.log("pre_images > 0");
-      await Promise.all(
-        imageFiles.map(async (item: FormDataImageItem) => {
-          return new Promise<void>(async (resolve) => {
-            // let fileUri: string = "";
-            let uploadFileName: string = "";
-            if (typeof item === "string") {
-              // If item is a string, use it directly as the URL
-              // fileUri = item;
-              uploadFileName = item;
-            } else {
-              // fileUri = item.base64;
-              uploadFileName = item.imageId;
-            }
-            ///--------------------------------------------------------
-            // Search if the image URL is already in article images
-            ///--------------------------------------------------------
-            const existingImage = await searchImageByFilename(
-              uploadFileName,
-              dbName,
-            );
-            console.log(
-              '"📸 [Image existingImage at uploadImage":',
-              existingImage,
-            );
+    // if (imageFiles.length > 0) {
+    //Filter valid file objects
+    //console.log("pre_images > 0");
 
-            if (existingImage) {
-              //console.log("Image already exists, using existing URL");
-              imageUrls.push({
-                url: existingImage.secure_url,
-                fileId: existingImage.public_id,
+    const insertCloudinaryUrlsatBody = async (
+      language: string,
+    ): Promise<string> => {
+      const imageUrlRegex = /<img[^>]+src="([^">]+)"/g;
+      const bodyContent = formData.get(
+        language === "en" ? "body" : "es_body",
+      ) as string;
+
+      let match: RegExpExecArray | null;
+      let cleanedBody: string = "";
+
+      // Search in English body
+      while ((match = imageUrlRegex.exec(bodyContent)) !== null) {
+        const imageUrl = match[1];
+        const uploadFileName = imageUrl.split("/").pop() || "";
+        const url = process.env.URL_IMAGES_STORE || "";
+
+        const response = await fetch(`${url}/?image_id=${uploadFileName}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Internal-Proxy-Key": process.env.PROXY_KEY || "",
+          },
+        });
+
+        const data = await response.json();
+        const base64Data = data.image_base64_url.base64;
+        const image_id = data.image_base64_url.image_id;
+        const file_name = data.image_base64_url.file_name;
+        const newCloudinaryImage: Array<{ url: string; fileId: string }> = [
+          { url: "", fileId: "" },
+        ];
+
+        cloudinary.uploader.upload(
+          base64Data,
+          {
+            invalidate: true,
+            resource_type: "auto",
+            public_id: image_id,
+            folder: dbName,
+          },
+          (uploadError, result) => {
+            if (uploadError) {
+              // Handle upload error
+              return NextResponse.json({
+                status: 400,
+                message: `Error uploading image: ${uploadError}`,
               });
-              resolve();
-            } else {
-              // Upload new image
-              console.log("Uploading new image:", uploadFileName);
-              ///--------------------------------------------------------
-              // Load the image into Cloudinary
-              ///--------------------------------------------------------
-              ///CLOUDINARY UPLOAD
-              // Use base64 data directly from sessionStorage
-              const imageItem = item as FormDataImageItem;
-              const base64Data = imageItem.base64;
-
-              if (!base64Data) {
-                console.error(
-                  "No base64 data available for image:",
-                  uploadFileName,
-                );
-                resolve();
-                return;
-              }
-
-              cloudinary.uploader.upload(
-                base64Data,
-                {
-                  invalidate: true,
-                  resource_type: "auto",
-                  public_id: imageItem.imageId,
-                  folder: dbName,
-                },
-                (uploadError, result) => {
-                  if (uploadError) {
-                    // Handle upload error
-                    console.log("Error uploading image:", uploadError);
-                    resolve();
-                    return;
-                  }
-                  // Get public URL
-                  if (result?.secure_url) {
-                    // CLOUDINARY URL
-                    imageUrls.push({
-                      url: result.secure_url,
-                      fileId: result.public_id,
-                    });
-                  }
-                  resolve();
-                },
-              );
+              return;
             }
-
-            // Update image URL in article content
-            // If any images were uploaded, update the article's images array
-            if (imageUrls.length > 0) {
-              console.log('"imageUrls.length > 0 at uploadImage"');
-              console.log('"imageUrls"', imageUrls);
-              article.images = imageUrls; // Append image URLs to article.images
+            // Get public URL
+            if (result?.secure_url) {
+              // CLOUDINARY URL
+              newCloudinaryImage[0] = {
+                url: result.secure_url,
+                fileId: file_name,
+              };
             }
-          });
-        }),
-      );
-    }
+          },
+        );
+
+        const bodyWithCloudinaryUrls = replaceSrcWithImagePlaceholdersAtPost(
+          bodyContent,
+          newCloudinaryImage,
+        );
+        console.log(
+          `Updated ${language} body with Cloudinary URLs:`,
+          bodyWithCloudinaryUrls,
+        );
+        console.log(
+          `==== Body with Cloudinary URLs length: ====`,
+          bodyWithCloudinaryUrls.length,
+        );
+        cleanedBody = cleanNestedDivsServer(bodyWithCloudinaryUrls);
+        console.log(`==== Cleaned ${language} body: ====`, cleanedBody);
+      }
+      return cleanedBody;
+    };
+    // imageFiles.map(async (item: FormDataImageItem) => {
+    //   return new Promise<void>(async (resolve) => {
+    //     // let fileUri: string = "";
+    //     let uploadFileName: string = "";
+    //     if (typeof item === "string") {
+    //       // If item is a string, use it directly as the URL
+    //       // fileUri = item;
+    //       uploadFileName = item;
+    //     } else {
+    //       // fileUri = item.base64;
+    //       uploadFileName = item.imageId;
+    //     }
+    ///--------------------------------------------------------
+    // Search if the image URL is already in article images
+    ///--------------------------------------------------------
+    // const existingImage = await searchImageByFilename(
+    //   uploadFileName,
+    //   dbName,
+    // );
+    // console.log(
+    //   '"📸 [Image existingImage at uploadImage":',
+    //   existingImage,
+    // );
+
+    // if (existingImage) {
+    //   //console.log("Image already exists, using existing URL");
+    //   imageUrls.push({
+    //     url: existingImage.secure_url,
+    //     fileId: existingImage.public_id,
+    //   });
+    //   resolve();
+    // } else {
+    //   // Upload new image
+    //   console.log("Uploading new image:", uploadFileName);
+    //   ///--------------------------------------------------------
+    //   // Load the image into Cloudinary
+    //   ///--------------------------------------------------------
+    //   ///CLOUDINARY UPLOAD
+    //   // Use base64 data directly from sessionStorage
+    //   const imageItem = item as FormDataImageItem;
+    //   const base64Data = imageItem.base64;
+
+    //   if (!base64Data) {
+    //     console.error(
+    //       "No base64 data available for image:",
+    //       uploadFileName,
+    //     );
+    //     resolve();
+    //     return;
+    //   }
+
+    //   cloudinary.uploader.upload(
+    //     base64Data,
+    //     {
+    //       invalidate: true,
+    //       resource_type: "auto",
+    //       public_id: imageItem.imageId,
+    //       folder: dbName,
+    //     },
+    //     (uploadError, result) => {
+    //       if (uploadError) {
+    //         // Handle upload error
+    //         console.log("Error uploading image:", uploadError);
+    //         resolve();
+    //         return;
+    //       }
+    //       // Get public URL
+    //       if (result?.secure_url) {
+    //         // CLOUDINARY URL
+    //         imageUrls.push({
+    //           url: result.secure_url,
+    //           fileId: result.public_id,
+    //         });
+    //       }
+    //       resolve();
+    //     },
+    //   );
+    // }
+
+    // Update image URL in article content
+    // If any images were uploaded, update the article's images array
+    //   if (imageUrls.length > 0) {
+    //     console.log('"imageUrls.length > 0 at uploadImage"');
+    //     console.log('"imageUrls"', imageUrls);
+    //     article.images = imageUrls; // Append image URLs to article.images
+    //   }
+    // });
+    //     }),
+    //   );
+    // }
     ///================================================================
     /// SAVE　THE FULL ARTICLE to database:
     ///================================================================
     // Parse individual fields
     const titleData = formData.get("title") as string;
     const titleObj = JSON.parse(titleData);
-    const esTitleData = formData.get("es-title") as string;
+    const esTitleData = formData.get("es_title") as string;
     const esTitleObj = JSON.parse(esTitleData);
     const idData = formData.get("id") as string;
     const idObj = JSON.parse(idData);
-    const articleData = formData.get("body") as string;
-    const bodyObj = JSON.parse(articleData);
-    const esArticleData = formData.get("es-body") as string;
-    const esBodyObj = JSON.parse(esArticleData);
+    // const articleData = formData.get("body") as string;
+    // const bodyObj = JSON.parse(articleData);
+    // const esArticleData = formData.get("es_body") as string;
+    // const esBodyObj = JSON.parse(esArticleData);
     const dbNameData = formData.get("dbName") as string;
     const dbNameObj = JSON.parse(dbNameData);
     const sectionData = formData.get("section") as string;
     const sectionObj = JSON.parse(sectionData);
-    const esSectionData = formData.get("es-section") as string;
+    const esSectionData = formData.get("es_section") as string;
     const esSectionObj = JSON.parse(esSectionData);
-    const esSummaryData = formData.get("es-summary") as string;
+    const esSummaryData = formData.get("es_summary") as string;
     const esSummaryObj = JSON.parse(esSummaryData);
     const summaryData = formData.get("summary") as string;
     const summaryObj = JSON.parse(summaryData);
@@ -235,32 +316,32 @@ export async function POST(req: NextRequest): Promise<Response> {
     //
     article.id = idObj;
     article.title = titleObj;
-    article.esTitle = esTitleObj;
-    article.body = bodyObj;
-    article.esBody = esBodyObj;
-    article.images = imageUrls;
+    article.es_title = esTitleObj;
+    // article.body = bodyObj;
+    // article.es_body = esBodyObj;
+    // article.images = imageUrls;
     article.section = sectionObj;
-    article.esSection = esSectionObj;
+    article.es_section = esSectionObj;
     article.summary = summaryObj;
-    article.esSummary = esSummaryObj;
+    article.es_summary = esSummaryObj;
     console.log('"article at post before replace image:"', article);
-    console.log("articles title and esTitle", article.title, article.esTitle);
-    console.log("articles body and esBody", article.body, article.esBody);
+    console.log("articles title and es_title", article.title, article.es_title);
+    console.log("articles body and es_body", article.body, article.es_body);
     console.log(
       "articles section and esSection",
       article.section,
-      article.esSection,
+      article.es_section,
     );
     console.log(
       "articles summary and esSummary",
       article.summary,
-      article.esSummary,
+      article.es_summary,
     );
 
     // SAVE in db.
-    const images = article.images;
+    // const images = article.images;
     const section = article.section;
-    console.log('article images after cloudinary upload:"', images);
+    // console.log('article images after cloudinary upload:"', images);
     console.log("body before replace image", article.body);
 
     //
@@ -268,25 +349,28 @@ export async function POST(req: NextRequest): Promise<Response> {
     //------------------------------------------
     // Purpose: Replace image src attributes in article bodies with placeholders and assign the updated strings back.
     //------------------------------------------
-
-    const articlesBodies = [article.body, article.esBody];
-    let articlesReplaced: (string | undefined)[] = [];
-    ////console.log("articlesBodie", article.body);
-    if (images.length > 0) {
-      articlesReplaced = articlesBodies.map((body, index) => {
-        if (body) {
-          return replaceImgWithSrc(
-            body,
-            images,
-            "post",
-            index === 0 ? "en" : "es",
-          );
-        }
-        return body;
-      });
-    } else {
-      articlesReplaced = articlesBodies;
-    }
+    article.body = await insertCloudinaryUrlsatBody("en");
+    article.es_body = await insertCloudinaryUrlsatBody("es");
+    console.log("body after replace image", article.body);
+    console.log("es_body after replace image", article.es_body);
+    // const articlesBodies = [article.body, article.es_body];
+    // let articlesReplaced: (string | undefined)[] = [];
+    // ////console.log("articlesBodie", article.body);
+    // if (images.length > 0) {
+    //   articlesReplaced = articlesBodies.map((body, index) => {
+    //     if (body) {
+    //       return replaceImgWithSrc(
+    //         body,
+    //         images,
+    //         "post",
+    //         index === 0 ? "en" : "es",
+    //       );
+    //     }
+    //     return body;
+    //   });
+    // } else {
+    //   articlesReplaced = articlesBodies;
+    // }
 
     // article.body = articlesReplaced[0]!;
     // article.esBody = articlesReplaced[1]!;
@@ -308,9 +392,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     //   '"articleReplaced at post after replaceImgWithSrc:"',
     //   articleReplaced
     // );
-    const cleanedBody = articlesReplaced.map((body) =>
-      body ? cleanNestedDivsServer(body) : body,
-    );
+
     //
     ///--------------------------------------------------------
     // Find Category and Section Code
@@ -360,8 +442,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     // ///--------------------------------------------------------
     // // HTML articles
     // ///--------------------------------------------------------
-    article.body = cleanedBody[0]!;
-    article.esBody = cleanedBody[1]!;
+    // article.body = cleanedBody[0]!;
+    // article.esBody = cleanedBody[1]!;
     // article.body = updatedArticlesBodies[0];
     // article.esBody = updatedArticlesBodies[1];
     //
@@ -409,11 +491,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     const id = article.id;
 
     // Validate required fields
-    if (!id || !article.title || !article.esTitle) {
+    if (!id || !article.title || !article.es_title) {
       return NextResponse.json({
         status: 400,
-        message: "Missing required fields: id, title, or esTitle",
-        data: { id, title: article.title, esTitle: article.esTitle },
+        message: "Missing required fields: id, title, or es_title",
+        data: { id, title: article.title, es_title: article.es_title },
       });
     }
     const newId = id.replace(/\s+/g, "-").replace(/\./g, "");
@@ -434,8 +516,8 @@ export async function POST(req: NextRequest): Promise<Response> {
       version: "1.0",
     };
     const esMetadata = {
-      title: article.esTitle,
-      description: article.esSummary,
+      title: article.es_title,
+      description: article.es_summary,
       author: author,
       date: new Date().toISOString(),
       tags: tags_es,
@@ -451,7 +533,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       // en: article.markdownArticle,
       // es: article.markdownEsArticle,
       en_html: article.body || "",
-      es_html: article.esBody || "",
+      es_html: article.es_body || "",
       metadata: metadata,
       esMetadata: esMetadata,
     };
@@ -459,73 +541,89 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log("articleDataForDb to be saved:", articleDataForDb);
 
     // Validate that we have article content
-    if (!article.body || !article.esBody) {
+    if (!article.body || !article.es_body) {
       return NextResponse.json({
         status: 400,
         message: "Missing article body content",
         data: {
           hasBody: !!article.body,
-          hasEsBody: !!article.esBody,
+          hasEsBody: !!article.es_body,
         },
       });
     }
 
-    const likes = {
-      likes: 0,
-    };
+    // const likes = {
+    //   likes: 0,
+    // };
 
     ///--------------------------------------------------------
     // Check on token expiration
     ///--------------------------------------------------------
 
-    try {
-      //TODO add new DB.
-      // const dbRef = db.ref(`articles/${newId}`);
-      // await dbRef.set(articleDataForDb);
-    } catch (e) {
-      console.log("Error saving article to database:", JSON.stringify(e));
-      console.error(e);
-      return NextResponse.json({
-        status: 500,
-        message: "Error saving article to database",
-        error: e instanceof Error ? e.message : "Unknown database error",
-      });
-    }
+    // try {
+    //   //TODO add new DB.
+    //   // const dbRef = db.ref(`articles/${newId}`);
+    //   // await dbRef.set(articleDataForDb);
+    // } catch (e) {
+    //   console.log("Error saving article to database:", JSON.stringify(e));
+    //   console.error(e);
+    //   return NextResponse.json({
+    //     status: 500,
+    //     message: "Error saving article to database",
+    //     error: e instanceof Error ? e.message : "Unknown database error",
+    //   });
+    // }
 
-    try {
-      //TODO add new DB. LIKES
-      // const dbLikes = db.ref(`likes/${newId}`);
-      // await dbLikes.set(likes);
-    } catch (e) {
-      return NextResponse.json({
-        status: 500,
-        message: "Error saving likes to database",
-        error: e instanceof Error ? e.message : "Unknown database error",
-      });
-    }
+    // try {
+    //   //TODO add new DB. LIKES
+    //   // const dbLikes = db.ref(`likes/${newId}`);
+    //   // await dbLikes.set(likes);
+    // } catch (e) {
+    //   return NextResponse.json({
+    //     status: 500,
+    //     message: "Error saving likes to database",
+    //     error: e instanceof Error ? e.message : "Unknown database error",
+    //   });
+    // }
 
-    const body = JSON.stringify({
-      title: article.title,
-      slug: newId,
-    });
+    // const body = JSON.stringify({
+    //   title: article.title,
+    //   slug: newId,
+    // });
 
-    const secret = process.env.CMS_SECRET_KEY!;
-    const signature = crypto
-      .createHmac("sha256", secret!)
-      .update(body)
-      .digest("hex");
+    // const secret = process.env.CMS_SECRET_KEY!;
+    // const signature = crypto
+    //   .createHmac("sha256", secret!)
+    //   .update(JSON.stringify({
+    //     title: article.title,
+    //     slug: newId,
+    //   }))
+    //   .digest("hex");
     //console.log("url preboarding", api_call_url);
 
+    ///--------------------------------------------------------
+    // Call CMS to update with urls from Cloudinary and Metadata.
+    ///--------------------------------------------------------
     const response = await fetch(api_call_url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-cms-secret": process.env.CMS_SECRET_KEY!,
-        "x-leg": signature,
-        "x-internal-proxy-key": process.env.PROXY_KEY!,
-        Authorization: `Bearer ${tokenG}`,
+        "X-Internal-Proxy-Key": process.env.PROXY_KEY || "",
       },
-      body: body,
+      body: JSON.stringify({
+        article_id: article.id,
+        title: article.title,
+        es_title: article.es_title,
+        status: "published",
+        body: article.body,
+        es_body: article.es_body,
+        section: section || "",
+        es_section: esSection || "",
+        summary: article.summary || "",
+        es_summary: article.es_summary || "",
+        metadata: metadata,
+        esMetadata: esMetadata,
+      }),
     });
     //console.log("response api", response);
     //
@@ -536,11 +634,43 @@ export async function POST(req: NextRequest): Promise<Response> {
         message: "Error saving data",
         error: errorText,
       });
+    } else {
+      ///--------------------------------------------------------
+      // Call DecodingAviation api/articles to update Blog.
+      ///--------------------------------------------------------
+
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const nonce = generateNonce();
+      const signature = createSignature(timestamp, nonce, article.id);
+
+      const decavResponse = await fetch(api_call_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Editor-Key-Id": process.env.EDITOR_SECRET_KEY_ID || "",
+          "X-Editor-Timestamp": timestamp,
+          "X-Editor-Nonce": nonce,
+          "X-Editor-Signature": signature,
+        },
+        body: JSON.stringify({
+          note: "Article published",
+        }),
+      });
+
+      if (decavResponse.status !== 200) {
+        const errorText = await decavResponse.text();
+        return NextResponse.json({
+          status: decavResponse.status,
+          message: "Error updating DecodingAviation API",
+          error: errorText,
+        });
+      } else {
+        return NextResponse.json({
+          status: 200,
+          message: "Data saved successfully",
+        });
+      }
     }
-    return NextResponse.json({
-      status: 200,
-      message: "Data saved successfully",
-    });
   } else {
     return NextResponse.json({
       status: 422,

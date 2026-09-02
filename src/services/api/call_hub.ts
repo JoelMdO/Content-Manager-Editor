@@ -7,6 +7,7 @@ import { TranslateType } from "../../types/translate_type";
 const callHub = async (
   type: string,
   data?: callHubType,
+  abortSignal?: AbortSignal,
 ): Promise<{
   status: number;
   message: string | unknown;
@@ -73,6 +74,7 @@ const callHub = async (
       body: body,
       headers: headers,
       credentials: credentials,
+      signal: abortSignal,
     });
     const jsonResponse = await response.json();
     //console.log("jsonResponse at callHub", jsonResponse);

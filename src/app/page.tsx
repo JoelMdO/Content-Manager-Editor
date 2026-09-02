@@ -85,10 +85,11 @@ const Login: React.FC = () => {
             width={52}
             height={52}
             quality={100}
+            loading="eager"
             className="md:w-[18rem] md:h-[15rem] mb-4"
           />
           <h1 className="text-2xl font-bold pb-4">{text.mainPage.welcome}</h1>
-          <form
+          {/* <form
             onSubmit={handleLogin}
             className="flex flex-col align-center items-center space-y-4 border-cyan-200 border-2 rounded-lg p-4 xs:w-[250px] md:w-[360px]"
           >
@@ -136,51 +137,51 @@ const Login: React.FC = () => {
                 onSubmit={handleSendResetLink}
                 className="flex flex-col items-center space-y-3 mt-3"
               >
-              <input
-                data-cy="reset-email-input"
-                className="w-[75%] flex align-center justify-center"
-                type="email"
-                placeholder="Type your email here"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <div className="flex space-x-2">
-                <button
-                  data-cy="send-reset-button"
-                  type="submit"
-                  className="bg-blue text-white text-xs rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center shadow-md shadow-dark-background"
+                <input
+                  data-cy="reset-email-input"
+                  className="w-[75%] flex align-center justify-center"
+                  type="email"
+                  placeholder="Type your email here"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <div className="flex space-x-2">
+                  <button
+                    data-cy="send-reset-button"
+                    type="submit"
+                    className="bg-blue text-white text-xs rounded-lg md:w-[170px] h-[30px] w-[120px] flex justify-center items-center shadow-md shadow-dark-background"
+                  >
+                    {isResetSubmitting ? (
+                      <Loader type={`Sending...`} />
+                    ) : (
+                      `Send reset link`
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    data-cy="reset-cancel-button"
+                    onClick={() => setShowReset(false)}
+                    className="bg-gray-200 rounded-lg text-xs md:w-[70px] h-[30px] w-[70px] flex justify-center items-center"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+              <p className="text-xs text-slate-500 mt-2 text-center">
+                Signed in with Google? Manage your password at{" "}
+                <a
+                  href="https://myaccount.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
                 >
-                  {isResetSubmitting ? (
-                    <Loader type={`Sending...`} />
-                  ) : (
-                    `Send reset link`
-                  )}
-                </button>
-                <button
-                  type="button"
-                  data-cy="reset-cancel-button"
-                  onClick={() => setShowReset(false)}
-                  className="bg-gray-200 rounded-lg text-xs md:w-[70px] h-[30px] w-[70px] flex justify-center items-center"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-            <p className="text-xs text-slate-500 mt-2 text-center">
-              Signed in with Google? Manage your password at{" "}
-              <a
-                href="https://myaccount.google.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                myaccount.google.com
-              </a>
-              .
-            </p>
+                  myaccount.google.com
+                </a>
+                .
+              </p>
             </>
-          ) : null}
+          ) : null} */}
           <button
             type="button"
             data-cy="google-signin-button"
@@ -192,9 +193,11 @@ const Login: React.FC = () => {
           >
             <div className="flex flex-row">
               {isSubmittedGoogle ? null : (
-                <img
+                <Image
                   src={process.env.NEXT_PUBLIC_GOOGLE_DEV_URL!}
                   alt="Google logo"
+                  width={24}
+                  height={24}
                   className="w-6 h-6 mr-2 rounded-xl"
                 />
               )}

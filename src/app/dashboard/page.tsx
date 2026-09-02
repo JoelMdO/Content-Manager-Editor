@@ -10,6 +10,8 @@ import AutoSaveScreen from "../../components/loaders/auto_save";
 import PreviewArticle from "@/components/dashboard/preview/preview_article";
 import LoadArticles from "@/components/dashboard/menu/load_articles/load_articles";
 import fetchArticlesFromDb from "@/components/dashboard/menu/load_articles/services/fetch_article_fromDb";
+import { ArticleItem } from "@/types/storage_item";
+import { useLoadArticleStore } from "@/store/useLoadArticleStore";
 // CHANGE LOG
 // Changed by : Copilot
 // Date       : 2026-03-11
@@ -34,11 +36,15 @@ const LinkDialog = dynamic(
   () => import("../../components/dashboard/menu/button_menu/link_dialog"),
 );
 const SummaryDialog = dynamic(
-  () => import("../../components/dashboard/menu/summary_dialog/summary_dialog"),
+  () => import("../../components/summary/summary_dialog/summary_dialog"),
   { ssr: false },
 );
 const SectionSelector = dynamic(
   () => import("../../components/dashboard/menu/button_menu/sections_selector"),
+);
+
+const SummarySelector = dynamic(
+  () => import("../../components/summary/summary_selector"),
 );
 
 const MenuDesktop = dynamic(
@@ -60,10 +66,11 @@ const Dashboard: React.FC = () => {
   const savedBodyRef = useRef<string>("");
   const pageRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [articles, setArticles] = useState<{ id: string; title: string }[]>([]);
+  const [articles, setArticles] = useState<ArticleItem[]>([]);
   // Local state — only dbIsReady remains to trigger the db-setup useEffect.
   // All other state lives in Zustand stores.
-  const [dbIsReady, setDbIsReady] = useState<boolean>(false);
+  const dbIsReady = useLoadArticleStore((s) => s.dbIsReady);
+  const setDbIsReady = useLoadArticleStore.getState().setDbIsReady;
   //
   // Read from stores for JSX — thin subscriptions
   const lastAutoSave = useUIStore((s) => s.lastAutoSave);
@@ -81,7 +88,6 @@ const Dashboard: React.FC = () => {
     }
 
     if (sessionStorage.getItem("db") !== null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDbIsReady(true);
     }
 
@@ -162,6 +168,7 @@ const Dashboard: React.FC = () => {
         </aside>
         {previewReady ? <PreviewArticle /> : <DashboardEditor />}
         <SectionSelector />
+        <SummarySelector />
         <ImageInput index={1} />
         <LinkDialog index={1} />
         <SummaryDialog />

@@ -5,4 +5,5 @@ export type postDataType = {
   JWT?: string | undefined;
   data: string | FormData | dataType;
   type: string;
+  signal?: AbortSignal;
 };

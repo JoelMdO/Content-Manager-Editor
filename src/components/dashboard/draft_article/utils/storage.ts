@@ -1,11 +1,11 @@
-import { StorageItem } from "../../../../types/storage_item";
+import { StorageArticle } from "../../../../types/storage_item";
 
 export interface IStorageProvider {
-  readDraft(dbName: string): Promise<StorageItem[]>;
+  readDraft(dbName: string): Promise<StorageArticle[]>;
 }
 
 export class LocalStorageProvider implements IStorageProvider {
-  async readDraft(dbName: string): Promise<StorageItem[]> {
+  async readDraft(dbName: string): Promise<StorageArticle[]> {
     try {
       const raw = localStorage.getItem(`draft-articleContent-${dbName}`);
       return raw ? JSON.parse(raw) : [];
@@ -17,7 +17,7 @@ export class LocalStorageProvider implements IStorageProvider {
 }
 
 export class SessionStorageProvider implements IStorageProvider {
-  async readDraft(dbName: string): Promise<StorageItem[]> {
+  async readDraft(dbName: string): Promise<StorageArticle[]> {
     try {
       const raw = sessionStorage.getItem(`articleContent-${dbName}`);
       return raw ? JSON.parse(raw) : [];

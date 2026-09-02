@@ -2,17 +2,19 @@
 import { dataType } from "../../types/dataType";
 import { postDataType } from "../../types/postData";
 import { NextResponse } from "next/server";
+import { fetchLlm } from "../../lib/api/llm_fetch";
 
 const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
   ///=============================================================
   /// Function to redirect the api endpoints, includes the fecthing
   ///=============================================================
-  const { JWT, token, data, type } = postData;
-  const url = process.env.NEXT_PUBLIC_url_api;
+  const { JWT, token, data, type, signal } = postData;
+  const url = process.env.INTERNAL_APP_URL;
   let endPoint: string = "";
   let body: dataType | string | FormData = new FormData();
   const headers: HeadersInit = {};
   let credentials: RequestCredentials = "omit";
+  let abortSignal: AbortSignal | undefined = undefined;
   //
   try {
     ///-----------------------------------------------
@@ -26,18 +28,21 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         console.log("doing post at api/routes after sanitize");
         endPoint = type;
         body = data as FormData;
-        body.append("token", token || "");
-        headers["Authorization"] = `Bearer ${JWT!}`;
+        body.append("token", JWT || "");
+        headers["Authorization"] = `Bearer ${JWT}`;
         credentials = "include";
+        abortSignal = signal;
         break;
       case "summary":
         endPoint = type;
-        const mergedData = { data, token: token || "" };
+        const mergedData = { data, token: JWT || "" };
         //console.log("doing summary at api/routes, mergedData:", mergedData);
         body = JSON.stringify(mergedData); // Fix: stringify the data for JSON body
         headers["Content-Type"] = "application/json";
-        headers["Authorization"] = `Bearer ${JWT!}`;
+        console.log("JWT at api/routes summary", JWT);
+        headers["Authorization"] = `Bearer ${JWT}`;
         credentials = "include";
+        abortSignal = signal;
         break;
       case "markdown":
         endPoint = type;
@@ -98,10 +103,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     ///-----------------------------------------------
     // Article saves are handled by the editor API route. They must not be sent
     // to FastAPI: FastAPI exposes translation/summary endpoints, not /api/save.
-    const targetUrl =
-      type === "save"
-        ? `${process.env.INTERNAL_APP_URL}/api/save`
-        : `${url}/api/${endPoint}`;
+    const targetUrl = `${url}/api/${endPoint}`;
     console.error("[SAVE_FORWARD_V4]", { type, targetUrl });
     console.log("api_routes: calling backend ->", targetUrl, {
       headers,
@@ -109,20 +111,36 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
       endPoint,
     });
 
-    let response: Response;
+    let response;
+
     try {
-      response = await fetch(targetUrl, {
-        method: "POST",
-        body: body,
-        headers: headers,
-        credentials: credentials,
-      });
+      switch (type) {
+        case "translate":
+        case "summary":
+          response = await fetchLlm(targetUrl, {
+            method: "POST",
+            body: body,
+            headers: headers,
+            credentials: credentials,
+            signal: abortSignal,
+          });
+          break;
+        default:
+          response = await fetch(targetUrl, {
+            method: "POST",
+            body: body,
+            headers: headers,
+            credentials: credentials,
+            signal: abortSignal,
+          });
+      }
     } catch (err) {
       console.error("api_routes: fetch failed", err);
       return NextResponse.json({ status: 500, message: `error: ${err}` });
     }
     // Log status and attempt to parse JSON response
     console.log("api_routes: backend response status", response.status);
+    console.log("api_routes: backend response message", response);
     let jsonResponse: { status: number; message: string; body?: unknown };
     try {
       jsonResponse = await response.json();

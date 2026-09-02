@@ -60,6 +60,7 @@ export interface ButtonProps {
   summaryDialogRef: React.RefObject<HTMLDialogElement | null>;
   //setIsSummary: React.Dispatch<React.SetStateAction<boolean>>;
   setIsSummary: (v: boolean) => void;
+  summarySelectorRef: React.RefObject<HTMLDialogElement | null>;
   isSummary: boolean;
   //setSummaryContent: React.Dispatch<React.SetStateAction<string>>;
   setSummaryContent: (v: string) => void;
@@ -74,6 +75,7 @@ export interface ButtonProps {
   setIsLoadingPreview: React.Dispatch<React.SetStateAction<boolean>>;
   isMarkdownText: boolean;
   setIsMarkdownText: React.Dispatch<React.SetStateAction<boolean>>;
+  setArticleStored: (v: boolean) => void;
 }
 
 export const menuButtonTypes = [

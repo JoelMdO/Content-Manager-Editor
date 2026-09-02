@@ -1,51 +1,60 @@
+import { ArticleItem } from "@/types/storage_item";
 import { handleClear } from "../../button_menu/utils/handler_clear";
 
 interface FetchArticlesFromDbParams {
   article_title?: string;
+  type?: string;
 }
+
 const fetchArticlesFromDb = async ({
   article_title,
-}: FetchArticlesFromDbParams = {}) => {
-  console.log(
-    "Fetching articles from DB at FETCHARTICLECONTENT...",
-    article_title,
-  );
+  type,
+}: FetchArticlesFromDbParams = {}): Promise<ArticleItem[]> => {
   const controller = new AbortController();
   const params = article_title
     ? new URLSearchParams({ title: article_title })
     : new URLSearchParams({ type: "all" });
 
-  // This function runs in the browser. Docker service names such as `proxy`
-  // are only resolvable from containers, so use the same-origin Next.js API.
-  const configuredApiUrl = `/api/articles?${params.toString()}`;
-
-  console.log("API call URL:", configuredApiUrl); // Log the API call URL for debugging
-
-  const response = await fetch(`${configuredApiUrl}`, {
+  const response = await fetch(`/api/articles?${params.toString()}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     signal: controller.signal,
   });
-  console.log("Response from fetchArticlesFromDb:", response); // Log the response for debugging
+
   if (!response.ok) {
     throw new Error(
       `Failed to fetch articles from the database, error: ${response.statusText}`,
     );
   }
 
-  const article = await response.json();
+  const articles = await response.json();
+  console.log("Fetched articles from DB:", articles);
+  console.log("Fetched articles from DB (TYPE):", typeof articles);
 
-  if (article) {
-    // Delete the localstorage db and indexdb.
-    handleClear();
+  if (articles && typeof window !== "undefined") {
+    const dbName = sessionStorage.getItem("db");
+    console.log("Type of dbName:", typeof dbName, "Value of dbName:", dbName);
+    if (type === "single" && dbName) {
+      handleClear();
+      console.log("Storing single article in localStorage for dbName:", dbName);
+      const newArticle = Object.entries(articles as ArticleItem[]).map(
+        ([key, article]: [string, ArticleItem]) => ({
+          type: key,
+          content: article,
+        }),
+      );
+      console.log(
+        "New article array to be stored in localStorage:",
+        newArticle,
+      );
+      localStorage.setItem(
+        `draft-articleContent-${dbName}`,
+        JSON.stringify(newArticle),
+      );
+    }
   }
 
-  console.log("Fetched articles from DB at FETCHARTICLECONTENT:", article); // Log the fetched article for debugging
-  return article;
-
-  controller.abort(); // Abort the fetch request if needed
+  return articles;
 };
 
 export default fetchArticlesFromDb;

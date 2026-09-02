@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
       );
     }
     const { email, name, provider } = body;
-    const internalApiKey = process.env.INTERNAL_API_KEY;
-    if (!internalApiKey) {
+    const internalProxyKey = process.env.PROXY_KEY;
+    if (!internalProxyKey) {
       return NextResponse.json(
-        { error: "INTERNAL_API_KEY is not configured" },
+        { error: "PROXY_KEY is not configured" },
         { status: 500 },
       );
     }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Internal-Key": internalApiKey,
+        "X-Internal-Proxy-Key": internalProxyKey,
       },
       body: JSON.stringify({ email, name, provider }),
     });

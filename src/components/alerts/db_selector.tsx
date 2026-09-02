@@ -1,3 +1,4 @@
+import { useLoadArticleStore } from "@/store/useLoadArticleStore";
 import "animate.css";
 import Swal from "sweetalert2";
 
@@ -6,6 +7,7 @@ const dbSelector = () => {
   // A sweet alert for the user to select which database to be used
   // can be for DeCav or Joel
   ///=============================================================
+  const setDbIsReady = useLoadArticleStore.getState().setDbIsReady;
   //
   ///------------------------------
   // Sweetalert
@@ -46,13 +48,17 @@ const dbSelector = () => {
             url("/byJoel.png")
             right top
             no-repeat
+            width: 25%
+            height: 25%
             `,
     })
     .then((result) => {
       if (result.isConfirmed) {
         sessionStorage.setItem("db", "DeCav");
+        setDbIsReady(true);
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         sessionStorage.setItem("db", "Joel");
+        setDbIsReady(true);
       }
     });
 };

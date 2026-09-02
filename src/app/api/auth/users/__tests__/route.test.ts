@@ -24,18 +24,18 @@ function makeRequest(body: Record<string, unknown>): Request {
 // ─── Tests ───────────────────────────────────────────────────────────────────
 describe("POST /api/auth/users", () => {
   const originalEndpoint = process.env.USERS_API_ENDPOINT;
-  const originalKey = process.env.INTERNAL_API_KEY;
+  const originalKey = process.env.PROXY_KEY;
 
   beforeEach(() => {
     mockAllowedOriginsCheck.mockReturnValue(null);
     process.env.USERS_API_ENDPOINT = "http://django/auth/users/";
-    process.env.INTERNAL_API_KEY = "test-internal-key";
+    process.env.PROXY_KEY = "test-internal-key";
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
     process.env.USERS_API_ENDPOINT = originalEndpoint;
-    process.env.INTERNAL_API_KEY = originalKey;
+    process.env.PROXY_KEY = originalKey;
   });
 
   // ─── Happy paths ─────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ describe("POST /api/auth/users", () => {
     expect(json.status).toBe(200);
   });
 
-  it("sends the X-Internal-Key header to the backend", async () => {
+  it("sends the X-Internal-Proxy-Key header to the backend", async () => {
     const mockFetch = jest
       .spyOn(global, "fetch")
       .mockResolvedValueOnce(new Response("{}", { status: 200 }));
@@ -92,7 +92,7 @@ describe("POST /api/auth/users", () => {
       "http://django/auth/users/",
       expect.objectContaining({
         headers: expect.objectContaining({
-          "X-Internal-Key": "test-internal-key",
+          "X-Internal-Proxy-Key": "test-internal-key",
         }),
       }),
     );
@@ -152,8 +152,8 @@ describe("POST /api/auth/users", () => {
     expect(json.error).toBe("USERS_API_ENDPOINT is not configured");
   });
 
-  it("returns 500 when INTERNAL_API_KEY env var is not configured", async () => {
-    delete process.env.INTERNAL_API_KEY;
+  it("returns 500 when PROXY_KEY env var is not configured", async () => {
+    delete process.env.PROXY_KEY;
 
     const res = await POST(
       makeRequest({
@@ -164,7 +164,7 @@ describe("POST /api/auth/users", () => {
     );
     const json = await res.json();
 
-    expect(json.error).toBe("INTERNAL_API_KEY is not configured");
+    expect(json.error).toBe("PROXY_KEY is not configured");
   });
 
   it("returns 500 when the backend responds with a non-200/201 status", async () => {

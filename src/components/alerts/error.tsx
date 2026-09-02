@@ -5,7 +5,7 @@ const errorAlert = (
   type: string,
   status: string = "",
   message: string | unknown = "",
-  router?: AppRouterInstance
+  router?: AppRouterInstance,
 ) => {
   ///=============================================================
   // Error Alerts with use of sweetalert
@@ -40,6 +40,9 @@ const errorAlert = (
       break;
     case "nonSummary":
       text = `Summary generation failed ${message}.`;
+      break;
+    case "summaryNotFound":
+      text = `Summary was not found, Create a new one.`;
       break;
     case "nonMarkdown":
       text = `Markdown Loading generation failed ${message}.`;

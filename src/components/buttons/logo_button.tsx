@@ -30,6 +30,8 @@ const LogoButton: React.FC<LogoButtonProps> = ({ type }) => {
       break;
     case "playbook-footer":
       image = image;
+      width = 60;
+      height = 60;
       break;
     default:
       break;

@@ -1,11 +1,11 @@
 const replaceSrcWithImagePlaceholdersAtPost = (
   htmlContent: string,
-  images: Array<{ url: string; fileId: string }>
+  images: { url: string; fileId: string }[],
 ) => {
   // const regex =
   //   /<img src="{image_url_placeholder}">[\s\S]*?<p[^>]*>(.*?)<\/p>/g;
   const newHtmlContent = htmlContent.replace(
-    /<img src="{image_url_placeholder}">[\s\S]*?<p[^>]*>(.*?)<\/p>/g,
+    /<img\s+src="\/media[^"]*">[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/g,
     (match, filename) => {
       const matchingImage = images.find((image) => {
         //console.log(
@@ -23,7 +23,7 @@ const replaceSrcWithImagePlaceholdersAtPost = (
       }
       // If no match found, return the original <img> tag
       return `<img src="{image_url_placeholder}" alt="${filename}">`;
-    }
+    },
   );
 
   if (!newHtmlContent.trim().startsWith("<div>")) {
