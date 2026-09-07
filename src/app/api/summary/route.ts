@@ -45,7 +45,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const title = data.data.title;
     const article = data.data.body;
     const language = data.data.language;
-    const abortSignal = data.signal; // Get the signal from the request body
+    const abortSignal = req.signal; // Abort when the client cancels the request
     console.log("data at resume", data);
     console.log("title", title);
     console.log("article", article);
