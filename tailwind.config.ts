@@ -35,6 +35,7 @@ export default {
         gold: colors.gold,
         "editor-background": colors.editor_background,
         "editor-text": colors.editor_text,
+        "menu-style-button": colors.menu_style_button,
       },
     },
   },

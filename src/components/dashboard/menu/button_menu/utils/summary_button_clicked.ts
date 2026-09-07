@@ -48,11 +48,11 @@ const summaryButtonClicked = async ({
       // First get English summary
       //===================================================
       if (
-        existingSummary == "" &&
-        existingSummary == null &&
-        existingSummary == undefined &&
-        existingEsSummary == "" &&
-        existingEsSummary == null &&
+        existingSummary == "" ||
+        existingSummary == null ||
+        existingSummary == undefined ||
+        existingEsSummary == "" ||
+        existingEsSummary == null ||
         existingEsSummary == undefined
       ) {
         console.log("Creating Both summary at summary button clicked...");
@@ -94,9 +94,9 @@ const summaryButtonClicked = async ({
         existingSummary != "" &&
         existingSummary != null &&
         existingSummary != undefined &&
-        existingEsSummary == "" &&
-        existingEsSummary == null &&
-        existingEsSummary == undefined
+        (existingEsSummary == "" ||
+          existingEsSummary == null ||
+          existingEsSummary == undefined)
       ) {
         console.log(
           "Summary EN found, Creating Spanish summary at summary button clicked...",

@@ -56,46 +56,6 @@ const FontStyleUI = ({
   return (
     <>
       <div className="flex md:top-1/2 md:left-1/2 md:transform md:translate-x-1/2 md:translate-y-1/2 flex-col justify-center items-center md:justify-normal md:items-start">
-        {/* ORIGINAL — replaced by: use grid on mobile to display 3 columns */}
-        {/* <div className="flex flex-row flex-wrap gap-1">
-          {Array.from(fontTypes).map((font) => (
-            <button
-              key={font.value}
-              type="button"
-              data-cy={`${font.value}-button`}
-              className={`${
-                isPressed
-                  ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"
-                  : defaultProperties
-              } mt-2 text-lg text-white w-10 h-9`}
-              onClick={() => {
-                const editor = useEditorStore.getState().bodyEditorRef.current;
-                if (editor) handleFontChange(font.value, editor);
-                type === "mobile" ? setIsFontStyleOpen!(false) : null;
-                setIsPressed(true);
-                setTimeout(() => {
-                  setIsPressed(false);
-                  if (type !== "desktop") {
-                    setIsMenuClicked!(false);
-                  }
-                }, 1000);
-              }}
-            >
-              {typeof font.type === "string" ? (
-                font.type
-              ) : (
-                <Image
-                  src={font.type}
-                  alt={font.value}
-                  width={25}
-                  height={25}
-                  className="ml-1"
-                />
-              )}
-            </button>
-          ))}
-        </div> */}
-        {/* UPDATED — mobile uses 3-column grid; desktop keeps original flex/wrap */}
         <div
           className={`${type === "mobile" ? "grid grid-cols-3 gap-3 w-[85%]" : "flex flex-row flex-wrap gap-1"}`}
         >
@@ -108,7 +68,7 @@ const FontStyleUI = ({
                 isPressed
                   ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"
                   : defaultProperties
-              } mt-2 text-lg text-white w-10 h-9`}
+              } mt-2 text-lg text-menu-style-button w-10 h-9`}
               onClick={() => {
                 const editor = useEditorStore.getState().bodyEditorRef.current;
                 if (editor) handleFontChange(font.value, editor);
@@ -122,17 +82,6 @@ const FontStyleUI = ({
                 }, 1000);
               }}
             >
-              {/* {typeof font.type === "string" ? (
-                font.type
-              ) : ( 
-                // <Image
-                //   src={font.type}
-                //   alt={font.value}
-                //   width={25}
-                //   height={25}
-                //   className="ml-1"
-                // />
-                    */}
               {typeof font.type === "string"
                 ? font.type
                 : (() => {
@@ -154,10 +103,10 @@ const FontStyleUI = ({
                           <Icon
                             title={font.value}
                             aria-label={font.value}
-                            className="ml-1 hover:text-amber-500"
+                            className="ml-1 hover:text-amber-500 text-menu-style-button"
                             size={25}
                           />
-                          <span className="text-xs capitalize">
+                          <span className="text-xs capitalize text-menu-style-button">
                             {font.value}
                           </span>
                         </div>

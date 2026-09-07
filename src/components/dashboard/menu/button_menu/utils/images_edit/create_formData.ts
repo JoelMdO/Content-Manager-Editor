@@ -51,70 +51,19 @@ const createFormData = async (
   formData.append("es_summary", es_summary);
 
   //
-  //Filter if any image on the data
-
-  // if (type !== "translate") {
-  //   //console.log('"type is not translate" is', type);
-
-  //   async function getAllImagesFromLocalDraft() {
-  //     const items = newData.filter((item: FormDataItem | FormDataImageItem) =>
-  //       item.type.startsWith("image-")
-  //     );
-  //     //console.log('"items at getAllImagesFromSessionStorage"');
-  //     if (items.length === 0) return [];
-  //     //
-  //     const images = await Promise.all(
-  //       items.map(async (item: FormDataItem | FormDataImageItem) => {
-  //         const key = item.type;
-  //         if (
-  //           "base64" in item &&
-  //           typeof key === "string" &&
-  //           key.startsWith("image-")
-  //         ) {
-  //           const imageItem = item as FormDataImageItem;
-  //           const blobUrl = imageItem.blobUrl;
-  //           const fileName = imageItem.fileName;
-  //           const imageId = imageItem.imageId;
-  //           //console.log("imageId", imageId);
-  //           const blob = imageId ? await getBlob(imageId) : undefined;
-  //           const base64 = blob
-  //             ? await blobToBase64(blob)
-  //             : imageItem.base64;
-
-  //           return {
-  //             type: key as `image-${string}`,
-  //             base64: base64 ?? "",
-  //             blobUrl: blobUrl ?? "",
-  //             fileName: fileName ?? "",
-  //             imageId: imageId ?? "",
-  //           };
-  //         }
-  //         return null;
-  //       }),
-  //     );
-
-  //     return images.filter(
-  //       (image): image is FormDataImageItem => image !== null,
-  //     );
-  //   }
-  //   const images = JSON.stringify(await getAllImagesFromLocalDraft());
-  //   formData.append("images", images);
-
-  //   // await Promise.all(imagePromises);
-  // } else {
   //------------------------------------------
   // Purpose: For "translate" type, filter all image items and append their content as strings to formData.
   // Note: This approach appends the image data as a string (likely a base64 or similar representation).
   // Make sure the backend expects images as strings for this case.
   //------------------------------------------
   data
-    .filter((item: FormDataItem) => item.type.startsWith("image-"))
+    .filter((item: FormDataItem) => item.type === "image-")
     .forEach((item) => {
       // Get the image content as string (e.g., base64 or identifier)
       if (
         "base64" in item &&
         typeof item.type === "string" &&
-        item.type.startsWith("image-")
+        item.type === "image-"
       ) {
         const imageContent =
           JSON.stringify(getContentByType(item.base64)) ?? "";

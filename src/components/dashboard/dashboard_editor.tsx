@@ -60,7 +60,7 @@ const DashboardEditor = () => {
     editorProps: {
       attributes: {
         class:
-          "h-[10dvh] font-bold p-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text overflow-hidden",
+          "h-[10dvh] font-inter font-bold p-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text overflow-hidden",
         "data-cy": "editor-title",
       },
       handleKeyDown(_view, event) {
@@ -94,7 +94,7 @@ const DashboardEditor = () => {
     editorProps: {
       attributes: {
         class:
-          "h-[70dvh] md:h-[85dvh] overflow-auto p-4 pl-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text",
+          "font-inter h-[70dvh] md:h-[85dvh] overflow-auto p-4 pl-4 rounded-g shadow-sm focus:outline-none cursor-pointer text-editor-text",
         "data-cy": "editor-body",
       },
     },

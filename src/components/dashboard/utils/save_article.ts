@@ -84,14 +84,19 @@ const saveArticle = async ({
       const { setOpenDialogNoSection } = useUIStore.getState();
 
       const sectionItem = localStoreArticle.find(
-        (item: StorageArticle) =>
-          item.type === "section" || item.type === "es_section",
+        (item: StorageArticle) => item.type === "section",
+      );
+      const sectionEsItem = localStoreArticle.find(
+        (item: StorageArticle) => item.type === "es_section",
       );
       console.log("saveArticle sectionItem", sectionItem);
       if (
-        !sectionItem ||
-        sectionItem === undefined ||
-        sectionItem.content === ""
+        !sectionItem &&
+        !sectionEsItem &&
+        sectionItem === undefined &&
+        sectionEsItem === undefined &&
+        (!sectionItem || sectionItem.content === "") &&
+        (!sectionEsItem || sectionEsItem.content === "")
       ) {
         setOpenDialogNoSection(true);
         console.log({ status: 400, message: "No section selected" });
@@ -100,7 +105,8 @@ const saveArticle = async ({
       if (sectionItem && sectionItem.content !== "") {
         // Retrieve the image blob from IndexedDB and convert it to base64
         const imageItems = localStoreArticle.filter(
-          (item: StorageArticle) => item.type === "image",
+          (item: StorageArticle) =>
+            item.type.startsWith("image") && item.imageId,
         );
 
         console.log("saveArticle imageItems", imageItems);
@@ -126,12 +132,23 @@ const saveArticle = async ({
               console.log("saveArticle image blob", blob);
               console.log("saveArticle image item", item);
 
-              return {
-                type: item.type,
-                imageId: item.imageId ?? "",
-                fileName: item.fileName ?? "",
-                base64: blob ? await blobToBase64(blob) : (item.base64 ?? ""),
-              };
+              if (blob) {
+                const base64 = await blobToBase64(blob!);
+                console.log("saveArticle image base64", base64);
+
+                return {
+                  type: item.type,
+                  imageId: item.imageId ?? "",
+                  fileName: item.fileName ?? "",
+                  base64: blob ? base64 : (item.base64 ?? ""),
+                };
+              } else {
+                return {
+                  status: 204,
+                  message: "Blob not found for image",
+                  imageId: item.imageId,
+                };
+              }
             }),
           );
         }

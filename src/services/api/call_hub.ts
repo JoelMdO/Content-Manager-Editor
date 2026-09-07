@@ -76,13 +76,29 @@ const callHub = async (
       credentials: credentials,
       signal: abortSignal,
     });
-    const jsonResponse = await response.json();
+    if (response.status === 413) {
+      return {
+        status: 413,
+        message:
+          "Image upload was rejected because it exceeds the server's upload limit. Please try a smaller image or contact the administrator.",
+      };
+    }
+
+    let jsonResponse: { status?: number; message?: string; body?: unknown };
+    try {
+      jsonResponse = await response.json();
+    } catch {
+      return {
+        status: response.status,
+        message: `Request failed with status ${response.status}.`,
+      };
+    }
     //console.log("jsonResponse at callHub", jsonResponse);
 
     return {
-      status: jsonResponse.status,
+      status: jsonResponse.status ?? response.status,
       message: jsonResponse.message,
-      body: jsonResponse.body,
+      body: jsonResponse.body as PlaybookMeta[] | TranslateType | undefined,
     };
     //}
   } catch (error) {

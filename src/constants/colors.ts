@@ -22,7 +22,8 @@ const Colors = {
   secondMenuButtonColor: "#2A7B9B",
   gold: "#e5a21e",
   editor_background: "#0F172A",
-  editor_text: "#E2E8F0",
+  editor_text: "#D4D4D4",
+  menu_style_button: "#569CD6",
 };
 
 export default Colors;

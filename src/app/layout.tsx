@@ -3,10 +3,16 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "sweetalert2/dist/sweetalert2.min.css";
-import { Lexend } from "next/font/google";
+import { Lexend, Inter } from "next/font/google";
 import { headers } from "next/headers";
 
 const lexend = Lexend({
+  weight: ["400", "700"],
+  style: ["normal"],
+  subsets: ["latin"],
+});
+
+const inter = Inter({
   weight: ["400", "700"],
   style: ["normal"],
   subsets: ["latin"],
@@ -45,7 +51,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" nonce={nonce}>
-      <body className={lexend.className}>
+      <body className={`${lexend.className} ${inter.className}`}>
         {children}
         <SpeedInsights />
         <Analytics />

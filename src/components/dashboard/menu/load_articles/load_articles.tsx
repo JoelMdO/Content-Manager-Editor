@@ -6,7 +6,7 @@
 //
 import fetchArticleContentFromDb from "./services/fetch_article_fromDb";
 import { useLoadArticleStore } from "@/store/useLoadArticleStore";
-import { text } from "@/constants/load_articles.json";
+import text from "@/constants/load_articles.json";
 import { useDraftStore } from "@/store/useDraftStore";
 import { ArticleItem } from "@/types/storage_item";
 const LoadArticles = ({ articles }: { articles: ArticleItem[] }) => {
@@ -19,7 +19,7 @@ const LoadArticles = ({ articles }: { articles: ArticleItem[] }) => {
     <>
       <div className="flex flex-col gap-y-1 mt-3 pl-6">
         <label htmlFor="articles" className=" text-base text-white">
-          {text.load_articles}:
+          {text.load_text.load_articles}:
         </label>
         <select
           id="articles"
@@ -60,7 +60,7 @@ const LoadArticles = ({ articles }: { articles: ArticleItem[] }) => {
           }}
         >
           <option value="" disabled hidden>
-            {text.choose_article}
+            {text.load_text.choose_article}
           </option>
           {articles.map((article: ArticleItem) => (
             <option

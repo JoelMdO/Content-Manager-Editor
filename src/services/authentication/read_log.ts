@@ -13,13 +13,13 @@ const readLog = (session: string) => {
     throw new Error(
       `Invalid buffer: Not enough data. Expected at least ${
         saltLength + ivLength
-      } bytes but got ${buffer.length}`
+      } bytes but got ${buffer.length}`,
     );
   }
   const minLength = saltLength + ivLength + tagLength;
   if (buffer.length < minLength) {
     throw new Error(
-      `Invalid buffer: Expected at least ${minLength} bytes but got ${buffer.length}`
+      `Invalid buffer: Expected at least ${minLength} bytes but got ${buffer.length}`,
     );
   }
   //
@@ -28,7 +28,7 @@ const readLog = (session: string) => {
   const iv = buffer.subarray(saltLength, saltLength + ivLength);
   const tag = buffer.subarray(
     saltLength + ivLength,
-    saltLength + ivLength + tagLength
+    saltLength + ivLength + tagLength,
   );
   const encryptedData = buffer.subarray(saltLength + ivLength + tagLength);
   // Derive the key
@@ -38,19 +38,19 @@ const readLog = (session: string) => {
     salt,
     Number(process.env.iterations!),
     Number(process.env.keyLength!),
-    process.env.digest!
+    process.env.digest!,
   );
   //
   if (!iv || iv.length !== ivLength) {
     throw new Error(
-      `Invalid IV: Expected ${ivLength} bytes but got ${iv.length}`
+      `Invalid IV: Expected ${ivLength} bytes but got ${iv.length}`,
     );
   }
   // Decifer the data
   const decipher = createDecipheriv(
     process.env.algorithm as CipherGCMTypes,
     key,
-    iv
+    iv,
   ) as crypto.DecipherGCM;
   decipher.setAuthTag(tag);
   let decrypted = decipher.update(encryptedData, undefined, "utf8");
@@ -60,19 +60,29 @@ const readLog = (session: string) => {
     .replace(/\x00/g, "")
     .replace(/[^\x20-\x7E]/g, "");
 
+  console.log("Decrypted data:", decrypted);
+
   // Check if the expiration is valid
   const parsed = JSON.parse(decrypted);
+  console.log("Parsed decrypted data:", parsed);
   const exp = parsed.exp; // from your token
+  console.log("Token expiration (exp):", exp);
   const now = Date.now();
   const margin = 2 * 60 * 1000; // 2 minutes in milliseconds
 
   // Check 1: Is the token expired?
   const isExpired = now > exp;
-
+  console.log("Token is expired:", isExpired);
   // Check 2: Is it within the 2-minute valid range?
   const isWithin2Minutes = exp - now <= margin && !isExpired;
+  console.log("Token is within 2-minute valid range:", isWithin2Minutes);
 
   if (isExpired || !isWithin2Minutes) {
+    console.log(
+      `Token is expired or not within the 2-minute valid range. Exp: ${new Date(
+        exp,
+      ).toISOString()}, Now: ${new Date(now).toISOString()}`,
+    );
     return false;
   } else {
     return true;

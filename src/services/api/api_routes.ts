@@ -20,12 +20,21 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     ///-----------------------------------------------
     /// Api endpoints, per type.
     ///-----------------------------------------------
-
+    console.log("Data at api/routes", postData);
     switch (type) {
       //## POST
       case "post":
+        console.log("doing POST AT API/ROUTES after sanitize");
+        console.log("Token at api/routes post", token);
+        endPoint = type;
+        body = data as FormData;
+        body.append("token", token || "");
+        headers["Authorization"] = `Bearer ${token}`;
+        credentials = "include";
+        abortSignal = signal;
+        break;
       case "translate":
-        console.log("doing post at api/routes after sanitize");
+        console.log("doing TRANSLATE AT API/ROUTES after sanitize");
         endPoint = type;
         body = data as FormData;
         body.append("token", JWT || "");

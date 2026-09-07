@@ -42,10 +42,10 @@ const uploadImage = async (
 
     // Check if the file is a valid image
     const response = await callHub("clean-image", file);
-
+    console.log("response from callHub at upload_image:", response);
     if (response.status === 200) {
       // Create a formatted date string (dd-mm-yy)
-      const date = new Date();
+      //const date = new Date();
       // const formattedDate = `${String(date.getDate()).padStart(2, "0")}-${String(
       //   date.getMonth() + 1,
       // ).padStart(2, "0")}-${date.getFullYear().toString().slice(-2)}`;
@@ -121,6 +121,8 @@ const uploadImage = async (
       e.target.value = "";
       return { status: 200, message: "Image uploaded" };
     } else {
+      console.log("error at upload_image", response);
+      console.error(response);
       return { status: response.status, message: response.message as string };
     }
   } catch (error) {

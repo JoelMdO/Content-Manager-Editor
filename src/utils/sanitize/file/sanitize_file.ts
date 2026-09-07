@@ -6,16 +6,20 @@ import { isValidImage } from "./valid_image";
 // Function to sanitize the images.
 ///========================================================
 export async function sanitizeFile(
-  file: File
+  file: File,
 ): Promise<{ status: number; message: string }> {
   const allowedTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"];
   const maxSize = 500 * 1024; // 500kB limit
+  console.log("Sanitizing file Size:", file.size);
+  console.log("Sanitizing file Type:", file.type);
   try {
     if (!allowedTypes.includes(file.type)) {
+      console.log("Invalid file type:", file.type);
       return { status: 205, message: "Invalid file type" };
     }
     if (file.size > maxSize) {
-      return { status: 205, message: "File too large" };
+      console.log("File too large:", file.size);
+      return { status: 205, message: "File too large more than 500kb" };
     }
     // Sanitize the filename (avoid script injection via filename)
     const sanitizedFileName = sanitizeHtml(file.name, {
@@ -36,6 +40,7 @@ export async function sanitizeFile(
       return { status: 400, message: "Invalid image content" };
     }
   } catch (error) {
+    console.error("Error processing file:", error);
     return { status: 500, message: `Error processing file, ${error}` };
   }
 

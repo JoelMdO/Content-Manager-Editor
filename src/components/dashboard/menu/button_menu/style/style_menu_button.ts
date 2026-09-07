@@ -12,7 +12,7 @@ export function menuButtonStyle(
 ): styleMenuButton {
   //
 
-  const defaultProperties = `bg-gradient-to-r from-transparent from-[95%] to-secondMenuButtonColor text-white hover:text-black hover:to-orange-300  hover:border-amber-500  mt-4 shadow-md shadow-black`; // isClicked ? "bg-cream text-black" : ""
+  const defaultProperties = `bg-gradient-to-r from-transparent from-[95%] to-secondMenuButtonColor text-menu-style-button hover:text-black hover:to-orange-300  hover:border-amber-500  mt-4 shadow-md shadow-black`; // isClicked ? "bg-cream text-black" : ""
   //
   const defaultStyle: styleMenuButton = {
     text: "Clear",
