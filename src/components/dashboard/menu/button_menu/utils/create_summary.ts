@@ -22,13 +22,12 @@ const createSummary = async ({
 
   switch (language) {
     case "es":
-      title = "Titulo de texto en Espanol";
-      // article.find((item: StorageArticle) => item.type === "es_title")
-      //   ?.content || "";
+      title =
+        article.find((item: StorageArticle) => item.type === "es_title")
+          ?.content || "";
       body =
-        "Margarita es una mujer que vive en un pequeño pueblo de España. Un día, mientras paseaba por el bosque, encontró un misterioso libro antiguo que contenía secretos mágicos. A medida que leía el libro, descubrió que tenía poderes especiales y podía comunicarse con los animales del bosque. Con la ayuda de sus nuevos amigos animales, Margarita decidió usar sus poderes para proteger el bosque y a sus habitantes de una amenaza inminente. Juntos, enfrentaron desafíos y aprendieron valiosas lecciones sobre la amistad, la valentía y la importancia de cuidar la naturaleza.";
-      // article.find((item: StorageArticle) => item.type === "es_body")
-      //   ?.content || "";
+        article.find((item: StorageArticle) => item.type === "es_body")
+          ?.content || "";
       break;
     default:
       title =
