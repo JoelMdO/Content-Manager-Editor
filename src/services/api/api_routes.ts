@@ -4,6 +4,15 @@ import { postDataType } from "../../types/postData";
 import { NextResponse } from "next/server";
 import { fetchLlm } from "../../lib/api/llm_fetch";
 
+const ALLOWED_ENDPOINTS: Record<string, string> = {
+  post: "post",
+  translate: "translate",
+  summary: "summary",
+  search: "search",
+  markdown: "markdown",
+  cleanimage: "cleanimage",
+};
+
 const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
   ///=============================================================
   /// Function to redirect the api endpoints, includes the fecthing
@@ -21,12 +30,20 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     /// Api endpoints, per type.
     ///-----------------------------------------------
     console.log("Data at api/routes", postData);
+    const resolvedEndPoint = ALLOWED_ENDPOINTS[type];
+    if (!resolvedEndPoint) {
+      return NextResponse.json({
+        status: 400,
+        message: "Unsupported request type",
+      });
+    }
+
     switch (type) {
       //## POST
       case "post":
         console.log("doing POST AT API/ROUTES after sanitize");
         console.log("Token at api/routes post", token);
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         body = data as FormData;
         body.append("token", token || "");
         headers["Authorization"] = `Bearer ${token}`;
