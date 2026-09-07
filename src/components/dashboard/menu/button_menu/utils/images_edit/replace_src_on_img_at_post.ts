@@ -3,7 +3,7 @@ const replaceSrcWithImagePlaceholdersAtPost = (
   image: { url: string; fileId: string },
 ) => {
   const regex =
-    /<img\b[^>]*\bsrc=["']\/media\/article_images\/[^"']+["'][^>]*\/?>/gi;
+    /<img\b[^>]*\bsrc=["']\/media\/article_images\/[^"']+["'][^>]*\/?>/i;
 
   console.log("Replacing image with placeholders in HTML content");
 
