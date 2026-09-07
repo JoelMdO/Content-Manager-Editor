@@ -52,7 +52,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         break;
       case "translate":
         console.log("doing TRANSLATE AT API/ROUTES after sanitize");
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         body = data as FormData;
         body.append("token", JWT || "");
         headers["Authorization"] = `Bearer ${JWT}`;
