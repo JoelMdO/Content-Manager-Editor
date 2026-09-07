@@ -56,20 +56,26 @@ const createFormData = async (
   // Note: This approach appends the image data as a string (likely a base64 or similar representation).
   // Make sure the backend expects images as strings for this case.
   //------------------------------------------
-  data
-    .filter((item: FormDataItem) => item.type === "image-")
-    .forEach((item) => {
-      // Get the image content as string (e.g., base64 or identifier)
-      if (
-        "base64" in item &&
-        typeof item.type === "string" &&
-        item.type === "image-"
-      ) {
-        const imageContent =
-          JSON.stringify(getContentByType(item.base64)) ?? "";
-        formData.append(item.type, imageContent);
+  const imageItems = data.filter(
+    (item): item is FormDataImageItem =>
+      typeof item.type === "string" && item.type.slice(0, 6) === "image-",
+  );
+
+  const images = await Promise.all(
+    imageItems.map(async (item) => {
+      if (item.base64) {
+        return item;
       }
-    });
+      const blob = await getBlob(item.imageId);
+      if (!blob) {
+        return item;
+      }
+      const base64 = await blobToBase64(blob);
+      return { ...item, base64 };
+    }),
+  );
+
+  formData.append("images", JSON.stringify(images));
   // }
 
   return formData;
