@@ -60,7 +60,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         abortSignal = signal;
         break;
       case "summary":
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         const mergedData = { data, token: JWT || "" };
         //console.log("doing summary at api/routes, mergedData:", mergedData);
         body = JSON.stringify(mergedData); // Fix: stringify the data for JSON body
@@ -71,7 +71,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         abortSignal = signal;
         break;
       case "markdown":
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         body = JSON.stringify(data); // Fix: stringify the data for JSON body
         headers["Content-Type"] = "application/json";
         headers["Authorization"] = `Bearer ${JWT!}`;
