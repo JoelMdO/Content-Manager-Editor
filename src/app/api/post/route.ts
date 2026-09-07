@@ -196,11 +196,14 @@ export async function POST(req: NextRequest): Promise<Response> {
       });
     }
     const newId = id
-      .replace(/<p\b[^>]*>(.*?)<\/p>/gi, "$1")
-      .replace(/<[^>]*>/g, "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
       .trim()
       .replace(/\s+/g, "-")
-      .replace(/\./g, "");
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
     // /--------------------------------------------------------
     // Create Metadata Object
     // /--------------------------------------------------------
@@ -300,7 +303,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       const decodingAviationUrl = process.env.URL_API_DECAV || "";
       const timestamp = Math.floor(Date.now() / 1000).toString();
       const nonce = generateNonce();
-      const signature = createSignature(timestamp, nonce, article.id);
+      const signature = createSignature(nonce, timestamp, article.id);
 
       const decavResponse = await fetch(decodingAviationUrl, {
         method: "POST",

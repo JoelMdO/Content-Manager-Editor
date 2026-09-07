@@ -1,5 +1,5 @@
 import callHub from "../../../../../services/api/call_hub";
-export const translateController = new AbortController();
+export let translateController = new AbortController();
 const translateButtonClicked = async () => {
   ///========================================================
   // Function to translate the article to the database
@@ -12,6 +12,7 @@ const translateButtonClicked = async () => {
     localStorage.getItem(`draft-articleContent-${dbName}`) || "[]",
   );
 
+  translateController = new AbortController();
   const response = await callHub(
     "translate",
     articleContent,

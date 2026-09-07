@@ -4,6 +4,15 @@ import { postDataType } from "../../types/postData";
 import { NextResponse } from "next/server";
 import { fetchLlm } from "../../lib/api/llm_fetch";
 
+const ALLOWED_ENDPOINTS: Record<string, string> = {
+  post: "post",
+  translate: "translate",
+  summary: "summary",
+  search: "search",
+  markdown: "markdown",
+  cleanimage: "cleanimage",
+};
+
 const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
   ///=============================================================
   /// Function to redirect the api endpoints, includes the fecthing
@@ -21,12 +30,20 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
     /// Api endpoints, per type.
     ///-----------------------------------------------
     console.log("Data at api/routes", postData);
+    const resolvedEndPoint = ALLOWED_ENDPOINTS[type];
+    if (!resolvedEndPoint) {
+      return NextResponse.json({
+        status: 400,
+        message: "Unsupported request type",
+      });
+    }
+
     switch (type) {
       //## POST
       case "post":
         console.log("doing POST AT API/ROUTES after sanitize");
         console.log("Token at api/routes post", token);
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         body = data as FormData;
         body.append("token", token || "");
         headers["Authorization"] = `Bearer ${token}`;
@@ -35,7 +52,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         break;
       case "translate":
         console.log("doing TRANSLATE AT API/ROUTES after sanitize");
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         body = data as FormData;
         body.append("token", JWT || "");
         headers["Authorization"] = `Bearer ${JWT}`;
@@ -43,7 +60,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         abortSignal = signal;
         break;
       case "summary":
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         const mergedData = { data, token: JWT || "" };
         //console.log("doing summary at api/routes, mergedData:", mergedData);
         body = JSON.stringify(mergedData); // Fix: stringify the data for JSON body
@@ -54,7 +71,7 @@ const apiRoutes = async (postData: postDataType): Promise<NextResponse> => {
         abortSignal = signal;
         break;
       case "markdown":
-        endPoint = type;
+        endPoint = resolvedEndPoint;
         body = JSON.stringify(data); // Fix: stringify the data for JSON body
         headers["Content-Type"] = "application/json";
         headers["Authorization"] = `Bearer ${JWT!}`;

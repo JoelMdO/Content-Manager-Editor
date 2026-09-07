@@ -60,29 +60,18 @@ const readLog = (session: string) => {
     .replace(/\x00/g, "")
     .replace(/[^\x20-\x7E]/g, "");
 
-  console.log("Decrypted data:", decrypted);
-
   // Check if the expiration is valid
   const parsed = JSON.parse(decrypted);
-  console.log("Parsed decrypted data:", parsed);
   const exp = parsed.exp; // from your token
-  console.log("Token expiration (exp):", exp);
   const now = Date.now();
   const margin = 2 * 60 * 1000; // 2 minutes in milliseconds
 
   // Check 1: Is the token expired?
   const isExpired = now > exp;
-  console.log("Token is expired:", isExpired);
   // Check 2: Is it within the 2-minute valid range?
   const isWithin2Minutes = exp - now <= margin && !isExpired;
-  console.log("Token is within 2-minute valid range:", isWithin2Minutes);
 
   if (isExpired || !isWithin2Minutes) {
-    console.log(
-      `Token is expired or not within the 2-minute valid range. Exp: ${new Date(
-        exp,
-      ).toISOString()}, Now: ${new Date(now).toISOString()}`,
-    );
     return false;
   } else {
     return true;

@@ -19,6 +19,7 @@ export const insertCloudinaryUrlsatBody = async (
 
   let match: RegExpExecArray | null;
   let cleanedBody: string = "";
+  let updatedBodyContent = bodyContent!;
   const prematch = imageUrlRegexCloudinaryMatch.exec(bodyContent!);
   if (prematch) {
     console.log("/// Found Cloudinary image in body: ///", prematch[2]);
@@ -99,9 +100,10 @@ export const insertCloudinaryUrlsatBody = async (
     console.log("New Cloudinary image:", newCloudinaryImage);
 
     const bodyWithCloudinaryUrls = replaceSrcWithImagePlaceholdersAtPost(
-      bodyContent!,
+      updatedBodyContent,
       newCloudinaryImage,
     );
+    updatedBodyContent = bodyWithCloudinaryUrls;
     console.log(
       `Updated ${language} body with Cloudinary URLs:`,
       bodyWithCloudinaryUrls,

@@ -180,7 +180,7 @@ export async function sanitizeData(
         "body" in data
       ) {
         console.log("type of data: " + typeof data);
-        console.log("data at sanitizeData, type: " + type, data);
+        console.log("data at sanitizeData, type: %s", type, data);
         sanitizedData = {
           status: 200,
           message: {
