@@ -196,11 +196,14 @@ export async function POST(req: NextRequest): Promise<Response> {
       });
     }
     const newId = id
-      .replace(/<p\b[^>]*>(.*?)<\/p>/gi, "$1")
-      .replace(/<[^>]*>/g, "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
       .trim()
       .replace(/\s+/g, "-")
-      .replace(/\./g, "");
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
     // /--------------------------------------------------------
     // Create Metadata Object
     // /--------------------------------------------------------
