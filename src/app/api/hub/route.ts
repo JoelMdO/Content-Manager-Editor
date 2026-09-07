@@ -7,6 +7,7 @@ import { authOptions } from "../../../lib/nextauth/auth";
 import createLog from "../../../services/authentication/create_log";
 import { dataType } from "@/types/dataType";
 import { getToken } from "next-auth/jwt";
+import { Session } from "next-auth";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   //
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let type: string = "clean-image";
   let token: string | undefined = "";
   let nextAuthToken: string | undefined = "";
-  let sessionId: string | undefined = "";
+  const sessionId: string | undefined = "";
   let formData: FormData = new FormData();
 
   ///___________________________________________________
@@ -80,12 +81,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     if (saveJwt?.sub) {
+      console.log("saveJwt.sub at api/hub:", saveJwt.sub);
+      console.log("Creating log for saveJwt.sub at api/hub");
       token = createLog(saveJwt.sub);
+      console.log("token at api/hub:", token);
       nextAuthToken = saveJwt.accessToken;
+      console.log("nextAuthToken at api/hub:", nextAuthToken);
     }
-    // else if (session && type !== "sign-in-by-email") {
-    //   token = createLog(session?.user?.id);
-    // }
+    const sessionUserId = (session as Session | null)?.user?.id;
+    if (sessionUserId && type === "post") {
+      token = createLog(sessionUserId);
+      console.log("Created encrypted post token at api/hub");
+    }
 
     if (
       (session && type === "post") ||
@@ -106,6 +113,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     //
     if (statusSanitize.status != 200) {
+      console.log(
+        '"statusSanitize at api/hub" indicates failure:',
+        statusSanitize,
+      );
       return NextResponse.json({
         status: statusSanitize.status,
         message: statusSanitize.message,
@@ -161,7 +172,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
         break;
       case "post":
-        console.log("doing post at api/hub after sanitize");
+        console.log("doing POST AT API/HUB after sanitize");
         formData.append("session", sessionId || "");
         dataApiHub = formData;
         type = type;
@@ -170,6 +181,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           secret: process.env.NEXTAUTH_SECRET,
         });
         nextAuthToken = nextToken?.accessToken;
+        console.log("nextAuthToken for POST at api/hub:", nextAuthToken);
         break;
       case "save":
         console.log("doing save at api/hub after sanitize");

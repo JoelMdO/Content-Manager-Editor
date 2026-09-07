@@ -5,12 +5,12 @@ export type FormDataItem =
         | "id"
         | "body"
         | "section"
-        | "es-section"
+        | "es_section"
         | "dbName"
-        | "es-title"
-        | "es-body"
+        | "es_title"
+        | "es_body"
         | "summary"
-        | "es-summary";
+        | "es_summary";
       content: string;
     }
   | {

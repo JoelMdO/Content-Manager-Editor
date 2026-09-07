@@ -20,8 +20,8 @@ const loadHTMLArticle = async ({
   if (parsedData) {
     switch (language) {
       case "es":
-        title = "es-title";
-        body = "es-body";
+        title = "es_title";
+        body = "es_body";
         break;
       default:
         title = "title";
@@ -31,13 +31,13 @@ const loadHTMLArticle = async ({
     //
 
     const articleTitle = parsedData.find(
-      (item: ImageItem) => item.type === title
+      (item: ImageItem) => item.type === title,
     );
     const articleBody = parsedData.find(
-      (item: ImageItem) => item.type === body
+      (item: ImageItem) => item.type === body,
     );
     const images = parsedData.filter((item: ImageItem) =>
-      item.type!.startsWith("image")
+      item.type!.startsWith("image"),
     );
     //
     //console.log("articleTitle", articleTitle);
@@ -50,7 +50,7 @@ const loadHTMLArticle = async ({
     const updatedTagArticleBody = replaceImgWithSrc(
       articleBody.content! as string,
       images,
-      "html"
+      "html",
     );
     //console.log("updatedTagArticleBody at load html", updatedTagArticleBody);
     ///--------------------------------------------------------

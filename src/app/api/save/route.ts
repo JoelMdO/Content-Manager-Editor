@@ -1,10 +1,10 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import generateSearchIndex from "@/utils/api/generate_search_index";
 import uploadImagesToCMS from "@/utils/api/save/upload_images_to_CMS";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import readLog from "@/services/authentication/read_log";
 import replaceImgWithSrc from "@/components/dashboard/menu/button_menu/utils/images_edit/replace_img_with_src";
+import { ImageData } from "@/utils/api/save/upload_images_to_CMS";
 
 export async function POST(req: NextRequest): Promise<Response> {
   console.error("[SAVE_ROUTE_V4] entered", req.url);
@@ -37,21 +37,62 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (auth) {
       // Parse the request body
       console.log("AUTH OK");
-      const { title, body, images = [] } = data;
+      const {
+        title,
+        body,
+        images = [],
+        section,
+        es_title,
+        es_body,
+        summary,
+        es_summary,
+        es_section,
+      } = data;
       console.log("title at api/save", title);
       console.log("body at api/save", body);
       console.log("images at api/save", images);
+      console.log("section at api/save", section);
       //Retieve the image URLs from the req and upload them to the CMS /images.
-      const imageUrls = (await uploadImagesToCMS(images)).map(
-        (image: { url: string; image_id: string }) => ({
-          url: image.url,
-          fileId: image.image_id,
-        }),
+
+      let imageUrls: { url: string; fileId: string }[] = [];
+      let updatedBody;
+      let updatedEsBody;
+
+      const imagesCheckBase64Empty = images.filter(
+        (image: ImageData) =>
+          image.type.startsWith("image") && image.base64 !== "",
       );
-      console.log("imageUrls at api/save", imageUrls);
-      // Update the body content with the uploaded image URLs
-      const updatedBody = replaceImgWithSrc(body, imageUrls, "save", "en");
-      console.log("updatedBody at api/save", updatedBody);
+      const imagesCheckText =
+        images === "Body has the images already" ? [images] : images;
+
+      console.log(
+        "Without images check",
+        imagesCheckBase64Empty.length === 0 ||
+          imagesCheckText[0] === "Body has the images already",
+      );
+
+      if (
+        imagesCheckBase64Empty.length === 0 ||
+        imagesCheckText[0] === "Body has the images already"
+      ) {
+        console.log("No new images to upload, using existing body content");
+        updatedBody = body;
+        updatedEsBody = es_body;
+      } else {
+        imageUrls = (await uploadImagesToCMS(images)).map(
+          (image: { url: string; image_id: string }) => ({
+            url: image.url,
+            fileId: image.image_id,
+          }),
+        );
+        console.log("imageUrls at api/save", imageUrls);
+        // Update the body content with the uploaded image URLs
+        updatedBody = replaceImgWithSrc(body, imageUrls, "save", "en");
+        updatedEsBody = replaceImgWithSrc(es_body, imageUrls, "save", "es");
+        console.log("updatedBody at api/save", updatedBody);
+      }
+
+      // Call the CMS article endpoint
       const configuredApiUrl =
         process.env.URL_API_DECAV || process.env.URL_API_JOE || "";
       const api_call_url = configuredApiUrl.replace(/\/$/, "") + "/";
@@ -74,14 +115,15 @@ export async function POST(req: NextRequest): Promise<Response> {
         body: JSON.stringify({
           article_id: title + Date.now(),
           title: title,
+          es_title: es_title,
           status: "draft",
-          body: [
-            {
-              type: "paragraph",
-              content: updatedBody,
-            },
-          ],
-          images: [],
+          body: updatedBody,
+          es_body: updatedEsBody,
+          section: section || "",
+          es_section: es_section || "",
+          summary: summary || "",
+          es_summary: es_summary || "",
+          // images: [],
         }),
       });
       console.log("api/save downstream RESPONSE", {

@@ -2,6 +2,7 @@ import readLog from "@/services/authentication/read_log";
 import allowedOriginsCheck from "@/utils/allowed_origins_check";
 import { NextRequest, NextResponse } from "next/server";
 import { JWT } from "next-auth/jwt";
+import { fetchLlm } from "@/lib/api/llm_fetch";
 
 export async function POST(request: NextRequest) {
   //
@@ -29,12 +30,19 @@ export async function POST(request: NextRequest) {
   }
   //
 
-  // Check if the user is authenticated
-  const tokenReceived = formData.get("token") as string;
-  const auth = readLog(tokenReceived ?? "");
+  const authHeader = request.headers.get("authorization");
+
+  const tokenReceived: string | JWT | undefined = authHeader?.split(" ")[1];
+  console.log("tokenReceived at api/translate", tokenReceived);
+  // const auth = readLog(tokenReceived ?? "");
+  console.log("api/translate authentication", {
+    hasAuthorization: Boolean(tokenReceived),
+    // valid: auth,
+  });
 
   // Upload images and update URLs
-  if (auth) {
+  if (tokenReceived) {
+    console.log("AUTH OK AT API/TRANSLATE");
     ///================================================================
     /// SAVE IMAGE :
     ///================================================================
@@ -65,26 +73,15 @@ export async function POST(request: NextRequest) {
     const body = article.article;
     const section = article.section;
 
-    ///--------------------------------------------------------
-    // Get the Google access token from next-auth
-    ///--------------------------------------------------------
-
-    const authHeader = request.headers.get("authorization");
-
-    const tokenG: JWT | string | undefined | null = authHeader?.split(" ")[1];
-
-    if (!tokenG) {
-      return NextResponse.json({ status: 401, error: "Unauthorized" });
-    }
-    const newUrl = process.env.SERVER_URL;
+    const newUrl = process.env.TRANSLATE_URL;
     //
-    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; //TODO delete this line in production
+    // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; //TODO delete this line in production
 
     try {
-      const response = await fetch(`${newUrl}`, {
+      const response = await fetchLlm(`${newUrl}`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${tokenG}`,
+          Authorization: `Bearer ${tokenReceived}`,
           "Content-Type": "application/json",
           "X-Request-Type": "translation",
           "X-Service": "cms-translate",
@@ -103,7 +100,7 @@ export async function POST(request: NextRequest) {
         const errorText = await response.text();
 
         return NextResponse.json({
-          status: 200,
+          status: 500,
           error: `API returned ${response.status}: ${errorText}`,
         });
       }

@@ -35,7 +35,7 @@ const LogOutButton: React.FC<LogoButtonProps> = ({ type }) => {
     <>
       <button
         type="button"
-        className={`${mt} ${mb} flex flex-col w-[40px] items-center md:mt-2`}
+        className={`${mt} ${mb} flex flex-col w-[40px] items-center md:mt-4`}
         onClick={() => {
           signOut({ callbackUrl: "/" });
           setIsClicked(true);

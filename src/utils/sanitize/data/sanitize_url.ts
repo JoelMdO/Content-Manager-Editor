@@ -1,18 +1,18 @@
 "server-only";
 export function sanitizeUrl(
   url: string,
-  type?: string
+  type?: string,
 ): { status: number; message: string } {
   ////console.log('at sanitizeUrl, url:"', url);
   let u: string = "";
 
-  if (type === "markdown") {
-    ////console.log('u markdown at sanitizeUrl, url:"', url);
+  // if (type === "markdown") {
+  ////console.log('u markdown at sanitizeUrl, url:"', url);
 
-    u = url;
-  } else {
-    u = decodeURI(url).trim().toLowerCase();
-  }
+  u = url;
+  // } else {
+  //   u = decodeURI(url).trim().toLowerCase();
+  // }
   ////console.log('"u at sanitizeUrl":', u);
   //
   ////console.log('url or U"', u);

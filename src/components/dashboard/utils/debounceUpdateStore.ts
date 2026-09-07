@@ -1,5 +1,6 @@
 import { debounce } from "lodash";
 import slugify from "./slugify";
+import { StorageArticle } from "@/types/storage_item";
 
 export const debouncedUpdateStore = debounce(
   ///========================================================
@@ -10,25 +11,30 @@ export const debouncedUpdateStore = debounce(
     newTitle: string,
     newBody: string,
     language: string,
-    setText: (text: string) => void
+    setText: (text: string) => void,
   ) => {
     //
     const title = newTitle;
-    const titleKey = language === "es" ? "es-title" : "title";
-    const bodyKey = language === "es" ? "es-body" : "body";
+    const titleKey = language === "es" ? "es_title" : "title";
+    const bodyKey = language === "es" ? "es_body" : "body";
     //----------------------------------------------------
     // Remove previous Title and Body content before adding the new one
     //----------------------------------------------------
     const dbName = sessionStorage.getItem("db");
     const draftKey = `draft-articleContent-${dbName}`;
-    let articleContent = JSON.parse(
-      localStorage.getItem(draftKey) || "[]"
+    let articleContent: StorageArticle[] = Object.values(
+      JSON.parse(localStorage.getItem(draftKey) || "[]"),
     );
-
-    if (newTitle !== "") {
+    console.log(
+      "debouncedUpdateStore articleContent:",
+      title,
+      newBody,
+      articleContent,
+    );
+    if (title !== "" && title !== "<p></p>") {
       // Ensure only the latest title and id
       articleContent = articleContent.filter(
-        (item: { type: string }) => item.type !== titleKey && item.type !== "id"
+        (item: StorageArticle) => item.type !== titleKey && item.type !== "id",
       );
       //console.log("newTitle:", newTitle);
       //console.log("titleKey:", titleKey);
@@ -49,10 +55,10 @@ export const debouncedUpdateStore = debounce(
       setText(newTitle); // Update the displayed text
     }
 
-    if (newBody !== "") {
+    if (newBody !== "" && newBody !== "<p></p>") {
       // Ensure only the latest body
       articleContent = articleContent.filter(
-        (item: { type: string }) => item.type !== bodyKey
+        (item: { type: string }) => item.type !== bodyKey,
       );
       // Add body to articleContent
       //console.log("newBody:", newBody);
@@ -62,5 +68,5 @@ export const debouncedUpdateStore = debounce(
     }
     localStorage.setItem(draftKey, JSON.stringify(articleContent));
   },
-  500 // Wait 500ms after last change before updating store
+  500, // Wait 500ms after last change before updating store
 );

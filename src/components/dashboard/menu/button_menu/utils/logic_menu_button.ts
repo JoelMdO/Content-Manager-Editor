@@ -9,16 +9,24 @@ import translateButtonClicked from "./translate_button_clicked";
 import router from "next/router";
 import saveArticle from "@/components/dashboard/utils/save_article";
 import summaryButtonClicked from "./summary_button_clicked";
-import { StorageItem } from "@/types/storage_item";
+import { StorageArticle } from "@/types/storage_item";
 import { TranslateType } from "@/types/translate_type";
 import { useEditorStore } from "@/store/useEditorStore";
-import { tagsReplace } from "@/components/dashboard/draft_article/utils/tags_replace";
+import { loadTranslatedDraftIntoEditor } from "./load_translated_draft";
+// import { tagsReplace } from "@/components/dashboard/draft_article/utils/tags_replace";
+
 ///--------------------------------------------------------
 // Post function to handle the save button click
 ///--------------------------------------------------------
+// CHANGE LOG
+// Changed by : Joel Montes de Oca
+// Date       : 2026-08-23
+// Reason     : Modified option to store the translated content in localStorage.
+// Impact     : LogicMenu will now store the translated content in localStorage
+//              instead by updatig the fields or creating if not exists.
+//
 export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
   //
-
   handlePost(debouncedUpdateStore);
   setIsClicked!(true);
   postButtonClicked()
@@ -164,19 +172,9 @@ const openSelectorDialog = ({
 ///--------------------------------------------------------
 // Translate to Spanish
 ///--------------------------------------------------------
-// ORIGINAL — replaced by updated version that syncs Zustand from sessionStorage
-// export const translateToSpanish = ({
-//   setTranslationReady,
-//   setIsClicked,
-//   setTranslating,
-// }: Partial<ButtonProps>) => {
-//   ... original implementation ...
-// };
-
-// UPDATED — after writing translation to localStorage,
-// update the editor content directly so the UI reflects the latest draft data.
 export const translateToSpanish = ({
-  setTranslationReady,
+  // setTranslationReady,
+  setLanguage,
   setIsClicked,
   setTranslating,
 }: Partial<ButtonProps>) => {
@@ -194,15 +192,6 @@ export const translateToSpanish = ({
           const articleContent = JSON.parse(
             localStorage.getItem(`draft-articleContent-${dbName}`) || "[]",
           );
-
-          // Check if translation already exists
-          // Remove all previous es-title, es-body, es-section items
-          const filteredContent = articleContent.filter(
-            (item: StorageItem) =>
-              item.type !== "es-title" &&
-              item.type !== "es-body" &&
-              item.type !== "es-section",
-          );
           //
           const translated = (response.body as TranslateType).translated_text;
           const title = translated!.title || "";
@@ -210,31 +199,44 @@ export const translateToSpanish = ({
           const section = translated!.section || "";
 
           // Add new translation
-          filteredContent.push({ type: "es-title", content: title });
-          filteredContent.push({ type: "es-body", content: es_body });
-          filteredContent.push({ type: "es-section", content: section });
-
-          localStorage.setItem(
-            `draft-articleContent-${dbName}`,
-            JSON.stringify(filteredContent),
+          const translationTitleFiled = articleContent.find(
+            (item: StorageArticle) => item.type === "es_title",
           );
-
-          // Sync in-memory editor state so UI updates
-          if (dbName) {
-            try {
-              console.log("calling sybcFromSession");
-
-              // ORIGINAL: Replaced with tags_replace function that updates the editor content directly.
-              // await useDraftStore.getState().syncFromSession(dbName);
-
-              // UPDATED: Call a new function that updates blobs URLS and the editor
-              tagsReplace({ dbName });
-            } catch (e) {
-              console.warn("[translateToSpanish] syncFromSession failed:", e);
-            }
+          if (translationTitleFiled) {
+            translationTitleFiled.content = title;
+          } else {
+            articleContent.push({ type: "es_title", content: title });
           }
 
-          setTranslationReady!(true);
+          const translationBodyFiled = articleContent.find(
+            (item: StorageArticle) => item.type === "es_body",
+          );
+          if (translationBodyFiled) {
+            translationBodyFiled.content = es_body;
+          } else {
+            articleContent.push({ type: "es_body", content: es_body });
+          }
+
+          const translationSectionFiled = articleContent.find(
+            (item: StorageArticle) => item.type === "es_section",
+          );
+          if (translationSectionFiled) {
+            translationSectionFiled.content = section;
+          } else {
+            articleContent.push({ type: "es_section", content: section });
+          }
+
+          // Save updated content back to localStorage
+          localStorage.setItem(
+            `draft-articleContent-${dbName}`,
+            JSON.stringify(articleContent),
+          );
+
+          if (dbName) {
+            loadTranslatedDraftIntoEditor(dbName);
+          }
+
+          setLanguage!("es");
         }
       } else if (
         response.status === 401 ||
@@ -260,7 +262,7 @@ export const translateToSpanish = ({
 // Summary
 ///--------------------------------------------------------
 export const getSummary = ({
-  setIsClicked,
+  // setIsClicked,
   summaryDialogRef,
   setIsSummary,
   setSummaryContent,
@@ -268,9 +270,12 @@ export const getSummary = ({
 }: Partial<ButtonProps>) => {
   if (!summaryDialogRef?.current) return;
 
-  setIsClicked!(true);
+  // setIsClicked!(true);
   setIsSummary!(true); // Needed for DialogsLoader
-
+  console.log(
+    "summaryButtonClicked called with setSummaryContent:",
+    setSummaryContent,
+  );
   // Call summary creation
   summaryButtonClicked({ setSummaryContent })
     .then((response) => {
@@ -293,7 +298,7 @@ export const getSummary = ({
     })
     .finally(() => {
       setTimeout(() => {
-        setIsClicked!(false);
+        // setIsClicked!(false);
         setIsSummary!(false); // Reset loader state
       }, 500);
     });
@@ -317,7 +322,7 @@ export const buttonMenuLogic = ({
   type,
   stylesDialogRef,
   setIsFontStyleOpen,
-  setTranslationReady,
+  // setTranslationReady,
   setTranslating,
   language,
   setLanguage,
@@ -327,6 +332,7 @@ export const buttonMenuLogic = ({
   setIsSummary,
   setSummaryContent,
   isClicked,
+  summarySelectorRef,
 }: Partial<ButtonProps>) => {
   switch (type) {
     case "image":
@@ -356,7 +362,8 @@ export const buttonMenuLogic = ({
     case "translate":
       translateToSpanish({
         setIsClicked,
-        setTranslationReady,
+        // setTranslationReady,
+        setLanguage,
         setTranslating,
       });
       break;
@@ -369,10 +376,17 @@ export const buttonMenuLogic = ({
         setIsClicked,
       });
       break;
+    case "summary_selector":
+      console.log("calling summary_selector");
+      console.log(summarySelectorRef?.current);
+      if (summarySelectorRef?.current) {
+        summarySelectorRef.current.showModal();
+      }
+      break;
     case "summary":
-      //console.log("calling summary");
+      console.log("calling summary");
       getSummary({
-        setIsClicked,
+        // setIsClicked,
         summaryDialogRef,
         setIsSummary,
         setSummaryContent,

@@ -44,33 +44,33 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config: any) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      stream: "stream-browserify",
-      util: "util/",
-    };
+  // webpack: (config: any) => {
+  //   config.resolve.fallback = {
+  //     ...config.resolve.fallback,
+  //     stream: "stream-browserify",
+  //     util: "util/",
+  //   };
 
-    config.optimization = {
-      minimize: true,
-      minimizer: [
-        new TerserPlugin({
-          terserOptions: {
-            compress: { drop_console: true },
-          },
-        }),
-      ],
-    };
-    return config;
-  },
+  //   config.optimization = {
+  //     minimize: true,
+  //     minimizer: [
+  //       new TerserPlugin({
+  //         terserOptions: {
+  //           compress: { drop_console: true },
+  //         },
+  //       }),
+  //     ],
+  //   };
+  //   return config;
+  // },
   images: {
-    unoptimized: true, // Temporarily disable image optimization
-    domains: [
-      "developers.google.com",
-      "chiyikfwnkgnirmwizsz.supabase.co",
-      "res.cloudinary.com",
-      "firebasestorage.googleapis.com",
-    ],
+    // unoptimized: true, // Temporarily disable image optimization
+    // domains: [
+    //   "developers.google.com",
+    //   "chiyikfwnkgnirmwizsz.supabase.co",
+    //   "res.cloudinary.com",
+    //   "firebasestorage.googleapis.com",
+    // ],
     remotePatterns: [
       {
         protocol: "https",
@@ -98,6 +98,7 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+    qualities: [25, 50, 75, 85, 100],
   },
 };
 

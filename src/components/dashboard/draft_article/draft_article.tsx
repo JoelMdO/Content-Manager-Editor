@@ -4,30 +4,26 @@ import { useEditorStore } from "@/store/useEditorStore";
 import { handleClick } from "./utils/handle_click";
 import draftArticleText from "../../../constants/draft_article_text.json";
 import { iconsMenu } from "../../../constants/icons";
-import { StorageItem } from "../../../types/storage_item";
+import { readDraftTitle } from "./utils/read_draft_title";
 
 const DraftArticle = () => {
   //
   // CHANGE LOG
-  // Changed by : Copilot
-  // Date       : 2026-03-11
-  // Reason     : Read state from Zustand stores instead of MenuContext.
-  // Impact     : MenuContext no longer needed in this file.
-  //              setDraftArticleButtonClicked removed — handleClick now calls
-  //              loadDraftIntoEditor() directly.
+  // Changed by : Joel Montes de Oca
+  // Date       : 2026-08-12
+  // Reason     : Non used variable removed
+  // Impact     : NIL
   //
-  // ORIGINAL:
-  // const { dbNameToSearch, DRAFT_KEY, savedTitleRef, savedBodyRef,
-  //         setDraftArticleButtonClicked, setText, text, setLanguage,
-  //         setArticle, setDraftKey } = useContext(MenuContext) as ButtonProps;
   const DRAFT_KEY = useDraftStore((s) => s.DRAFT_KEY);
   const dbName = useDraftStore((s) => s.dbName);
   const text = useDraftStore((s) => s.text);
+  const articleStored = useDraftStore((s) => s.articleStored);
+
   if (process.env.NODE_ENV !== "production") {
     console.log({ text });
   }
 
-  const { savedTitleRef, savedBodyRef } = useEditorStore.getState();
+  const { savedTitleRef } = useEditorStore.getState();
   const { setText, setLanguage, setArticle, setDraftKey } =
     useDraftStore.getState();
   const newSavedTitleRef = useRef<string>("");
@@ -43,26 +39,30 @@ const DraftArticle = () => {
 
   useEffect(() => {
     //
-    const articleStored = localStorage.getItem(DRAFT_KEY);
-    if (!articleStored || articleStored === "[]") {
-      const dbName = sessionStorage.getItem("db") as string;
-      setDraftKey(`draft-articleContent-${dbName}`);
-    }
-    if (articleStored) {
-      const jsonArticle = JSON.parse(articleStored);
-      console.log({ jsonArticleFromLocalStorage: jsonArticle });
-      newSavedTitleRef.current =
-        jsonArticle.find((item: StorageItem) => item.type === "title")
-          ?.content || "";
-      console.log({ newSavedTitleRef: newSavedTitleRef.current });
+    const loadDraftArticle = () => {
+      //  console.log("[DraftArticle] loadDraftArticle called");
+      const articleStored = localStorage.getItem(DRAFT_KEY);
+      //console.log("[DraftArticle] articleStored:", articleStored);
+      if (!articleStored || articleStored === "[]") {
+        //  console.log("[DraftArticle] No draft article found in localStorage");
+        const dbName = sessionStorage.getItem("db") as string;
+        setDraftKey(`draft-articleContent-${dbName}`);
+      }
+      if (articleStored) {
+        //  console.log("[DraftArticle] articleStored exists:", articleStored);
+        newSavedTitleRef.current = readDraftTitle(articleStored);
+        //  console.log({ newSavedTitleRef: newSavedTitleRef.current });
+        //
+        setText(newSavedTitleRef.current);
+        //
+      } else {
+        setText("Without Draft Articles");
+      }
       //
-      setText(newSavedTitleRef.current);
-      //
-    } else {
-      setText("Without Draft Articles");
-    }
-    //
-  }, [dbName, DRAFT_KEY, setDraftKey, setText]);
+    };
+
+    loadDraftArticle();
+  }, [dbName, DRAFT_KEY, setDraftKey, setText, articleStored]);
   //
 
   //

@@ -1,7 +1,7 @@
-import successAlert from "../../../alerts/sucess";
+import successAlert from "../../alerts/sucess";
 import { useState } from "react";
-import { iconsMenu } from "../../../../constants/icons";
-import { handleClick } from "../../draft_article/utils/handle_click";
+import { iconsMenu } from "../../../constants/icons";
+import { handleClick } from "../../dashboard/draft_article/utils/handle_click";
 import { debounce } from "lodash";
 import updateStorage from "./utils/update_storage";
 import { useUIStore } from "@/store/useUIStore";
@@ -62,9 +62,11 @@ const SummaryDialog = () => {
   // Debounce function to create the summary
   ///--------------------------------------------------------
   const debouncedCreateSummary = debounce(async () => {
+    console.log("Creating summary with content:", summaryContent);
     if (!summaryContent) return;
-    const summary = language === "en" ? "summary" : "es-summary";
+    const summary = language === "en" ? "summary" : "es_summary";
     const db = sessionStorage.getItem("db") || "DeCav";
+    console.log("Loaded summary with content:", summary);
     try {
       updateStorage(
         localStorage,

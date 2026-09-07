@@ -15,7 +15,7 @@ export function deleteImageFromLocalStorageIndexDB(
   if (!stored) return;
 
   const content = JSON.parse(stored);
-  const imageToDelete = content.find(
+  const imageToDelete = content.filter(
     (item: ImageItem) => item.imageId === imageIdToRemove,
   );
   console.log("Image to delete from localStorage", { imageToDelete });

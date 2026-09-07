@@ -32,6 +32,7 @@ const MenuButton = ({
   const sectionsDialogRef = useUIStore((s) => s.sectionsDialogRef);
   const stylesDialogRef = useUIStore((s) => s.stylesDialogRef);
   const summaryDialogRef = useUIStore((s) => s.summaryDialogRef);
+  const summarySelectorRef = useUIStore((s) => s.summarySelectorRef);
   const setSelectedSection = useUIStore((s) => s.setSelectedSection);
   const setSummaryContent = useUIStore((s) => s.setSummaryContent);
   const setIsSummary = useUIStore((s) => s.setIsSummary);
@@ -78,6 +79,7 @@ const MenuButton = ({
       setIsSummary,
       setLanguage,
       isClicked,
+      summarySelectorRef,
     });
   }, [
     type,
@@ -101,6 +103,7 @@ const MenuButton = ({
     setSummaryContent,
     setIsSummary,
     setLanguage,
+    summarySelectorRef,
   ]);
   //
   ///--------------------------------------------------------
@@ -132,7 +135,11 @@ const MenuButton = ({
               break;
             case "translate":
             case "post":
+            case "summary_selector":
             case "summary":
+              console.log(
+                `Button type "${type}" is handled by its respective function.`,
+              );
               // These are handled by their respective functions in buttonMenuLogic
               // They will set isClicked to false after their async operations
               break;

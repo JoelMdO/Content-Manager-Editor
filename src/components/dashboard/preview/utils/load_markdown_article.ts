@@ -22,8 +22,8 @@ const loadMarkdownArticle = async ({
   if (parsedData) {
     switch (language) {
       case "es":
-        title = "es-title";
-        body = "es-body";
+        title = "es_title";
+        body = "es_body";
         break;
       default:
         title = "title";
@@ -32,13 +32,13 @@ const loadMarkdownArticle = async ({
     }
     //
     const articleTitle = parsedData.find(
-      (item: ImageItem) => item.type === title
+      (item: ImageItem) => item.type === title,
     );
     const articleBody = parsedData.find(
-      (item: ImageItem) => item.type === body
+      (item: ImageItem) => item.type === body,
     );
     const images = parsedData.filter((item: ImageItem) =>
-      item.type!.startsWith("image")
+      item.type!.startsWith("image"),
     );
     //
     //console.log("articleTitle", articleTitle);
@@ -50,16 +50,15 @@ const loadMarkdownArticle = async ({
     ///--------------------------------------------------------
     const updatedTagArticleBody = replaceImgWithSrc(
       articleBody.content! as string,
-      images
+      images,
     );
     //console.log("updatedTagArticleBody", updatedTagArticleBody);
     ///--------------------------------------------------------
     // Convert to Markdown
     ///--------------------------------------------------------
     const articleToMarkDown = `<h1>${articleTitle.content}</h1>\n${updatedTagArticleBody}`;
-    const articleBodyMarkdown = await convertHtmlToMarkdownAPI(
-      articleToMarkDown
-    );
+    const articleBodyMarkdown =
+      await convertHtmlToMarkdownAPI(articleToMarkDown);
     //console.log("articleBodyMarkdown", articleBodyMarkdown);
     ///--------------------------------------------------------
     // Parses the article, separates the body text into content
@@ -81,7 +80,7 @@ const loadMarkdownArticle = async ({
 
       localStorage.setItem(
         `draft-articleContent-${dbName}`,
-        JSON.stringify(parsedData)
+        JSON.stringify(parsedData),
       );
       //--------------------------------------------------------
       return {

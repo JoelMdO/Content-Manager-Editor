@@ -26,169 +26,200 @@ export async function sanitizeData(
   ///--------------------------------------------------------
   // Clean Links / URLS
   ///--------------------------------------------------------
-  if (type === "clean-link") {
-    if (typeof data === "string") {
-      value = sanitizeHtml(data);
-      // Check if the string is a URL
-      if (isValidUrl(value)) {
-        sanitizedData = sanitizeUrl(value);
+  switch (type) {
+    case "clean-link":
+      if (typeof data === "string") {
+        value = sanitizeHtml(data);
+        // Check if the string is a URL
+        if (isValidUrl(value)) {
+          sanitizedData = sanitizeUrl(value);
+        } else {
+          sanitizedData = { status: 205, message: "url not allowed" };
+        }
       } else {
+        //is not a string return error.
         sanitizedData = { status: 205, message: "url not allowed" };
       }
-    } else {
-      //is not a string return error.
-      sanitizedData = { status: 205, message: "url not allowed" };
-    }
+      break;
     ///--------------------------------------------------------
-  } else if (type === "clean-image") {
     ///--------------------------------------------------------
     // Clean Images / Files
     ///--------------------------------------------------------
-    if (data instanceof File) {
-      sanitizedData = await sanitizeFile(data);
-    }
+    case "clean-image":
+      if (data instanceof File) {
+        sanitizedData = await sanitizeFile(data);
+      }
+      break;
     ///--------------------------------------------------------
-    // } else if (data instanceof FormData) {
-  } else if (type === "post") {
     ///--------------------------------------------------------
-    // Clean data article
+    // Clean post
     ///--------------------------------------------------------
-
-    if (
-      data !== null &&
-      !(data instanceof File) &&
-      !(data instanceof FormData)
-    ) {
-      const sanitized = Object.fromEntries(
-        Object.entries(data).map(([key, value]) => [
-          key,
-          sanitizePost(value as string | undefined),
-        ]),
-      );
-      sanitizedData = {
-        status: 200,
-        message: sanitized,
-      };
-    } else {
-      sanitizedData = { status: 400, message: "Invalid post data" };
-    }
-    //--------------------------------------------------------
-  } else if (type === "playbook-save") {
+    case "post":
+      if (
+        data !== null &&
+        !(data instanceof File) &&
+        !(data instanceof FormData)
+      ) {
+        const sanitized = Object.fromEntries(
+          Object.entries(data).map(([key, value]) => [
+            key,
+            sanitizePost(value as string | undefined),
+          ]),
+        );
+        sanitizedData = {
+          status: 200,
+          message: sanitized,
+        };
+      } else {
+        sanitizedData = { status: 400, message: "Invalid post data" };
+      }
+      break;
+    ///--------------------------------------------------------
     ///--------------------------------------------------------
     // Clean Playbook Data
     ///--------------------------------------------------------
-
-    if (
-      typeof data === "object" &&
-      data !== null &&
-      !(data instanceof File) &&
-      !(data instanceof FormData)
-    ) {
-      sanitizedData = sanitizeFormPlaybook(data as PlaybookMetaWithUseRecord);
-    } else {
-      sanitizedData = { status: 400, message: "Invalid playbook data" };
-    }
-  } else if (type === "sign-in-by-email") {
-    if (
-      typeof data === "object" &&
-      data !== null &&
-      "email" in data &&
-      "password" in data
-    ) {
-      const newEmail = sanitizeEmail((data as { email: string }).email);
-      const newPassword = sanitizePassword(
-        (data as { password: string }).password,
-      );
-      if (newEmail == "" || newPassword == "") {
-        sanitizedData = { status: 400, message: "Invalid text input" };
+    case "playbook-save":
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        !(data instanceof File) &&
+        !(data instanceof FormData)
+      ) {
+        sanitizedData = sanitizeFormPlaybook(data as PlaybookMetaWithUseRecord);
       } else {
+        sanitizedData = { status: 400, message: "Invalid playbook data" };
+      }
+      break;
+    ///--------------------------------------------------------
+    ///--------------------------------------------------------
+    // Clean Sign-in Data
+    ///--------------------------------------------------------
+    case "sign-in-by-email":
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "email" in data &&
+        "password" in data
+      ) {
+        const newEmail = sanitizeEmail((data as { email: string }).email);
+        const newPassword = sanitizePassword(
+          (data as { password: string }).password,
+        );
+        if (newEmail == "" || newPassword == "") {
+          sanitizedData = { status: 400, message: "Invalid text input" };
+        } else {
+          sanitizedData = {
+            status: 200,
+            message: { email: newEmail, password: newPassword },
+          };
+        }
+      } else {
+        sanitizedData = { status: 400, message: "Invalid sign-in data" };
+      }
+      break;
+    ///--------------------------------------------------------
+    ///--------------------------------------------------------
+    // Clean Password Reset Data
+    ///--------------------------------------------------------
+    case "password-reset":
+      if (typeof data === "object" && data !== null && "email" in data) {
+        const newEmail = sanitizeEmail((data as { email: string }).email);
+        if (newEmail === "") {
+          sanitizedData = { status: 400, message: "Invalid email" };
+        } else {
+          sanitizedData = { status: 200, message: { email: newEmail } };
+        }
+      } else {
+        sanitizedData = { status: 400, message: "Invalid password-reset data" };
+      }
+      break;
+    ///--------------------------------------------------------
+    ///--------------------------------------------------------
+    // Clean Save User Data
+    ///--------------------------------------------------------
+    case "save-user":
+      if (typeof data === "object" && data !== null && "email" in data) {
+        const newEmail = sanitizeEmail((data as { email: string }).email);
+        if (newEmail === "") {
+          sanitizedData = { status: 400, message: "Invalid email" };
+        } else {
+          const message: { email: string; provider?: string } = {
+            email: newEmail,
+          };
+          if ("provider" in data) {
+            message.provider = sanitizeHtml(
+              (data as { provider: string }).provider,
+            );
+          }
+          sanitizedData = { status: 200, message };
+        }
+      } else {
+        sanitizedData = { status: 400, message: "Invalid save-user data" };
+      }
+      break;
+    ///--------------------------------------------------------
+    ///--------------------------------------------------------
+    // Clean Summary Data
+    ///--------------------------------------------------------
+    case "summary":
+      const sanitizedText = sanitizeSummary(data);
+      sanitizedData = { status: 200, message: sanitizedText };
+      break;
+    ///--------------------------------------------------------
+    ///--------------------------------------------------------
+    // Clean Save Article
+    ///--------------------------------------------------------
+    case "save":
+      console.log("doing save at sanitizeData, type: " + type);
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        !(data instanceof File) &&
+        !(data instanceof FormData) &&
+        "title" in data &&
+        "body" in data
+      ) {
+        console.log("type of data: " + typeof data);
+        console.log("data at sanitizeData, type: %s", type, data);
         sanitizedData = {
           status: 200,
-          message: { email: newEmail, password: newPassword },
+          message: {
+            title: sanitizePost((data as { title: string }).title),
+            body: sanitizePost((data as { body: string }).body),
+          },
         };
-      }
-    } else {
-      sanitizedData = { status: 400, message: "Invalid sign-in data" };
-    }
-  } else if (type === "password-reset") {
-    if (typeof data === "object" && data !== null && "email" in data) {
-      const newEmail = sanitizeEmail((data as { email: string }).email);
-      if (newEmail === "") {
-        sanitizedData = { status: 400, message: "Invalid email" };
       } else {
-        sanitizedData = { status: 200, message: { email: newEmail } };
+        sanitizedData = { status: 400, message: "Invalid save data" };
       }
-    } else {
-      sanitizedData = { status: 400, message: "Invalid password-reset data" };
-    }
-  } else if (type === "save-user") {
-    if (typeof data === "object" && data !== null && "email" in data) {
-      const newEmail = sanitizeEmail((data as { email: string }).email);
-      if (newEmail === "") {
-        sanitizedData = { status: 400, message: "Invalid email" };
-      } else {
-        const message: { email: string; provider?: string } = {
-          email: newEmail,
-        };
-        if ("provider" in data) {
-          message.provider = sanitizeHtml(
-            (data as { provider: string }).provider,
-          );
+      break;
+    default:
+      ///--------------------------------------------------------
+      // Clean Text
+      ///--------------------------------------------------------
+      // //console.log('"type at sanitizeData:", type);' + type);
+      // //console.log("type of data at sanitizeData:", typeof data);
+
+      if (typeof data === "string") {
+        ////console.log('"type of data is string at sanitizeData"');
+
+        const sanitizedText = sanitizeUrl(data, type);
+        // //console.log(
+        //   '"sanitizedText at sanitizeData:", sanitizedText);' + sanitizedText
+        // );
+
+        if (sanitizedText.status === 200) {
+          sanitizedData = { status: 200, message: "Valid text input" };
+        } else {
+          sanitizedData = { status: 400, message: "Invalid text input" };
         }
-        sanitizedData = { status: 200, message };
-      }
-    } else {
-      sanitizedData = { status: 400, message: "Invalid save-user data" };
-    }
-  } else if (type === "summary") {
-    const sanitizedText = sanitizeSummary(data);
-    sanitizedData = { status: 200, message: sanitizedText };
-  } else if (type === "save") {
-    if (
-      typeof data === "object" &&
-      data !== null &&
-      !(data instanceof File) &&
-      !(data instanceof FormData) &&
-      "title" in data &&
-      "body" in data
-    ) {
-      sanitizedData = {
-        status: 200,
-        message: {
-          title: sanitizePost((data as { title: string }).title),
-          body: sanitizePost((data as { body: string }).body),
-        },
-      };
-    } else {
-      sanitizedData = { status: 400, message: "Invalid save data" };
-    }
-  } else {
-    ///--------------------------------------------------------
-    // Clean Text
-    ///--------------------------------------------------------
-    // //console.log('"type at sanitizeData:", type);' + type);
-    // //console.log("type of data at sanitizeData:", typeof data);
-
-    if (typeof data === "string") {
-      ////console.log('"type of data is string at sanitizeData"');
-
-      const sanitizedText = sanitizeUrl(data, type);
-      // //console.log(
-      //   '"sanitizedText at sanitizeData:", sanitizedText);' + sanitizedText
-      // );
-
-      if (sanitizedText.status === 200) {
-        sanitizedData = { status: 200, message: "Valid text input" };
+        return sanitizedData;
       } else {
-        sanitizedData = { status: 400, message: "Invalid text input" };
-      }
-      return sanitizedData;
-    } else {
-      //is not a string return error.
-      ////console.log("doing else at sanitizeData, type: " + type);
+        //is not a string return error.
+        ////console.log("doing else at sanitizeData, type: " + type);
 
-      sanitizedData = { status: 205, message: "text not allowed" };
-    }
+        sanitizedData = { status: 205, message: "text not allowed" };
+      }
   }
+  console.log("sanitizedData at sanitizeData:", sanitizedData);
   return sanitizedData;
 }

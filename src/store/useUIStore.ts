@@ -4,25 +4,10 @@
 // =============================================================
 
 // CHANGE LOG
-// Changed by : Copilot
-// Date       : 2026-03-11
-// Reason     : Extract UI-only state from MenuContext into a focused store
-//              so UI interactions don't cause editor or draft components
-//              to re-render unnecessarily.
-// Impact     : Components using isSummary, openDialogNoSection, previewReady,
-//              selectedSection etc. must read from useUIStore instead of
-//              MenuContext. Dialog refs are stable objects owned by the store;
-//              initDialogRefs() mutates their .current values rather than
-//              replacing the objects so that components already holding a
-//              reference to the stub are never desynchronised.
-// Changed by : Copilot
-// Date       : 2026-03-13
-// Reason     : initDialogRefs previously called set(refs), replacing the
-//              stored ref objects entirely. Any component that rendered with
-//              the stub as its ref prop would not reattach unless it
-//              re-rendered with the new value, causing ref desynchronization.
-//              Fix: keep the stable stub objects; only mutate .current.
-// Impact     : initDialogRefs no longer causes store subscribers to re-render.
+// Changed by : Joel Montes de Oca
+// Date       : 2026-08-20
+// Reason     : Added summarySelectorRef and isSummarySelector to the UI store.
+// Impact     : Summary button will now open the summary selector dialog instead of the summary dialog.
 
 import { create } from "zustand";
 
@@ -38,6 +23,7 @@ interface UIState {
   // Dialogs — open state
   openDialogNoSection: boolean;
   isSummary: boolean;
+  isSummarySelector: boolean;
   summaryContent: string;
   isView: boolean;
   previewReady: boolean;
@@ -52,6 +38,7 @@ interface UIState {
   dialogRef: Ref<HTMLDialogElement | null>;
   sectionsDialogRef: Ref<HTMLDialogElement | null>;
   summaryDialogRef: Ref<HTMLDialogElement | null>;
+  summarySelectorRef: Ref<HTMLDialogElement | null>;
   stylesDialogRef: Ref<HTMLDialogElement | null>;
 
   // Actions
@@ -59,6 +46,7 @@ interface UIState {
     dialogRef: Ref<HTMLDialogElement | null>;
     sectionsDialogRef: Ref<HTMLDialogElement | null>;
     summaryDialogRef: Ref<HTMLDialogElement | null>;
+    summarySelectorRef: Ref<HTMLDialogElement | null>;
     stylesDialogRef: Ref<HTMLDialogElement | null>;
   }) => void;
   setIsMediumScreen: (v: boolean) => void;
@@ -66,6 +54,7 @@ interface UIState {
   setOpenDialogNoSection: (v: boolean) => void;
   setIsSummary: (v: boolean) => void;
   setSummaryContent: (v: string) => void;
+  setIsSummarySelector: (v: boolean) => void;
   setIsView: (v: boolean) => void;
   setPreviewReady: (v: boolean) => void;
   setIsLoadingPreview: (v: boolean) => void;
@@ -77,6 +66,7 @@ export const useUIStore = create<UIState>((set, get) => ({
   selectedSection: "Select category",
   openDialogNoSection: false,
   isSummary: false,
+  isSummarySelector: false,
   summaryContent: "",
   isView: false,
   previewReady: false,
@@ -88,6 +78,7 @@ export const useUIStore = create<UIState>((set, get) => ({
   dialogRef: { current: null },
   sectionsDialogRef: { current: null },
   summaryDialogRef: { current: null },
+  summarySelectorRef: { current: null },
   stylesDialogRef: { current: null },
 
   // Keep the stable ref objects; only update .current so that components
@@ -108,6 +99,8 @@ export const useUIStore = create<UIState>((set, get) => ({
       state.sectionsDialogRef.current = refs.sectionsDialogRef.current;
     if (refs.summaryDialogRef.current !== null)
       state.summaryDialogRef.current = refs.summaryDialogRef.current;
+    if (refs.summarySelectorRef.current !== null)
+      state.summarySelectorRef.current = refs.summarySelectorRef.current;
     if (refs.stylesDialogRef.current !== null)
       state.stylesDialogRef.current = refs.stylesDialogRef.current;
   },
@@ -119,5 +112,6 @@ export const useUIStore = create<UIState>((set, get) => ({
   setIsView: (v) => set({ isView: v }),
   setPreviewReady: (v) => set({ previewReady: v }),
   setIsLoadingPreview: (v) => set({ isLoadingPreview: v }),
+  setIsSummarySelector: (v) => set({ isSummarySelector: v }),
   setLastAutoSave: (v) => set({ lastAutoSave: v }),
 }));

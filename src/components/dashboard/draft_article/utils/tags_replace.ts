@@ -1,4 +1,4 @@
-import { StorageItem } from "@/types/storage_item";
+import { StorageArticle } from "@/types/storage_item";
 import { cleanNestedDivs } from "../../utils/clean_content";
 import { hydrateImagesInHTML } from "@/lib/imageStore/hydrateImages";
 import { useDraftStore } from "@/store/useDraftStore";
@@ -9,10 +9,10 @@ export const tagsReplace = async ({ dbName }: { dbName: string }) => {
   const jsonArticle = JSON.parse(articleStored!);
 
   let preSavedBodyRef =
-    jsonArticle.find((item: StorageItem) => item.type === "es-body")?.content ||
-    "";
+    jsonArticle.find((item: StorageArticle) => item.type === "es_body")
+      ?.content || "";
   const title =
-    jsonArticle.find((item: StorageItem) => item.type === "es-title")
+    jsonArticle.find((item: StorageArticle) => item.type === "es_title")
       ?.content || "";
   //console.log("preSavedBodyRef before image processing:", preSavedBodyRef);
 
