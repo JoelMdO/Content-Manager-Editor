@@ -26,6 +26,16 @@ describe("sanitizeUrl", () => {
     expect(result).toEqual({ status: 205, message: "url not allowed" });
   });
 
+  it("blocks uppercase javascript: scheme", () => {
+    const result = sanitizeUrl("JavaScript:alert(document.cookie)");
+    expect(result).toEqual({ status: 205, message: "url not allowed" });
+  });
+
+  it("blocks encoded javascript: scheme", () => {
+    const result = sanitizeUrl("javascript%3Aalert(document.cookie)");
+    expect(result).toEqual({ status: 205, message: "url not allowed" });
+  });
+
   it("blocks data: URI", () => {
     const result = sanitizeUrl("data:text/html,<h1>injected</h1>");
     expect(result).toEqual({ status: 205, message: "url not allowed" });
