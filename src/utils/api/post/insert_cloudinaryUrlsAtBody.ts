@@ -32,29 +32,32 @@ export const insertCloudinaryUrlsatBody = async (
     const uploadFileName = imageUrl.split("/").pop() || "";
     const url = process.env.URL_IMAGES_STORE || "";
 
-    const response = await fetch(`${url}?image_url=${imageUrl}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Internal-Proxy-Key": process.env.PROXY_KEY || "",
+    const response = await fetch(
+      `${url}?image_url=${encodeURIComponent(imageUrl)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Internal-Proxy-Key": process.env.PROXY_KEY || "",
+        },
       },
-    });
+    );
 
     console.log("Fetching image from internal store:", {
       imageUrl,
       uploadFileName,
     });
-    const data = await response.json();
-    console.log("Response from internal store:", data);
 
-    if (response.status !== 200) {
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
       return {
         status: "400",
-        message:
-          "Failed to fetch image from internal store: " + response.status,
+        message: `Failed to fetch image from internal store: ${response.status}${errorText ? ` - ${errorText}` : ""}`,
       };
-      continue;
     }
+
+    const data = await response.json();
+    console.log("Response from internal store:", data);
 
     // const base64 = await toBase64(data.image_base64_url.file_url);
     // const base64Data = base64;
