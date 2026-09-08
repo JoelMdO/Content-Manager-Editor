@@ -37,3 +37,7 @@ export type SummaryStorage = {
 };
 
 export type ArticleItemOrNull = null | ProcessedArticle;
+
+// Backwards-compatible aliases (many callers still import these names)
+export type StorageItem = StorageArticle;
+export type StorageItemOrNull = ArticleItemOrNull;

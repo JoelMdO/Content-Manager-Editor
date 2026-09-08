@@ -98,9 +98,14 @@ export async function POST(req: NextRequest): Promise<Response> {
 
       //
       if (resume.success !== true) {
-        const errorText = await resume.text();
+        const errorText =
+          typeof resume.error === "string"
+            ? resume.error
+            : typeof resume.message === "string"
+              ? resume.message
+              : "Upstream summary API returned success=false";
         return NextResponse.json({
-          status: resume.status,
+          status: resume.status ?? 500,
           message: "Error saving data",
           error: errorText,
         });

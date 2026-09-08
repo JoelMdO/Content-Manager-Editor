@@ -22,12 +22,12 @@ const createSummary = async ({
 
   switch (language) {
     case "es":
-      title = 
-      article.find((item: StorageArticle) => item.type === "es_title")
-        ?.content || "";
+      title =
+        article.find((item: StorageArticle) => item.type === "es_title")
+          ?.content || "";
       body =
-      article.find((item: StorageArticle) => item.type === "es_body")
-        ?.content || "";
+        article.find((item: StorageArticle) => item.type === "es_body")
+          ?.content || "";
       break;
     default:
       title =

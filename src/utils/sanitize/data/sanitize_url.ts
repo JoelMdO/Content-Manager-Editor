@@ -6,13 +6,11 @@ export function sanitizeUrl(
   ////console.log('at sanitizeUrl, url:"', url);
   let u: string = "";
 
-  // if (type === "markdown") {
-  ////console.log('u markdown at sanitizeUrl, url:"', url);
-
-  u = url;
-  // } else {
-  //   u = decodeURI(url).trim().toLowerCase();
-  // }
+  try {
+    u = decodeURIComponent(url).trim().toLowerCase();
+  } catch {
+    u = url.trim().toLowerCase();
+  }
   ////console.log('"u at sanitizeUrl":', u);
   //
   ////console.log('url or U"', u);
