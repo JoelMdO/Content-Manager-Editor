@@ -300,7 +300,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       // Call DecodingAviation api/articles to update Blog.
       ///--------------------------------------------------------
 
-      const decodingAviationUrl = process.env.URL_API_DECAV || "";
+      const decodingAviationUrl = process.env.DECODING_AVIATION_URL || "";
       const timestamp = Math.floor(Date.now() / 1000).toString();
       const nonce = generateNonce();
       const signature = createSignature(nonce, timestamp, article.id);
@@ -312,9 +312,10 @@ export async function POST(req: NextRequest): Promise<Response> {
           "X-Editor-Key-Id": process.env.EDITOR_SECRET_KEY_ID || "",
           "X-Editor-Timestamp": timestamp,
           "X-Editor-Nonce": nonce,
-          "X-Editor-Signature": signature,
+          "X-Editor-Signature": signature.signature,
         },
         body: JSON.stringify({
+          articleId: article.id,
           note: "Article published",
         }),
       });
@@ -329,7 +330,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       } else {
         return NextResponse.json({
           status: 200,
-          message: "Data saved successfully",
+          message: "Article published successfully",
         });
       }
     }
