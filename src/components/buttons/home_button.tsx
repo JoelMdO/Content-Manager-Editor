@@ -8,28 +8,6 @@ interface HomeButtonProps {
   type?: string;
 }
 
-// ORIGINAL — replaced by: Prevent server-side access to `window`
-// const HomeButton: React.FC<HomeButtonProps> = () => {
-//   //
-//   const router = useRouter();
-//   const size = window.innerWidth > 768 ? 34 : 18;
-//   //
-//   return (
-//     <>
-//       <button
-//         type="button"
-//         className="flex flex-row max-w-[110px] min-w-[55px] ml-1 md:mt-0 items-center"
-//         onClick={() => router.push("/home")}
-//       >
-//         <SquareChevronLeft className="text-gray-600" size={size} />
-//         <span className="text-gray-500 ml-1 xs:text-xs md:text-normal">
-//           {text.buttons.home}
-//         </span>
-//       </button>
-//     </>
-//   );
-// };
-
 const HomeButton: React.FC<HomeButtonProps> = () => {
   const router = useRouter();
   const getSize = () =>
@@ -47,7 +25,7 @@ const HomeButton: React.FC<HomeButtonProps> = () => {
     <>
       <button
         type="button"
-        className="flex flex-row max-w-[110px] min-w-[55px] ml-1 md:mt-4 items-center"
+        className="flex flex-row max-w-27.5 min-w-13.75 ml-1 md:mt-4 items-center"
         onClick={() => router.push("/home")}
       >
         <SquareChevronLeft className="text-gray-600" size={size} />

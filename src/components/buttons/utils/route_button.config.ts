@@ -14,10 +14,15 @@ const routeButtonConfig = {
     label: "Continue Editing",
     features: "flex bg-yellow-button text-black w-[38vw] self-center",
   },
+  "dashboard-draft": {
+    path: "/dashboard",
+    label: "No Draft Available",
+    features: "bg-gray-500 text-white",
+  },
   default: {
     path: "/dashboard",
     label: "New Article",
-    features: "bg-gray-500 text-white",
+    features: "bg-blue-500 text-white",
   },
 };
 export default routeButtonConfig;
