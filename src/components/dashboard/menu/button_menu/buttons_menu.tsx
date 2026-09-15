@@ -116,9 +116,9 @@ const MenuButton = ({
         data-cy={`${type}-button`}
         className={`${
           isClicked
-            ? " text-black bg-gradient-to-r to-orange-300 from-cyan-400 border-cyan-400"
-            : "bg-gradient-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-black"
-        } hover:border-orange-300 font-normal mt-4 shadow-md shadow-black h-[30px] md:h-[40px]  w-[9em] md:w-[6em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
+            ? " text-black bg-linear-to-r to-orange-300 from-cyan-400 border-cyan-400"
+            : "bg-linear-to-r from-cyan-400 to-secondMenuButtonColor border border-green text-black"
+        } hover:border-orange-300 font-normal mt-4 shadow-md shadow-black h-7.5 md:h-10  w-[9em] md:w-[6em] text-[0.60rem] md:text-lg rounded text-center flex items-center justify-center md:gap-2 gap-1`}
         onClick={() => {
           // Call handleClick which triggers buttonMenuLogic
           handleClick();
@@ -137,9 +137,9 @@ const MenuButton = ({
             case "post":
             case "summary_selector":
             case "summary":
-              console.log(
-                `Button type "${type}" is handled by its respective function.`,
-              );
+              //console.log(
+              //   `Button type "${type}" is handled by its respective function.`,
+              // );
               // These are handled by their respective functions in buttonMenuLogic
               // They will set isClicked to false after their async operations
               break;

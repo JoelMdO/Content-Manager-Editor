@@ -6,6 +6,8 @@ import InopButton from "@/components/buttons/inop_button";
 import RouteButton from "@/components/buttons/routes_button";
 import text from "../../constants/homePage_data_text.json";
 import withSessionProvider from "../../utils/withSessionProvider";
+import { useEffect, useState } from "react";
+import { LocalStorageProvider } from "@/components/dashboard/draft_article/utils/storage";
 
 const Home: React.FC = () => {
   // const [thereIsPlaybook, setThereIsPlaybook] = useState<boolean>(false);
@@ -21,6 +23,26 @@ const Home: React.FC = () => {
   //   }
   // }, []);
   //
+
+  ///--------------------------------------------------------
+  // Check if a draft article is already temporary stored
+  ///--------------------------------------------------------
+  const [isDraftArticleAvailable, setIsDraftArticleAvailable] = useState<
+    { dbName: string; content: string } | "No Draft Available"
+  >("No Draft Available");
+
+  useEffect(() => {
+    const checkDraftAvailability = async () => {
+      const draft = await new LocalStorageProvider().readIfDraftAvaiable();
+      setIsDraftArticleAvailable(
+        draft === "No Draft Available"
+          ? draft
+          : { dbName: draft.dbName, content: draft.content },
+      );
+      //console.log("Draft Available:", draft);
+    };
+    checkDraftAvailability();
+  }, []);
 
   return (
     <>
@@ -42,22 +64,22 @@ const Home: React.FC = () => {
             {text.homePage.home}
           </h1>
           <div className="flex flex-col justify-center items-center h-[90%] w-full">
-            <div className="flex flex-col w-[90%] md:w-[60%] g:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-5 mt-2">
+            {/* <div className="flex flex-col w-[90%] md:w-[60%] g:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-5 mt-2">
               <h1 className="text-white pt-6 pl-2 text-xl font-roboto">
                 {text.homePage.playbook}
               </h1>
               <p className="text-gray-500 text-xs pl-2">
                 {text.homePage.slogan}
-              </p>
-              {/* {thereIsPlaybook && <RouteButton type="with-item-playbook" />} */}
-              <div className="flex flex-row self-center pt-2 gap-4">
+              </p> */}
+            {/* {thereIsPlaybook && <RouteButton type="with-item-playbook" />} */}
+            {/* <div className="flex flex-row self-center pt-2 gap-4">
                 <RouteButton type="playbook" data-cy="route-button-playbook" />
                 <RouteButton
                   type="read-playbook"
                   data-cy="route-button-read-playbook"
                 />
               </div>
-            </div>
+            </div> */}
             <div className="flex flex-col w-[90%] md:w-[60%] g:w-[50%] md:h-[30%] h-[35%] bg-transparent border-slate-500 border md:mt-8 mt-3 align-middle">
               <h1 className="text-white pt-6 pl-2 text-xl font-roboto">
                 {text.homePage.CMS}
@@ -65,10 +87,16 @@ const Home: React.FC = () => {
               <p className="text-gray-500 text-xs pl-2">
                 {text.homePage.cmsSlogan}
               </p>
-              <div className="flex flex-row self-center pt-2">
+              <div className="flex flex-row self-center pt-2 gap-4">
                 <RouteButton
                   type="dashboard"
                   data-cy="route-button-dashboard"
+                  draft={"No Draft Available"}
+                />
+                <RouteButton
+                  type="dashboard-draft"
+                  draft={isDraftArticleAvailable}
+                  data-cy="route-button-dashboard-draft"
                 />
                 <InopButton type="load_article" />
               </div>

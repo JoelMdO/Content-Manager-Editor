@@ -1,4 +1,4 @@
-import { ArticleItem, StorageArticle } from "../../../../types/storage_item";
+import { StorageArticle } from "../../../../types/storage_item";
 
 export interface IStorageProvider {
   readDraft(dbName: string): Promise<StorageArticle[]>;
@@ -15,20 +15,45 @@ export class LocalStorageProvider implements IStorageProvider {
     }
   }
 
-  async readIfDraftAvaiable(): Promise<string> {
+  async readIfDraftAvaiable(): Promise<
+    { dbName: string; content: string } | "No Draft Available"
+  > {
     try {
-      const rawDeCav = localStorage.getItem(`draft-articleContent-${"DeCav"}`);
+      const rawDeCav = localStorage.getItem("draft-articleContent-DeCav");
+      //console.log("Raw DeCav draft:", rawDeCav);
       if (rawDeCav) {
         const raw = JSON.parse(rawDeCav);
-        return raw[0].title;
-      } else {
-        const rawJoel = localStorage.getItem(`draft-articleContent-${"Joel"}`);
+        const articleTitle = raw.find(
+          (item: StorageArticle) => item.type === "title",
+        );
+        //console.log("Parsed DeCav draft:", articleTitle);
+        //console.log("Parsed DeCav draft content:", articleTitle?.content);
+        return {
+          dbName: "DeCav",
+          content: articleTitle?.content
+            .replace(/<\/?p[^>]*>/gi, "")
+            .toLocaleUpperCase(),
+        };
+      } else if (localStorage.getItem("draft-articleContent-Joel")) {
+        const rawJoel = localStorage.getItem("draft-articleContent-Joel");
+        //console.log("Raw Joel draft:", rawJoel);
         if (rawJoel) {
           const raw = JSON.parse(rawJoel);
-          return raw[0].title;
+          const articleTitle = raw.find(
+            (item: StorageArticle) => item.type === "title",
+          );
+          //console.log("Parsed Joel draft:", articleTitle);
+          return {
+            dbName: "Joel",
+            content: articleTitle?.content
+              .replace(/<\/?p[^>]*>/gi, "")
+              .toLocaleUpperCase(),
+          };
         } else {
           return "No Draft Available";
         }
+      } else {
+        return "No Draft Available";
       }
     } catch (e) {
       console.warn("[LocalStorageProvider] failed to parse draft", e);

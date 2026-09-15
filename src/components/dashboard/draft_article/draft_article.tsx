@@ -20,7 +20,7 @@ const DraftArticle = () => {
   const articleStored = useDraftStore((s) => s.articleStored);
 
   if (process.env.NODE_ENV !== "production") {
-    console.log({ text });
+    //console.log({ text });
   }
 
   const { savedTitleRef } = useEditorStore.getState();

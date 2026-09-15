@@ -1,11 +1,12 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import routeButtonConfig from "./utils/route_button.config";
+import { useDraftStore } from "@/store/useDraftStore";
 
 interface RouteButtonProps {
   type?: string;
   "data-cy"?: string;
-  draft?: string;
+  draft: { dbName: string; content: string } | "No Draft Available";
 }
 
 const RouteButton: React.FC<RouteButtonProps> = ({
@@ -15,16 +16,20 @@ const RouteButton: React.FC<RouteButtonProps> = ({
 }) => {
   //
   const router = useRouter();
+  const setUsingDraft = useDraftStore((state) => state.setUsingDraft);
   const [isPending, startTransition] = useTransition();
   const { path, label, features } =
     routeButtonConfig[type as keyof typeof routeButtonConfig] ||
     routeButtonConfig["default"];
   let buttonLabel: string = "";
+  //console.log("Draft prop received:", draft);
 
   switch (type) {
     case "dashboard-draft":
       buttonLabel =
-        draft !== "No Draft Available" ? `${"Draft: " + draft} ` : label;
+        draft !== "No Draft Available"
+          ? `${"Draft: " + draft.content} `
+          : label;
       break;
     default:
       buttonLabel = label;
@@ -32,10 +37,17 @@ const RouteButton: React.FC<RouteButtonProps> = ({
   }
 
   const handleClick = () => {
-    console.log("Using Draft from:", draft);
+    //console.log("Using Draft from:", draft);
     startTransition(() => {
-      router.push(draft ? path : `${path}?modal=true`);
+      router.push(
+        draft !== "No Draft Available"
+          ? `${path}?modal=false`
+          : `${path}?modal=true`,
+      );
     });
+    if (draft !== "No Draft Available") {
+      setUsingDraft(true);
+    }
   };
   //
   return (

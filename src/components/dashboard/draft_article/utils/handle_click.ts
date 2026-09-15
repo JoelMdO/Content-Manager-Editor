@@ -24,12 +24,12 @@ type HandleClickProps = {
 export const handleClick = async (props: HandleClickProps) => {
   const db = sessionStorage.getItem("dbName") || "DeCav";
   const ctx = defaultHandlerContext(db);
-  console.log(
-    "[handleClick] dispatching tag:",
-    props.tag,
-    "with context:",
-    ctx,
-  );
+  //console.log(
+  //   "[handleClick] dispatching tag:",
+  //   props.tag,
+  //   "with context:",
+  //   ctx,
+  // );
   try {
     await defaultDispatcher.dispatch(props.tag, props as DispatchProps, ctx);
   } catch (e) {

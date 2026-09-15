@@ -45,6 +45,7 @@ const DashboardEditor = () => {
   const setArticleStored = useDraftStore.getState().setArticleStored;
   const isLoadingPreview = useUIStore((s) => s.isLoadingPreview);
   const { setOpenDialogNoSection, setLastAutoSave } = useUIStore.getState();
+  const isImageLoading = useUIStore((s) => s.isImageLoading);
 
   ///--------------------------------------------------------
   // Each editor gets its own extension instances, including Image's node view
@@ -114,7 +115,7 @@ const DashboardEditor = () => {
     onUpdate({ editor }) {
       const html = editor.getHTML();
       if (process.env.NODE_ENV === "development") {
-        console.log({ html });
+        //console.log({ html });
       }
 
       savedBodyRef.current = html;
@@ -132,7 +133,11 @@ const DashboardEditor = () => {
       useEditorStore.getState().titleEditorRef.current = titleEditor;
     if (bodyEditor)
       useEditorStore.getState().bodyEditorRef.current = bodyEditor;
-  }, [titleEditor, bodyEditor]);
+
+    if (titleEditor && bodyEditor && useDraftStore.getState().usingDraft) {
+      useDraftStore.getState().loadDraftIntoEditorFromHome(dbName);
+    }
+  }, [titleEditor, bodyEditor, dbName]);
 
   ///--------------------------------------------------------
   // Get the translated article draft
@@ -213,12 +218,13 @@ const DashboardEditor = () => {
       {isLoadingPreview && <DialogsLoader type={"preview"} />}
       {isMarkdownText && <DialogsLoader type={"load_html"} />}
       {isLoadingArticle && <DialogsLoader type={"loading_article"} />}
+      {isImageLoading && <DialogsLoader type={"loading_image"} />}
 
       <EditorContent editor={titleEditor} />
       <div className="hidden md:flex absolute md:right-[20vw] top-[13dvh] gap-3 items-center">
         <FontStyleUI type={`desktop`} />
       </div>
-      <div className="h-[1px] w-full bg-gradient-to-r from-blue from-[15%] to-transparent" />
+      <div className="h-px w-full bg-linear-to-r from-blue from-15% to-transparent" />
       <EditorContent editor={bodyEditor} />
     </div>
   );

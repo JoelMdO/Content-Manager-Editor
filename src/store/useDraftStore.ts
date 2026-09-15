@@ -11,15 +11,12 @@
 // =============================================================
 
 // CHANGE LOG
-// Changed by : Copilot
-// Date       : 2026-03-11
-// Reason     : Replace MenuContext draft state + eliminate the reactive
-//              useEffect([isDraftArticleButtonClicked,...]) pattern that
-//              caused editor innerHTML overwrite on unrelated re-renders.
-// Impact     : DraftArticle component and handle_click.ts must call
-//              useDraftStore.getState().loadDraftIntoEditor() instead of
-//              setDraftArticleButtonClicked(). dashboard/page.tsx no longer
-//              needs isDraftArticleButtonClicked / setDraftArticleButtonClicked.
+// Changed by : Joel Montes de Oca
+// Date       : 2026-09-15
+// Reason     : Added a LoadArticles, when user hits on continue with draft article at Home
+//              It will load the draft article into the editor.
+// Impact     : Routes_button.tsx must call useDraftStore.getState().loadDraftIntoEditor() instead of
+//              using the draft button at the editor.
 
 import { create } from "zustand";
 import type { ProcessedArticle } from "@/components/dashboard/preview/types/previewed_article";
@@ -27,38 +24,8 @@ import type { ProcessedArticle } from "@/components/dashboard/preview/types/prev
 import { useEditorStore } from "./useEditorStore";
 import { hydrateImagesInHTML } from "@/lib/imageStore/hydrateImages";
 import DOMPurify from "dompurify";
+import { StorageArticle } from "@/types/storage_item";
 
-// ORIGINAL — replaced by: added `syncFromSession` action
-// interface DraftState {
-//   DRAFT_KEY: string;
-//   dbName: string;
-//   dbIsReady: boolean;
-//   language: "en" | "es";
-//   /** Title text displayed in the sidebar DraftArticle component */
-//   text: string;
-//   /** Non-null when a preview article has been loaded for display */
-//   article: ProcessedArticle | null;
-//
-//   // Actions
-//   setDraftKey: (key: string) => void;
-//   setDbName: (name: string) => void;
-//   setDbIsReady: (ready: boolean) => void;
-//   setLanguage: (lang: "en" | "es") => void;
-//   setText: (text: string) => void;
-//   setArticle: (article: ProcessedArticle | null) => void;
-//
-//   /**
-//    * IMPERATIVE — sets editor DOM content directly without going through
-//    * React state or useEffect. Call this from user-triggered actions only
-//    * (e.g. clicking the draft button). Never put this inside a useEffect.
-//    *
-//    * @param title  HTML string for the title editor div
-//    * @param body   HTML string for the body editor div (already hydrated)
-//    */
-//   loadDraftIntoEditor: (title: string, body: string) => void;
-// }
-
-// UPDATED — added syncFromSession to allow syncing Zustand from sessionStorage
 interface DraftState {
   DRAFT_KEY: string;
   dbName: string;
@@ -69,7 +36,7 @@ interface DraftState {
   /** Non-null when a preview article has been loaded for display */
   article: ProcessedArticle | null;
   articleStored: boolean; // New state to track if an article is stored
-
+  usingDraft: boolean;
   // Actions
   setDraftKey: (key: string) => void;
   setDbName: (name: string) => void;
@@ -78,7 +45,7 @@ interface DraftState {
   setText: (text: string) => void;
   setArticle: (article: ProcessedArticle | null) => void;
   setArticleStored: (stored: boolean) => void; // New action to set articleStored
-
+  setUsingDraft: (usingDraft: boolean) => void;
   /**
    * IMPERATIVE — sets editor DOM content directly without going through
    * React state or useEffect. Call this from user-triggered actions only
@@ -88,6 +55,7 @@ interface DraftState {
    * @param body   HTML string for the body editor div (already hydrated)
    */
   loadDraftIntoEditor: (title: string, body: string) => void;
+  loadDraftIntoEditorFromHome: (dbName: string) => void;
 
   /**
    * Read `articleContent-${dbName}` from sessionStorage and update the
@@ -107,6 +75,7 @@ export const useDraftStore = create<DraftState>((set) => ({
   language: "en",
   text: "Without Draft Articles",
   article: null,
+  usingDraft: false,
 
   setDraftKey: (key) => set({ DRAFT_KEY: key }),
   setDbName: (name) => set({ dbName: name }),
@@ -118,6 +87,42 @@ export const useDraftStore = create<DraftState>((set) => ({
   },
   setArticle: (article) => set({ article }),
   setArticleStored: (stored) => set({ articleStored: stored }),
+  setUsingDraft: (usingDraft) => set({ usingDraft: usingDraft }),
+
+  loadDraftIntoEditorFromHome: (dbName: string) => {
+    const article = localStorage.getItem(`draft-articleContent-${dbName}`);
+    if (!article) {
+      console.warn(
+        `[loadDraftIntoEditorFromHome] No article found for dbName: ${dbName}`,
+      );
+      return;
+    }
+    const parsedArticle = JSON.parse(article);
+    const title = parsedArticle.find(
+      (item: StorageArticle) => item?.type === "title",
+    )?.content;
+    const body = parsedArticle.find(
+      (item: StorageArticle) => item?.type === "body",
+    )?.content;
+
+    // Update the persistent refs so autosave and session-writes stay current
+    const { titleEditorRef, bodyEditorRef, savedTitleRef, savedBodyRef } =
+      useEditorStore.getState();
+    savedTitleRef.current = title;
+    //savedBodyRef.current = cleanBody;
+    //UPDATE
+    savedBodyRef.current = body;
+    console.log("[loadDraftIntoEditorFromHome] saved refs updated:", {
+      savedTitleRef: savedTitleRef.current,
+      savedBodyRef: savedBodyRef.current,
+    });
+
+    // Use TipTap commands to set content — no direct DOM mutation
+    titleEditorRef.current?.commands.setContent(title, { emitUpdate: false });
+    bodyEditorRef.current?.commands.setContent(body, {
+      emitUpdate: false,
+    });
+  },
 
   loadDraftIntoEditor: (title, body) => {
     const { titleEditorRef, bodyEditorRef, savedTitleRef, savedBodyRef } =

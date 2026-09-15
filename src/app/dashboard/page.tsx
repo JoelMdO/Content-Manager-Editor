@@ -75,13 +75,16 @@ const Dashboard: React.FC = () => {
   // Read from stores for JSX — thin subscriptions
   const lastAutoSave = useUIStore((s) => s.lastAutoSave);
   const previewReady = useUIStore((s) => s.previewReady);
+  const usingDraft = useDraftStore((s) => s.usingDraft);
   //
   //
   ///======================================================
   // Check if screen is desktop and database selector
   ///======================================================
   useEffect(() => {
-    dbSelector();
+    if (!usingDraft) {
+      dbSelector();
+    }
     //
     if (window.innerWidth > 768) {
       useUIStore.getState().setIsMediumScreen(true);
@@ -119,15 +122,15 @@ const Dashboard: React.FC = () => {
   // }, [dbIsReady]);
   useEffect(() => {
     if (!dbIsReady) return;
-    console.log("dbIsReady is true, setting up draft store...");
+    //console.log("dbIsReady is true, setting up draft store...");
     const dbName = sessionStorage.getItem("db") as string;
     useDraftStore.getState().setDbName(dbName);
     useDraftStore.getState().setDraftKey(`draft-articleContent-${dbName}`);
     useDraftStore.getState().setDbIsReady(true);
     const fetchArticles = async () => {
-      console.log("Fetching articles from DB...");
+      //console.log("Fetching articles from DB...");
       const fetchedArticles = await fetchArticlesFromDb();
-      console.log("Fetched articles:", fetchedArticles);
+      //console.log("Fetched articles:", fetchedArticles);
       setArticles(fetchedArticles);
     };
     fetchArticles();
