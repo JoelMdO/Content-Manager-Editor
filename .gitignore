@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /test/
+/__tests__/
 /.pnp
 .pnp.*
 .yarn/*

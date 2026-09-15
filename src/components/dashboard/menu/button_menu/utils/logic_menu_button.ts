@@ -13,6 +13,7 @@ import { StorageArticle } from "@/types/storage_item";
 import { TranslateType } from "@/types/translate_type";
 import { useEditorStore } from "@/store/useEditorStore";
 import { loadTranslatedDraftIntoEditor } from "./load_translated_draft";
+import playBell from "./bell_play";
 // import { tagsReplace } from "@/components/dashboard/draft_article/utils/tags_replace";
 
 ///--------------------------------------------------------
@@ -32,21 +33,22 @@ export const post = ({ setIsClicked, router }: Partial<ButtonProps>) => {
   postButtonClicked()
     .then((response) => {
       if (response.status === 200) {
-        successAlert("saved");
+        playBell();
+        successAlert("post");
       } else if (
         response.status === 401 ||
         response.message === "User not authenticated"
       ) {
-        errorAlert("saved", "nonauth", response.message);
+        errorAlert("post", "nonauth", response.message);
         router!.push("/");
       } else if (response.status === 206) {
-        errorAlert("saved", "nonsection", response.message);
+        errorAlert("post", "nonsection", response.message);
       } else {
-        errorAlert("saved", "non200", response.message);
+        errorAlert("post", "non200", response.message);
       }
     })
     .catch((error) => {
-      errorAlert("saved", "error", error);
+      errorAlert("post", "error", error);
     })
     .finally(() => {
       setTimeout(() => {
@@ -183,9 +185,12 @@ export const translateToSpanish = ({
   translateButtonClicked()
     .then(async (response) => {
       setTranslating!(false);
+      playBell();
       if (response.status === 200) {
         successAlert("translate");
+
         if (response.body) {
+          console.log("response body at translateToSpanish", response.body);
           const dbName = sessionStorage.getItem("db");
 
           // Get existing content
@@ -194,9 +199,13 @@ export const translateToSpanish = ({
           );
           //
           const translated = (response.body as TranslateType).translated_text;
+          console.log("translated content at translateToSpanish", translated);
           const title = translated!.title || "";
           const es_body = translated!.body || "";
+          console.log("title at translateToSpanish", title);
+          console.log("es_body at translateToSpanish", es_body);
           const section = translated!.section || "";
+          console.log("section at translateToSpanish", section);
 
           // Add new translation
           const translationTitleFiled = articleContent.find(
@@ -280,12 +289,14 @@ export const getSummary = ({
   summaryButtonClicked({ setSummaryContent })
     .then((response) => {
       if (response?.status === 200) {
+        playBell();
         setLanguage!("en");
         // Only show modal if ref exists and we got successful response
         if (summaryDialogRef?.current) {
           summaryDialogRef.current.showModal();
         }
       } else {
+        playBell();
         errorAlert(
           "summary",
           "nonSummary",
